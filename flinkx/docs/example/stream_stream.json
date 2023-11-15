@@ -1,0 +1,47 @@
+{
+  "job" : {
+    "content" : [ {
+      "reader" : {
+        "parameter" : {
+          "column" : [ {
+            "name": "id",
+            "type" : "id"
+          }, {
+            "name": "string",
+            "type" : "string"
+          } ],
+          "sliceRecordCount" : [ "100001"],
+          "rateCounterLimit": 10000
+        },
+        "name" : "streamreader"
+      },
+      "writer" : {
+        "parameter" : {
+          "batchInterval": 10000
+        },
+        "name" : "streamwriter"
+      }
+    } ],
+    "setting" : {
+      "speed" : {
+        "channel": 1,
+        "readerChannel": 1,
+        "writerChannel": 1,
+        "rebalance": false
+      },
+      "errorLimit": {
+        "record": 0,
+        "tryPlan": "none"
+      },
+      "restore": {
+        "maxRowNumForCheckpoint": 0,
+        "isRestore": false,
+        "restoreColumnName": "id",
+        "restoreColumnIndex": 0
+      },
+      "log": {
+        "level" : "info"
+      }
+    }
+  }
+}

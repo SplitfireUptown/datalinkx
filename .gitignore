@@ -1,0 +1,51 @@
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+node_modules
+### VS Code ###
+.vscode/
+
+build
+logs
+out
+target
+
+.gradle
+.idea
+.vertx
+
+.DS_Store
+*.log
+rebel.xml
+rebel-remote.xml
+.metals
+*test.sh
+
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+plugins/
+lib/
+jobs/
+nohup.out
+flinkconf/
+hadoopconf/
+/default_task_id_output

@@ -1,0 +1,54 @@
+{
+  "job":{
+    "content":[
+      {
+        "reader": {
+          "parameter": {
+            "topic": "zhaohh188",
+            "mode": "earliest-offset",
+            "codec": "text",
+            "blankIgnore": false,
+            "consumerSettings": {
+              "bootstrap.servers": "49.234.96.157:9092"
+            },
+            "column" : [ {
+              "name" : "a",
+              "type" : "Double"
+            }, {
+              "name" : "b",
+              "type" : "String"
+            }, {
+              "name" : "c",
+              "type" : "String"
+            } ]
+          },
+          "name": "kafkacustomreader"
+        },
+        "writer":{
+          "parameter":{
+            "timezone":"UTC",
+            "topic":"zhaohh3",
+            "producerSettings":{
+              "zookeeper.connect":"49.234.96.157:2181",
+              "bootstrap.servers":"49.234.96.157:9092"
+            },
+            "tableFields":[
+              "a",
+              "b",
+              "c"
+            ]
+          },
+          "name":"kafkacustomwriter"
+        }
+      }
+    ],
+    "setting":{
+      "restore":{
+        "isStream":true
+      },
+      "speed":{
+        "channel":1
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+server:
+  port: 23456
+
+spring:
+  application:
+    name: datalinkx-job
+
+xxl:
+  job:
+    admin:
+      addresses: http://xxl/xxl-job-admin
+    executor:
+      address: ''
+      appname: dataTransJobHandler
+      ip: ''
+      logpath: log/jobhandler
+      logretentiondays: 30
+      port: 9999
+
+client:
+  dataserver:
+    url: http://localhost:12345
+    connect_timeout_ms: 20000
+    call_timeout_ms: 600000
+    read_timeout_ms: 600000
+    logging: true
+  flink:
+    url:
+    connect_timeout_ms: 20000
+    call_timeout_ms: 600000
+    read_timeout_ms: 600000
+    logging: true
+
+flinkx:
+  path: /Users/lixiaofei/work/datalinkX/flinkx/
+
+
+support:
+  datasource:
+    - mysql
+    - elasticsearch

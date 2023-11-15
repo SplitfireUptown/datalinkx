@@ -1,0 +1,24 @@
+{
+  "restore": {
+    "maxRowNumForCheckpoint": 0,
+    "isRestore": false,
+    "restoreColumnName": "",
+    "restoreColumnIndex": 0
+  },
+  "log": {
+    "path": "",
+    "level": "info",
+    "pattern": "",
+    "isLogger": false
+  },
+  "errorLimit": {
+    "record": 1
+  },
+  "speed": {
+    "bytes": 0,
+    "channel": 1,
+    "readerChannel": 1,
+    "writerChannel": 1,
+    "rebalance": false
+  }
+}

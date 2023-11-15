@@ -1,0 +1,90 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "root",
+            "password": "bdp_pcloud",
+            "where": "1=1",
+            "fetchSize": 10000,
+            "queryTimeOut": 100000,
+            "column": [
+              {
+                "name": "id"
+              },
+              {
+                "name": "ds_id"
+              }
+            ],
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:mysql://192.168.1.167:3306/test_auto?useCursorFetch=true&useUnicode=true&zeroDateTimeBehavior=round&characterEncoding=UTF8&useInformationSchema=true&serverTimezone=GMT-8"
+                ],
+                "table": [
+                  "DS"
+                ],
+                "schema": "test_auto"
+              }
+            ]
+          }
+        },
+        "writer": {
+          "name": "mysqlwriter",
+          "parameter": {
+            "username": "root",
+            "password": "bdp_pcloud",
+            "column": [
+              {
+                "name": "str",
+                "type": "VARCHAR(1000)"
+              },
+              {
+                "name": "val",
+                "type": "VARCHAR(1000)"
+              }
+            ],
+            "connection": [
+              {
+                "schema": "test_auto",
+                "jdbcUrl": "jdbc:mysql://192.168.1.167:3306/test_auto?useCursorFetch=true&useUnicode=true&zeroDateTimeBehavior=round&characterEncoding=UTF8&useInformationSchema=true&serverTimezone=GMT-8",
+                "table": [
+                  "ddd_test"
+                ]
+              }
+            ],
+            "writeMode": "insert",
+            "insertSqlMode": "copy",
+            "preSql": []
+          }
+        }
+      }
+    ],
+    "setting": {
+      "restore": {
+        "maxRowNumForCheckpoint": 0,
+        "isRestore": false,
+        "restoreColumnName": "",
+        "restoreColumnIndex": 0
+      },
+      "log": {
+        "path": "",
+        "level": "info",
+        "pattern": "",
+        "isLogger": false
+      },
+      "errorLimit": {
+        "record": 0,
+      },
+      "speed": {
+        "channel": 1,
+        "bytes": 0,
+        "readerChannel": 1,
+        "writerChannel": 1,
+        "rebalance": true
+      }
+    }
+  }
+}

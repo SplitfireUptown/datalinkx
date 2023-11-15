@@ -1,0 +1,70 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "name": "id",
+                "type": "id"
+              },
+              {
+                "name": "user_id",
+                "type": "int"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              }
+            ],
+            "sliceRecordCount" : [ "1000000"]
+          }
+        },
+        "writer": {
+          "name": "mysqlwriter",
+          "parameter": {
+            "username": "root",
+            "password": "peanut123",
+            "connection": [
+              {
+                "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/vlandia?useSSL=false&allowPublicKeyRetrieval=true",
+                "table": ["test_flinkx"]
+              }
+            ],
+            "preSql": ["truncate table test_flinkx"],
+            "postSql": ["update test_flinkx set user_id = 1;"],
+            "writeMode": "insert",
+            "column": ["id","user_id","name"],
+            "batchSize": 5
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": 0,
+        "readerChannel": 1,
+        "writerChannel": 1,
+        "rebalance": true
+      },
+      "errorLimit": {
+        "record": 1
+      },
+      "restore": {
+        "maxRowNumForCheckpoint": 0,
+        "isRestore": false,
+        "restoreColumnName": "",
+        "restoreColumnIndex": 0
+      },
+      "log" : {
+        "isLogger": false,
+        "level" : "debug",
+        "path" : "",
+        "pattern":""
+      }
+    }
+  }
+}
