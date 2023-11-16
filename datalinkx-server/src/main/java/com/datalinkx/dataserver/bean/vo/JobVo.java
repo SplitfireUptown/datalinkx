@@ -39,6 +39,8 @@ public class JobVo {
 		@JsonProperty("to_tb_name")
 		private String toTbName;
 
+		private String progress;
+
 		private Integer status;
 	}
 

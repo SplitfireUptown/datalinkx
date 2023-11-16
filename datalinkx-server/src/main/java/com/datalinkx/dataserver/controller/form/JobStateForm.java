@@ -20,8 +20,6 @@ public class JobStateForm {
     Integer tbTotal;
 
     private Long appendCount = 0L;
-    private Long updateCount = 0L;
-    private Long deleteCount = 0L;
-    private Long failedCount = 0L;
     private Long allCount = 0L;
+    private Long filterCount = 0L;
 }

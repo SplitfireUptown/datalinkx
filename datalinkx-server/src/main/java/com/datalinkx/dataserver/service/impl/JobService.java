@@ -334,13 +334,11 @@ public class JobService implements DtsJobService {
 		JobDto.DataCountDto countVo = JobDto.DataCountDto.builder()
 				.allCount(jobStateForm.getAllCount())
 				.appendCount(jobStateForm.getAppendCount())
-				.deleteCount(jobStateForm.getDeleteCount())
-				.failedCount(jobStateForm.getFailedCount())
-				.updateCount(jobStateForm.getUpdateCount())
+				.filterCount(jobStateForm.getFilterCount())
 				.build();
 		jobBean.setStatus(status);
 		jobBean.setCount(JsonUtils.toJson(countVo));
-		jobBean.setErrorMsg(StringUtils.equalsIgnoreCase(jobStateForm.getErrmsg(), "success") ? "导出成功"
+		jobBean.setErrorMsg(StringUtils.equalsIgnoreCase(jobStateForm.getErrmsg(), "success") ? "任务成功"
 				: jobStateForm.getErrmsg() == null ? "" : jobStateForm.getErrmsg());
 		jobRepository.save(jobBean);
 
@@ -351,7 +349,7 @@ public class JobService implements DtsJobService {
 					.status(ObjectUtils.nullSafeEquals(status, FAILED) ? 1 : 0)
 					.endTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) ? null : new Timestamp(jobStateForm.getEndTime()))
 					.costTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) ? 0 : (int) ((jobStateForm.getEndTime() - jobStateForm.getStartTime()) / 1000))
-					.errorMsg(StringUtils.equalsIgnoreCase(jobStateForm.getErrmsg(), "success") ? "导出成功" : jobStateForm.getErrmsg())
+					.errorMsg(StringUtils.equalsIgnoreCase(jobStateForm.getErrmsg(), "success") ? "任务成功" : jobStateForm.getErrmsg())
 					.count(JsonUtils.toJson(countVo))
 					.isDel(0)
 					.build());
@@ -470,13 +468,17 @@ public class JobService implements DtsJobService {
 				.stream()
 				.collect(Collectors.toMap(DsBean::getDsId, DsBean::getName));
 
-		List<JobVo.JobPageVo> pageVoList = jobBeans.getContent().stream().map(jobBean -> JobVo.JobPageVo
-				.builder()
-				.jobId(jobBean.getJobId())
-				.fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + dsTbNameMap.get(jobBean.getFromTbId()))
-				.toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + dsTbNameMap.get(jobBean.getToTbId()))
-				.status(jobBean.getStatus())
-				.build()).collect(Collectors.toList());
+		List<JobVo.JobPageVo> pageVoList = jobBeans.getContent().stream().map(jobBean -> {
+			JobDto.DataCountDto dataCountDto = JsonUtils.toObject(jobBean.getCount(), JobDto.DataCountDto.class);
+			return JobVo.JobPageVo
+					.builder()
+					.jobId(jobBean.getJobId())
+					.progress(String.format("%s/%s", dataCountDto.getAppendCount(), dataCountDto.getFilterCount()))
+					.fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + dsTbNameMap.get(jobBean.getFromTbId()))
+					.toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + dsTbNameMap.get(jobBean.getToTbId()))
+					.status(jobBean.getStatus())
+					.build();
+		}).collect(Collectors.toList());
 
 		PageVo<List<JobVo.JobPageVo>> result = new PageVo<>();
 		result.setPageNo(form.getPageNo());

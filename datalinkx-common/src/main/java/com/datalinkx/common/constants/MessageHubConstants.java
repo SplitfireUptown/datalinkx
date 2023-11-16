@@ -12,6 +12,7 @@ public class MessageHubConstants {
     public static final String GLOBAL_COMMON_GROUP = "datalinkx";
 
     public static final String JOB_STATUS_TOPIC = "JOB_STATUS";
+    public static final String JOB_PROGRESS_TOPIC = "JOB_PROGRESS";
 
 
     /**

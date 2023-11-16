@@ -77,9 +77,6 @@ public class DataTransHandler {
                 .errmsg(message).tbSuccess(JobUtils.cntx().getSuccess()).tbTotal(JobUtils.cntx().getTotal())
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
-                .deleteCount(jobExecCountDto.getDeleteCount())
-                .failedCount(jobExecCountDto.getFailedCount())
-                .updateCount(jobExecCountDto.getUpdateCount())
                 .build());
     }
 }

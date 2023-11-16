@@ -13,12 +13,8 @@ import lombok.NoArgsConstructor;
 public class JobExecCountDto {
     @JsonProperty("appendCount")
     private Integer appendCount = 0;
-    @JsonProperty("updateCount")
-    private Integer updateCount = 0;
-    @JsonProperty("deleteCount")
-    private Integer deleteCount = 0;
-    @JsonProperty("failedCount")
-    private Integer failedCount = 0;
+    @JsonProperty("filterCount")
+    private Integer filterCount = 0;
     @JsonProperty("allCount")
     private Integer allCount = 0;
 }

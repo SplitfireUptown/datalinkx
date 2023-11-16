@@ -75,12 +75,12 @@ export default {
           width: '10%',
           dataIndex: 'job_id'
         }, {
-          title: 'from表',
+          title: '来源表',
           width: '10%',
           dataIndex: 'from_tb_name'
         },
         {
-          title: 'to表',
+          title: '目标表',
           width: '10%',
           dataIndex: 'to_tb_name',
           sorter: true
@@ -100,6 +100,11 @@ export default {
               </div>
             )
           }
+        },
+        {
+          title: '同步进度',
+          width: '10%',
+          dataIndex: 'progress'
         },
         {
           title: '操作',

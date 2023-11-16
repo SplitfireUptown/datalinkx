@@ -19,10 +19,6 @@ public class SseConnectController {
         return SseEmitterServer.connect(pageId);
     }
 
-    @GetMapping("/test")
-    public void test() {
-        SseEmitterServer.sendMessage("jobList", "123213123");
-    }
 
     @GetMapping("/connect/closed/{pageId}")
     public void closed(@PathVariable String pageId) {

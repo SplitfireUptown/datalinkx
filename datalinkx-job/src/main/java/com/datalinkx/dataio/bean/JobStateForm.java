@@ -37,12 +37,8 @@ public class JobStateForm {
 
     @Field("appendCount")
     private Integer appendCount = 0;
-    @Field("updateCount")
-    private Integer updateCount = 0;
-    @Field("deleteCount")
-    private Integer deleteCount = 0;
-    @Field("failedCount")
-    private Integer failedCount = 0;
+    @Field("filterCount")
+    private Integer filterCount = 0;
     @Field("allCount")
     private Integer allCount = 0;
 }

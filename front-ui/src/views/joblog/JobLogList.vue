@@ -72,7 +72,7 @@ export default {
           sorter: true
         },
         {
-          title: '执行耗时ms',
+          title: '执行耗时s',
           width: '10%',
           dataIndex: 'cost_time',
           sorter: true

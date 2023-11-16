@@ -23,10 +23,8 @@ public class JobDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static final class DataCountDto {
-        private Long appendCount;
-        private Long updateCount;
-        private Long deleteCount;
-        private Long failedCount;
-        private Long allCount;
+        private Long appendCount = 0L;
+        private Long allCount = 0L;
+        private Long filterCount = 0L;
     }
 }

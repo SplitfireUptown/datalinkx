@@ -13,6 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
+import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.dataio.bean.JobSyncModeForm;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
@@ -32,6 +35,8 @@ import com.datalinkx.dataio.client.flink.response.FlinkJobAccumulators;
 import com.datalinkx.dataio.client.flink.response.FlinkJobStatus;
 import com.datalinkx.dataio.config.DsProperties;
 import com.datalinkx.dataio.job.ExecutorJobHandler;
+import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
+import com.datalinkx.messagehub.service.MessageHubService;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +65,9 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
     @Autowired
     private DsProperties dsProperties;
 
+    @Resource(name = "messageHubServiceImpl")
+    MessageHubService messageHubService;
+
     public boolean isSupportedDb(String fromDbType, String toDbTYpe) {
         return dsProperties.getDatasource().contains(fromDbType) && dsProperties.getDatasource().contains(toDbTYpe);
     }
@@ -75,9 +83,7 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
                 .jobStatus(0).startTime(startTime.get()).endTime(null)
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
-                .deleteCount(jobExecCountDto.getDeleteCount())
-                .failedCount(jobExecCountDto.getFailedCount())
-                .updateCount(jobExecCountDto.getUpdateCount())
+                .filterCount(jobExecCountDto.getFilterCount())
                 .build());
     }
 
@@ -94,10 +100,8 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
         if (countRes.get() != null) {
             countRes.get().forEach((key, value) -> {
                 jobExecCountDto.setAllCount(jobExecCountDto.getAllCount() + value.getAllCount());
-                jobExecCountDto.setDeleteCount(jobExecCountDto.getDeleteCount() + value.getDeleteCount());
                 jobExecCountDto.setAppendCount(jobExecCountDto.getAppendCount() + value.getAppendCount());
-                jobExecCountDto.setUpdateCount(jobExecCountDto.getUpdateCount() + value.getUpdateCount());
-                jobExecCountDto.setFailedCount(jobExecCountDto.getFailedCount() + value.getFailedCount());
+                jobExecCountDto.setFilterCount(jobExecCountDto.getFilterCount() + value.getFilterCount());
             });
         }
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
@@ -105,9 +109,7 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
                 .tbTotal(JobUtils.cntx().getTotal()).tbSuccess(JobUtils.cntx().getSuccess())
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
-                .deleteCount(jobExecCountDto.getDeleteCount())
-                .failedCount(jobExecCountDto.getFailedCount())
-                .updateCount(jobExecCountDto.getUpdateCount())
+                .filterCount(jobExecCountDto.getFilterCount())
                 .errmsg(errmsg)
                 .build());
     }
@@ -246,6 +248,18 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
         unitParam.setReadRecords(readRecords.get());
         unitParam.setErrorRecords(errorRecords.get());
         unitParam.setWriteRecords(writeRecords.get() - errorRecords.get());
+
+        ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
+        producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
+        producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);
+        producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
+        Map<String, Object> jobProgress = new HashMap<String, Object>() {{
+            put("job_id", unitParam.getJobId());
+            put("read_records", unitParam.getReadRecords());
+            put("write_records", unitParam.getWriteRecords());
+        }};
+        producerAdapterForm.setMessage(JsonUtils.toJson(jobProgress));
+        messageHubService.produce(producerAdapterForm);
     }
 
     private JobExecCountDto getExecCount(String tableName) {
@@ -282,11 +296,9 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
             }
 
             String tableName = unit.getReader().getTableName();
-            getExecCount(tableName).setUpdateCount(0);
             getExecCount(tableName).setAllCount(getExecCount(tableName).getAllCount() == null ? 0 : getExecCount(tableName).getAllCount());
-            getExecCount(tableName).setDeleteCount(0);
             getExecCount(tableName).setAppendCount(getExecCount(tableName).getAppendCount() + unit.getReadRecords());
-            getExecCount(tableName).setFailedCount(getExecCount(tableName).getFailedCount() + (unit.getReadRecords() - unit.getWriteRecords()));
+            getExecCount(tableName).setFilterCount(getExecCount(tableName).getFilterCount() + unit.getWriteRecords());
         }
 
         if (success) {
