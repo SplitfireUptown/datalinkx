@@ -16,12 +16,12 @@ public class SseEmitterServer {
     /**
      * 当前连接数
      */
-    private static AtomicInteger count = new AtomicInteger(0);
+    private static final AtomicInteger count = new AtomicInteger(0);
 
     /**
      * 使用map对象，便于根据userId来获取对应的SseEmitter，或者放redis里面
      */
-    private static Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
+    private static final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
     /**
      * 创建用户连接并返回 SseEmitter
@@ -73,7 +73,6 @@ public class SseEmitterServer {
         sseEmitterMap.remove(employeeCode);
         // 数量-1
         count.getAndDecrement();
-        log.info("移除sse用户：{}", employeeCode);
     }
 
 
