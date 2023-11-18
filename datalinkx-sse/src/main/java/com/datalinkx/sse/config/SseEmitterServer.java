@@ -1,5 +1,6 @@
 package com.datalinkx.sse.config;
 
+import com.datalinkx.common.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -29,7 +30,9 @@ public class SseEmitterServer {
      * @return SseEmitter
      */
     public static SseEmitter connect(String employeeCode) {
-        // 设置超时时间，0表示不过期。默认30秒，超过时间未完成会抛出异常：AsyncRequestTimeoutException
+        if (!ObjectUtils.isEmpty(sseEmitterMap.get(employeeCode))) {
+            return sseEmitterMap.get(employeeCode);
+        }
         SseEmitter sseEmitter = new SseEmitter(0L);
         // 注册回调
         sseEmitter.onCompletion(completionCallBack(employeeCode));
@@ -38,7 +41,6 @@ public class SseEmitterServer {
         sseEmitterMap.put(employeeCode, sseEmitter);
         // 数量+1
         count.getAndIncrement();
-        log.info("创建新的sse连接，当前用户：{}", employeeCode);
         return sseEmitter;
     }
 
@@ -51,8 +53,7 @@ public class SseEmitterServer {
         try {
             SseEmitter emitter = sseEmitterMap.get(employeeCode);
             if (emitter == null) {
-                log.warn("sse用户[{}]不在注册表，消息推送失败", employeeCode);
-                return;
+                emitter = connect(employeeCode);
             }
             emitter.send(jsonMsg, MediaType.APPLICATION_JSON);
         } catch (IOException e) {

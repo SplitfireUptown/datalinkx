@@ -24,7 +24,6 @@ import org.springframework.util.ReflectionUtils;
 
 @Slf4j
 @Component
-@DependsOn("topicReloadTask")
 public class ConsumerConfig implements BeanPostProcessor, EnvironmentAware {
 
     Environment environment;

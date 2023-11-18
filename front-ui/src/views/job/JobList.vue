@@ -1,20 +1,5 @@
 <template>
   <a-card :bordered="false">
-    <!--    <div class="table-page-search-wrapper">-->
-    <!--      <a-form layout="inline">-->
-    <!--        <a-row :gutter="48">-->
-    <!--          <a-col :md="8" :sm="24">-->
-    <!--            <a-form-item label="数据源名称">-->
-    <!--              <a-input v-model="queryParam.name" placeholder="数据源名称"/>-->
-    <!--            </a-form-item>-->
-    <!--          </a-col>-->
-    <!--          <a-col :md="8" :sm="24">-->
-    <!--            <a-button @click="() => {this.queryData()}" type="primary">查询</a-button>-->
-    <!--            <a-button @click="() => queryParam = {}" style="margin-left: 8px">重置</a-button>-->
-    <!--          </a-col>-->
-    <!--        </a-row>-->
-    <!--      </a-form>-->
-    <!--    </div>-->
     <div class="table-operator">
       <a-button @click="$refs.JobSaveOrUpdate.edit('add', '')" icon="plus" type="primary">新建</a-button>
     </div>
@@ -102,7 +87,7 @@ export default {
           }
         },
         {
-          title: '同步进度',
+          title: '同步进度(w/r)',
           width: '10%',
           dataIndex: 'progress'
         },
@@ -155,7 +140,7 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange (pagination) {
       this.pagination = pagination
       this.pages.size = pagination.pageSize
       this.pages.current = pagination.current
@@ -211,8 +196,20 @@ export default {
           console.log('connect success')
         }
         this.eventSource.onmessage = (e) => {
-          // console.log('from server data:', e.data)
-          this.init()
+          console.log('from server data:', e.data)
+          const flashData = JSON.parse(e.data)
+          console.log(flashData)
+          for (const i of this.tableData) {
+            if (i.job_id === flashData.job_id) {
+              if (i.status === 1) {
+                i.progress = (flashData.write_records + '/' + flashData.read_records)
+              } else {
+                // 防止消息先到前端后端未入库
+                setTimeout(() => {}, 2000)
+                this.init()
+              }
+            }
+          }
         }
       } else {
         console.log('browser not support SSE')

@@ -14,19 +14,19 @@ public final class MetaConstants {
     }
 
     public static class JobStatus {
-        public static final int EXPORT_TABLE_CREATE = 0;
-        public static final int EXPORT_TABLE_SYNCING = 1;
-        public static final int EXPORT_TABLE_NORMAL = 2;
-        public static final int EXPORT_TABLE_ERROR = 3;
-        public static final int EXPORT_TABLE_QUEUE = 4;
-        public static final int EXPORT_TABLE_STOP = 5;
+        public static final int JOB_TABLE_CREATE = 0;
+        public static final int JOB_TABLE_SYNCING = 1;
+        public static final int JOB_TABLE_NORMAL = 2;
+        public static final int JOB_TABLE_ERROR = 3;
+        public static final int JOB_TABLE_QUEUE = 4;
+        public static final int JOB_TABLE_STOP = 5;
 
-        public static final int EXPORT_STATUS_CREATE = 0;
-        public static final int EXPORT_STATUS_SYNC = 1;
-        public static final int EXPORT_STATUS_NORMAL = 2;
-        public static final int EXPORT_STATUS_ERROR = 3;
-        public static final int EXPORT_STATUS_QUEUE = 4;
-        public static final int EXPORT_STATUS_STOP = 5;
+        public static final int JOB_STATUS_CREATE = 0;
+        public static final int JOB_STATUS_SYNC = 1;
+        public static final int JOB_STATUS_NORMAL = 2;
+        public static final int JOB_STATUS_ERROR = 3;
+        public static final int JOB_STATUS_QUEUE = 4;
+        public static final int JOB_STATUS_STOP = 5;
 
         public static final String SSE_JOB_STATUS = "jobList";
     }

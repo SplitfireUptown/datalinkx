@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class SsePushProcessor {
 
     @MessageHub(
-            topic = MessageHubConstants.JOB_STATUS_TOPIC,
+            topic = MessageHubConstants.JOB_PROGRESS_TOPIC,
             group = MessageHubConstants.GLOBAL_COMMON_GROUP,
             type = MessageHubConstants.REDIS_STREAM_TYPE)
     public void pushJobStatus(String jobStatusMsg) {

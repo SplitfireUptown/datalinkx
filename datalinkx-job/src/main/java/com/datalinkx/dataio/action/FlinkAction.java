@@ -255,6 +255,7 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
         producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
         Map<String, Object> jobProgress = new HashMap<String, Object>() {{
             put("job_id", unitParam.getJobId());
+            put("status", 1);
             put("read_records", unitParam.getReadRecords());
             put("write_records", unitParam.getWriteRecords());
         }};

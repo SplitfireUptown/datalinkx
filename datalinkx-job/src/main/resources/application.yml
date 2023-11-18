@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: datalinkx-job
+  redis:
+    database:       # Redis数据库索引（默认为0）,如果设置为1，那么存入的key-value都存放在select 1中
+    host:
+    port:
+    password:
 
 xxl:
   job:

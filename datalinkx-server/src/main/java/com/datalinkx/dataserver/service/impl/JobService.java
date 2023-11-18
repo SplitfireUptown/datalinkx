@@ -2,8 +2,8 @@ package com.datalinkx.dataserver.service.impl;
 
 
 
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.EXPORT_STATUS_STOP;
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.EXPORT_STATUS_SYNC;
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNC;
 import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
 
@@ -102,7 +102,7 @@ public class JobService implements DtsJobService {
 		jobBean.setConfig(toJson(form.getFieldMappings()));
 		jobBean.setFromTbId(getXtbId(form.getFromTbName(), form.getFromDsId()));
 		jobBean.setToTbId(getXtbId(form.getToTbName(), form.getFromDsId()));
-		jobBean.setStatus(MetaConstants.JobStatus.EXPORT_TABLE_CREATE);
+		jobBean.setStatus(MetaConstants.JobStatus.JOB_TABLE_CREATE);
 		jobBean.setCrontab(form.getSchedulerConf());
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 
@@ -133,13 +133,9 @@ public class JobService implements DtsJobService {
 
 
 	private void validDsInfo(JobForm.JobCreateForm form) {
-		Map<String, DsBean> dsBeanMap = dsRepository.findAllByDsIdIn(Lists.newArrayList(form.getFromDsId(), form.getToDsId()))
-				.stream()
-				.collect(Collectors.toMap(DsBean::getDsId, v -> v));
+		DsBean fromDsBean = dsRepository.findByDsId(form.getFromDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "来源数据源不存在"));
+		DsBean toBean = dsRepository.findByDsId(form.getToDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "目标数据源不存在"));
 
-		if (ObjectUtils.isEmpty(dsBeanMap) || dsBeanMap.entrySet().size() < 2) {
-			throw new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "选择的数据源不存在");
-		}
 
 		if (MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode()) && ObjectUtils.isEmpty(form.getSyncMode().getIncreateField())) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "增量模式必须指定增量字段");
@@ -147,7 +143,6 @@ public class JobService implements DtsJobService {
 
 		if (MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode())) {
 			try {
-				DsBean fromDsBean = dsBeanMap.get(form.getFromDsId());
 				IDsReader dsReader = DsDriverFactory.getDsReader(dsService.getConnectId(fromDsBean));
 				Boolean isIncremental = dsReader.judgeIncrementalField(fromDsBean.getDatabase(), fromDsBean.getSchema(), form.getFromTbName(), form.getSyncMode().getIncreateField());
 				if (!isIncremental) {
@@ -319,7 +314,7 @@ public class JobService implements DtsJobService {
 
 		ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
 		producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
-		producerAdapterForm.setTopic(MessageHubConstants.JOB_STATUS_TOPIC);
+		producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);
 		producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
 		producerAdapterForm.setMessage(
 				JsonUtils.toJson(
@@ -395,15 +390,15 @@ public class JobService implements DtsJobService {
 
 	public void jobExec(String jobId) {
 		JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "任务不存在"));
-		if (jobBean.getStatus() == EXPORT_STATUS_SYNC) {
+		if (jobBean.getStatus() == JOB_STATUS_SYNC) {
 			throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务已在运行中，请勿重复触发");
 		}
 
-		if (jobBean.getStatus() == EXPORT_STATUS_STOP) {
+		if (jobBean.getStatus() == JOB_STATUS_STOP) {
 			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
 		}
 
-		jobBean.setStatus(EXPORT_STATUS_SYNC);
+		jobBean.setStatus(JOB_STATUS_SYNC);
 
 		// if xxl-job not exist, then create it.
 		if (!jobClientApi.isXxljobExist(jobId)) {
