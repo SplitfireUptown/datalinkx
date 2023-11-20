@@ -54,6 +54,14 @@
 #### 中间件
 执行 `docker compose -p datalinkx up -d` 命令将各组件启动
 
+##### 手动搭建组件（linux）：
+xxl-job: https://github.com/xuxueli/xxl-job/archive/refs/tags/2.3.0.zip
+纯Java项目，可clone代码后打包成jar包启动，xxl-job依赖mysql，需要修改对应数据库地址配置，表结构在/xxl-job-2.3.0/doc/db/tables_xxl_job.sql，导入mysql即可。
+
+
+flink：https://archive.apache.org/dist/flink/flink-1.10.3/
+选择flink-1.10.3-bin-scala_2.12.tgz下载，解压进入bin目录执行./start-cluster.sh，首次运行默认只有一个任务slot，访问http://localhost:8081 进去flink后台页面。
+
 #### DB层
 执行  /datalinkx-server/src/main/resources/db.sql
 
