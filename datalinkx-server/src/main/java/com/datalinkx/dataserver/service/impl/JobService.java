@@ -43,7 +43,6 @@ import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
-import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -55,11 +54,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-/**
- * @author uptown
- * @version 1.0
- * @create 12/18/20 4:00 下午
- **/
+
 
 @Component
 @Service
@@ -91,7 +86,7 @@ public class JobService implements DtsJobService {
 
 	@Transactional(rollbackFor = Exception.class)
 	public String jobCreate(JobForm.JobCreateForm form) {
-		this.validDsInfo(form);
+		this.validJobForm(form);
 		String jobId = genKey("job");
 		JobBean jobBean = new JobBean();
 		jobBean.setJobId(jobId);
@@ -108,8 +103,6 @@ public class JobService implements DtsJobService {
 
 		// 创建 xxljob
 		String xxlJobId = jobClientApi.add(jobId, form.getSchedulerConf(), DataTransJobParam.builder().jobId(jobId).build());
-		// 启动 xxljob
-//		jobClientApi.start(jobId);
 
 		jobBean.setXxlId(xxlJobId);
 		jobRepository.save(jobBean);
@@ -118,7 +111,7 @@ public class JobService implements DtsJobService {
 
 
 	public String jobModify(JobForm.JobModifyForm form) {
-		this.validDsInfo(form);
+		this.validJobForm(form);
 		JobBean jobBean = jobRepository.findByJobId(form.getJobId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
 		jobBean.setReaderDsId(form.getFromDsId());
 		jobBean.setWriterDsId(form.getToDsId());
@@ -132,7 +125,7 @@ public class JobService implements DtsJobService {
 	}
 
 
-	private void validDsInfo(JobForm.JobCreateForm form) {
+	private void validJobForm(JobForm.JobCreateForm form) {
 		DsBean fromDsBean = dsRepository.findByDsId(form.getFromDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "来源数据源不存在"));
 		DsBean toBean = dsRepository.findByDsId(form.getToDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "目标数据源不存在"));
 
@@ -151,6 +144,9 @@ public class JobService implements DtsJobService {
 			} catch (Exception e) {
 				throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, e.getMessage());
 			}
+		}
+		if (ObjectUtils.isEmpty(form.getSchedulerConf())) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "流转任务需要配置crontab表达式");
 		}
 	}
 

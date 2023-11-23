@@ -22,11 +22,7 @@ import org.springframework.stereotype.Component;
 
 
 
-/**
- * @author uptown
- * @Description TODO
- * @createTime 2021年05月21日 18:11:49
- */
+
 @Component
 @Slf4j
 public class JobClientApi {

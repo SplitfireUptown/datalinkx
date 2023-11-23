@@ -20,11 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-/**
- * @author uptown
- * @version 1.0
- * @create 12/8/20 3:46 下午
- **/
+
 @Slf4j
 @RestController
 @RequestMapping("/api/ds")

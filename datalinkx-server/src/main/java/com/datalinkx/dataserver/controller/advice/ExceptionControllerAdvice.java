@@ -78,8 +78,7 @@ public class ExceptionControllerAdvice {
 	@ResponseBody
 	public WebResult<?> databridgeExceptionHandler(DatalinkXServerException databridgeException) {
 		Throwable r = ErrorsUtils.getRootCause(databridgeException);
-		WebResult<?> result = WebResult.fail(r);
-        return result;
+        return WebResult.fail(r);
 	}
 
     /**

@@ -15,11 +15,7 @@ import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.GenericConverter;
 
 
-/**
- * @author WangChengYu
- * @description: 用户自定义类型转换器集合
- * @date 2020-02-16 12:48
- */
+
 @Slf4j
 public class UserGenericConverter implements GenericConverter {
 

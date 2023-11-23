@@ -10,11 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
-/**
- * @author uptown
- * @Description TODO
- * @createTime 2021年05月27日 10:19:31
- */
 
 @Data
 @AllArgsConstructor

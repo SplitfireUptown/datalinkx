@@ -11,10 +11,6 @@ import retrofit2.http.Query;
 import retrofit2.http.QueryBean;
 
 
-/**
- * @Description TODO
- * @createTime 2021年05月27日 10:06:16
- */
 public interface DatalinkXServerClient {
 
     @GET("/api/job_graph/execute_info")

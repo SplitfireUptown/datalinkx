@@ -82,5 +82,4 @@ CREATE TABLE `MESSAGEHUB_TOPIC` (
     UNIQUE KEY `topic_type_key` (`topic`,`info_type`,`is_del`)
     ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='消息队列白名单';
 
-INSERT INTO `MESSAGEHUB_TOPIC` (`topic`, `fields`, `info_type`, `desc`) VALUES
-    ('JOB_PROGRESS', '', 'REDIS_STREAM', '任务状态刷新');
+INSERT INTO `MESSAGEHUB_TOPIC` (`topic`, `fields`, `info_type`, `desc`) VALUES ('JOB_PROGRESS', '', 'REDIS_STREAM', '任务状态刷新');

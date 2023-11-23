@@ -5,9 +5,7 @@ import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-/**
- * @author uptown
- */
+
 @Data
 @AllArgsConstructor
 public class ReturnT<T> implements Serializable {

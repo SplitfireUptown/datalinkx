@@ -8,11 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import retrofit2.http.Field;
 
-/**
- * @author uptown
- * @Description TODO
- * @createTime 2021年05月21日 17:01:14
- */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

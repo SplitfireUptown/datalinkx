@@ -12,11 +12,6 @@ import retrofit2.converter.JacksonParamConverterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 
-/**
- * @author uptown
- * @Description TODO
- * @createTime 2021年06月07日 14:02:31
- */
 @Slf4j
 public final class DatalinkXClientUtils {
     private static final long DEFAULT_CONNECT_TIMEOUT = 60000;

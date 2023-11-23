@@ -4,11 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 
-/**
- * @author uptown
- * @Description TODO
- * @createTime 2021年05月27日 10:06:16
- */
 public interface FlinkClient {
 
     @GET("/jobs/{jobId}/exceptions")

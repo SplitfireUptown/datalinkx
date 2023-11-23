@@ -40,12 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 
-/**
- * @author uptown
- * @version 1.0
- * @create 12/18/20 4:00 下午
- **/
-
 @Component
 @Service
 @Log4j2
