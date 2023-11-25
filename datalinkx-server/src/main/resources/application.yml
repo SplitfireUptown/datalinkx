@@ -6,8 +6,8 @@ spring:
     name: datalinkx-server
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: bdp_pcloud
+    username:
+    password:
     url: jdbc:mysql://mysql:3306/datalink?characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -26,10 +26,6 @@ spring:
     port:
     password:
 
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-
 xxl-job:
   username:
   password:
@@ -44,6 +40,10 @@ xxl-job:
 
 topic:
   daemon: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
 
 retrofit:
   # 日志打印配置
