@@ -26,6 +26,7 @@ node_modules
 
 build
 logs
+log
 out
 target
 

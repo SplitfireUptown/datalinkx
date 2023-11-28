@@ -35,4 +35,8 @@ public final class MetaConstants {
         public static final String INCREMENT_MODE = "increment";
         public static final String OVERWRITE_MODE = "overwrite";
     }
+
+    public static class CommonConstant {
+        public static final String TRACE_ID = "trace_id";
+    }
 }

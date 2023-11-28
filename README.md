@@ -39,7 +39,7 @@
 | Spring Boot			     | 2.4.3					      |项目脚手架
 | SpringData JPA			  | 2.4.3					      |持久层框架
 | MySQL					         | 8.0					        |DB数据库
-| Redis					         | 5.0					        |缓存数据库
+| Redis					         | 5.0 ↑					      |缓存数据库
 | ChunJun(原FlinkX)		 | 1.10_release			 |袋鼠云开源数据同步框架
 | Flink					         | 1.10.3					     |分布式大数据计算引擎
 | Xxl-job				        | 2.3.0					      |分布式调度框架

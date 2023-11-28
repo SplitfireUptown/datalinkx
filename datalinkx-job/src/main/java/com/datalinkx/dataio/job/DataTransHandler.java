@@ -14,6 +14,7 @@ import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,8 +45,10 @@ public class DataTransHandler {
         XxlJobHelper.log("begin dataTransJobHandler. ");
         DataTransJobParam jobParam = JsonUtils.toObject(XxlJobHelper.getJobParam(), DataTransJobParam.class);
 
-        // 生成任务ID
+        // 生成任务content
         JobUtils.initContext();
+        // 定时异步调用无法统一trace_id，这里用job_id做trace_id
+        MDC.put("trace_id", jobParam.getJobId());
 
         long startTime = new Date().getTime();
         DataTransJobDetail jobDetail;
