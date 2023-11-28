@@ -221,7 +221,7 @@ public class KafkacustomClient implements IClient {
         LinkedHashMap<String, Object> event = new LinkedHashMap<>();
 //        ProtoBufUtil.deserializer((new String(byteMsg)).getBytes(), String.class)
         // 当有分割符的时候，默认读到的message是1，2，3这种字符串形式，没有分割符的时候默认是json字符串
-        // 是否需要解压数据，目前海致内部用的是pb压缩，所以导出内部数据的时候需要用解压pb格式数据
+        // 是否需要解压数据
         if (format.getDeCompress() != null) {
             switch (format.getDeCompress().toUpperCase()) {
                 case "PROTOBUF":

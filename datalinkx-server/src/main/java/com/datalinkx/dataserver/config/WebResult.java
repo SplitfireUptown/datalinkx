@@ -17,36 +17,14 @@ public class WebResult<T> {
 	public WebResult() {
 	}
 
-	public WebResult(T result, String errstr) {
+
+	public void setResult(T result) {
 		this.result = result;
-		this.errstr = errstr;
-	}
-
-
-	public T getResult() {
-		return this.result;
-	}
-
-	public WebResult<T> setResult(T result) {
-		this.result = result;
-		return this;
-	}
-
-	/**
-	 * 兼容之前python服务返回的状态码（都是string类型的，而非int)
-	 * @return
-	 */
-	public String getStatus() {
-		return this.status;
 	}
 
 	public WebResult<T> setStatus(String status) {
 		this.status = status;
 		return this;
-	}
-
-	public String getErrstr() {
-		return this.errstr;
 	}
 
 	public WebResult<T> setErrstr(String errstr) {

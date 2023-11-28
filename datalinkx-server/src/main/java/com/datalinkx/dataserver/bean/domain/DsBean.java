@@ -19,7 +19,7 @@ import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
+@ApiModel(description = "数据源")
 @Data
 @FieldNameConstants
 @SuperBuilder(toBuilder = true)

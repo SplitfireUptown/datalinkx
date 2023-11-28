@@ -16,5 +16,5 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 @ToString(callSuper = true)
 public class DataTransJobParam {
-    String jobId;  // 导入schedulerId，导出为jobId
+    String jobId;
 }

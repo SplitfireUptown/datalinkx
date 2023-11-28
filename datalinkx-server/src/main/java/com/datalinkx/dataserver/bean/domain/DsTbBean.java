@@ -23,7 +23,7 @@ import org.hibernate.annotations.DynamicUpdate;
  * @author tools
  * @date 2020-02-12 14:15:20
  */
-@ApiModel(description = "导出数据源表")
+@ApiModel(description = "数据表")
 
 @Data
 @FieldNameConstants
@@ -35,7 +35,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "EXPORT_DS_TB")
+@Table(name = "DS_TB")
 public class DsTbBean extends BaseDomainBean {
 	private static final long serialVersionUID = 1L;
 

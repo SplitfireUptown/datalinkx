@@ -61,7 +61,7 @@ public class JobController {
 	}
 
 	@RequestMapping("/exec/{jobId}")
-	public WebResult jobExec(@PathVariable String jobId) {
+	public WebResult<String> jobExec(@PathVariable String jobId) {
 		jobService.jobExec(jobId);
 		return WebResult.of(jobId);
 	}

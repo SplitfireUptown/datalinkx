@@ -20,7 +20,7 @@ import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
-@ApiModel(description = "导出任务的更新记录")
+@ApiModel(description = "流转任务执行记录")
 
 @Data
 @FieldNameConstants
