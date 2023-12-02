@@ -1,12 +1,17 @@
 // CHECKSTYLE:OFF
 package com.datalinkx.dataio.action;
 
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_ERROR;
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
+
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.driver.model.JobContext;
 import com.datalinkx.driver.utils.JobUtils;
 import com.datalinkx.dataio.bean.JobExecCountDto;
@@ -18,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractFlinkAction<T, D, U> implements IAction<T> {
     protected abstract void begin(D info);
-    protected abstract void end(D info, int success, String errmsg);
+    protected abstract void end(D info, int status, String errmsg);
     protected abstract void beforeExec(U unit) throws Exception;
     protected abstract void execute(U unit) throws Exception;
     protected abstract boolean checkResult(U unit);
@@ -154,15 +159,15 @@ public abstract class AbstractFlinkAction<T, D, U> implements IAction<T> {
             postThread.join();
 
             // 整个Job结束后的处理
-            end(detail, error.length() == 0 ? 2 : 1, error.length() == 0 ? "success" : error.toString());
+            end(detail, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
         } catch (InterruptedException e) {
             log.error("Stop task by user.");
             JobUtils.cntx().setCanceled(true);
-            end(detail, 3, "cancel the job");
+            end(detail, JOB_STATUS_STOP, "cancel the job");
             throw e;
         } catch (Throwable e) {
             log.error("sync failed", e);
-            end(detail, 1, e.getMessage());
+            end(detail, JOB_STATUS_ERROR, e.getMessage());
         }
     }
 }

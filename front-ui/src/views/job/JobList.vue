@@ -205,8 +205,7 @@ export default {
                 i.progress = (flashData.write_records + '/' + flashData.read_records)
               } else {
                 // 防止消息先到前端后端未入库
-                setTimeout(() => {}, 2000)
-                this.init()
+                i.status = flashData.status
               }
             }
           }

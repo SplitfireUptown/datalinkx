@@ -265,11 +265,6 @@ public class JobService implements DtsJobService {
 		DsTbBean dsTbBean = dsTbRepository.findByTbId(jobBean.getToTbId())
 				.orElseThrow(() -> new DatalinkXServerException(StatusCode.XTB_NOT_EXISTS, "xtb not found"));
 
-//		String schemaName = null;
-//		if (StringUtils.isNotEmpty(toDs.getConfig())) {
-//			Map<String, Object> properties = JsonUtils.json2Map(toDs.getConfig());
-//			schemaName = properties.get("schema") == null ? "" : String.valueOf(properties.get("schema"));
-//		}
 		IDsReader dsReader = DsDriverFactory.getDsReader(dsService.getConnectId(toDs));
 		Map<String, String> typeMappings = dsReader.getFields(toDs.getDatabase(), toDs.getSchema(), dsTbBean.getName())
 				.stream().collect(Collectors.toMap(TableField::getName, TableField::getRawType));
@@ -300,13 +295,7 @@ public class JobService implements DtsJobService {
 	public String updateJobStatus(JobStateForm jobStateForm) {
 		JobBean jobBean = jobRepository.findByJobId(jobStateForm.getJobId())
 				.orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
-		int status;
-		switch (jobStateForm.getJobStatus()) {
-			case 0: status = 1; break;
-			case 1: status = FAILED; break;
-			case 2: status = SUCCESS; break;
-			default: status = 2; break;
-		}
+		int status = jobStateForm.getJobStatus();
 
 		ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
 		producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);

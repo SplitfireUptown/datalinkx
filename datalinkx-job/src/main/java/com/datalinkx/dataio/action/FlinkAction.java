@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import com.datalinkx.common.constants.MessageHubConstants;
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.dataio.bean.JobSyncModeForm;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
@@ -80,7 +81,7 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
         log.info(String.format("jobid: %s, begin to sync", info.getJobId()));
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
-                .jobStatus(0).startTime(startTime.get()).endTime(null)
+                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE).startTime(startTime.get()).endTime(null)
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
                 .filterCount(jobExecCountDto.getFilterCount())

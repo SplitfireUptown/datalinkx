@@ -38,7 +38,6 @@ public class WebConfig implements WebMvcConfigurer {
 
 	/**
 	 * 将snake case（lower undersocre）风格的参数转换为camel风格
-	 * 以便兼容之前python服务定义的参数，同时保持Java的编码风格
 	 */
 	@Bean
 	public Filter snakeConverter() {

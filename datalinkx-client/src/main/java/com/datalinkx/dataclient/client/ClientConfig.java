@@ -20,7 +20,6 @@ public class ClientConfig {
         private Integer connectTimeoutMs;
         private Integer callTimeoutMs;
         private Integer readTimeoutMs;
-        private Boolean enabled = true;
         private Boolean logging = false;
         //调用返回的status状态不符合要求的 抛出异常
         private Boolean errorThrow = true;

@@ -25,7 +25,6 @@ CREATE TABLE `JOB` (
                        `reader_ds_id` char(40) NOT NULL DEFAULT '' COMMENT '来源数据源id',
                        `writer_ds_id` char(40) NOT NULL DEFAULT '' COMMENT '目标数据源id',
                        `config` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-                       `type` int NOT NULL,
                        `crontab` varchar(256) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
                        `from_tb_id` char(40) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '来源数据表id',
                        `to_tb_id` char(40) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '目标数据表id',
@@ -72,7 +71,7 @@ CREATE TABLE `JOB_LOG` (
 CREATE TABLE `MESSAGEHUB_TOPIC` (
                                                   `id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
                                                   `topic` varchar(256) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '消息主题',
-    `fields` longtext COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '字段描述',
+    `fields` text COLLATE utf8_unicode_ci COMMENT '字段描述',
     `info_type` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'REDIS_QUEUE' COMMENT '消息类型',
     `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `utime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

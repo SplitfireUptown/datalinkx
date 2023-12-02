@@ -1,5 +1,6 @@
 package com.datalinkx.dataio.client.datalinkxserver;
 
+import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataio.bean.JobStateForm;
 import com.datalinkx.dataio.bean.JobSyncModeForm;
 import com.datalinkx.driver.model.DataTransJobDetail;

@@ -23,7 +23,7 @@ public final class MetaConstants {
 
         public static final int JOB_STATUS_CREATE = 0;
         public static final int JOB_STATUS_SYNC = 1;
-        public static final int JOB_STATUS_NORMAL = 2;
+        public static final int JOB_STATUS_SUCCESS = 2;
         public static final int JOB_STATUS_ERROR = 3;
         public static final int JOB_STATUS_QUEUE = 4;
         public static final int JOB_STATUS_STOP = 5;

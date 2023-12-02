@@ -2,26 +2,18 @@ package com.datalinkx.dataserver.controller;
 
 import java.util.List;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-import com.datalinkx.dataserver.bean.domain.JobBean;
-import com.datalinkx.dataserver.bean.domain.JobLogBean;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
-import com.datalinkx.dataserver.config.WebResult;
+import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.service.impl.JobService;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 

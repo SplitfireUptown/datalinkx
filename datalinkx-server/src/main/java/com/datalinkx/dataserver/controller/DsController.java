@@ -6,7 +6,7 @@ import java.util.List;
 import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
-import com.datalinkx.dataserver.config.WebResult;
+import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.service.impl.DsService;
 import io.swagger.annotations.Api;

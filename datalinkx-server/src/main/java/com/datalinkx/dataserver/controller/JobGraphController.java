@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.driver.model.DataTransJobDetail;
-import com.datalinkx.dataserver.config.WebResult;
+import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
 import com.datalinkx.dataserver.service.DtsJobService;
 import lombok.extern.slf4j.Slf4j;

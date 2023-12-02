@@ -1,8 +1,7 @@
-package com.datalinkx.dataserver.config;
+package com.datalinkx.common.result;
 
 import java.util.Optional;
 
-import com.datalinkx.common.result.StatusCode;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
