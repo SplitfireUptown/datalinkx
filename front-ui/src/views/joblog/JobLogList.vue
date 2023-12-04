@@ -123,8 +123,8 @@ export default {
         ...this.pages,
         ...this.queryParam
       }).then(res => {
-        this.tableData = res.data
-        this.pagination.total = +res.total
+        this.tableData = res.result.data
+        this.pagination.total = +res.result.total
         this.loading = false
       }).finally(() => {
         this.loading = false

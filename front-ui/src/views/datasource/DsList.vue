@@ -128,8 +128,9 @@ export default {
         ...this.queryParam,
         ...this.pages
       }).then(res => {
-        this.tableData = res.data
-        this.pagination.total = +res.total
+        this.tableData = res.result.data
+        console.log(res)
+        this.pagination.total = +res.result.total
         this.loading = false
       }).catch(reason => {
         this.loading = false

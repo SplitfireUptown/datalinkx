@@ -1,15 +1,21 @@
 package com.datalinkx.common.result;
 
+import static com.datalinkx.common.constants.MetaConstants.CommonConstant.TRACE_ID;
+
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Slf4j
 @Data
 public class WebResult<T> {
 	private String status;
 	private String errstr;
+	private String traceId;
 	private T result;
 
 
@@ -23,6 +29,7 @@ public class WebResult<T> {
 
 	public WebResult<T> setStatus(String status) {
 		this.status = status;
+		this.traceId = MDC.get(TRACE_ID);
 		return this;
 	}
 

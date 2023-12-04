@@ -133,8 +133,8 @@ export default {
         ...this.queryParam,
         ...this.pages
       }).then(res => {
-        this.tableData = res.data
-        this.pagination.total = +res.total
+        this.tableData = res.result.data
+        this.pagination.total = +res.result.total
         this.loading = false
       }).finally(() => {
         this.loading = false
@@ -152,7 +152,7 @@ export default {
     },
     delete (record) {
       delObj(record.job_id).then(res => {
-        if (res.status === '0') {
+        if (res.result.status === '0') {
           this.$message.info('删除成功')
           this.init()
         } else {
