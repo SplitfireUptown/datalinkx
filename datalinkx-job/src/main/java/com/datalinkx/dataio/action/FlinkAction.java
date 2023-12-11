@@ -147,9 +147,9 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
         }
 
         // 处理写入的表
-        TableStruct tableStruct = writeDsDriver.describeTbAndField(unit.getWriter().getCatalog(),
-                unit.getWriter().getSchema(), unit.getWriter().getTableId(), unit.getWriter().getTableName(), true);
-        unit.getWriter().setRealName(tableStruct.getRealName());
+//        TableStruct tableStruct = writeDsDriver.describeTbAndField(unit.getWriter().getCatalog(),
+//                unit.getWriter().getSchema(), unit.getWriter().getTableId(), unit.getWriter().getTableName(), true);
+//        unit.getWriter().setRealName(tableStruct.getRealName());
     }
 
 

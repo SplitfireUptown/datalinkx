@@ -67,7 +67,7 @@ public class DataTransJobDetail extends JobDetail {
         String schema; // jdbc catalog; dmc folder name
         String tableId;
         String tableName;
-        String realName;
+//        String realName;
         List<Column> columns;
         List<String> rowkey;
         String connectId;

@@ -54,21 +54,6 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
     }
 
     @Override
-    public TableStruct describeTbAndField(String catalog, String schema, String tableId, String tableName, boolean includeField) throws Exception {
-        TableStruct tableStruct = new TableStruct();
-        tableStruct.setId(tableName);
-        tableStruct.setRealName(tableName);
-        tableStruct.setName(tableName);
-        tableStruct.setRemark("");
-        tableStruct.setFieldList(new ArrayList<>());
-
-        List<TableField> fieldList = includeField ? esService.getFields(tableName) : new ArrayList<>();
-        tableStruct.setFieldList(fieldList);
-
-        return tableStruct;
-    }
-
-    @Override
     public void checkConnectAlive(Object conn) throws Exception {
         esService.checkConnectAlive(conn);
     }

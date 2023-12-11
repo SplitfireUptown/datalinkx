@@ -47,6 +47,6 @@ plugins/
 lib/
 jobs/
 nohup.out
-flinkconf/
+#flinkconf/
 hadoopconf/
 /default_task_id_output

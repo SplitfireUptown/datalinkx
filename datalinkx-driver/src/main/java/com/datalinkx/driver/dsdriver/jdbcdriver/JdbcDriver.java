@@ -235,32 +235,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return Base64.encode(JsonUtils.toJson(refs).getBytes());
     }
 
-    @Override
-    public TableStruct describeTbAndField(String catalog, String schema, String tableId, String tableName, boolean includeField) throws Exception {
-
-        Connection connection = ConnectPool.getConnection(this, Connection.class);
-        try {
-            Map<String, Object> tableInfo = fetchTableInfo(catalog, schema, tableName, connection);
-            List<Map<String, Object>> fieldInfo =
-                    includeField ? fetchColumn(catalog, schema, tableName, connection) : new ArrayList<>();
-
-            TableStruct tableStruct = new TableStruct();
-            tableStruct.setName(tableInfo.get("name") == null ? null : tableInfo.get("name").toString());
-            tableStruct.setRemark(tableInfo.get("remark") == null ? null : tableInfo.get("remark").toString());
-            tableStruct.setFieldList(fieldInfo.stream().map(field -> TableField.builder()
-                    .id(field.get("name") == null ? null : field.get("name").toString())
-                    .name(field.get("name") == null ? null : field.get("name").toString())
-                    .remark(field.get("remark") == null ? null : field.get("remark").toString())
-                    .type(field.get("type") == null ? null : field.get("type").toString())
-                    .rawType(field.get("raw_type") == null ? null : field.get("raw_type").toString())
-                    .allowNull(field.get("allow_null") == null || (boolean) field.get("allow_null"))
-                    .uniqIndex((Boolean) field.get("uniq_index"))
-                    .build()).collect(Collectors.toList()));
-            return tableStruct;
-        } finally {
-            ConnectPool.releaseConnection(connectId, connection);
-        }
-    }
 
     @Override
     public void checkConnectAlive(Object conn) throws Exception {

@@ -36,10 +36,6 @@ public class RestapiDriver implements AbstractDriver<RestapiSetupInfo, RestapiRe
         return connectId;
     }
 
-    @Override
-    public TableStruct describeTbAndField(String catalog, String schema, String tableId, String tableName, boolean includeField) throws Exception {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public void checkConnectAlive(Object conn) throws Exception {
