@@ -27,12 +27,8 @@ import org.springframework.util.ResourceUtils;
 @Component
 public class ExecutorJobHandler {
 
-
 	@Value("${flinkx.path}")
 	private String flinkXHomePath;
-
-	private static Logger logger = LoggerFactory.getLogger(ExecutorJobHandler.class);
-
 
 	public String execute(String jobId, String reader, String writer) throws Exception {
 
@@ -43,9 +39,10 @@ public class ExecutorJobHandler {
 		String jobJsonFile = this.generateJobJsonFile(jobId, reader, writer, jobSettings);
 
 		try {
-			String cmdstr = this.generateFlinkCmd(jobId, jobJsonFile);
+			String cmdStr = this.generateFlinkCmd(jobId, jobJsonFile);
 			try {
-				Process process = Runtime.getRuntime().exec(cmdstr);
+				log.info("job_id: {}, execute job command: {}", jobId, cmdStr);
+				Process process = Runtime.getRuntime().exec(cmdStr);
 				InputStreamReader ir = new InputStreamReader(process.getErrorStream());
 				LineNumberReader errorInput = new LineNumberReader(ir);
 				Thread threadError = new Thread(new ProcessStreamHandler(errorInput, errorRet));
@@ -112,7 +109,7 @@ public class ExecutorJobHandler {
 			FileUtil.mkdir(jsonPath);
 		}
 
-		String tmpFilePath = jsonPath + "/" + "jobTmp-" + IdUtil.simpleUUID() + ".json";
+		String tmpFilePath = jsonPath + "jobTmp-" + IdUtil.simpleUUID() + ".json";
 		try (PrintWriter ptWriter = new PrintWriter(tmpFilePath, "UTF-8")) {
 			ptWriter.println(jobJson);
 		} catch (Exception e) {
