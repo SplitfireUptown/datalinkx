@@ -1,11 +1,10 @@
-package com.datalinkx.dataio.bean;
+package com.datalinkx.datajob.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import retrofit2.http.Field;
-import retrofit2.http.Query;
 
 @Data
 @NoArgsConstructor

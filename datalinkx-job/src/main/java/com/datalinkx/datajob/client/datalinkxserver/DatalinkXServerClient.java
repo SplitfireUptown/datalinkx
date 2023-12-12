@@ -1,8 +1,8 @@
-package com.datalinkx.dataio.client.datalinkxserver;
+package com.datalinkx.datajob.client.datalinkxserver;
 
 import com.datalinkx.common.result.WebResult;
-import com.datalinkx.dataio.bean.JobStateForm;
-import com.datalinkx.dataio.bean.JobSyncModeForm;
+import com.datalinkx.datajob.bean.JobStateForm;
+import com.datalinkx.datajob.bean.JobSyncModeForm;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;

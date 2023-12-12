@@ -1,5 +1,5 @@
 // CHECKSTYLE:OFF
-package com.datalinkx.dataio.action;
+package com.datalinkx.datajob.action;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,25 +16,23 @@ import javax.annotation.Resource;
 
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.dataio.bean.JobSyncModeForm;
+import com.datalinkx.datajob.bean.JobSyncModeForm;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
-import com.datalinkx.driver.dsdriver.base.model.TableId;
-import com.datalinkx.driver.dsdriver.base.model.TableStruct;
 import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.datalinkx.driver.utils.JobUtils;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.dataio.bean.JobExecCountDto;
-import com.datalinkx.dataio.bean.JobStateForm;
-import com.datalinkx.dataio.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.dataio.client.flink.FlinkClient;
-import com.datalinkx.dataio.client.flink.response.FlinkJobAccumulators;
-import com.datalinkx.dataio.client.flink.response.FlinkJobStatus;
-import com.datalinkx.dataio.config.DsProperties;
-import com.datalinkx.dataio.job.ExecutorJobHandler;
+import com.datalinkx.datajob.bean.JobExecCountDto;
+import com.datalinkx.datajob.bean.JobStateForm;
+import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.datajob.client.flink.FlinkClient;
+import com.datalinkx.datajob.client.flink.response.FlinkJobAccumulators;
+import com.datalinkx.datajob.client.flink.response.FlinkJobStatus;
+import com.datalinkx.datajob.config.DsProperties;
+import com.datalinkx.datajob.job.ExecutorJobHandler;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -145,11 +142,6 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
         } catch (Exception e) {
             throw new Exception("ds not exist", e);
         }
-
-        // 处理写入的表
-//        TableStruct tableStruct = writeDsDriver.describeTbAndField(unit.getWriter().getCatalog(),
-//                unit.getWriter().getSchema(), unit.getWriter().getTableId(), unit.getWriter().getTableName(), true);
-//        unit.getWriter().setRealName(tableStruct.getRealName());
     }
 
 

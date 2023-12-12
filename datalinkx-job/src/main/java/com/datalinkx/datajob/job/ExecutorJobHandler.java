@@ -1,4 +1,4 @@
-package com.datalinkx.dataio.job;
+package com.datalinkx.datajob.job;
 
 
 import java.io.File;
@@ -16,8 +16,6 @@ import com.datalinkx.common.utils.JsonUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;

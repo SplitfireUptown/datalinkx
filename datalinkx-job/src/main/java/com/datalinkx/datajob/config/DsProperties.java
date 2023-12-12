@@ -1,4 +1,4 @@
-package com.datalinkx.dataio.config;
+package com.datalinkx.datajob.config;
 
 
 import java.util.List;

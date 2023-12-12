@@ -1,8 +1,8 @@
-package com.datalinkx.dataio.config;
+package com.datalinkx.datajob.config;
 
 import com.datalinkx.dataclient.client.DatalinkXClientUtils;
-import com.datalinkx.dataio.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.dataio.client.flink.FlinkClient;
+import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.datajob.client.flink.FlinkClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

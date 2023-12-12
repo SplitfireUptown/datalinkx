@@ -1,4 +1,4 @@
-package com.datalinkx.dataio.config;
+package com.datalinkx.datajob.config;
 
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import org.slf4j.Logger;

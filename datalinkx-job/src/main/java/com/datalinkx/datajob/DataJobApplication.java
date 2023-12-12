@@ -1,5 +1,5 @@
 // CHECKSTYLE:OFF
-package com.datalinkx.dataio;
+package com.datalinkx.datajob;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

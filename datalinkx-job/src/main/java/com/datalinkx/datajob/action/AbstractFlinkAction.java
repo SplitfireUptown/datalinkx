@@ -1,5 +1,5 @@
 // CHECKSTYLE:OFF
-package com.datalinkx.dataio.action;
+package com.datalinkx.datajob.action;
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_ERROR;
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
@@ -11,10 +11,9 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.driver.model.JobContext;
 import com.datalinkx.driver.utils.JobUtils;
-import com.datalinkx.dataio.bean.JobExecCountDto;
+import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.xxl.job.core.thread.JobThread;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +34,7 @@ public abstract class AbstractFlinkAction<T, D, U> implements IAction<T> {
 
     private boolean isStop() {
         JobThread jobThread = ((JobThread)Thread.currentThread());
-        Field toStopField = null;
+        Field toStopField;
         boolean toStop = false;
         try {
             toStopField = jobThread.getClass().getDeclaredField("toStop");

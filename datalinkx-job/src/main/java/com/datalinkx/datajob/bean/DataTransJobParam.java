@@ -1,11 +1,8 @@
-package com.datalinkx.dataio.bean;
-
-import java.util.List;
+package com.datalinkx.datajob.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
