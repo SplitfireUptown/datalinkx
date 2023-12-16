@@ -152,7 +152,7 @@ export default {
     },
     delete (record) {
       delObj(record.job_id).then(res => {
-        if (res.result.status === '0') {
+        if (res.status === '0') {
           this.$message.info('删除成功')
           this.init()
         } else {
