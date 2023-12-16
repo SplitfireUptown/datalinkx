@@ -90,7 +90,7 @@ public class ExecutorJobHandler {
 		return String.format(
 				"%s -cp %s com.dtstack.flinkx.launcher.Launcher -mode standalone -jobid %s  -job %s  -pluginRoot %s -flinkconf %s",
 				javaHome + "/bin/java",
-				flinkXHomePath + "lib/*",
+				flinkXHomePath + ("windows".equals(System.getProperty("os.name")) ? "lib\\*" : "lib/*"),
 				jobId,
 				jobJsonFile,
 				flinkXHomePath + "syncplugins",
