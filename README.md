@@ -103,7 +103,3 @@ flink：https://archive.apache.org/dist/flink/flink-1.10.3/
 ## 联系作者
 私聊进群我会拉到项目交流群中
 ![输入图片说明](datalinkx-server/src/main/resources/readme/author.png)
-
-## 项目文档
-
-https://xiaozhuanlan.com/uptown_datalinkx
