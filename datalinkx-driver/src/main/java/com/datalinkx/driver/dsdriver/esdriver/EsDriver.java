@@ -169,7 +169,7 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                         .map(col -> MetaColumn.builder()
                                 .name(col.getName())
                                 .format(col.getFormat())
-                                .value("DX_AUDIT".equals(col.getName()) ? "now()" : null)
+                                .value(null)
                                 .build()).collect(Collectors.toList()))
                 .build());
 

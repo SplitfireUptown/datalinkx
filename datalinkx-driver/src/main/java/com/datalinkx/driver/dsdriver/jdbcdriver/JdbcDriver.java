@@ -454,7 +454,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .column(unit.getReader().getColumns().stream().map(col ->
                                 MetaColumn.builder()
                                         .name(col.getName())
-                                        .value("DX_AUDIT".equals(col.getName()) ? nowValue() : col.getValue())
+                                        .value(col.getValue())
                                         .format(col.getFormat())
                                         .build())
                         .collect(Collectors.toList()))
