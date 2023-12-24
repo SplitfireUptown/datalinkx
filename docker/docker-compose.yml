@@ -6,7 +6,10 @@ services:
       - "3306:3306"
     container_name: mysql
     volumes:
+      #     windows配置
       - E:\dockerFile\mysql:/var/lib/mysql
+    #     linux配置
+    #     - /data/conf/mysql:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=123456
 
