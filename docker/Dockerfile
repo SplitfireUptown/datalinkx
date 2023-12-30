@@ -2,9 +2,6 @@ FROM maven:3.8.7-eclipse-temurin-19
 
 RUN apt update && apt install git
 
-#配置环境变量
-ENTRYPOINT ["git"]
-
 #切换目录，指定源码克隆后保存位置
 WORKDIR /
 
