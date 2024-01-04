@@ -1,27 +1,24 @@
 package com.datalinkx.driver.dsdriver.esdriver;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.datalinkx.common.sql.SqlOperator;
+import com.datalinkx.common.utils.ConnectIdUtils;
+import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.RefUtils;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
 import com.datalinkx.driver.dsdriver.base.model.TableField;
-import com.datalinkx.driver.dsdriver.base.model.TableStruct;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
-import com.datalinkx.common.utils.ConnectIdUtils;
-import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.common.utils.RefUtils;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>, IDsReader {

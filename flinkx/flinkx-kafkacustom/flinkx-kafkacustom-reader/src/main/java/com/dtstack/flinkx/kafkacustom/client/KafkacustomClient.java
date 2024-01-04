@@ -189,7 +189,7 @@ public class KafkacustomClient implements IClient {
 
                 ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
                 if (!records.isEmpty()) {
-                    LOG.debug("DMC Kafka Client Received Message");
+                    LOG.debug("Kafka Client Received Message");
                 }
                 for (ConsumerRecord<String, String> r : records) {
                     boolean isIgnoreCurrent = r.value() == null || blankIgnore && StringUtils.isBlank(r.value());
