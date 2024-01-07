@@ -288,7 +288,7 @@ export default {
     handleToTbChange (value) {
       this.selectedTargetTable = value
       this.queryParam = {
-        'ds_id': this.selectedDataSource,
+        'ds_id': this.selectedTargetSource,
         'name': value
       }
       getDsTbFieldsInfo({

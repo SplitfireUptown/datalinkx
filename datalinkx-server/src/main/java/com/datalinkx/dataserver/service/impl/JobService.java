@@ -211,7 +211,7 @@ public class JobService implements DtsJobService {
 				.builder()
 				.tableId(tbBean.getTbId())
 				.connectId(dsService.getConnectId(fromDs))
-				.type(dsService.genTypeToDbNameMap().get(fromDs.getType()))
+				.type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(fromDs.getType()))
 				.schema(fromDs.getDatabase())
 				.sync(sync)
 				.maxValue(syncModeForm.getIncreateValue())
@@ -285,7 +285,7 @@ public class JobService implements DtsJobService {
 
 		return DataTransJobDetail.Writer.builder()
 				.schema(toDs.getDatabase()).connectId(dsService.getConnectId(toDs))
-				.tableId(jobBean.getToTbId()).type(dsService.genTypeToDbNameMap().get(toDs.getType()))
+				.tableId(jobBean.getToTbId()).type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
 				.tableName(tbBean.getName()).columns(toCols).build();
 	}
 

@@ -45,8 +45,7 @@ public class OracleDriver extends JdbcDriver<OracleSetupInfo, JdbcReader, JdbcWr
         String url = this.jdbcSetupInfo.getServer() + ":" + jdbcSetupInfo.getPort();
         String sidOrServerName = jdbcSetupInfo.getSid();
         if (BASIC_CONNECT.equalsIgnoreCase(jdbcSetupInfo.getSubtype())) {
-            String pattern = (ALIAS_SID.equalsIgnoreCase(jdbcSetupInfo.getAlias())) ? ORACLE_BASIC_SID_JDBC_PATTERN
-                    : ORACLE_BASIC_SERVER_NAME_JDBC_PATTERN;
+            String pattern = (ALIAS_SID.equalsIgnoreCase(jdbcSetupInfo.getAlias())) ? ORACLE_BASIC_SID_JDBC_PATTERN : ORACLE_BASIC_SERVER_NAME_JDBC_PATTERN;
             jdbc = String.format(pattern, url, sidOrServerName);
         } else {
             String[] hostAndPort = url.split(":");
