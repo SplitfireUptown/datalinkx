@@ -2,7 +2,11 @@ package com.datalinkx.dataserver.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import com.datalinkx.dataserver.bean.vo.DsVo;
 import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
@@ -40,6 +44,15 @@ public class DsController {
 	public WebResult<List<DsBean>> list() {
 		return WebResult.of(dsService.list());
 	}
+
+
+	@GetMapping("/group")
+	public WebResult<Map> group() {
+		return WebResult.of(
+				dsService.list().stream().collect(Collectors.groupingBy(DsBean::getType,  Collectors.counting()))
+		);
+	}
+
 
 	@GetMapping("/info/{dsId}")
 	public WebResult<DsBean> info(@PathVariable String dsId) {
