@@ -1,11 +1,15 @@
 package com.datalinkx.driver.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-import lombok.experimental.FieldNameConstants;
-
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.FieldNameConstants;
 
 
 /**
@@ -53,8 +57,6 @@ public class DataTransJobDetail extends JobDetail {
         String connectId;
         String type;
         String maxValue;
-        String remark;
-        Integer tableComment;
     }
 
     @Data
@@ -62,18 +64,13 @@ public class DataTransJobDetail extends JobDetail {
     @NoArgsConstructor
     @Builder
     public static class Writer {
-        String dbId; // dmc import db id
-        String catalog; // jdbc catalog; dmc folder id
-        String schema; // jdbc catalog; dmc folder name
+        String catalog; // jdbc catalog;
+        String schema; // jdbc catalog;
         String tableId;
         String tableName;
-//        String realName;
         List<Column> columns;
-        List<String> rowkey;
         String connectId;
         String type;
-        String method;
-        String url;
     }
 
     @Data
@@ -85,7 +82,6 @@ public class DataTransJobDetail extends JobDetail {
         String type;
         String value;
         String format;
-        Integer seqNo = 0;
     }
 
     @Data
@@ -96,7 +92,6 @@ public class DataTransJobDetail extends JobDetail {
         String type; // [overwrite全量更新，increment增量更新]
         Integer fetchSize; // 每次获取的条数
         Integer queryTimeOut = 100000; // 查询超时时间
-        Integer dereplication = 0; // 去重
         SyncCondition syncCondition;
 
         @Data

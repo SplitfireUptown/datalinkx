@@ -19,10 +19,10 @@
         <!--******离线******-->
         <module>flinkx-rdb</module>
         <module>flinkx-mysql</module>
-        <module>flinkx-datahub</module>
+<!--        <module>flinkx-datahub</module>-->
 <!--        <module>flinkx-polardb</module>-->
         <module>flinkx-oracle</module>
-<!--        <module>flinkx-sqlserver</module>-->
+        <module>flinkx-sqlserver</module>
         <module>flinkx-postgresql</module>
 <!--        <module>flinkx-db2</module>-->
 <!--        <module>flinkx-gbase</module>-->
@@ -32,19 +32,19 @@
 <!--        <module>flinkx-greenplum</module>-->
 <!--        <module>flinkx-kingbase</module>-->
 
-        <module>flinkx-hdfs</module>
-        <module>flinkx-hive</module>
+<!--        <module>flinkx-hdfs</module>-->
+<!--        <module>flinkx-hive</module>-->
         <module>flinkx-es</module>
 <!--        <module>flinkx-ftp</module>-->
 <!--        <module>flinkx-odps</module>-->
-        <module>flinkx-hbase</module>
+<!--        <module>flinkx-hbase</module>-->
 <!--        <module>flinkx-phoenix</module>-->
 <!--        <module>flinkx-phoenix5</module>-->
 <!--        <module>flinkx-carbondata</module>-->
 <!--        <module>flinkx-kudu</module>-->
 <!--        <module>flinkx-cassandra</module>-->
 
-<!--        <module>flinkx-redis</module>-->
+        <module>flinkx-redis</module>
 <!--        <module>flinkx-mongodb</module>-->
 
         <!--******实时******-->
@@ -54,12 +54,12 @@
 <!--        <module>flinkx-kafka10</module>-->
 <!--        <module>flinkx-kafka11</module>-->
 <!--        <module>flinkx-kafka</module>-->
+        <module>flinkx-kafkacustom</module>
 <!--        <module>flinkx-emqx</module>-->
 <!--        <module>flinkx-pulsar</module>-->
 <!--        <module>flinkx-pgwal</module>-->
-<!--        <module>flinkx-restapi</module>-->
+        <module>flinkx-restapi</module>
 <!--        <module>flinkx-vertica</module>-->
-<!--        <module>flinkx-cache</module>-->
     </modules>
 
     <properties>

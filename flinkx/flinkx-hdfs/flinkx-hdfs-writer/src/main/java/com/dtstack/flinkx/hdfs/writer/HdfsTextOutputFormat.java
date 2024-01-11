@@ -127,7 +127,6 @@ public class HdfsTextOutputFormat extends BaseHdfsOutputFormat {
         try {
             int cnt = fullColumnNames.size();
             int k = 0;
-            boolean containsNull = columnNames.contains("dmc_null_default");
             for (; i < cnt; ++i) {
                 int j = colIndices[i];
                 if(j == -1) {
@@ -135,18 +134,6 @@ public class HdfsTextOutputFormat extends BaseHdfsOutputFormat {
                 }
 
                 int rowFieldIndex = j;
-                if (containsNull) {
-                    if (columnNames.get(j).equals("dmc_null_default")) {
-                        LOG.debug("====dmc_null_default");
-                        sb.append(delimiter);
-                        sb.append(HdfsUtil.NULL_VALUE);
-
-                        continue;
-                    } else {
-                        rowFieldIndex = k;
-                        k++;
-                    }
-                }
 
                 if (i != 0) {
                     sb.append(delimiter);
@@ -162,7 +149,6 @@ public class HdfsTextOutputFormat extends BaseHdfsOutputFormat {
         }
 
         try {
-            LOG.debug("====dmc_row_info: " + sb);
             byte[] bytes = sb.toString().getBytes(this.charsetName);
             this.stream.write(bytes);
             this.stream.write(NEWLINE);
