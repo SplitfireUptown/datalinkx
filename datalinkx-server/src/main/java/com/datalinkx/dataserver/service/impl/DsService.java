@@ -12,12 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.driver.dsdriver.DsDriverFactory;
-import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.base.model.DbTree;
-import com.datalinkx.driver.dsdriver.base.model.TableField;
-import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
-import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
+import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.Base64Utils;
 import com.datalinkx.common.utils.ConnectIdUtils;
@@ -26,9 +21,15 @@ import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.DsTbBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.DsForm;
-import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.DsTbRepository;
+import com.datalinkx.driver.dsdriver.DsDriverFactory;
+import com.datalinkx.driver.dsdriver.IDsReader;
+import com.datalinkx.driver.dsdriver.base.model.DbTree;
+import com.datalinkx.driver.dsdriver.base.model.TableField;
+import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
+import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
+import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +51,6 @@ public class DsService {
 	@Autowired
 	private DsTbRepository dsTbRepository;
 
-	public Map<Integer, String> genTypeToDbNameMap() {
-		Map<Integer, String> typeToDbNameMap = new HashMap<>();
-		typeToDbNameMap.put(MetaConstants.DsType.MYSQL, "mysql");
-		typeToDbNameMap.put(MetaConstants.DsType.ELASTICSEARCH, "elasticsearch");
-		return typeToDbNameMap;
-	}
-
 
 	/**
 	* @Description //数据源创建
@@ -68,13 +62,13 @@ public class DsService {
 	@SneakyThrows
 	public String create(DsForm.DsCreateForm form) {
 		String dsId = genKey("ds");
-		// 检测数据源是否重复，重名或者已接入
+		// 1、检测数据源是否重复，重名或者已接入
 		DsBean nameCheck = dsRepository.findByName(form.getName());
 		if (!ObjectUtils.isEmpty(nameCheck)) {
 			throw new DatalinkXServerException(form.getName() + " 数据源名称存在");
 		}
 
-		// 获取数据源配置信息
+		// 2、构造数据源配置信息
 		DsBean dsBean = new DsBean();
 		dsBean.setDsId(dsId);
 		dsBean.setType(form.getType());
@@ -83,22 +77,23 @@ public class DsService {
 		dsBean.setPort(form.getPort());
 		dsBean.setName(form.getName());
 		dsBean.setDatabase(form.getDatabase());
+		dsBean.setConfig(form.getConfig());
+
+		// 2.1、oracle类型数据源有schema概念
+		if (MetaConstants.DsType.ORACLE.equals(form.getType())) {
+			dsBean.setSchema(form.getDatabase());
+		}
+
 		if (form.getPassword() != null) {
 			dsBean.setPassword(Base64Utils.encodeBase64(form.getPassword().getBytes(StandardCharsets.UTF_8)));
 		}
 
-//		ExportDsForm.ConfigForm config = form.getConfig();
-//		if (!ObjectUtils.isEmpty(config)) {
-//			if (StringUtils.isEmpty(config.getSchema())) {
-//				dsBean.setSchema(config.getSchema());
-//			}
-//		}
-//
-//		dsBean.setConfig(JsonUtils.toJson(config));
+		// 2.2、检查config字符串是否合法
+		this.checkConfigFormat(dsBean);
+		// 2.3、检查连接情况
+		this.checkConnect(dsBean);
 
-		checkConnect(dsBean);
-
-		//获取选中的表并创建
+		// 3、获取选中的表并创建
 		List<String> tbNameList = ObjectUtils.isEmpty(form.getTbNameList()) ? new ArrayList<>() : form.getTbNameList();
 		for (String tbName : tbNameList) {
 			xtbCreate(tbName, dsId);
@@ -107,6 +102,17 @@ public class DsService {
 		dsRepository.save(dsBean);
 
 		return dsId;
+	}
+
+	private void checkConfigFormat(DsBean dsBean) {
+		if (!ObjectUtils.isEmpty(dsBean.getConfig())) {
+			try {
+				Map map = JsonUtils.toObject(dsBean.getConfig(), Map.class);
+			} catch (Exception e) {
+				log.error("dsbean config json format error", e);
+				throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "数据源附加信息转化Json格式异常");
+			}
+		}
 	}
 
 	public String xtbCreate(String tbName, String dsId) {
@@ -132,7 +138,7 @@ public class DsService {
 	}
 
 	public String getConnectId(DsBean dsBean) {
-		String toType = Optional.ofNullable(genTypeToDbNameMap().get(dsBean.getType())).orElse("").toLowerCase();
+		String toType = Optional.ofNullable(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsBean.getType())).orElse("").toLowerCase();
 		switch (toType) {
 			case "mysql":
 				MysqlSetupInfo mysqlSetupInfo = new MysqlSetupInfo();
@@ -141,8 +147,6 @@ public class DsService {
 				mysqlSetupInfo.setType(toType);
 				mysqlSetupInfo.setUid(dsBean.getUsername());
 				mysqlSetupInfo.setPwd(dsBean.getPassword());
-				mysqlSetupInfo.setIsExport(1);
-				mysqlSetupInfo.setCrypter(false);
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(mysqlSetupInfo));
 			case "elasticsearch":
 				EsSetupInfo esSetupInfo = new EsSetupInfo();
@@ -151,9 +155,23 @@ public class DsService {
 				esSetupInfo.setPwd(dsBean.getPassword());
 				esSetupInfo.setUid(dsBean.getUsername());
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(esSetupInfo));
+			case "oracle":
+				OracleSetupInfo oracleSetupInfo = new OracleSetupInfo();
+				oracleSetupInfo.setType(toType);
+				oracleSetupInfo.setServer(dsBean.getHost());
+				oracleSetupInfo.setPort(dsBean.getPort());
+				oracleSetupInfo.setPwd(dsBean.getPassword());
+				oracleSetupInfo.setUid(dsBean.getUsername());
+
+				Map configMap = JsonUtils.toObject(dsBean.getConfig(), Map.class);
+				oracleSetupInfo.setSid((String) configMap.get("sid"));
+				oracleSetupInfo.setSubtype((String) configMap.getOrDefault("subtype", "BASIC"));
+				oracleSetupInfo.setAlias((String) configMap.getOrDefault("alias", "SID"));
+
+				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(oracleSetupInfo));
 			default:
 				Map<String, Object> map = new HashMap<>();
-				map.put("type", genTypeToDbNameMap().get(dsBean.getType()));
+				map.put("type", MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsBean.getType()));
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(map));
 		}
 	}
@@ -209,7 +227,7 @@ public class DsService {
 		List<String> tableList = new ArrayList<>();
 		try {
 			IDsReader dsReader = DsDriverFactory.getDsReader(getConnectId(dsBean));
-			tableList = dsReader.treeTable(dsBean.getDatabase(), "").stream().map(DbTree::getName).collect(Collectors.toList());
+			tableList = dsReader.treeTable(dsBean.getDatabase(), dsBean.getSchema()).stream().map(DbTree::getName).collect(Collectors.toList());
 		} catch (Exception e) {
 			log.error("connect error", e);
 			throw new DatalinkXServerException(e);
@@ -226,7 +244,7 @@ public class DsService {
 		DsBean dsBean = dsRepository.findByDsId(dsId).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS));
 		try {
 			IDsReader dsReader = DsDriverFactory.getDsReader(getConnectId(dsBean));
-			return dsReader.getFields(dsBean.getDatabase(), "", tbName);
+			return dsReader.getFields(dsBean.getDatabase(), dsBean.getSchema(), tbName);
 		} catch (Exception e) {
 			log.error("connect error", e);
 			throw new DatalinkXServerException(e);

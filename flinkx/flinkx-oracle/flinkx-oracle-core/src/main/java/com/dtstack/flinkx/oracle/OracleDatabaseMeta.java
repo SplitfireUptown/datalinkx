@@ -51,7 +51,7 @@ public class OracleDatabaseMeta extends BaseDatabaseMeta {
 
     @Override
     public String getDriverClass() {
-        return "oracle.jdbc.dsdriver.OracleDriver";
+        return "oracle.jdbc.driver.OracleDriver";
     }
 
     @Override

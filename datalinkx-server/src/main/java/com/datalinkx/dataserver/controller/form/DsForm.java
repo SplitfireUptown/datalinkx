@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,7 +26,7 @@ public class DsForm {
 		private String database = "";
 		private Integer port;
 		private Integer type;
-//		private ConfigForm config;
+		private String config;
 		@JsonProperty("tb_name_list")
 		private List<String> tbNameList;
 	}

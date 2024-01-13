@@ -201,7 +201,8 @@ export default {
           console.log(flashData)
           for (const i of this.tableData) {
             if (i.job_id === flashData.job_id) {
-              if (i.status === 1) {
+              if (flashData.status === 1) {
+                i.status = flashData.status
                 i.progress = (flashData.write_records + '/' + flashData.read_records)
               } else {
                 // 防止消息先到前端后端未入库

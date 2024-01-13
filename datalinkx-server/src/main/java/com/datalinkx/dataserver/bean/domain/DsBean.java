@@ -2,17 +2,11 @@ package com.datalinkx.dataserver.bean.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
 
-import com.datalinkx.dataserver.bean.domain.BaseDomainBean;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
@@ -49,8 +43,6 @@ public class DsBean extends BaseDomainBean {
 	private String password;
 	@Column(name = "config", nullable = true, length = 65535, columnDefinition = "text")
 	private String config;
-//	@Column(name = "ds_desc", nullable = true, columnDefinition = "varchar(256)")
-//	private String dsDesc;
 	@Column(name = "`database`", nullable = true, length = 64, columnDefinition = "varchar(64)")
 	private String database;
 	@Column(name = "`schema`", nullable = true, length = 64, columnDefinition = "varchar(64)")
