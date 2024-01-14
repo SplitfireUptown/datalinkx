@@ -47,6 +47,7 @@ public class DsForm {
 	@Data
 	public static class DataSourcePageForm {
 		private String name;
+		private Integer type;
 
 		@ApiModelProperty(value = "当前页")
 		@JsonProperty("page_no")

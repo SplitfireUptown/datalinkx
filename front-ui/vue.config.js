@@ -127,8 +127,8 @@ const vueConfig = {
     port: 8000,
     proxy: {
       '/api': {
-        // target: 'http://localhost:12345',
-        target: 'http://192.168.1.167:12345',
+        target: 'http://localhost:12345',
+        // target: 'http://192.168.1.167:12345',
         ws: true,
         changeOrigin: true,
         pathRewrite: {

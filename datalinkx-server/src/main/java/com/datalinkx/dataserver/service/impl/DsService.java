@@ -179,7 +179,7 @@ public class DsService {
 
     public PageVo<List<DsBean>> dsPage(DsForm.DataSourcePageForm dataSourcePageForm) {
 		PageRequest pageRequest = PageRequest.of(dataSourcePageForm.getPageNo() - 1, dataSourcePageForm.getPageSize());
-		Page<DsBean> dsBeans = dsRepository.pageQuery(pageRequest, dataSourcePageForm.getName());
+		Page<DsBean> dsBeans = dsRepository.pageQuery(pageRequest, dataSourcePageForm.getName(), dataSourcePageForm.getType());
 		PageVo<List<DsBean>> result = new PageVo<>();
 		result.setPageNo(dataSourcePageForm.getPageNo());
 		result.setPageSize(dataSourcePageForm.getPageSize());

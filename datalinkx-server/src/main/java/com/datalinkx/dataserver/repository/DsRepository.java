@@ -25,8 +25,10 @@ public interface DsRepository extends CRUDRepository<DsBean, String> {
 
 	List<DsBean> findAllByDsIdIn(List<String> dsIds);
 
-	@Query(value = " select * from DS where is_del = 0 and if(:name != '', name like concat('%', :name, '%'), 1=1) ", nativeQuery = true)
-    Page<DsBean> pageQuery(Pageable pageable, String name);
+	@Query(value = " select * from DS where is_del = 0 "
+			+ " and if(:name != '', name like concat('%', :name, '%'), 1=1) "
+			+ " and if(:type != '', type = :type, 1=1) ", nativeQuery = true)
+    Page<DsBean> pageQuery(Pageable pageable, String name, Integer type);
 
 	@Transactional
 	@Modifying

@@ -11,17 +11,20 @@ import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.RefUtils;
 import com.datalinkx.driver.dsdriver.IDsReader;
+import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
 import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
+import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 
-public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>, IDsReader {
+public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>, IDsReader, IDsWriter {
     private static final long ES_TIMEOUT = 3000L;
     private static final long DEFAULT_FETCH_SIZE = 10000L;
 
@@ -221,5 +224,43 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
 
     @Override
     public void afterRead(FlinkActionParam param) {
+    }
+
+    @Override
+    public void truncateData(FlinkActionParam param) throws Exception {
+
+    }
+
+    @Override
+    public Object getWriterInfo(FlinkActionParam param) {
+        String catalog = param.getWriter().getCatalog();
+        String tableName = param.getWriter().getTableName();
+        WriterInfo<EsWriter> writerInfo = new WriterInfo<>();
+        writerInfo.setName("eswriter");
+        if ("huawei".equals(esSetupInfo.getVersion())) {
+            writerInfo.setName("eshuaweiwriter");
+        }
+        writerInfo.setName("eswriter");
+        writerInfo.setParameter(EsWriter.builder()
+                .address(esSetupInfo.getAddress())
+                .username(esSetupInfo.getUid())
+                .password(esSetupInfo.getPwd())
+                .timeout(ES_TIMEOUT)
+                .bulkAction(DEFAULT_FETCH_SIZE)
+                .index(catalog)
+                .type(tableName)
+                .idColumn(Lists.newArrayList(ImmutableMap.of("index", 0, "type", "integer")))
+                .column(param.getWriter().getColumns().stream().map(col ->
+                                MetaColumn.builder()
+                                        .name(col.getName())
+                                        .type(MetaColumn.esColumnTypeMap.getOrDefault(col.getType(), "keyword")).build())
+                        .collect(Collectors.toList()))
+                .build());
+        return writerInfo;
+    }
+
+    @Override
+    public void afterWrite(FlinkActionParam param) {
+
     }
 }
