@@ -54,3 +54,9 @@ export function getDsTbFieldsInfo (params) {
     params: params
   })
 }
+export function getDsGroup () {
+  return axios({
+    url: '/api/ds/group',
+    method: 'GET'
+  })
+}

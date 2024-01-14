@@ -7,5 +7,23 @@
  * 所有图标均从这里加载，方便管理
  */
 import bxAnaalyse from '@/assets/icons/bx-analyse.svg?inline' // path to your '*.svg?inline' file.
+import dataManage from '@/assets/icons/data-manage.svg?inline'
+import dataList from '@/assets/icons/data-list.svg?inline'
+import taskList from '@/assets/icons/task-list.svg?inline'
+import taskLog from '@/assets/icons/task-log.svg?inline'
+import mysqlPng from '@/assets/icons/MYSQL.png'
+import oraclePng from '@/assets/icons/ORACLE.png'
+import ESPng from '@/assets/icons/ELASTICSEARCH.png'
+import httpPng from '@/assets/icons/HTTP.png'
 
-export { bxAnaalyse }
+export {
+  bxAnaalyse,
+  dataManage,
+  dataList,
+  taskList,
+  taskLog,
+  mysqlPng,
+  oraclePng,
+  ESPng,
+  httpPng
+}
