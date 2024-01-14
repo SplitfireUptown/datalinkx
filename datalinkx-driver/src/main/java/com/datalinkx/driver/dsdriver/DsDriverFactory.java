@@ -1,18 +1,19 @@
 package com.datalinkx.driver.dsdriver;
 
-import com.datalinkx.common.utils.ConnectIdUtils;
-import com.datalinkx.driver.dsdriver.esdriver.EsDriver;
-import com.datalinkx.driver.dsdriver.mysqldriver.MysqlDriver;
-import lombok.extern.slf4j.Slf4j;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.datalinkx.common.utils.ConnectIdUtils;
+import com.datalinkx.driver.dsdriver.esdriver.EsDriver;
+import com.datalinkx.driver.dsdriver.mysqldriver.MysqlDriver;
+import com.datalinkx.driver.dsdriver.oracledriver.OracleDriver;
+import lombok.extern.slf4j.Slf4j;
+
 
 @Slf4j
-public final class DsDriverFactory {
+public final class  DsDriverFactory {
 
     private DsDriverFactory() {
 
@@ -21,6 +22,7 @@ public final class DsDriverFactory {
     static {
         dsDriverMap.put("elasticsearch", EsDriver.class);
         dsDriverMap.put("mysql", MysqlDriver.class);
+        dsDriverMap.put("oracle", OracleDriver.class);
     }
 
     public static IDsReader getDsReader(String connectId) throws Exception {

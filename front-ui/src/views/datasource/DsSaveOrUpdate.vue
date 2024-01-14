@@ -155,6 +155,10 @@ export default {
         {
           label: 'ELASTICSEARCH',
           value: 2
+        },
+        {
+          label: 'ORACLE',
+          value: 3
         }
       ],
       type: 'add'

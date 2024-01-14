@@ -1,27 +1,24 @@
 package com.datalinkx.driver.dsdriver.esdriver;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.datalinkx.common.sql.SqlOperator;
+import com.datalinkx.common.utils.ConnectIdUtils;
+import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.RefUtils;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
 import com.datalinkx.driver.dsdriver.base.model.TableField;
-import com.datalinkx.driver.dsdriver.base.model.TableStruct;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
-import com.datalinkx.common.utils.ConnectIdUtils;
-import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.common.utils.RefUtils;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>, IDsReader {
@@ -51,21 +48,6 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
     @Override
     public SqlOperator genWhere(FlinkActionParam param) throws Exception {
         return null;
-    }
-
-    @Override
-    public TableStruct describeTbAndField(String catalog, String schema, String tableId, String tableName, boolean includeField) throws Exception {
-        TableStruct tableStruct = new TableStruct();
-        tableStruct.setId(tableName);
-        tableStruct.setRealName(tableName);
-        tableStruct.setName(tableName);
-        tableStruct.setRemark("");
-        tableStruct.setFieldList(new ArrayList<>());
-
-        List<TableField> fieldList = includeField ? esService.getFields(tableName) : new ArrayList<>();
-        tableStruct.setFieldList(fieldList);
-
-        return tableStruct;
     }
 
     @Override
@@ -184,7 +166,7 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                         .map(col -> MetaColumn.builder()
                                 .name(col.getName())
                                 .format(col.getFormat())
-                                .value("DX_AUDIT".equals(col.getName()) ? "now()" : null)
+                                .value(null)
                                 .build()).collect(Collectors.toList()))
                 .build());
 

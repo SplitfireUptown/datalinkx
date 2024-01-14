@@ -1,8 +1,6 @@
 package com.datalinkx.dataserver.service.impl;
 
 
-
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNC;
 import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
@@ -18,10 +16,7 @@ import javax.annotation.Resource;
 
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.driver.dsdriver.DsDriverFactory;
-import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.base.model.TableField;
-import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
@@ -35,12 +30,15 @@ import com.datalinkx.dataserver.client.xxljob.JobClientApi;
 import com.datalinkx.dataserver.client.xxljob.request.DataTransJobParam;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
-import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.DsTbRepository;
 import com.datalinkx.dataserver.repository.JobLogRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.DtsJobService;
+import com.datalinkx.driver.dsdriver.DsDriverFactory;
+import com.datalinkx.driver.dsdriver.IDsReader;
+import com.datalinkx.driver.dsdriver.base.model.TableField;
+import com.datalinkx.driver.model.DataTransJobDetail;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
 import lombok.SneakyThrows;
@@ -211,7 +209,7 @@ public class JobService implements DtsJobService {
 				.builder()
 				.tableId(tbBean.getTbId())
 				.connectId(dsService.getConnectId(fromDs))
-				.type(dsService.genTypeToDbNameMap().get(fromDs.getType()))
+				.type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(fromDs.getType()))
 				.schema(fromDs.getDatabase())
 				.sync(sync)
 				.maxValue(syncModeForm.getIncreateValue())
@@ -256,7 +254,7 @@ public class JobService implements DtsJobService {
 												List<JobForm.FieldMappingForm> jobConf) {
 
 		DsBean toDs = dsRepository
-				.findByDsId(jobBean.getReaderDsId())
+				.findByDsId(jobBean.getWriterDsId())
 				.orElseThrow(
 						() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "to ds not exist")
 				);
@@ -285,7 +283,7 @@ public class JobService implements DtsJobService {
 
 		return DataTransJobDetail.Writer.builder()
 				.schema(toDs.getDatabase()).connectId(dsService.getConnectId(toDs))
-				.tableId(jobBean.getToTbId()).type(dsService.genTypeToDbNameMap().get(toDs.getType()))
+				.tableId(jobBean.getToTbId()).type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
 				.tableName(tbBean.getName()).columns(toCols).build();
 	}
 
@@ -379,9 +377,9 @@ public class JobService implements DtsJobService {
 			throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务已在运行中，请勿重复触发");
 		}
 
-		if (jobBean.getStatus() == JOB_STATUS_STOP) {
-			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
-		}
+//		if (jobBean.getStatus() == JOB_STATUS_STOP) {
+//			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
+//		}
 
 		jobBean.setStatus(JOB_STATUS_SYNC);
 

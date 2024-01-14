@@ -57,13 +57,8 @@ public abstract class SqlGenerator {
             String field = unit.getReader().getSync().getSyncCondition().getField();
             // 2、获取增量条件
             String fieldType = unit.getReader().getSync().getSyncCondition().getFieldType();
-            String nextMaxValue = unit.getDsReader().retrieveMax(unit, field);
 
-            if (!ObjectUtils.isEmpty(nextMaxValue)) {
-                // 3、更新下次增量条件
-                unit.getReader().setMaxValue(nextMaxValue);
-            }
-
+            // 3、如果不是首次增量同步，取上一次同步字段最大值
             if (!StringUtils.isEmpty(unit.getReader().getMaxValue())) {
                 String maxValue = unit.getReader().getMaxValue();
                 CompareOperator maxOp = new CompareOperator(
@@ -72,7 +67,18 @@ public abstract class SqlGenerator {
                         fieldType,
                         wrapValue(fieldType, maxValue)
                 );
+
+                // 3.1、更新下一次的增量条件
+                String nextMaxValue = unit.getDsReader().retrieveMax(unit, field);
+                if (!ObjectUtils.isEmpty(nextMaxValue)) {
+                    unit.getReader().setMaxValue(nextMaxValue);
+                }
                 return RelOperator.newRelOperator("and", maxOp);
+            }
+            // 4、如果是首次增量同步，上一次同步字段最大值为空，保存到下次
+            String nextMaxValue = unit.getDsReader().retrieveMax(unit, field);
+            if (!ObjectUtils.isEmpty(nextMaxValue)) {
+                unit.getReader().setMaxValue(nextMaxValue);
             }
         }
 

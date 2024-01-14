@@ -1,6 +1,9 @@
 package com.datalinkx.common.constants;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class MetaConstants {
     private MetaConstants() {
     }
@@ -11,6 +14,13 @@ public final class MetaConstants {
         // 数据源类型
         public static final Integer MYSQL = 1;
         public static final Integer ELASTICSEARCH = 2;
+        public static final Integer ORACLE = 3;
+
+        public static final Map<Integer, String> TYPE_TO_DB_NAME_MAP = new HashMap<Integer, String>() {{
+            put(MetaConstants.DsType.MYSQL, "mysql");
+            put(MetaConstants.DsType.ELASTICSEARCH, "elasticsearch");
+            put(MetaConstants.DsType.ORACLE, "oracle");
+        }};
     }
 
     public static class JobStatus {

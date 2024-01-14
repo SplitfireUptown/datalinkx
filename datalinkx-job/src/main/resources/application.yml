@@ -20,6 +20,7 @@ logging:
 
 xxl:
   job:
+    accessToken:
     admin:
       addresses: http://xxl/xxl-job-admin
     executor:
@@ -52,3 +53,4 @@ support:
   datasource:
     - mysql
     - elasticsearch
+    - oracle

@@ -260,11 +260,11 @@ public class HbaseInputFormat extends BaseRichInputFormat {
         scan.setStopRow(stopRow);
         scan.setCaching(scanCacheSize);
         if (null != fromTime && null != toTime && fromTime != -1 && toTime != -1) {
-            LOG.info(String.format("===dmc: timerange[%s,%s]", fromTime, toTime));
+            LOG.info(String.format("===datalinkx: timerange[%s,%s]", fromTime, toTime));
             scan.setTimeRange(fromTime, toTime);
         }
         if (StringUtils.isNotEmpty(filter)) {
-            LOG.info(String.format("===dmc: filter[%s]", filter));
+            LOG.info(String.format("===datalinkx: filter[%s]", filter));
             FilterList list = formatFilter(filter);
             scan.setFilter(list);
         }
