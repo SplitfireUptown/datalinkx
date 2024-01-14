@@ -7,6 +7,8 @@
     :handleMediaQuery="handleMediaQuery"
     :handleCollapse="handleCollapse"
     :i18nRender="i18nRender"
+    :siderWidth="224"
+    :footerRender="false"
     v-bind="settings"
   >
     <ads v-if="isProPreviewSite && !collapsed"/>
@@ -40,9 +42,9 @@
       <right-content :top-menu="settings.layout === 'topmenu'" :is-mobile="isMobile" :theme="settings.theme" />
     </template>
     <!-- custom footer / 自定义Footer -->
-    <template v-slot:footerRender>
+    <!-- <template v-slot:footerRender>
       <global-footer />
-    </template>
+    </template> -->
     <router-view />
   </pro-layout>
 </template>

@@ -1,6 +1,11 @@
 // eslint-disable-next-line
 import { UserLayout, BasicLayout, BlankLayout } from '@/layouts'
-import { bxAnaalyse } from '@/core/icons'
+import {
+  dataManage,
+  dataList,
+  taskList,
+  taskLog
+} from '@/core/icons'
 
 const RouteView = {
   name: 'RouteView',
@@ -20,25 +25,39 @@ export const asyncRouterMap = [
         name: 'datasource',
         redirect: '/datasource/workplace',
         component: RouteView,
-        meta: { title: 'menu.datasource', keepAlive: true, icon: bxAnaalyse },
+        meta: { title: 'menu.datasource', keepAlive: true, icon: dataManage },
         children: [
           {
             path: '/dashboard',
             name: 'dashboard',
             component: () => import('@/views/datasource/DsList.vue'),
-            meta: { title: '数据源列表', keepAlive: false }
+            meta: { title: 'menu.datasourcelist', keepAlive: false, icon: dataList }
+            // children: [
+            //   {
+            //     path: '/job',
+            //     name: 'job',
+            //     component: () => import('@/views/job/JobList.vue'),
+            //     meta: { title: 'http', keepAlive: false }
+            //   },
+            //   {
+            //     path: '/job',
+            //     name: 'job',
+            //     component: () => import('@/views/job/JobList.vue'),
+            //     meta: { title: 'mysql', keepAlive: false }
+            //   }
+            // ]
           },
           {
             path: '/job',
             name: 'job',
             component: () => import('@/views/job/JobList.vue'),
-            meta: { title: '任务列表', keepAlive: false }
+            meta: { title: 'menu.tasklist', keepAlive: false, icon: taskList }
           },
           {
             path: '/job_log',
             name: 'joblog',
             component: () => import('@/views/joblog/JobLogList.vue'),
-            meta: { title: '任务执行日志', keepAlive: false }
+            meta: { title: 'menu.tasklistlog', keepAlive: false, icon: taskLog }
           }
           // 外部链接
           // {
