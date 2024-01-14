@@ -30,15 +30,15 @@ const StatusType = [
     value: 0
   },
   {
-    label: '同步中',
+    label: '流转中',
     value: 1
   },
   {
-    label: '同步完成',
+    label: '流转完成',
     value: 2
   },
   {
-    label: '同步失败',
+    label: '流转失败',
     value: 3
   },
   {
@@ -87,7 +87,7 @@ export default {
           }
         },
         {
-          title: '同步进度(w/r)',
+          title: '流转进度(w/r)',
           width: '10%',
           dataIndex: 'progress'
         },

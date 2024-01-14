@@ -219,5 +219,5 @@ jobmanager.execution.failover-strategy: region
 
 # Interval in milliseconds for refreshing the monitored directories.
 #historyserver.archive.fs.refresh-interval: 10000
-#rest.bind-port: 8888
+rest.bind-port: 8888
 rest.port: 8081

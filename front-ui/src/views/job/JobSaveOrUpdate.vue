@@ -241,11 +241,11 @@ export default {
             this.isIncrement = true
           }
           fetchTables(this.selectedTargetSource).then(res => {
-            this.sourceTables = res.result
+            this.targetTables = res.result
           })
           this.handleFromTbChange(this.selectedSourceTable)
           fetchTables(this.selectedDataSource).then(res => {
-            this.targetTables = res.result
+            this.sourceTables = res.result
           })
           this.handleToTbChange(this.selectedTargetTable)
         })
@@ -312,8 +312,10 @@ export default {
       this.sourceTables = []
       this.targetTables = []
       this.isIncrement = false
+      this.mappings = []
       this.syncMode = ''
       this.incrementField = ''
+      this.schedulerConf = ''
     },
     removeMapping (index) {
       this.mappings.splice(index, 1)

@@ -19,7 +19,6 @@ import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
 import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
@@ -158,8 +157,6 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 .address(esSetupInfo.getAddress())
                 .username(esSetupInfo.getUid())
                 .password(esSetupInfo.getPwd())
-                .kerberosKrb5Path(esSetupInfo.getKerberosKrb5Path())
-                .kerberosJaasPath(esSetupInfo.getKerberosJaasPath())
                 .batchSize(param.getReader().getSync().getFetchSize() == null ? DEFAULT_FETCH_SIZE
                         : param.getReader().getSync().getFetchSize().longValue())
                 .index(param.getReader().getTableName())
@@ -233,13 +230,8 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
 
     @Override
     public Object getWriterInfo(FlinkActionParam param) {
-        String catalog = param.getWriter().getCatalog();
         String tableName = param.getWriter().getTableName();
         WriterInfo<EsWriter> writerInfo = new WriterInfo<>();
-        writerInfo.setName("eswriter");
-        if ("huawei".equals(esSetupInfo.getVersion())) {
-            writerInfo.setName("eshuaweiwriter");
-        }
         writerInfo.setName("eswriter");
         writerInfo.setParameter(EsWriter.builder()
                 .address(esSetupInfo.getAddress())
@@ -247,13 +239,16 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 .password(esSetupInfo.getPwd())
                 .timeout(ES_TIMEOUT)
                 .bulkAction(DEFAULT_FETCH_SIZE)
-                .index(catalog)
+                .index(tableName)
                 .type(tableName)
-                .idColumn(Lists.newArrayList(ImmutableMap.of("index", 0, "type", "integer")))
+//                .idColumn(Lists.newArrayList(ImmutableMap.of("index", 0, "type", "integer")))
                 .column(param.getWriter().getColumns().stream().map(col ->
                                 MetaColumn.builder()
                                         .name(col.getName())
-                                        .type(MetaColumn.esColumnTypeMap.getOrDefault(col.getType(), "keyword")).build())
+//                                        .type(MetaColumn.esColumnTypeMap.getOrDefault(col.getType(), "keyword"))
+                                        .type(col.getType())
+                                        .build()
+                        )
                         .collect(Collectors.toList()))
                 .build());
         return writerInfo;

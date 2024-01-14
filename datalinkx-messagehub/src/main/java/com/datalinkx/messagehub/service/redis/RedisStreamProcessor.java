@@ -81,7 +81,7 @@ public class RedisStreamProcessor extends MessageHubServiceImpl {
                     List<ObjectRecord<String, String>> messageList = streamOperations.read(
                             String.class,
                             Consumer.from(group, consumerName),
-                            StreamReadOptions.empty().count(1).block(Duration.ofSeconds(0)),
+                            StreamReadOptions.empty().count(1).block(Duration.ofSeconds(5)),
                             StreamOffset.create(topic, readOffset));
 
                     if (ObjectUtils.isEmpty(messageList)) {

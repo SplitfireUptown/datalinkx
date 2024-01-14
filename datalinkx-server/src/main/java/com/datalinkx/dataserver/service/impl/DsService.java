@@ -147,6 +147,7 @@ public class DsService {
 				mysqlSetupInfo.setType(toType);
 				mysqlSetupInfo.setUid(dsBean.getUsername());
 				mysqlSetupInfo.setPwd(dsBean.getPassword());
+				mysqlSetupInfo.setDatabase(dsBean.getDatabase());
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(mysqlSetupInfo));
 			case "elasticsearch":
 				EsSetupInfo esSetupInfo = new EsSetupInfo();

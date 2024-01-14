@@ -1,20 +1,16 @@
 package com.datalinkx.driver.dsdriver.mysqldriver;
 
 
+import java.util.HashSet;
+import java.util.Set;
 
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcDriver;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcReader;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcWriter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 
 @Slf4j
@@ -23,9 +19,6 @@ public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWrit
     public MysqlDriver(String connectId) {
         super(connectId);
     }
-
-    private static final String MYSQL_JDBC_PATTERN = "jdbc:mysql://%s:%s?useCursorFetch=%s" +
-            "&useUnicode=%s&zeroDateTimeBehavior=%s&characterEncoding=%s&useInformationSchema=%s&serverTimezone=%s";
 
     private static final String MYSQL_DATABASE_JDBC_PATTERN = "jdbc:mysql://%s:%s/%s?useCursorFetch=%s" +
             "&useUnicode=%s&zeroDateTimeBehavior=%s&characterEncoding=%s&useInformationSchema=%s&serverTimezone=%s";
@@ -47,9 +40,10 @@ public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWrit
     @Override
     protected String jdbcUrl() {
         return String.format(
-                MYSQL_JDBC_PATTERN,
+                MYSQL_DATABASE_JDBC_PATTERN,
                 this.jdbcSetupInfo.getServer(),
                 this.jdbcSetupInfo.getPort(),
+                this.jdbcSetupInfo.getDatabase(),
                 this.jdbcSetupInfo.getUseCursorFetch(),
                 this.jdbcSetupInfo.getUseUnicode(),
                 this.jdbcSetupInfo.getZeroDateTimeBehavior(),
@@ -59,20 +53,6 @@ public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWrit
         );
     }
 
-    protected String jdbcUrl(FlinkActionParam unit) {
-        return String.format(
-                MYSQL_DATABASE_JDBC_PATTERN,
-                this.jdbcSetupInfo.getServer(),
-                this.jdbcSetupInfo.getPort(),
-                unit.getWriter().getSchema(),
-                this.jdbcSetupInfo.getUseCursorFetch(),
-                this.jdbcSetupInfo.getUseUnicode(),
-                this.jdbcSetupInfo.getZeroDateTimeBehavior(),
-                this.jdbcSetupInfo.getCharacterEncoding(),
-                this.jdbcSetupInfo.getUseInformationSchema(),
-                this.jdbcSetupInfo.getServerTimezone()
-        );
-    }
 
     @Override
     protected String driverClass() {

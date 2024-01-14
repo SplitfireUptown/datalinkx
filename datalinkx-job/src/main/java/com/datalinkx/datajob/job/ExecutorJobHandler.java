@@ -28,6 +28,10 @@ public class ExecutorJobHandler {
 	@Value("${flinkx.path}")
 	private String flinkXHomePath;
 
+	@Value("${reserve.job_graph:false}")
+	private Boolean reserveJobGraph;
+
+
 	public String execute(String jobId, String reader, String writer) throws Exception {
 
 		StringBuffer errorRet = new StringBuffer();
@@ -64,7 +68,7 @@ public class ExecutorJobHandler {
 			throw new Exception(e);
 		} finally {
 			// 删除临时文件
-			if (FileUtil.exist(jobJsonFile)) {
+			if (FileUtil.exist(jobJsonFile) && !reserveJobGraph) {
 				FileUtil.del(new File(jobJsonFile));
 			}
 		}

@@ -1,7 +1,28 @@
 package com.datalinkx.driver.dsdriver.jdbcdriver;
 
 
-import com.datalinkx.common.utils.*;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.datalinkx.common.utils.Base64Utils;
+import com.datalinkx.common.utils.ConnectIdUtils;
+import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
+import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
@@ -10,7 +31,9 @@ import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.column.ReaderConnection;
 import com.datalinkx.driver.dsdriver.base.column.WriterConnection;
 import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
-import com.datalinkx.driver.dsdriver.base.model.*;
+import com.datalinkx.driver.dsdriver.base.model.DbTree;
+import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
+import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import com.datalinkx.driver.model.DataTransJobDetail;
@@ -18,13 +41,6 @@ import com.google.common.collect.Lists;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> extends SqlGenerator implements AbstractDriver<T, P, Q>, IDsReader, IDsWriter {
@@ -67,9 +83,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return "";
     }
 
-    protected String jdbcUrl(FlinkActionParam flinkActionParam) {
-        return jdbcUrl();
-    }
 
     protected String driverClass() {
         return "";
@@ -447,7 +460,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .fetchSize(defaultFetchSize)
                 .queryTimeOut(defaultQueryTimeOut)
                 .connection(Collections.singletonList(ReaderConnection.builder()
-                        .jdbcUrl(Collections.singletonList(jdbcUrl(unit)))
+                        .jdbcUrl(Collections.singletonList(jdbcUrl()))
                         .table(Collections.singletonList(unit.getReader().getTableName()))
                         .schema(schema)
                         .build()))
@@ -477,7 +490,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .password(jdbcSetupInfo.getPwd())
                 .connection(Collections.singletonList(WriterConnection.builder()
                         .schema(schema)
-                        .jdbcUrl(jdbcUrl(unit))
+                        .jdbcUrl(jdbcUrl())
                         .table(Collections.singletonList(unit.getWriter().getTableName()))
                         .build()))
                 .column(unit.getWriter().getColumns().stream().map(DataTransJobDetail.Column::getName).collect(Collectors.toList()))

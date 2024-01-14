@@ -2,6 +2,7 @@ package com.datalinkx.datajob.job;
 
 import java.util.Date;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.datalinkx.driver.utils.JobUtils;
 import com.datalinkx.common.utils.JsonUtils;
@@ -61,7 +62,7 @@ public class DataTransHandler {
             throw e;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            shutdownJob(startTime, jobParam, 1, e.getMessage());
+            shutdownJob(startTime, jobParam, MetaConstants.JobStatus.JOB_STATUS_ERROR, e.getMessage());
 
             XxlJobHelper.handleFail(e.getMessage());
         }

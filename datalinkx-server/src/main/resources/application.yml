@@ -25,6 +25,7 @@ spring:
     host:
     port:
     password:
+    timeout: 3000
 
 xxl-job:
   username:

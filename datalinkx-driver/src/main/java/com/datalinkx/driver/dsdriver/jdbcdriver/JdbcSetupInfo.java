@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JdbcSetupInfo extends SetupInfo {
+    private String database;
     private String server;
     private String pwd;
     private String uid;

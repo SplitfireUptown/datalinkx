@@ -192,8 +192,11 @@ public class JobService implements DtsJobService {
 				new DatalinkXServerException(StatusCode.TB_NOT_EXISTS, "xtable not exist"));
 
 		// 处理增量条件
+		DsTbBean fromTbBean = dsTbRepository.findByTbId(jobBean.getFromTbId())
+				.orElseThrow(() -> new DatalinkXServerException(StatusCode.XTB_NOT_EXISTS, "xtb not found"));
+
 		IDsReader dsReader = DsDriverFactory.getDsReader(dsService.getConnectId(fromDs));
-		Map<String, String> typeMappings = dsReader.getFields(fromDs.getDatabase(), fromDs.getSchema(), fromDs.getName())
+		Map<String, String> typeMappings = dsReader.getFields(fromDs.getDatabase(), fromDs.getSchema(), fromTbBean.getName())
 				.stream().collect(Collectors.toMap(TableField::getName, TableField::getRawType));
 		JobForm.SyncModeForm syncModeForm = JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class);
 
