@@ -32,7 +32,7 @@ services:
       --xxl.job.accessToken=testtoken'
 
   jobmanager:
-    image: flink:latest
+    image: flink:1.10.3
     ports:
       - "8081:8081"
     command: jobmanager
@@ -40,7 +40,7 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
 
   taskmanager:
-    image: flink:latest
+    image: flink:1.10.3
     depends_on:
       - jobmanager
     command: taskmanager
