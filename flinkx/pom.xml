@@ -22,11 +22,11 @@
 <!--        <module>flinkx-datahub</module>-->
 <!--        <module>flinkx-polardb</module>-->
         <module>flinkx-oracle</module>
-        <module>flinkx-sqlserver</module>
-        <module>flinkx-postgresql</module>
+<!--        <module>flinkx-sqlserver</module>-->
+<!--        <module>flinkx-postgresql</module>-->
 <!--        <module>flinkx-db2</module>-->
 <!--        <module>flinkx-gbase</module>-->
-        <module>flinkx-clickhouse</module>
+<!--        <module>flinkx-clickhouse</module>-->
 <!--        <module>flinkx-saphana</module>-->
 <!--        <module>flinkx-teradata</module>-->
 <!--        <module>flinkx-greenplum</module>-->
@@ -44,7 +44,7 @@
 <!--        <module>flinkx-kudu</module>-->
 <!--        <module>flinkx-cassandra</module>-->
 
-        <module>flinkx-redis</module>
+<!--        <module>flinkx-redis</module>-->
 <!--        <module>flinkx-mongodb</module>-->
 
         <!--******实时******-->
@@ -54,11 +54,11 @@
 <!--        <module>flinkx-kafka10</module>-->
 <!--        <module>flinkx-kafka11</module>-->
 <!--        <module>flinkx-kafka</module>-->
-        <module>flinkx-kafkacustom</module>
+<!--        <module>flinkx-kafkacustom</module>-->
 <!--        <module>flinkx-emqx</module>-->
 <!--        <module>flinkx-pulsar</module>-->
 <!--        <module>flinkx-pgwal</module>-->
-        <module>flinkx-restapi</module>
+<!--        <module>flinkx-restapi</module>-->
 <!--        <module>flinkx-vertica</module>-->
     </modules>
 
