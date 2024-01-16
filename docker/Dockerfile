@@ -9,7 +9,9 @@ WORKDIR /
 RUN git clone https://gitee.com/atuptown/datalinkx.git /datalinkx \
     && cd /datalinkx \
     && cp docker/settings.xml /usr/share/maven/conf \
-    && mvn clean install -U -Dmaven.test.skip=true
+    && mvn clean package -X -U -Dmaven.test.skip=true \
+    && cd /datalinkx/flinkx \
+    && mvn clean package -U -Dmaven.test.skip=true
 
 #切换jar目录
 WORKDIR /datalinkx
