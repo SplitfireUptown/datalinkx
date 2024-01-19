@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.datalinkx.common.sql.SqlOperator;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.common.utils.RefUtils;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -229,9 +230,13 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
     }
 
     @Override
-    public Object getWriterInfo(FlinkActionParam param) {
+    public Object getWriterInfo(FlinkActionParam param) throws Exception {
         String tableName = param.getWriter().getTableName();
         WriterInfo<EsWriter> writerInfo = new WriterInfo<>();
+        // es 7.x后续版本后取消了索引类型
+        List<String> indexTypeList = this.esService.getIndexType(tableName);
+        String indexType = ObjectUtils.isEmpty(indexTypeList) ? "doc" : indexTypeList.get(0);
+
         writerInfo.setName("eswriter");
         writerInfo.setParameter(EsWriter.builder()
                 .address(esSetupInfo.getAddress())
@@ -240,12 +245,10 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 .timeout(ES_TIMEOUT)
                 .bulkAction(DEFAULT_FETCH_SIZE)
                 .index(tableName)
-                .type(tableName)
-//                .idColumn(Lists.newArrayList(ImmutableMap.of("index", 0, "type", "integer")))
+                .type(indexType)
                 .column(param.getWriter().getColumns().stream().map(col ->
                                 MetaColumn.builder()
                                         .name(col.getName())
-//                                        .type(MetaColumn.esColumnTypeMap.getOrDefault(col.getType(), "keyword"))
                                         .type(col.getType())
                                         .build()
                         )

@@ -18,13 +18,20 @@
 
 package com.datalinkx.driver.dsdriver.esdriver;
 
-import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
-import com.datalinkx.driver.dsdriver.base.model.TableField;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.datalinkx.common.utils.HttpUtil;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
+import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -36,11 +43,11 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
-import org.elasticsearch.client.*;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 
 
 /**
@@ -169,43 +176,6 @@ public class OpenEsService implements EsService {
             }
 
             return tableFieldList;
-        } catch (ResponseException e) {
-            throw new Exception(getErrorInfo(EntityUtils.toString(e.getResponse().getEntity())));
-        } catch (IOException e) {
-            log.error("", e);
-            throw e;
-        } finally {
-            ConnectPool.releaseConnection(esDriver.getConnectId(), restClient);
-        }
-    }
-
-    public List<Map<String, String>> getObjects(String tableName) throws Exception {
-        RestClient restClient = ConnectPool.getConnection(esDriver, RestClient.class);
-        Response response = null;
-        try {
-            response = restClient.performRequest(new Request("POST", String.format("/%s/_search?format=json", tableName)));
-            String rawBody = EntityUtils.toString(response.getEntity());
-            JsonNode jsonNode = JsonUtils.toJsonNode(rawBody);
-
-            List<Map<String, String>> tableDataList = new ArrayList<>();
-            for (Iterator<JsonNode> it = jsonNode.get("hits").get("hits").elements(); it.hasNext();) {
-                JsonNode source = it.next().get("_source");
-                Map<String, String> tableData = new HashMap();
-                for (Iterator<String> iter = source.fieldNames(); iter.hasNext();) {
-                    String fname = iter.next();
-                    String value;
-                    if (source.get(fname) == null || source.get(fname) instanceof NullNode) {
-                        value = "";
-                    } else if (source.get(fname) instanceof ValueNode) {
-                        value = source.get(fname).asText();
-                    } else {
-                        value = source.get(fname).toString();
-                    }
-                    tableData.put(fname, value);
-                }
-                tableDataList.add(tableData);
-            }
-            return tableDataList;
         } catch (ResponseException e) {
             throw new Exception(getErrorInfo(EntityUtils.toString(e.getResponse().getEntity())));
         } catch (IOException e) {

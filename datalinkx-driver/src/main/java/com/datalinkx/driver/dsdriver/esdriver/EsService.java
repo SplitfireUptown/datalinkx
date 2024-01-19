@@ -18,15 +18,15 @@
 
 package com.datalinkx.driver.dsdriver.esdriver;
 
-import com.datalinkx.common.utils.DateUtil;
-import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.driver.dsdriver.base.model.TableField;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.datalinkx.common.utils.DateUtil;
+import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.driver.dsdriver.base.model.TableField;
+import com.fasterxml.jackson.databind.JsonNode;
 
 
 /**
@@ -42,8 +42,6 @@ public interface EsService {
 
 
     List<TableField> getFields(String tableName) throws Exception;
-
-    List<Map<String, String>> getObjects(String tableName) throws Exception;
 
     List<String> getIndexType(String tableName) throws Exception;
 
@@ -101,58 +99,6 @@ public interface EsService {
         return boolMap;
     }
 
-    default Map<String, Object> buildTerm(String name, String value, String mustOrShould) {
-        Map<String, Object> boolMap = new HashMap<>();
-        boolMap.put("bool", new HashMap<String, Object>() {
-            {
-                put(mustOrShould, new HashMap<String, Object>() {
-                    {
-                        put("term", new HashMap<String, Object>() {
-                            {
-                                put(name, new HashMap<String, Object>() {
-                                    {
-                                        put("value", value);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
-        return boolMap;
-    }
-
-    default Map<String, Object> buildWildcard(String name, String value, String mustOrShould) {
-        Map<String, Object> boolMap = new HashMap<>();
-        boolMap.put("bool", new HashMap<String, Object>() {
-            {
-                put(mustOrShould, new HashMap<String, Object>() {
-                    {
-                        put("wildcard", new HashMap<String, Object>() {
-                            {
-                                put(name, new HashMap<String, Object>() {
-                                    {
-                                        put("wildcard", value);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
-        return boolMap;
-    }
-
-    default Map<String, Object> buildShould(Map<String, Object> boolMap) {
-        Map<String, Object> shouldMap = new HashMap<>();
-        boolMap.put("should", boolMap);
-
-        return shouldMap;
-    }
 
     default String getErrorInfo(String errorInfo) {
         JsonNode jsonNode = JsonUtils.toJsonNode(errorInfo);
