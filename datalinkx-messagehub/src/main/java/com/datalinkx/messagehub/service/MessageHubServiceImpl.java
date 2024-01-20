@@ -6,19 +6,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.messagehub.bean.form.BaseMessageForm;
 import com.datalinkx.messagehub.bean.form.ConsumerAdapterForm;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
-import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.messagehub.service.redis.RedisPubSubProcessor;
+import com.datalinkx.messagehub.service.redis.RedisQueueProcessor;
+import com.datalinkx.messagehub.service.redis.RedisStreamProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import com.datalinkx.messagehub.service.redis.RedisQueueProcessor;
-import com.datalinkx.messagehub.service.redis.RedisStreamProcessor;
 
 
 @Slf4j

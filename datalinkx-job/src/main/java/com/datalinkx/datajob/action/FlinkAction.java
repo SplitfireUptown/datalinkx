@@ -16,23 +16,23 @@ import javax.annotation.Resource;
 
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.datajob.bean.JobSyncModeForm;
-import com.datalinkx.driver.dsdriver.DsDriverFactory;
-import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
 import com.datalinkx.common.exception.DatalinkXJobException;
-import com.datalinkx.driver.model.DataTransJobDetail;
-import com.datalinkx.driver.utils.JobUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.datalinkx.datajob.bean.JobStateForm;
+import com.datalinkx.datajob.bean.JobSyncModeForm;
 import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.datajob.client.flink.FlinkClient;
 import com.datalinkx.datajob.client.flink.response.FlinkJobAccumulators;
 import com.datalinkx.datajob.client.flink.response.FlinkJobStatus;
 import com.datalinkx.datajob.config.DsProperties;
 import com.datalinkx.datajob.job.ExecutorJobHandler;
+import com.datalinkx.driver.dsdriver.DsDriverFactory;
+import com.datalinkx.driver.dsdriver.IDsReader;
+import com.datalinkx.driver.dsdriver.IDsWriter;
+import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
+import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.driver.utils.JobUtils;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +44,7 @@ import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
-public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTransJobDetail, FlinkActionParam> {
+public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, FlinkActionParam> {
     public static ThreadLocal<Long> startTime = new ThreadLocal<>();
     public static ThreadLocal<Map<String, JobExecCountDto>> countRes = new ThreadLocal<>();
     public static ThreadLocal<Thread> checkThread = new ThreadLocal<>();
@@ -76,7 +76,7 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
         startTime.set(new Date().getTime());
         countRes.set(new HashMap<>());
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
-        log.info(String.format("jobid: %s, begin to sync", info.getJobId()));
+        log.info(String.format("jobid: %s, start to transfer", info.getJobId()));
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
                 .jobStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE).startTime(startTime.get()).endTime(null)
                 .allCount(jobExecCountDto.getAllCount())
@@ -114,13 +114,6 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
 
     @Override
     protected void beforeExec(FlinkActionParam unit) throws Exception {
-        // init reader and writer
-        initUnit(unit);
-
-        if (!ObjectUtils.isEmpty(unit.getErrorMsg())) {
-            throw new Exception(unit.getErrorMsg());
-        }
-
         String fromDbType = unit.getReader().getType();
         String toDbType = unit.getWriter().getType();
         if (!this.isSupportedDb(fromDbType, toDbType)) {
@@ -140,15 +133,20 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
             unit.setDsReader(readDsDriver);
             unit.setDsWriter(writeDsDriver);
         } catch (Exception e) {
-            throw new Exception("ds not exist", e);
+            throw new Exception("driver init error: ", e);
         }
     }
 
 
     @Override
     protected void execute(FlinkActionParam unit) throws Exception {
-        log.info(String.format("jobid: %s, exec from %s to %s",
-                unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
+        log.info(String.format("jobid: %s, exec from %s#%s to %s#%s",
+                unit.getJobId(),
+                unit.getReader().getSchema(),
+                unit.getReader().getTableName(),
+                unit.getWriter().getSchema(),
+                unit.getWriter().getTableName())
+        );
         String taskId = unit.getTaskId();
         try {
             if (!ObjectUtils.isEmpty(taskId)) {
@@ -160,13 +158,12 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
 
             String readerStr = JsonUtils.toJson(reader);
             String writerStr = JsonUtils.toJson(writer);
-            log.info(String.format("jobid : %s; reader: %s, writer: %s", unit.getJobId(), readerStr, writerStr));
             taskId = executorJobHandler.execute(unit.getJobId(), readerStr, writerStr);
             unit.setTaskId(taskId) ;
             // 更新task
             datalinkXServerClient.updateJobTaskRel(unit.getJobId(), taskId);
         } catch (DatalinkXJobException e) {
-            log.error("flink sync failed", e);
+            log.error("data transfer failed", e);
             throw e;
         }
     }
@@ -321,21 +318,5 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, DataTra
                     .jobId(jobDetail.getJobId())
                     .full(jobDetail.getFull())
                     .build()).collect(Collectors.toList());
-    }
-
-    @Override
-    public DataTransJobDetail getJobDetail(DataTransJobDetail jobParam) {
-        return jobParam;
-    }
-
-    @Override
-    protected void initUnit(FlinkActionParam unit) {
-        DataTransJobDetail detail = datalinkXServerClient.getJobExecInfo(unit.getJobId()).getResult();
-        if (detail.getSyncUnits().isEmpty()) {
-            unit.setErrorMsg(String.format("table %s not exist", unit.getReader().getTableId()));
-            return;
-        }
-        unit.setReader(detail.getSyncUnits().get(0).getReader());
-        unit.setWriter(detail.getSyncUnits().get(0).getWriter());
     }
 }

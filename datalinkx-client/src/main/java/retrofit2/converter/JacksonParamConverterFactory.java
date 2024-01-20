@@ -4,10 +4,10 @@ package retrofit2.converter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import retrofit2.http.JsonBeanParam;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
+import retrofit2.http.JsonBeanParam;
 
 
 public final class JacksonParamConverterFactory extends Converter.Factory {

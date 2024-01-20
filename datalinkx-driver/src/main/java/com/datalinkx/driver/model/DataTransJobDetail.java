@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
@@ -23,10 +22,9 @@ import lombok.experimental.FieldNameConstants;
 @NoArgsConstructor
 @FieldNameConstants
 @Builder
-@EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataTransJobDetail extends JobDetail {
+public class DataTransJobDetail {
     String jobId;
     List<SyncUnit> syncUnits;
     Integer full;
@@ -36,7 +34,6 @@ public class DataTransJobDetail extends JobDetail {
     @NoArgsConstructor
     @Builder
     public static class SyncUnit {
-        String taskId;
         Reader reader;
         Writer writer;
     }
@@ -49,7 +46,6 @@ public class DataTransJobDetail extends JobDetail {
     public static class Reader {
         String catalog;
         String schema;
-        String tableId;
         String tableName;
         String realName;
         List<Column> columns;
@@ -66,7 +62,6 @@ public class DataTransJobDetail extends JobDetail {
     public static class Writer {
         String catalog; // jdbc catalog;
         String schema; // jdbc catalog;
-        String tableId;
         String tableName;
         List<Column> columns;
         String connectId;
@@ -91,7 +86,7 @@ public class DataTransJobDetail extends JobDetail {
     public static class Sync {
         String type; // [overwrite全量更新，increment增量更新]
         Integer fetchSize; // 每次获取的条数
-        Integer queryTimeOut = 100000; // 查询超时时间
+        Integer queryTimeOut = 10000; // flinkx查询执行超时时间
         SyncCondition syncCondition;
 
         @Data

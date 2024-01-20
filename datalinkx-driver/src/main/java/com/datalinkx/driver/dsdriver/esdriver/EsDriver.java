@@ -235,7 +235,7 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
         WriterInfo<EsWriter> writerInfo = new WriterInfo<>();
         // es 7.x后续版本后取消了索引类型
         List<String> indexTypeList = this.esService.getIndexType(tableName);
-        String indexType = ObjectUtils.isEmpty(indexTypeList) ? "doc" : indexTypeList.get(0);
+        String indexType = ObjectUtils.isEmpty(indexTypeList) ? "_doc" : indexTypeList.get(0);
 
         writerInfo.setName("eswriter");
         writerInfo.setParameter(EsWriter.builder()

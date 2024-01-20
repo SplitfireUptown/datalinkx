@@ -27,8 +27,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 
 import retrofit2.Retrofit;
-import retrofit2.http.FieldMap;
-import retrofit2.http.FormUrlEncoded;
 
 /**
  * Named pair for a form-encoded request.

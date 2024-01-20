@@ -1,14 +1,13 @@
 package com.datalinkx.driver.dsdriver.jdbcdriver;
 
-import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
+import java.util.List;
+
 import com.datalinkx.driver.dsdriver.base.column.WriterConnection;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 
 
 @EqualsAndHashCode(callSuper = true)

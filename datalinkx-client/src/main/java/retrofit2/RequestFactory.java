@@ -17,9 +17,25 @@
 package retrofit2;
 
 
+import static retrofit2.Utils.methodError;
+import static retrofit2.Utils.parameterError;
 
-import retrofit2.http.QueryBean;
-import retrofit2.Utils;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
+
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -44,29 +60,11 @@ import retrofit2.http.Part;
 import retrofit2.http.PartMap;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.QueryBean;
 import retrofit2.http.QueryMap;
 import retrofit2.http.QueryName;
 import retrofit2.http.Tag;
 import retrofit2.http.Url;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-
-import static retrofit2.Utils.methodError;
-import static retrofit2.Utils.parameterError;
-
-import javax.annotation.Nullable;
 
 
 final class RequestFactory {

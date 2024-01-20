@@ -24,9 +24,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import retrofit2.http.HeaderMap;
-import retrofit2.http.Headers;
-
 /**
  * Replaces the header with the value of its target.
  * 

@@ -2,9 +2,9 @@ package com.datalinkx.dataserver.controller;
 
 import java.util.List;
 
+import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
-import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.service.impl.JobService;
 import lombok.extern.slf4j.Slf4j;

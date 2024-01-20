@@ -3,11 +3,11 @@ package com.datalinkx.dataserver.controller;
 
 import java.util.List;
 
-import com.datalinkx.dataserver.controller.form.JobForm;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import com.datalinkx.common.result.WebResult;
+import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
 import com.datalinkx.dataserver.service.DtsJobService;
+import com.datalinkx.driver.model.DataTransJobDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

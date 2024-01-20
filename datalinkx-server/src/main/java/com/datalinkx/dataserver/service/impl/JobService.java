@@ -95,7 +95,7 @@ public class JobService implements DtsJobService {
 		jobBean.setConfig(toJson(form.getFieldMappings()));
 		jobBean.setFromTbId(getXtbId(form.getFromTbName(), form.getFromDsId()));
 		jobBean.setToTbId(getXtbId(form.getToTbName(), form.getFromDsId()));
-		jobBean.setStatus(MetaConstants.JobStatus.JOB_TABLE_CREATE);
+		jobBean.setStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE);
 		jobBean.setCrontab(form.getSchedulerConf());
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 
@@ -165,7 +165,6 @@ public class JobService implements DtsJobService {
 
 		DataTransJobDetail.SyncUnit syncUnit = DataTransJobDetail.SyncUnit
 				.builder()
-				.taskId(jobId)
 				.reader(this.getReader(jobBean, fieldMappingForms))
 				.writer(this.getWriter(jobBean, fieldMappingForms))
 				.build();
@@ -210,7 +209,6 @@ public class JobService implements DtsJobService {
 
 		return DataTransJobDetail.Reader
 				.builder()
-				.tableId(tbBean.getTbId())
 				.connectId(dsService.getConnectId(fromDs))
 				.type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(fromDs.getType()))
 				.schema(fromDs.getDatabase())
@@ -286,7 +284,7 @@ public class JobService implements DtsJobService {
 
 		return DataTransJobDetail.Writer.builder()
 				.schema(toDs.getDatabase()).connectId(dsService.getConnectId(toDs))
-				.tableId(jobBean.getToTbId()).type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
+				.type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
 				.tableName(tbBean.getName()).columns(toCols).build();
 	}
 

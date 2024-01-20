@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
-import com.datalinkx.dataserver.controller.form.JobUnitStateForm;
 import com.datalinkx.driver.model.DataTransJobDetail;
 
 
