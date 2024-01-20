@@ -1,6 +1,5 @@
 package com.datalinkx.dataserver.repository;
 
-import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobLogBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -2,6 +2,9 @@ package com.datalinkx.messagehub.service.redis;
 
 import javax.annotation.Resource;
 
+import com.datalinkx.messagehub.bean.form.ConsumerAdapterForm;
+import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
+import com.datalinkx.messagehub.service.MessageHubServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -10,10 +13,6 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.stereotype.Service;
-
-import com.datalinkx.messagehub.bean.form.ConsumerAdapterForm;
-import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
-import com.datalinkx.messagehub.service.MessageHubServiceImpl;
 
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 @Service("redisPubSubProcessor")

@@ -1,16 +1,16 @@
 package com.datalinkx.driver.dsdriver.restapidriver;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 @EqualsAndHashCode(callSuper = true)

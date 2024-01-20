@@ -1,11 +1,11 @@
 package com.datalinkx.driver.dsdriver.mysqldriver;
 
+import java.util.TimeZone;
+
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcSetupInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-
-import java.util.TimeZone;
 
 
 @Data

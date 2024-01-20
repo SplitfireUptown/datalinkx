@@ -11,26 +11,24 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.datalinkx.driver.model.JobContext;
 import com.datalinkx.driver.utils.JobUtils;
-import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.xxl.job.core.thread.JobThread;
 import lombok.extern.slf4j.Slf4j;
 
 
 
 @Slf4j
-public abstract class AbstractFlinkAction<T, D, U> implements IAction<T> {
-    protected abstract void begin(D info);
-    protected abstract void end(D info, int status, String errmsg);
+public abstract class AbstractFlinkAction<T, U> implements IAction<T> {
+    protected abstract void begin(T info);
+    protected abstract void end(T info, int status, String errmsg);
     protected abstract void beforeExec(U unit) throws Exception;
     protected abstract void execute(U unit) throws Exception;
     protected abstract boolean checkResult(U unit);
     protected abstract void afterExec(U unit, boolean success, String errorMsg);
     protected abstract void cancel(U unit);
-    protected abstract List<U> getExecUnitList(D info);
-    protected abstract D getJobDetail(T jobParam);
-    protected abstract void initUnit(U unit);
+    protected abstract List<U> getExecUnitList(T info);
 
     private boolean isStop() {
         JobThread jobThread = ((JobThread)Thread.currentThread());
@@ -53,18 +51,16 @@ public abstract class AbstractFlinkAction<T, D, U> implements IAction<T> {
 
     @Override
     public void doAction(T actionInfo) throws Exception {
-        // 获取job详情
-        D detail = getJobDetail(actionInfo);
         LinkedBlockingDeque<U> runningUnit = new LinkedBlockingDeque<U>();
         LinkedBlockingDeque<U> unfinished = new LinkedBlockingDeque<>();
         Thread postThread;
         try {
             StringBuffer error = new StringBuffer();
             // 准备执行job
-            begin(detail);
+            begin(actionInfo);
 
             // 获取job中包含的执行单元列表
-            List<U> execUnits = getExecUnitList(detail);
+            List<U> execUnits = getExecUnitList(actionInfo);
             AtomicInteger unitCount = new AtomicInteger(execUnits.size());
 
             JobContext jobContext = JobUtils.cntx();
@@ -87,9 +83,8 @@ public abstract class AbstractFlinkAction<T, D, U> implements IAction<T> {
                             } else {
                                 unfinished.add(unit);
                             }
-
                         } catch (Exception e) {
-                            log.error("", e);
+                            log.error("datatransfer job error ", e);
                             String errorMsg = e.getMessage();
                             error.append(errorMsg).append("\r\n");
                             unitCount.decrementAndGet();
@@ -134,7 +129,7 @@ public abstract class AbstractFlinkAction<T, D, U> implements IAction<T> {
                 try {
                     // 每个单元执行前的准备
                     if (isStop()) {
-                        log.error("logkill trigger");
+                        log.error("job kill trigger");
                         throw new InterruptedException();
                     }
                     beforeExec(unit);
@@ -158,15 +153,15 @@ public abstract class AbstractFlinkAction<T, D, U> implements IAction<T> {
             postThread.join();
 
             // 整个Job结束后的处理
-            end(detail, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
+            end(actionInfo, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
         } catch (InterruptedException e) {
-            log.error("Stop task by user.");
+            log.error("Shutdown job by user.");
             JobUtils.cntx().setCanceled(true);
-            end(detail, JOB_STATUS_STOP, "cancel the job");
+            end(actionInfo, JOB_STATUS_STOP, "cancel the job");
             throw e;
         } catch (Throwable e) {
             log.error("sync failed", e);
-            end(detail, JOB_STATUS_ERROR, e.getMessage());
+            end(actionInfo, JOB_STATUS_ERROR, e.getMessage());
         }
     }
 }

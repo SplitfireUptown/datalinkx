@@ -26,8 +26,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 
 import retrofit2.Retrofit;
-import retrofit2.http.Query;
-import retrofit2.http.QueryName;
 
 /**
  * Query parameter keys and values appended to the URL.

@@ -2,7 +2,6 @@ package com.datalinkx.messagehub.bean.form;
 
 import java.lang.reflect.Method;
 
-
 import com.datalinkx.common.constants.MessageHubConstants;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

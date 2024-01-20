@@ -1,8 +1,8 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
-import lombok.Data;
-
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class DbTree {

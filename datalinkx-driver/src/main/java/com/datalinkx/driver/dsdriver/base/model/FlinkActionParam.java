@@ -1,5 +1,8 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.model.DataTransJobDetail;
@@ -9,9 +12,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
-
-import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Data
@@ -30,7 +30,6 @@ public class FlinkActionParam {
     int readRecords = 0;
     int writeRecords = 0;
     int errorRecords = 0;
-    String errorMsg = "success";
 
     IDsReader dsReader;
     IDsWriter dsWriter;

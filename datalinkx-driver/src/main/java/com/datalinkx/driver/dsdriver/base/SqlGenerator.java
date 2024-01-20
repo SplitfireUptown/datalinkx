@@ -1,15 +1,14 @@
 package com.datalinkx.driver.dsdriver.base;
 
-import com.datalinkx.common.sql.*;
-import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
-import com.datalinkx.driver.model.DataTransJobDetail;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import com.datalinkx.common.sql.CompareOperator;
+import com.datalinkx.common.sql.RelOperator;
+import com.datalinkx.common.sql.SqlOperator;
+import com.datalinkx.common.utils.ObjectUtils;
+import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
+import org.apache.commons.lang3.StringUtils;
 
 
 public abstract class SqlGenerator {

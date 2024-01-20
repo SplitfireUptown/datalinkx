@@ -1,17 +1,17 @@
 package com.datalinkx.driver.dsdriver.restapidriver;
 
 
+import java.util.List;
+
 import com.datalinkx.common.sql.SqlOperator;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.driver.dsdriver.base.model.*;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
-import com.datalinkx.driver.dsdriver.base.model.*;
+import com.datalinkx.driver.dsdriver.base.model.DbTree;
+import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
+import com.datalinkx.driver.dsdriver.base.model.TableField;
 import lombok.extern.slf4j.Slf4j;
-
-
-import java.util.List;
 
 
 @Slf4j

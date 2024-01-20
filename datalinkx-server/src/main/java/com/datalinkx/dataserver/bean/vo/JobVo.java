@@ -1,14 +1,9 @@
 package com.datalinkx.dataserver.bean.vo;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import com.datalinkx.dataserver.controller.form.JobForm;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
