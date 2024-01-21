@@ -19,6 +19,12 @@ export function exec (jobId) {
     method: 'POST'
   })
 }
+export function stop (jobId) {
+  return axios({
+    url: `/api/job/stop/${jobId}`,
+    method: 'POST'
+  })
+}
 export function addObj (obj) {
   return axios({
     url: '/api/job/create',

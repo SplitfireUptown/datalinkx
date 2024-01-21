@@ -58,6 +58,12 @@ public class JobController {
 		return WebResult.of(jobId);
 	}
 
+	@RequestMapping("/stop/{jobId}")
+	public WebResult<String> jobStop(@PathVariable String jobId) {
+		jobService.jobStop(jobId);
+		return WebResult.of(jobId);
+	}
+
 	@RequestMapping("/log/page")
 	public PageVo<List<JobVo.JobLogPageVo>> logPage(JobForm.JobLogPageForm jobLogPageForm) {
 		return jobService.logPage(jobLogPageForm);
