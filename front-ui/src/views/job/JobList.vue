@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { pageQuery, delObj, exec } from '@/api/job/job'
+import { pageQuery, delObj, exec, stop } from '@/api/job/job'
 import { closeConnect } from '@/api/job/sse'
 import JobSaveOrUpdate from '../job/JobSaveOrUpdate.vue'
 // 0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING
@@ -44,6 +44,10 @@ const StatusType = [
   {
     label: '排队中',
     value: 4
+  },
+  {
+    label: '流转停止',
+    value: 5
   }
 ]
 export default {
@@ -105,6 +109,8 @@ export default {
                 </a-popconfirm>
                 <a-divider type="vertical" />
                 <a href="javascript:;"onClick={(e) => this.execJob(record)}>手动触发</a>
+                <a-divider type="vertical" />
+                <a href="javascript:;"onClick={(e) => this.stopJob(record)}>暂停流转</a>
               </div>
             )
           }
@@ -169,6 +175,18 @@ export default {
       exec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')
+          this.init()
+        } else {
+          this.$message.error(res.errstr)
+        }
+      }).finally(() => {
+        this.loading = false
+      })
+    },
+    stopJob (record) {
+      stop(record.job_id).then(res => {
+        if (res.status === '0') {
+          this.$message.info('停止成功')
           this.init()
         } else {
           this.$message.error(res.errstr)

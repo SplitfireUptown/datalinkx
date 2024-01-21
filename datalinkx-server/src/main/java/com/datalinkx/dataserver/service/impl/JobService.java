@@ -501,4 +501,9 @@ public class JobService implements DtsJobService {
 		result.setTotal(jobLogBeans.getTotalElements());
 		return result;
 	}
+
+	public void jobStop(String jobId) {
+		jobRepository.updateJobStatus(jobId, MetaConstants.JobStatus.JOB_STATUS_STOP);
+		jobClientApi.stop(jobId);
+	}
 }

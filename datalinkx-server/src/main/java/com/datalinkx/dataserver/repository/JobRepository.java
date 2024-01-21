@@ -22,6 +22,11 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 
 	@Modifying
 	@Transactional
+	@Query(value = "update JOB set status = :status where job_id = :jobId", nativeQuery = true)
+	void updateJobStatus(String jobId, Integer status);
+
+	@Modifying
+	@Transactional
 	@Query(value = "update JOB set is_del = 1 where job_id = ?1", nativeQuery = true)
 	void logicDeleteByJobId(String jobId);
 
