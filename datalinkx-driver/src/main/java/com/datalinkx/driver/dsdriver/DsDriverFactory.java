@@ -9,6 +9,7 @@ import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.driver.dsdriver.esdriver.EsDriver;
 import com.datalinkx.driver.dsdriver.mysqldriver.MysqlDriver;
 import com.datalinkx.driver.dsdriver.oracledriver.OracleDriver;
+import com.datalinkx.driver.dsdriver.redisDriver.RedisDriver;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -23,6 +24,7 @@ public final class  DsDriverFactory {
         dsDriverMap.put("elasticsearch", EsDriver.class);
         dsDriverMap.put("mysql", MysqlDriver.class);
         dsDriverMap.put("oracle", OracleDriver.class);
+        dsDriverMap.put("redis", RedisDriver.class);
     }
 
     public static IDsReader getDsReader(String connectId) throws Exception {
@@ -34,13 +36,13 @@ public final class  DsDriverFactory {
                 IDsReader dsReader = (IDsReader) constructor.newInstance(connectId);
                 return dsReader;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                log.error("create ds dsdriver error", e);
+                log.error("driver load error", e);
             }
         } catch (NoSuchMethodException e) {
-            log.error("create ds dsdriver error", e);
+            log.error("driver load error", e);
         }
 
-        throw new Exception("no dsdriver");
+        throw new Exception("can not initialize driver");
     }
 
     public static IDsWriter getDsWriter(String connectId) throws Exception {
@@ -52,12 +54,12 @@ public final class  DsDriverFactory {
                 IDsWriter dsWriter = (IDsWriter) constructor.newInstance(connectId);
                 return dsWriter;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                log.error("create ds dsdriver error", e);
+                log.error("driver load error", e);
             }
         } catch (NoSuchMethodException e) {
-            log.error("create ds dsdriver error", e);
+            log.error("driver load error", e);
         }
 
-        throw new Exception("no dsdriver");
+        throw new Exception("can not initialize driver");
     }
 }

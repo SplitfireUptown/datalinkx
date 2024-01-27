@@ -44,7 +44,7 @@
 <!--        <module>flinkx-kudu</module>-->
 <!--        <module>flinkx-cassandra</module>-->
 
-<!--        <module>flinkx-redis</module>-->
+        <module>flinkx-redis</module>
 <!--        <module>flinkx-mongodb</module>-->
 
         <!--******实时******-->

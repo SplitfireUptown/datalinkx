@@ -9,7 +9,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EsSetupInfo extends SetupInfo {
     private String address;
-    private String version;
     private String uid;
     private String pwd;
 }
