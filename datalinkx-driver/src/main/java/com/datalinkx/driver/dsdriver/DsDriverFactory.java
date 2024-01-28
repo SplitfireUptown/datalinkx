@@ -27,14 +27,20 @@ public final class  DsDriverFactory {
         dsDriverMap.put("redis", RedisDriver.class);
     }
 
+    public static IDsDriver getDriver(String connectId) throws Exception {
+        String dsType = ConnectIdUtils.getDsType(connectId);
+        Class clazz = dsDriverMap.get(dsType.toLowerCase());
+        Constructor constructor = clazz.getDeclaredConstructor(String.class);
+        return (IDsDriver) constructor.newInstance(connectId);
+    }
+
     public static IDsReader getDsReader(String connectId) throws Exception {
         String dsType = ConnectIdUtils.getDsType(connectId);
         Class clazz = dsDriverMap.get(dsType.toLowerCase());
         try {
             Constructor constructor = clazz.getDeclaredConstructor(String.class);
             try {
-                IDsReader dsReader = (IDsReader) constructor.newInstance(connectId);
-                return dsReader;
+                return (IDsReader) constructor.newInstance(connectId);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 log.error("driver load error", e);
             }
@@ -51,8 +57,7 @@ public final class  DsDriverFactory {
         try {
             Constructor constructor = clazz.getDeclaredConstructor(String.class);
             try {
-                IDsWriter dsWriter = (IDsWriter) constructor.newInstance(connectId);
-                return dsWriter;
+                return (IDsWriter) constructor.newInstance(connectId);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 log.error("driver load error", e);
             }

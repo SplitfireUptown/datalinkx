@@ -24,12 +24,14 @@ import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.DsTbRepository;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
+import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
 import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
 import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
+import com.datalinkx.driver.dsdriver.redisDriver.RedisSetupInfo;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 
 @Component
@@ -128,7 +131,7 @@ public class DsService {
 
 	private void checkConnect(DsBean dsBean) {
 		try {
-			IDsReader ignored = DsDriverFactory.getDsReader(getConnectId(dsBean));
+			IDsDriver ignored = DsDriverFactory.getDriver(getConnectId(dsBean));
 			ignored.connect(true);
 			log.info("connect success");
 		} catch (Exception e) {
@@ -170,6 +173,14 @@ public class DsService {
 				oracleSetupInfo.setAlias((String) configMap.getOrDefault("alias", "SID"));
 
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(oracleSetupInfo));
+			case "redis":
+				RedisSetupInfo redisSetupInfo = new RedisSetupInfo();
+				redisSetupInfo.setDatabase(Integer.parseInt(StringUtils.hasLength(dsBean.getDatabase()) ? dsBean.getDatabase() : "0"));
+				redisSetupInfo.setHost(dsBean.getHost());
+				redisSetupInfo.setPort(dsBean.getPort());
+				redisSetupInfo.setPwd(dsBean.getPassword());
+				redisSetupInfo.setType(toType);
+				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(redisSetupInfo));
 			default:
 				Map<String, Object> map = new HashMap<>();
 				map.put("type", MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsBean.getType()));

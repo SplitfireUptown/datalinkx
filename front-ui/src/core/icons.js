@@ -15,6 +15,7 @@ import mysqlPng from '@/assets/icons/MYSQL.png'
 import oraclePng from '@/assets/icons/ORACLE.png'
 import ESPng from '@/assets/icons/ELASTICSEARCH.png'
 import httpPng from '@/assets/icons/HTTP.png'
+import redisPng from '@/assets/icons/REDIS.png'
 
 export {
   bxAnaalyse,
@@ -25,5 +26,6 @@ export {
   mysqlPng,
   oraclePng,
   ESPng,
-  httpPng
+  httpPng,
+  redisPng
 }

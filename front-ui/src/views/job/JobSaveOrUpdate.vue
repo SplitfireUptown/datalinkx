@@ -213,10 +213,14 @@ export default {
       listQuery().then(res => {
         const record = res.result
         for (var a of record) {
-          this.fromDsList.push({
-            'dsId': a.dsId,
-            'name': a.name
-          })
+          // redis数据源暂不支持读
+          if (a.type !== 4) {
+            this.fromDsList.push({
+              'dsId': a.dsId,
+              'name': a.name
+            })
+          }
+
           this.toDsList.push({
             'dsId': a.dsId,
             'name': a.name

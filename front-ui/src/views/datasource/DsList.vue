@@ -61,26 +61,14 @@
 <script>
 import { pageQuery, delObj, getDsGroup } from '@/api/datasource/datasource'
 import DsSaveOrUpdate from './DsSaveOrUpdate.vue'
+import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
 import {
   mysqlPng,
   oraclePng,
-  ESPng
+  ESPng,
+  redisPng
   // httpPng
 } from '@/core/icons'
-const DataSourceType = [
-  {
-    label: 'MySQL',
-    value: 1
-  },
-  {
-    label: 'ELASTICSEARCH',
-    value: 2
-  },
-  {
-    label: 'ORACLE',
-    value: 3
-  }
-]
 export default {
   name: 'ContainerBottom',
   components: {
@@ -106,7 +94,7 @@ export default {
           customRender: (text) => {
             return (
               <div>
-                {DataSourceType.map(item => {
+                {DATA_SOURCE_TYPE.map(item => {
                   if (item.value === text) {
                     return <span>{item.label}</span>
                   }
@@ -170,13 +158,13 @@ export default {
           label: 'Oracle',
           dsTypeKey: 3,
           img: oraclePng
+        },
+        {
+          value: 'redis',
+          label: 'Redis',
+          dsTypeKey: 4,
+          img: redisPng
         }
-        // {
-        //   value: 'http',
-        //   label: 'Http',
-        //   dsTypeKey: 4,
-        //   img: httpPng
-        // }
       ],
       // 各数据源的数量
       dsGroupNumber: {
@@ -212,7 +200,7 @@ export default {
     getAllDsNumber () {
       getDsGroup().then(res => {
         if (res.status === '0') {
-          this.dsGroupNumber = res.result
+          this.dsGroupNumber = Object.assign({}, this.dsGroupNumber, res.result)
         } else {
           this.$message.error(res.error)
         }

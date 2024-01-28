@@ -1,15 +1,13 @@
 package com.datalinkx.driver.dsdriver.redisDriver;
 
-import com.datalinkx.common.utils.TelnetUtil;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
 import lombok.SneakyThrows;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 public class RedisService {
 
     private RedisSetupInfo redisSetupInfo;
-    private static JedisPool jedisPool;
+    private RedisClient redisClient;
 
     public RedisService(RedisSetupInfo redisSetupInfo) {
         this.redisSetupInfo = redisSetupInfo;
@@ -17,28 +15,14 @@ public class RedisService {
 
 
     @SneakyThrows
-    public Jedis getClient() {
-        if (jedisPool == null){
-            String host = this.redisSetupInfo.getHost();
-            Integer port = this.redisSetupInfo.getPort();
-
-            TelnetUtil.telnet(host, port);
-
-            String password = this.redisSetupInfo.getPwd();
-            int db = this.redisSetupInfo.getDatabase();
-
-            jedisPool = new JedisPool(getConfig(), host, port, 3000, password, db);
-        }
-        return jedisPool.getResource();
+    public RedisClient getClient() {
+        RedisURI redisUri = RedisURI.Builder.redis(redisSetupInfo.getHost())
+                .withPort(redisSetupInfo.getPort())
+                .withDatabase(redisSetupInfo.getDatabase())
+                .withPassword(redisSetupInfo.getPwd())
+                .build();
+        redisClient = RedisClient.create(redisUri);
+        return redisClient;
     }
 
-    private static JedisPoolConfig getConfig(){
-        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxIdle(100);
-        jedisPoolConfig.setMaxTotal(500);
-        jedisPoolConfig.setMinIdle(0);
-        jedisPoolConfig.setMaxWaitMillis(2000);
-        jedisPoolConfig.setTestOnBorrow(true);
-        return jedisPoolConfig;
-    }
 }

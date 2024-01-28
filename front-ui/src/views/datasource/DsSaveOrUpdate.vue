@@ -123,6 +123,7 @@
 <script>
 import pick from 'lodash.pick'
 import { getObj, addObj, putObj } from '@/api/datasource/datasource'
+import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
 let selectTables = []
 
 export default {
@@ -147,20 +148,7 @@ export default {
       editable: false,
       addable: false,
       showable: false,
-      DataSourceType: [
-        {
-          label: 'MySQL',
-          value: 1
-        },
-        {
-          label: 'ELASTICSEARCH',
-          value: 2
-        },
-        {
-          label: 'ORACLE',
-          value: 3
-        }
-      ],
+      DataSourceType: DATA_SOURCE_TYPE,
       type: 'add'
     }
   },
