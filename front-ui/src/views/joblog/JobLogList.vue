@@ -22,6 +22,10 @@
       :rowKey="record => record.id"
       @change="handleTableChange"
     >
+    <span slot="status" slot-scope="text, record" style="display: flex;align-items: center;">
+      <div :style=getTableCss(record.status)></div>
+      <span>{{ record.status ? '失败' : '成功'}}</span>
+    </span>
     </a-table>
   </a-card>
 </template>
@@ -29,16 +33,6 @@
 <script>
 import { pageQuery } from '@/api/job/joblog'
 // 0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING
-const StatusType = [
-  {
-    label: '成功',
-    value: 0
-  },
-  {
-    label: '失败',
-    value: 1
-  }
-]
 export default {
   name: 'ContainerBottom',
   components: {
@@ -81,17 +75,7 @@ export default {
           title: '任务状态',
           width: '10%',
           dataIndex: 'status',
-          customRender: (text) => {
-            return (
-              <div>
-                {StatusType.map(item => {
-                  if (item.value === text) {
-                    return <span>{item.label}</span>
-                  }
-                })}
-              </div>
-            )
-          }
+          scopedSlots: { customRender: 'status' }
         },
         {
           title: '新增条数',
@@ -131,6 +115,9 @@ export default {
         this.queryParam.jobId = ''
       })
     },
+    getTableCss (status) {
+      return `width:12px;height:12px;border-radius:50%;margin-right:4px;background-color: ${status ? '#f00' : '#0f0'};`
+    },
     handleTableChange (pagination, filters, sorter) {
       this.pagination = pagination
       this.pages.page_size = pagination.pageSize
@@ -151,6 +138,5 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="less">
 </style>
