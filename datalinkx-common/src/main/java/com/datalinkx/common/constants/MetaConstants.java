@@ -15,11 +15,13 @@ public final class MetaConstants {
         public static final Integer MYSQL = 1;
         public static final Integer ELASTICSEARCH = 2;
         public static final Integer ORACLE = 3;
+        public static final Integer REDIS = 4;
 
         public static final Map<Integer, String> TYPE_TO_DB_NAME_MAP = new HashMap<Integer, String>() {{
             put(MetaConstants.DsType.MYSQL, "mysql");
             put(MetaConstants.DsType.ELASTICSEARCH, "elasticsearch");
             put(MetaConstants.DsType.ORACLE, "oracle");
+            put(MetaConstants.DsType.REDIS, "redis");
         }};
     }
 

@@ -31,6 +31,7 @@ import org.apache.flink.types.Row;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.dtstack.flinkx.redis.RedisConfigKeys.CUSTOM_KEY;
 import static com.dtstack.flinkx.redis.RedisConfigKeys.KEY_BATCH_SIZE;
 import static com.dtstack.flinkx.redis.RedisConfigKeys.KEY_DATE_FORMAT;
 import static com.dtstack.flinkx.redis.RedisConfigKeys.KEY_DB;
@@ -60,6 +61,8 @@ public class RedisWriter extends BaseDataWriter {
 
     private int database = 0;
 
+    private String customKey;
+
     private List<Integer> keyIndexes = new ArrayList<>();
 
     private String keyFieldDelimiter;
@@ -84,6 +87,7 @@ public class RedisWriter extends BaseDataWriter {
         batchSize = writerConfig.getParameter().getIntVal(KEY_BATCH_SIZE,1);
         password = writerConfig.getParameter().getStringVal(KEY_PASSWORD);
         database = writerConfig.getParameter().getIntVal(KEY_DB,0);
+        customKey = writerConfig.getParameter().getStringVal(CUSTOM_KEY);
         keyFieldDelimiter = (String)writerConfig.getParameter().getVal(KEY_KEY_FIELD_DELIMITER,JedisUtil.DELIMITER);
         dateFormat = writerConfig.getParameter().getStringVal(KEY_DATE_FORMAT);
         expireTime = writerConfig.getParameter().getLongVal(KEY_EXPIRE_TIME,0);
@@ -112,6 +116,7 @@ public class RedisWriter extends BaseDataWriter {
         builder.setHostPort(hostPort);
         builder.setPassword(password);
         builder.setDatabase(database);
+        builder.setCustomKey(customKey);
         builder.setKeyIndexes(keyIndexes);
         builder.setKeyFieldDelimiter(keyFieldDelimiter);
         builder.setDateFormat(dateFormat);

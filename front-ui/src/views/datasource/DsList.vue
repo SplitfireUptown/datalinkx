@@ -61,7 +61,8 @@
 <script>
 import { pageQuery, delObj, getDsGroup } from '@/api/datasource/datasource'
 import DsSaveOrUpdate from './DsSaveOrUpdate.vue'
-import { DataSourceType, dsTypeList } from './const'
+import { dsTypeList } from './const'
+import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
 
 export default {
   name: 'ContainerBottom',
@@ -88,7 +89,7 @@ export default {
           customRender: (text) => {
             return (
               <div>
-                {DataSourceType.map(item => {
+                {DATA_SOURCE_TYPE.map(item => {
                   if (item.value === text) {
                     return <span>{item.label}</span>
                   }
@@ -168,7 +169,7 @@ export default {
     getAllDsNumber () {
       getDsGroup().then(res => {
         if (res.status === '0') {
-          this.dsGroupNumber = res.result
+          this.dsGroupNumber = Object.assign({}, this.dsGroupNumber, res.result)
         } else {
           this.$message.error(res.error)
         }

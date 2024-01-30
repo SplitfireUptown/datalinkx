@@ -257,6 +257,7 @@ export default {
         this.selectloading = false
         const record = res.result
         for (var a of record) {
+          // redis数据源暂不支持读
           if (a.type !== 4) {
             this.fromDsList.push({
               dsId: a.dsId,

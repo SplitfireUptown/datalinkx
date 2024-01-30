@@ -58,6 +58,10 @@ public class RedisOutputFormatBuilder extends BaseRichOutputFormatBuilder {
         this.format.keyFieldDelimiter = keyFieldDelimiter;
     }
 
+    public void setCustomKey(String customKey) {
+        this.format.customKey = customKey;
+    }
+
     public void setDateFormat(String dateFormat) {
         this.format.dateFormat = dateFormat;
     }

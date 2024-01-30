@@ -58,8 +58,8 @@ import org.elasticsearch.client.RestClientBuilder;
  */
 @Slf4j
 public class OpenEsService implements EsService {
-    private EsSetupInfo esSetupInfo;
-    private EsDriver esDriver;
+    private final EsSetupInfo esSetupInfo;
+    private final EsDriver esDriver;
 
     public OpenEsService(EsSetupInfo esSetupInfo, EsDriver esDriver) {
         this.esSetupInfo = esSetupInfo;
