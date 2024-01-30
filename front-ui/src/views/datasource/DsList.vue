@@ -61,26 +61,8 @@
 <script>
 import { pageQuery, delObj, getDsGroup } from '@/api/datasource/datasource'
 import DsSaveOrUpdate from './DsSaveOrUpdate.vue'
-import {
-  mysqlPng,
-  oraclePng,
-  ESPng
-  // httpPng
-} from '@/core/icons'
-const DataSourceType = [
-  {
-    label: 'MySQL',
-    value: 1
-  },
-  {
-    label: 'ELASTICSEARCH',
-    value: 2
-  },
-  {
-    label: 'ORACLE',
-    value: 3
-  }
-]
+import { DataSourceType, dsTypeList } from './const'
+
 export default {
   name: 'ContainerBottom',
   components: {
@@ -152,32 +134,7 @@ export default {
       },
       queryParam: {
       },
-      dsTypeList: [
-        {
-          value: 'MySQL',
-          label: 'MySQL',
-          dsTypeKey: 1,
-          img: mysqlPng
-        },
-        {
-          value: 'es',
-          label: 'ES',
-          dsTypeKey: 2,
-          img: ESPng
-        },
-        {
-          value: 'oracle',
-          label: 'Oracle',
-          dsTypeKey: 3,
-          img: oraclePng
-        }
-        // {
-        //   value: 'http',
-        //   label: 'Http',
-        //   dsTypeKey: 4,
-        //   img: httpPng
-        // }
-      ],
+      dsTypeList,
       // 各数据源的数量
       dsGroupNumber: {
         1: 0,
@@ -188,8 +145,7 @@ export default {
       currentDs: {
         value: 'MySQL',
         label: 'MySQL',
-        dsTypeKey: 1,
-        img: mysqlPng
+        dsTypeKey: 1
       }
     }
   },
