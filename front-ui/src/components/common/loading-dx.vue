@@ -1,8 +1,13 @@
 <template>
   <div class="base-loading-layer">
     <div :class="['size']" class="loader-outer">
-      <div class="loader-inner line-scale-pulse-out-rapid">
-        <div></div><div></div><div></div><div></div><div></div>
+      <div class="ant-spin-spinning">
+        <span class="ant-spin-dot ant-spin-dot-spin">
+          <i class="ant-spin-dot-item"></i>
+          <i class="ant-spin-dot-item"></i>
+          <i class="ant-spin-dot-item"></i>
+          <i class="ant-spin-dot-item"></i>
+        </span>
       </div>
     </div>
   </div>
@@ -20,63 +25,67 @@ export default {
 
 <style lang="less">
 .base-loading-layer {
-        position: absolute;
-        z-index: 999999;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-      }
-      .base-loading-layer .loader-outer{
-        position: absolute;
-        z-index: 999999;
-        top: 50%;
-        left: 50%;
-        width: 40px;
-        height: 40px;
-        margin-top: -20px;
-        margin-left: -20px;
-      }
-      .loader-outer.size-1x {
-        transform: scale(0.5);
-      }
-      .line-scale-pulse-out-rapid>div {
-        background-color: #5484E1;
-        width: 4px;
-        height: 35px;
-        border-radius: 2px;
-        margin: 2px;
-        display: inline-block;
-        -webkit-animation: line-scale-pulse-out-rapid .9s 0s infinite cubic-bezier(.11, .49, .38, .78);
-        animation: line-scale-pulse-out-rapid .9s 0s infinite cubic-bezier(.11, .49, .38, .78)
-      }
-      .line-scale-pulse-out-rapid>div:nth-child(2), .line-scale-pulse-out-rapid>div:nth-child(4) {
-        -webkit-animation-delay: .25s !important;
-        animation-delay: .25s !important
-      }
-      .line-scale-pulse-out-rapid>div:nth-child(1), .line-scale-pulse-out-rapid>div:nth-child(5) {
-        -webkit-animation-delay: .5s !important;
-        animation-delay: .5s !important
-      }
+  position: absolute;
+  z-index: 999999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  .loader-outer.size-1x {
+    transform: scale(0.5);
+  }
+}
 
-      @-webkit-keyframes line-scale-pulse-out-rapid {
-        0%, 90% {
-          -webkit-transform: scaley(1);
-          transform: scaley(1)
-        }
-        80% {
-          -webkit-transform: scaley(.3);
-          transform: scaley(.3)
-        }
-      }
-      @keyframes line-scale-pulse-out-rapid {
-        0%, 90% {
-          -webkit-transform: scaley(1);
-          transform: scaley(1)
-        }
-        80% {
-          -webkit-transform: scaley(.3);
-          transform: scaley(.3)
-        }
-      }
+.base-loading-layer .loader-outer{
+  position: absolute;
+  z-index: 999999;
+  top: 50%;
+  left: 50%;
+  margin-top: -20px;
+  margin-left: -20px;
+  .ant-spin-spinning {
+    position: static;
+    display: inline-block;
+    opacity: 1;
+  }
+  .ant-spin-dot {
+    font-size: 28px;
+  }
+  .ant-spin-dot-item {
+    position: absolute;
+    display: block;
+    width: 14px;
+    height: 14px;
+    background-color: #1890ff;
+    border-radius: 100%;
+    transform: scale(0.75);
+    transform-origin: 50% 50%;
+    opacity: 0.3;
+    -webkit-animation: antSpinMove 1s infinite linear alternate;
+            animation: antSpinMove 1s infinite linear alternate;
+  }
+
+  .ant-spin-dot-item:nth-child(1) {
+    top: 0;
+    left: 0;
+  }
+  .ant-spin-dot-item:nth-child(2) {
+    top: 0;
+    right: 0;
+    -webkit-animation-delay: 0.4s;
+            animation-delay: 0.4s;
+  }
+  .ant-spin-dot-item:nth-child(3) {
+    right: 0;
+    bottom: 0;
+    -webkit-animation-delay: 0.8s;
+            animation-delay: 0.8s;
+  }
+  .ant-spin-dot-item:nth-child(4) {
+    bottom: 0;
+    left: 0;
+    -webkit-animation-delay: 1.2s;
+            animation-delay: 1.2s;
+  }
+}
 </style>
