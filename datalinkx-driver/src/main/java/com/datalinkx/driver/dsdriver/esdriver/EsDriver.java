@@ -28,9 +28,9 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
     private static final long ES_TIMEOUT = 3000L;
     private static final long DEFAULT_FETCH_SIZE = 10000L;
 
-    private String connectId;
-    private EsSetupInfo esSetupInfo;
-    private EsService esService;
+    private final String connectId;
+    private final EsSetupInfo esSetupInfo;
+    private final EsService esService;
 
     public EsDriver(String connectId) {
         this.connectId = connectId;

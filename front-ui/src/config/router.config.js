@@ -3,6 +3,7 @@ import { UserLayout, BasicLayout, BlankLayout } from '@/layouts'
 import {
   dataManage,
   dataList,
+  task,
   taskList,
   taskLog
 } from '@/core/icons'
@@ -31,33 +32,13 @@ export const asyncRouterMap = [
             path: '/dashboard',
             name: 'dashboard',
             component: () => import('@/views/datasource/DsList.vue'),
-            meta: { title: 'menu.datasourcelist', keepAlive: false, icon: dataList }
-            // children: [
-            //   {
-            //     path: '/job',
-            //     name: 'job',
-            //     component: () => import('@/views/job/JobList.vue'),
-            //     meta: { title: 'http', keepAlive: false }
-            //   },
-            //   {
-            //     path: '/job',
-            //     name: 'job',
-            //     component: () => import('@/views/job/JobList.vue'),
-            //     meta: { title: 'mysql', keepAlive: false }
-            //   }
-            // ]
+            meta: { title: 'menu.batchDataSource', keepAlive: false, icon: dataList }
           },
           {
-            path: '/job',
-            name: 'job',
-            component: () => import('@/views/job/JobList.vue'),
-            meta: { title: 'menu.tasklist', keepAlive: false, icon: taskList }
-          },
-          {
-            path: '/job_log',
-            name: 'joblog',
-            component: () => import('@/views/joblog/JobLogList.vue'),
-            meta: { title: 'menu.tasklistlog', keepAlive: false, icon: taskLog }
+            path: '/StreamingDsList',
+            name: 'StreamingDsList',
+            component: () => import('@/views/datasource/StreamingDsList.vue'),
+            meta: { title: 'menu.streamingDataSource', keepAlive: false, icon: dataList }
           }
           // 外部链接
           // {
@@ -71,6 +52,27 @@ export const asyncRouterMap = [
           //   component: () => import('@/views/dashboard/Workplace'),
           //   meta: { title: 'menu.dashboard.workplace', keepAlive: true, permission: ['dashboard'] }
           // }
+        ]
+      },
+      {
+        path: '/transferTask',
+        name: 'transferTask',
+        redirect: '/transferTask/workplace',
+        component: RouteView,
+        meta: { title: 'menu.transferTask', keepAlive: true, icon: task },
+        children: [
+          {
+            path: '/job',
+            name: 'job',
+            component: () => import('@/views/job/JobList.vue'),
+            meta: { title: 'menu.tasklist', keepAlive: false, icon: taskList }
+          },
+          {
+            path: '/job_log',
+            name: 'joblog',
+            component: () => import('@/views/joblog/JobLogList.vue'),
+            meta: { title: 'menu.tasklistlog', keepAlive: false, icon: taskLog }
+          }
         ]
       }
     ]

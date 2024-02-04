@@ -5,6 +5,7 @@
     :visible="visible"
     :maskClosable="false"
     @cancel="handleCancel"
+    class="job-save-root"
   >
     <a-form :form="form" @submit="handleSubmit" style="max-width: 600px">
       <a-form-item
@@ -38,27 +39,49 @@
 
       <a-form-item>
         <a-row :gutter="16">
-          <a-col :span="12" >
-            <label>来源数据源表</label>
+          <a-col :span="12" class="job-save-col">
+            <div class="redis-type-lable">
+              <label>来源数据源表</label>
+            </div>
             <a-select v-model="selectedSourceTable" @change="handleFromTbChange" placeholder="请选择来源数据源表">
               <a-select-option v-for="table in sourceTables" :value="table" :key="table" >
                 {{ table }}
               </a-select-option>
             </a-select>
           </a-col>
-          <a-col :span="12">
-            <label>目标数据源表</label>
+          <a-col :span="12" v-show="!isRedisTo">
+            <div class="redis-type-lable">
+              <label>目标数据源表</label>
+            </div>
             <a-select v-model="selectedTargetTable" @change="handleToTbChange" placeholder="请选择目标数据源表">
               <a-select-option v-for="table in targetTables" :value="table" :key="table">
                 {{ table }}
               </a-select-option>
             </a-select>
           </a-col>
+          <a-col :span="12" v-show="isRedisTo" class="job-save-col">
+            <div class="redis-type-lable">
+              <label class="redis-lable">type:</label>
+              <label class="redis-lable">key:</label>
+            </div>
+            <div class="redis-type-val">
+              <a-select v-model="redisToType" @change="changeToRedisType" placeholder="请选择Type">
+                <a-select-option v-for="item in RedisTypes" :value="item.value" :key="item.value" >
+                  {{ item.label }}
+                </a-select-option>
+              </a-select>
+              <a-input
+                type="text"
+                placeholder="请输入Value"
+                v-model="redisToValue"/>
+            </div>
+          </a-col>
         </a-row>
       </a-form-item>
 
       <a-form-item
         label="同步配置"
+        v-show="!isRedisTo"
       >
         <a-row :gutter="16">
           <a-col :span="6">
@@ -125,6 +148,7 @@
           </a-col>
         </a-row>
       </a-form-item>
+      <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
     </a-form>
 
     <template slot="footer" >
@@ -137,9 +161,15 @@
 <script>
 import { fetchTables, getDsTbFieldsInfo, listQuery } from '@/api/datasource/datasource'
 import { addObj, getObj, modifyObj } from '@/api/job/job'
+import LoadingDx from './../../components/common/loading-dx.vue'
+import { RedisTypes } from './../datasource/const'
 export default {
+  components: {
+    LoadingDx
+  },
   data () {
     return {
+      RedisTypes,
       form: this.$form.createForm(this),
       selectedDataSource: null,
       selectedTargetSource: null,
@@ -168,7 +198,19 @@ export default {
       targetFields: [],
       isIncrement: false,
       syncMode: 'overwrite',
-      incrementField: ''
+      incrementField: '',
+      selectloading: false,
+      redisToType: 'string',
+      redisToValue: ''
+    }
+  },
+  computed: {
+    isRedisTo () {
+      let temp = false
+      if (this.selectedTargetSource) {
+        temp = this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 4
+      }
+      return temp
     }
   },
   methods: {
@@ -177,6 +219,10 @@ export default {
         this.confirmLoading = true
         if (!err) {
           this.confirmLoading = true
+          if (this.redisToValue !== '') {
+            this.selectedTargetTable = (this.redisToType + '$¥$' + this.redisToValue)
+          }
+
           const formData = {
             'job_id': this.jobId,
             'from_ds_id': this.selectedDataSource,
@@ -210,16 +256,23 @@ export default {
     edit (type, id) {
       this.visible = true
       this.type = type
+      this.selectloading = true
       listQuery().then(res => {
+        this.selectloading = false
         const record = res.result
         for (var a of record) {
-          this.fromDsList.push({
-            'dsId': a.dsId,
-            'name': a.name
-          })
+          // redis数据源暂不支持读
+          if (a.type !== 4) {
+            this.fromDsList.push({
+              dsId: a.dsId,
+              name: a.name,
+              type: a.type
+            })
+          }
           this.toDsList.push({
-            'dsId': a.dsId,
-            'name': a.name
+            dsId: a.dsId,
+            name: a.name,
+            type: a.type
           })
         }
       })
@@ -236,6 +289,12 @@ export default {
           this.jobId = record.job_id
           this.syncMode = record.sync_mode.mode
           console.log(this.syncMode)
+          if (this.selectedTargetTable.includes('$¥$')) {
+            const arr = this.selectedTargetTable.split('$¥$')
+            this.redisToValue = arr[1]
+            this.redisToType = arr[0]
+          }
+
           this.incrementField = record.sync_mode.increate_field
           if (this.syncMode === 'increment') {
             this.isIncrement = true
@@ -253,15 +312,26 @@ export default {
     },
     handleFromChange (value) {
       this.selectedDataSource = value
+      this.selectloading = true
       fetchTables(value).then(res => {
+        this.selectloading = false
         this.sourceTables = res.result
       })
     },
     handleToDsChange (value) {
       this.selectedTargetSource = value
-      fetchTables(value).then(res => {
-        this.targetTables = res.result
-      })
+      console.log('当前选中数据源类型', this.selectedTargetSource, this.isRedisTo)
+      // 如果目标数据源是redis 则设置为全量
+      if (this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 4) {
+        this.syncMode = 'overwrite'
+        this.isIncrement = false
+      } else {
+        this.selectloading = true
+        fetchTables(value).then(res => {
+          this.selectloading = false
+          this.targetTables = res.result
+        })
+      }
     },
     handleFromTbChange (value) {
       this.selectedSourceTable = value
@@ -274,6 +344,10 @@ export default {
       }).then(res => {
         this.sourceFields = res.result
       })
+    },
+    // 目标数据源为redis时切换类型
+    changeToRedisType (val) {
+      console.log(val)
     },
     changeSyncConfig (value) {
       if (value.target.value === 'increment') {
@@ -323,3 +397,22 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="less">
+.job-save-root {
+  .job-save-col {
+    .redis-type-lable {
+      display: flex;
+      .redis-lable {
+        display: block;
+        width: 48%;
+      }
+    }
+    .redis-type-val {
+      display: flex;
+      width: 100%;
+      margin-top: 4px;
+    }
+  }
+}
+</style>

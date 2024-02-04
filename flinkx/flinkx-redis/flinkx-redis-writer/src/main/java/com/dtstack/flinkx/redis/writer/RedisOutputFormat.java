@@ -54,6 +54,9 @@ public class RedisOutputFormat extends BaseRichOutputFormat {
 
     protected int database;
 
+    // 自定义key
+    protected String customKey;
+
     protected List<Integer> keyIndexes;
 
     protected String keyFieldDelimiter;
@@ -181,6 +184,11 @@ public class RedisOutputFormat extends BaseRichOutputFormat {
     }
 
     private String concatKey(Row row){
+        // 如果使用自定义key
+        if (StringUtils.isNotBlank(customKey)) {
+            return customKey;
+        }
+
         if (keyIndexes.size() == 1){
             return String.valueOf(row.getField(keyIndexes.get(0)));
         } else {

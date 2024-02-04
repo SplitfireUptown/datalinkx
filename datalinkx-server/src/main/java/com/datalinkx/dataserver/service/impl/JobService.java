@@ -264,8 +264,8 @@ public class JobService implements DtsJobService {
 		DsTbBean dsTbBean = dsTbRepository.findByTbId(jobBean.getToTbId())
 				.orElseThrow(() -> new DatalinkXServerException(StatusCode.XTB_NOT_EXISTS, "xtb not found"));
 
-		IDsReader dsReader = DsDriverFactory.getDsReader(dsService.getConnectId(toDs));
-		Map<String, String> typeMappings = dsReader.getFields(toDs.getDatabase(), toDs.getSchema(), dsTbBean.getName())
+		IDsReader dsWriter = DsDriverFactory.getDsReader(dsService.getConnectId(toDs));
+		Map<String, String> typeMappings = dsWriter.getFields(toDs.getDatabase(), toDs.getSchema(), dsTbBean.getName())
 				.stream().collect(Collectors.toMap(TableField::getName, TableField::getRawType));
 
 		List<DataTransJobDetail.Column> toCols = jobConf

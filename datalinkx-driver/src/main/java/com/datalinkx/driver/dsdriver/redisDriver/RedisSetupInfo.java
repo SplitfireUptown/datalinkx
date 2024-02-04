@@ -1,14 +1,15 @@
-package com.datalinkx.driver.dsdriver.esdriver;
+package com.datalinkx.driver.dsdriver.redisDriver;
 
 import com.datalinkx.driver.dsdriver.base.connect.SetupInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EsSetupInfo extends SetupInfo {
-    private String address;
-    private String uid;
+public class RedisSetupInfo extends SetupInfo {
+    private String host;
     private String pwd;
+    private Integer port;
+    private Integer database;
+    private String mode;
 }

@@ -32,6 +32,8 @@ public class RedisConfigKeys {
 
     public final static String KEY_DB = "database";
 
+    public final static String CUSTOM_KEY = "customKey";
+
     public final static String KEY_KEY_INDEXES = "keyIndexes";
 
     public final static String KEY_WRITE_MODE = "writeMode";

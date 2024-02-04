@@ -21,6 +21,8 @@ package com.dtstack.flinkx.writer;
 import com.dtstack.flinkx.classloader.ClassLoaderManager;
 import com.dtstack.flinkx.classloader.PluginUtil;
 import com.dtstack.flinkx.config.DataTransferConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -33,6 +35,7 @@ import java.util.Set;
  * @author huyifan.zju@163.com
  */
 public class DataWriterFactory {
+    private static Logger LOG = LoggerFactory.getLogger(DataWriterFactory.class);
 
     private DataWriterFactory() {}
 
@@ -48,6 +51,7 @@ public class DataWriterFactory {
                 return (BaseDataWriter)constructor.newInstance(config);
             });
         } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
