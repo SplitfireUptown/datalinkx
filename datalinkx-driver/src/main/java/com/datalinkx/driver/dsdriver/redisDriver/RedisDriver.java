@@ -1,5 +1,6 @@
 package com.datalinkx.driver.dsdriver.redisDriver;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.TelnetUtil;
@@ -46,14 +47,17 @@ public class RedisDriver implements AbstractDriver<RedisSetupInfo, AbstractReade
     @Override
     public Object getWriterInfo(FlinkActionParam param) throws Exception {
         String tableName = param.getWriter().getTableName();
+        String[] typeKeyArray = tableName.split(MetaConstants.DsType.REDIS_SPIT_STR);
+        String type = typeKeyArray[0];
+        String key = typeKeyArray[1];
         WriterInfo<RedisWriter> writerInfo = new WriterInfo<>();
         writerInfo.setName("rediswriter");
         writerInfo.setParameter(RedisWriter.builder()
-                        .customKey(redisSetupInfo.getCustomKey())
+                        .customKey(key)
                         .password(redisSetupInfo.getPwd())
                         .hostPort(redisSetupInfo.getHost() + ":" + redisSetupInfo.getPort())
                         .mode(redisSetupInfo.getMode())
-                        .type(redisSetupInfo.getType())
+                        .type(type)
                         .database(redisSetupInfo.getDatabase())
                         .keyIndexes(new String[0])
                 .build());

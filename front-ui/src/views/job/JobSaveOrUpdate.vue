@@ -62,7 +62,7 @@
           <a-col :span="12" v-show="isRedisTo" class="job-save-col">
             <div class="redis-type-lable">
               <label class="redis-lable">type:</label>
-              <label class="redis-lable">value:</label>
+              <label class="redis-lable">key:</label>
             </div>
             <div class="redis-type-val">
               <a-select v-model="redisToType" @change="changeToRedisType" placeholder="请选择Type">
@@ -219,6 +219,10 @@ export default {
         this.confirmLoading = true
         if (!err) {
           this.confirmLoading = true
+          if (this.redisToValue !== '') {
+            this.selectedTargetTable = (this.redisToType + '$¥$' + this.redisToValue)
+          }
+
           const formData = {
             'job_id': this.jobId,
             'from_ds_id': this.selectedDataSource,
@@ -285,6 +289,12 @@ export default {
           this.jobId = record.job_id
           this.syncMode = record.sync_mode.mode
           console.log(this.syncMode)
+          if (this.selectedTargetTable.includes('$¥$')) {
+            const arr = this.selectedTargetTable.split('$¥$')
+            this.redisToValue = arr[1]
+            this.redisToType = arr[0]
+          }
+
           this.incrementField = record.sync_mode.increate_field
           if (this.syncMode === 'increment') {
             this.isIncrement = true

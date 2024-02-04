@@ -17,6 +17,8 @@ public final class MetaConstants {
         public static final Integer ORACLE = 3;
         public static final Integer REDIS = 4;
 
+        public static final String REDIS_SPIT_STR = "$¥$";
+
         public static final Map<Integer, String> TYPE_TO_DB_NAME_MAP = new HashMap<Integer, String>() {{
             put(MetaConstants.DsType.MYSQL, "mysql");
             put(MetaConstants.DsType.ELASTICSEARCH, "elasticsearch");

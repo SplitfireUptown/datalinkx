@@ -11,6 +11,5 @@ public class RedisSetupInfo extends SetupInfo {
     private String pwd;
     private Integer port;
     private Integer database;
-    private String customKey;
     private String mode;
 }
