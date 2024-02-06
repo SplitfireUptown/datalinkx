@@ -66,17 +66,8 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         Class clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
         this.jdbcSetupInfo = (T) JsonUtils.toObject(ConnectIdUtils.decodeConnectId(connectId), clazz);
-        rebuildPassword(jdbcSetupInfo);
+        jdbcSetupInfo.setPwd(rebuildPassword(jdbcSetupInfo.getPwd()));
         this.connectId = connectId;
-    }
-
-    protected void rebuildPassword(JdbcSetupInfo jdbcSetupInfo) {
-        try {
-            String pwd = new String(Base64Utils.decodeBase64(jdbcSetupInfo.getPwd()));
-            jdbcSetupInfo.setPwd(pwd);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     protected String jdbcUrl() {
@@ -464,11 +455,17 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                         .table(Collections.singletonList(unit.getReader().getTableName()))
                         .schema(schema)
                         .build()))
-                .column(unit.getReader().getColumns().stream().map(col ->
+                .column(
+                        ObjectUtils.isEmpty(unit.getReader().getColumns()) ?
+                                Collections.singletonList(
+                                        MetaColumn.builder()
+                                                .name("*")
+                                                .build()
+                                )
+                                :
+                                unit.getReader().getColumns().stream().map(col ->
                                 MetaColumn.builder()
                                         .name(col.getName())
-                                        .value(col.getValue())
-                                        .format(col.getFormat())
                                         .build())
                         .collect(Collectors.toList()))
                 .where(whereSql)

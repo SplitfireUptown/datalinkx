@@ -60,15 +60,13 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, FlinkAc
     @Autowired
     private DatalinkXServerClient datalinkXServerClient;
 
-    @Autowired
-    private DsProperties dsProperties;
 
     @Resource(name = "messageHubServiceImpl")
     MessageHubService messageHubService;
 
-    public boolean isSupportedDb(String fromDbType, String toDbTYpe) {
-        return dsProperties.getDatasource().contains(fromDbType) && dsProperties.getDatasource().contains(toDbTYpe);
-    }
+//    public boolean isSupportedDb(String fromDbType, String toDbTYpe) {
+//        return dsProperties.getDatasource().contains(fromDbType) && dsProperties.getDatasource().contains(toDbTYpe);
+//    }
 
     @Override
     protected void begin(DataTransJobDetail info) {
@@ -114,12 +112,12 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, FlinkAc
 
     @Override
     protected void beforeExec(FlinkActionParam unit) throws Exception {
-        String fromDbType = unit.getReader().getType();
-        String toDbType = unit.getWriter().getType();
-        if (!this.isSupportedDb(fromDbType, toDbType)) {
-            log.error(String.format("flink not support from %s to %s", fromDbType, toDbType));
-            return;
-        }
+//        String fromDbType = unit.getReader().getType();
+//        String toDbType = unit.getWriter().getType();
+//        if (!this.isSupportedDb(fromDbType, toDbType)) {
+//            log.error(String.format("flink not support from %s to %s", fromDbType, toDbType));
+//            return;
+//        }
 
         log.info(String.format("jobid: %s, begin from %s to %s",
                 unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));

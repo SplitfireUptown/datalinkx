@@ -15,7 +15,7 @@ public class RedisWriter extends AbstractWriter {
     private String type;
     private String mode;
     private String customKey;
-    private String[] keyIndexes;
+    private Integer[] keyIndexes;
     private String password;
     private Integer database;
 }

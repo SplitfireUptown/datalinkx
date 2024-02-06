@@ -189,6 +189,7 @@ export default {
       toDsList: [],
       sourceTables: [],
       targetTables: [],
+      redisSpitKey: '!-!-!',
       mappings: [
         { sourceField: '', targetField: '' }
       ],
@@ -220,7 +221,7 @@ export default {
         if (!err) {
           this.confirmLoading = true
           if (this.redisToValue !== '') {
-            this.selectedTargetTable = (this.redisToType + '$¥$' + this.redisToValue)
+            this.selectedTargetTable = (this.redisToType + this.redisSpitKey + this.redisToValue)
           }
 
           const formData = {
@@ -289,8 +290,8 @@ export default {
           this.jobId = record.job_id
           this.syncMode = record.sync_mode.mode
           console.log(this.syncMode)
-          if (this.selectedTargetTable.includes('$¥$')) {
-            const arr = this.selectedTargetTable.split('$¥$')
+          if (this.selectedTargetTable.includes(this.redisSpitKey)) {
+            const arr = this.selectedTargetTable.split(this.redisSpitKey)
             this.redisToValue = arr[1]
             this.redisToType = arr[0]
           }

@@ -1,10 +1,19 @@
 package com.datalinkx.driver.dsdriver.base;
 
 
+import java.io.IOException;
+
+import com.datalinkx.common.utils.Base64Utils;
 import com.datalinkx.driver.dsdriver.base.connect.SetupInfo;
 import com.datalinkx.driver.dsdriver.base.reader.AbstractReader;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
+import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcSetupInfo;
+import lombok.SneakyThrows;
 
 public interface AbstractDriver<T extends SetupInfo, P extends AbstractReader, Q extends AbstractWriter> {
 
+    @SneakyThrows
+    default String rebuildPassword(String password) {
+       return new String(Base64Utils.decodeBase64(password));
+    }
 }

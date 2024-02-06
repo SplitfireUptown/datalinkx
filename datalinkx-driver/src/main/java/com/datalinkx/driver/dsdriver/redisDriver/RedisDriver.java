@@ -19,6 +19,7 @@ public class RedisDriver implements AbstractDriver<RedisSetupInfo, AbstractReade
     public RedisDriver(String connectId) {
         this.connectId = connectId;
         this.redisSetupInfo = JsonUtils.toObject(ConnectIdUtils.decodeConnectId(connectId) , RedisSetupInfo.class);
+        this.redisSetupInfo.setPwd(rebuildPassword(redisSetupInfo.getPwd()));
         this.redisService = new RedisService(this.redisSetupInfo);
     }
 
@@ -48,18 +49,29 @@ public class RedisDriver implements AbstractDriver<RedisSetupInfo, AbstractReade
     public Object getWriterInfo(FlinkActionParam param) throws Exception {
         String tableName = param.getWriter().getTableName();
         String[] typeKeyArray = tableName.split(MetaConstants.DsType.REDIS_SPIT_STR);
-        String type = typeKeyArray[0];
+        String typeArray = typeKeyArray[0];
         String key = typeKeyArray[1];
+
+        String[] typeModeArray = typeArray.split("-");
+        String type = typeModeArray[0];
+        String mode;
+        if (typeModeArray.length > 1) {
+            mode = typeModeArray[1];
+        } else {
+            mode = "set";
+        }
+
         WriterInfo<RedisWriter> writerInfo = new WriterInfo<>();
         writerInfo.setName("rediswriter");
         writerInfo.setParameter(RedisWriter.builder()
                         .customKey(key)
                         .password(redisSetupInfo.getPwd())
                         .hostPort(redisSetupInfo.getHost() + ":" + redisSetupInfo.getPort())
-                        .mode(redisSetupInfo.getMode())
+                        .mode(mode)
                         .type(type)
                         .database(redisSetupInfo.getDatabase())
-                        .keyIndexes(new String[0])
+                        // 只是为了补充JobGraph信息，无异议
+                        .keyIndexes(new Integer[] {0, 1})
                 .build());
         return writerInfo;
     }

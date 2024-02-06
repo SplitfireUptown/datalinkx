@@ -75,8 +75,6 @@ public class DataTransJobDetail {
     public static class Column {
         String name;
         String type;
-        String value;
-        String format;
     }
 
     @Data
