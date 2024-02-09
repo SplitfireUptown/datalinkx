@@ -1,6 +1,7 @@
 package com.datalinkx.dataserver.service.impl;
 
 
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNC;
 import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
@@ -188,9 +189,6 @@ public class JobService implements DtsJobService {
 						.build())
 				.collect(Collectors.toList());
 
-		DsTbBean tbBean = dsTbRepository.findByTbId(jobBean.getFromTbId()).orElseThrow(() ->
-				new DatalinkXServerException(StatusCode.TB_NOT_EXISTS, "xtable not exist"));
-
 		// 处理增量条件
 		DsTbBean fromTbBean = dsTbRepository.findByTbId(jobBean.getFromTbId())
 				.orElseThrow(() -> new DatalinkXServerException(StatusCode.XTB_NOT_EXISTS, "xtb not found"));
@@ -215,8 +213,7 @@ public class JobService implements DtsJobService {
 				.schema(fromDs.getDatabase())
 				.sync(sync)
 				.maxValue(syncModeForm.getIncreateValue())
-				.tableName(tbBean.getName())
-				.realName(tbBean.getName())
+				.tableName(fromTbBean.getName())
 				.columns(fromCols)
 				.build();
 	}
@@ -261,9 +258,6 @@ public class JobService implements DtsJobService {
 						() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "to ds not exist")
 				);
 
-
-		DsTbBean dsTbBean = dsTbRepository.findByTbId(jobBean.getToTbId())
-				.orElseThrow(() -> new DatalinkXServerException(StatusCode.XTB_NOT_EXISTS, "xtb not found"));
 
 		List<DataTransJobDetail.Column> toCols = jobConf
 				.stream()
@@ -374,9 +368,9 @@ public class JobService implements DtsJobService {
 			throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务已在运行中，请勿重复触发");
 		}
 
-//		if (jobBean.getStatus() == JOB_STATUS_STOP) {
-//			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
-//		}
+		if (jobBean.getStatus() == JOB_STATUS_STOP) {
+			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
+		}
 
 		jobBean.setStatus(JOB_STATUS_SYNC);
 
@@ -499,7 +493,7 @@ public class JobService implements DtsJobService {
 	}
 
 	public void jobStop(String jobId) {
-		jobRepository.updateJobStatus(jobId, MetaConstants.JobStatus.JOB_STATUS_STOP);
+		jobRepository.updateJobStatus(jobId, JOB_STATUS_STOP);
 		jobClientApi.stop(jobId);
 	}
 }

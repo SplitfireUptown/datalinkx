@@ -47,7 +47,6 @@ public class DataTransJobDetail {
         String catalog;
         String schema;
         String tableName;
-        String realName;
         List<Column> columns;
         Sync sync;
         String connectId;
