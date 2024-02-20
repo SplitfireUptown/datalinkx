@@ -4,8 +4,8 @@
 <a href="https://gitee.com/atuptown/datalinkx"><img src="https://gitee.com/atuptown/datalinkx/badge/star.svg?theme=dark" alt="Gitee Starts"></a>
   <a href="https://gitee.com/atuptown/datalinkx"><img src="https://gitee.com/atuptown/datalinkx/badge/fork.svg?theme=dark" alt="Gitee Starts"></a>
 <a href="#"><img src="https://img.shields.io/badge/Author-在下uptown-orange.svg" alt="作者"></a>
-<a href="#项目文档"><img src="https://img.shields.io/badge/JDK-8-red.svg" alt="jdk版本"></a>
-  <a href="#项目文档"><img src="https://img.shields.io/badge/SpringBoot-2.4.3-green.svg" alt="SpringBoot版本"></a>
+<a href="#项目文档"><img src="https://img.shields.io/badge/JDK-21-red.svg" alt="jdk版本"></a>
+  <a href="#项目文档"><img src="https://img.shields.io/badge/SpringBoot-3.2.1-green.svg" alt="SpringBoot版本"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/MySQL-8.0-orange.svg" alt="MySQL版本"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/Redis-5.0-green.svg" alt="Redis版本"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/消息队列-Redis Stream-red.svg" alt="Redis版本"></a>
@@ -37,8 +37,8 @@
 ## 项目技术栈
 | 依赖					            | 版本					         |描述
 |--------------------|-----------------|-------
-| Spring Boot			     | 2.4.3					      |项目脚手架
-| SpringData JPA			  | 2.4.3					      |持久层框架
+| Spring Boot			     | 3.2.1					      |项目脚手架
+| SpringData JPA			  | 3.2.1					      |持久层框架
 | MySQL					         | 8.0					        |DB数据库
 | ElasticSearch					 | 7.x					        |支持流转的数据库
 | Redis					         | 5.0 ↑					      |缓存数据库

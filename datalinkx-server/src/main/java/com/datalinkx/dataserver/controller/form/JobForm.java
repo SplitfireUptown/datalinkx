@@ -13,28 +13,6 @@ public class JobForm {
 
 	@Data
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public static final class ConfigForm {
-		// mysql/postgreSQL/es需要的参数
-		private String name;
-		// datahub的entPoint绑定在url上
-		private String url;
-		// datahub的accessId绑定在user上
-		private String user;
-		// datahub的accessKey绑定在password上
-		private String password;
-		// datahub的project绑定在dbName上
-		@JsonProperty("db_name")
-		private String dbName;
-		// es需要额外配置的参数
-		@JsonProperty("is_security")
-		private Integer isSecurity;
-		@JsonProperty("is_net_ssl")
-		private Integer isNetSSL;
-
-	}
-
-	@Data
-	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class JobCreateForm {
 		@ApiModelProperty(value = "数据源id")
 		@JsonProperty("from_ds_id")

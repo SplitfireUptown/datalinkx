@@ -32,19 +32,6 @@ public class DsForm {
 	}
 
 	@Data
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@JsonIgnoreProperties(ignoreUnknown = true)
-	public static final class ConfigForm {
-		private String schema;
-		// es需要额外配置的参数
-		@JsonProperty("is_security")
-		private Integer isSecurity;
-		@JsonProperty("is_net_ssl")
-		private Integer isNetSSL;
-	}
-
-	@Data
 	public static class DataSourcePageForm {
 		private String name;
 		private Integer type;
