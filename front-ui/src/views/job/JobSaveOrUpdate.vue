@@ -16,6 +16,13 @@
           v-decorator="['dsId']"
         />
       </a-form-item>
+      <a-form-item
+        label="任务名称"
+      >
+        <a-input
+          type="text"
+          v-model="jobName"/>
+      </a-form-item>
       <a-form-item>
         <a-row :gutter="16">
           <a-col :span="12" >
@@ -151,9 +158,9 @@
       <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
     </a-form>
 
-    <template slot="footer" >
-        <a-button key="cancel" @click="handleCancel">取消</a-button>
-        <a-button key="forward" :loading="confirmLoading" type="primary" @click="handleSubmit">保存</a-button>
+    <template slot="footer">
+      <a-button key="cancel" @click="handleCancel">取消</a-button>
+      <a-button key="forward" v-show='onlyRead' :loading="confirmLoading" type="primary" @click="handleSubmit">保存</a-button>
     </template>
   </a-modal>
 </template>
@@ -177,6 +184,8 @@ export default {
       selectedTargetTable: null,
       schedulerConf: '',
       confirmLoading: false,
+      jobName: '',
+      onlyRead: true,
       dataSources: [
         { id: 1, name: '数据源1' },
         { id: 2, name: '数据源2' },
@@ -232,6 +241,7 @@ export default {
             'to_tb_name': this.selectedTargetTable,
             'scheduler_conf': this.schedulerConf,
             'field_mappings': this.mappings,
+            'job_name': this.jobName,
             'sync_mode': {
               'mode': this.syncMode,
               'increate_field': this.incrementField
@@ -253,7 +263,11 @@ export default {
         }
       })
     },
-
+    readOnly (id) {
+      this.onlyRead = false
+      console.log(this.onlyRead)
+      this.edit('edit', id)
+    },
     edit (type, id) {
       this.visible = true
       this.type = type
@@ -289,6 +303,7 @@ export default {
           this.mappings = record.field_mappings
           this.jobId = record.job_id
           this.syncMode = record.sync_mode.mode
+          this.jobName = record.job_name
           console.log(this.syncMode)
           if (this.selectedTargetTable.includes(this.redisSpitKey)) {
             const arr = this.selectedTargetTable.split(this.redisSpitKey)

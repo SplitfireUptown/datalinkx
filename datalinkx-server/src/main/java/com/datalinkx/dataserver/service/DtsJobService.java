@@ -12,4 +12,5 @@ public interface DtsJobService {
     String updateJobStatus(JobStateForm jobStateForm);
     String updateJobTaskRel(String jobId, String taskId);
     void updateSyncMode(JobForm.SyncModifyForm syncMode);
+    String cascadeJob(String jobId);
 }

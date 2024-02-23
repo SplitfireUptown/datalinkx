@@ -40,18 +40,6 @@ export const asyncRouterMap = [
             component: () => import('@/views/datasource/StreamingDsList.vue'),
             meta: { title: 'menu.streamingDataSource', keepAlive: false, icon: dataList }
           }
-          // 外部链接
-          // {
-          //   path: 'https://www.baidu.com/',
-          //   name: 'Monitor',
-          //   meta: { title: 'menu.dashboard.monitor', target: '_blank' }
-          // },
-          // {
-          //   path: '/dashboard/workplace',
-          //   name: 'Workplace',
-          //   component: () => import('@/views/dashboard/Workplace'),
-          //   meta: { title: 'menu.dashboard.workplace', keepAlive: true, permission: ['dashboard'] }
-          // }
         ]
       },
       {
@@ -72,6 +60,18 @@ export const asyncRouterMap = [
             name: 'joblog',
             component: () => import('@/views/joblog/JobLogList.vue'),
             meta: { title: 'menu.tasklistlog', keepAlive: false, icon: taskLog }
+          },
+          {
+            path: '/job_relation',
+            name: 'job_relation',
+            component: () => import('@/views/jobrelation/JobRelationList.vue'),
+            meta: { title: 'menu.taskrelationlist', keepAlive: false, icon: taskLog }
+          },
+          {
+            path: '/job_relation_map',
+            name: 'job_map',
+            component: () => import('@/views/jobrelation/JobRelationBloodMap.vue'),
+            meta: { title: 'menu.taskrelationmap', keepAlive: false, icon: taskLog }
           }
         ]
       }

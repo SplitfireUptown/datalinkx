@@ -7,6 +7,12 @@ export function pageQuery (params) {
     params: params
   })
 }
+export function listQuery () {
+  return axios({
+    url: '/api/job/list',
+    method: 'GET'
+  })
+}
 export function delObj (jobId) {
   return axios({
     url: `/api/job/delete/${jobId}`,

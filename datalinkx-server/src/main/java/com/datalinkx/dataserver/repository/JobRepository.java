@@ -17,7 +17,9 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 
 	Optional<JobBean> findByJobId(String jobId);
 
-	@Query(value = "select * from JOB where is_del = 0 and job_source = 1", nativeQuery = true)
+	List<JobBean> findByJobIdIn(List<String> jobIds);
+
+	@Query(value = "select * from JOB where is_del = 0", nativeQuery = true)
 	List<JobBean> findAll();
 
 	@Modifying

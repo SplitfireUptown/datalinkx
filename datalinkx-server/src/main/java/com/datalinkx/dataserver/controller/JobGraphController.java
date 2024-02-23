@@ -8,6 +8,7 @@ import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
 import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.driver.model.DataTransJobDetail;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,18 +25,27 @@ public class JobGraphController {
     @Autowired
     private DtsJobService dtsJobService;
 
+    @ApiOperation("获取流转任务job_graph")
     @RequestMapping("/execute_info")
     public WebResult<DataTransJobDetail> getJobExecInfo(String jobId,
-                                             @RequestParam(value = "tableIds", required = false) List<String> tableIds,
-                                             @RequestParam(value = "tbDetail", defaultValue = "false") Boolean tbDetail) {
+                                                        @RequestParam(value = "tableIds", required = false) List<String> tableIds,
+                                                        @RequestParam(value = "tbDetail", defaultValue = "false") Boolean tbDetail) {
         return WebResult.of(dtsJobService.getJobExecInfo(jobId, tableIds, tbDetail));
     }
 
+    @ApiOperation("级联触发流转任务")
+    @RequestMapping("/cascade_job")
+    public WebResult<String> cascadeJob(String jobId) {
+        return WebResult.of(this.dtsJobService.cascadeJob(jobId));
+    }
+
+    @ApiOperation("更新流转任务状态")
     @RequestMapping("/update_job")
     public WebResult<String> updateJobStatus(JobStateForm jobStateForm) {
         return WebResult.of(this.dtsJobService.updateJobStatus(jobStateForm));
     }
 
+    @ApiOperation("更新流转任务增量条件")
     @RequestMapping("/update_sync_mode")
     public WebResult<String> updateSyncMode(JobForm.SyncModifyForm syncmodifyForm) {
         this.dtsJobService.updateSyncMode(syncmodifyForm);
@@ -43,8 +53,9 @@ public class JobGraphController {
     }
 
 
+    @ApiOperation("绑定业务JOB id与Flink task_id关联")
     @PostMapping("/update_job_task_rel")
     public WebResult<String> updateJobTaskRel(String jobId, String taskId) {
-        return WebResult.of(dtsJobService.updateJobTaskRel(jobId, taskId));
+        return WebResult.of(this.dtsJobService.updateJobTaskRel(jobId, taskId));
     }
 }

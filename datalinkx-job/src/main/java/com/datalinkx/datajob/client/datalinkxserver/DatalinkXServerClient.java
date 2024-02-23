@@ -17,6 +17,10 @@ public interface DatalinkXServerClient {
     @GET("/api/job_graph/execute_info")
     WebResult<DataTransJobDetail> getJobExecInfo(@Query("jobId") String jobId);
 
+    @POST("/api/job_graph/cascade_job")
+    @FormUrlEncoded
+    WebResult<String> cascadeJob(@Field("jobId") String jobId);
+
     @POST("/api/job_graph/update_job")
     @FormUrlEncoded
     WebResult<String> updateJobStatus(@QueryBean JobStateForm jobStateForm);

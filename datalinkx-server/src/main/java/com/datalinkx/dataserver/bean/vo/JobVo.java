@@ -25,6 +25,9 @@ public class JobVo {
 		@ApiModelProperty(value = "任务id")
 		@JsonProperty("job_id")
 		private String jobId;
+		@ApiModelProperty(value = "任务id")
+		@JsonProperty("job_name")
+		private String jobName;
 
 		@JsonProperty("from_tb_name")
 		private String fromTbName;
@@ -74,6 +77,9 @@ public class JobVo {
 		@ApiModelProperty(value = "任务id")
 		@JsonProperty("job_id")
 		private String jobId;
+		@ApiModelProperty(value = "任务id")
+		@JsonProperty("job_name")
+		private String jobName;
 		@ApiModelProperty(value = "数据源id")
 		@JsonProperty("from_ds_id")
 		private String fromDsId;
@@ -112,5 +118,68 @@ public class JobVo {
 		@JsonProperty("mappingValue")
 		private String mappingValue = "";
 
+	}
+
+	@Data
+	@ApiModel
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static final class JobId2NameVo {
+		@ApiModelProperty(value = "任务id")
+		@JsonProperty("job_id")
+		private String JobId;
+		@ApiModelProperty(value = "任务名称")
+		@JsonProperty("job_name")
+		private String jobName;
+	}
+
+	@Data
+	@ApiModel
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static final class JobRelationVo {
+		@JsonProperty("relation_id")
+		private String relationId;
+		@JsonProperty("job_id")
+		private String jobId;
+		@JsonProperty("job_name")
+		private String jobName;
+		@JsonProperty("sub_job_id")
+		private String subJobId;
+		@JsonProperty("sub_job_name")
+		private String subJobName;
+		private int priority;
+	}
+
+	@Data
+	@ApiModel
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static final class JobRelationBloodVo {
+		List<JobRelationBloodVoEdge> edges;
+		List<JobRelationBloodVoNode> nodes;
+	}
+
+	@Data
+	@ApiModel
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static final class JobRelationBloodVoNode {
+		private String id;
+		private String label;
+	}
+
+	@Data
+	@ApiModel
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static final class JobRelationBloodVoEdge {
+		private String from;
+		private String to;
 	}
 }

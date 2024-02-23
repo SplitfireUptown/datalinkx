@@ -10409,6 +10409,11 @@ venn.js@~0.2.20:
     d3-transition "^1.0.1"
     fmin "0.0.2"
 
+vis-network@^9.1.9:
+  version "9.1.9"
+  resolved "https://registry.yarnpkg.com/vis-network/-/vis-network-9.1.9.tgz#8159b34e7c1570150fcc9296213d2b88ed169394"
+  integrity sha512-Ft+hLBVyiLstVYSb69Q1OIQeh3FeUxHJn0WdFcq+BFPqs+Vq1ibMi2sb//cxgq1CP7PH4yOXnHxEH/B2VzpZYA==
+
 viser-vue@^2.4.8:
   version "2.4.8"
   resolved "https://registry.npmjs.org/viser-vue/-/viser-vue-2.4.8.tgz"

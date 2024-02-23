@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public abstract class AbstractFlinkAction<T, U> implements IAction<T> {
+public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
     protected abstract void begin(T info);
     protected abstract void end(T info, int status, String errmsg);
     protected abstract void beforeExec(U unit) throws Exception;
@@ -64,12 +64,12 @@ public abstract class AbstractFlinkAction<T, U> implements IAction<T> {
             AtomicInteger unitCount = new AtomicInteger(execUnits.size());
 
             JobContext jobContext = JobUtils.cntx();
-            Map<String, JobExecCountDto> countRes = FlinkAction.countRes.get();
+            Map<String, JobExecCountDto> countRes = DataTransferAction.countRes.get();
 
             // 定时检查更新执行的结果
             postThread = new Thread(() -> {
                 JobUtils.configContext(jobContext);
-                FlinkAction.countRes.set(countRes);
+                DataTransferAction.countRes.set(countRes);
 
                 while (true) {
                     unfinished.clear();
@@ -111,18 +111,18 @@ public abstract class AbstractFlinkAction<T, U> implements IAction<T> {
 
                     runningUnit.addAll(unfinished);
                     try {
-                        Thread.sleep(FlinkAction.SLEEP_TIME);
+                        Thread.sleep(DataTransferAction.SLEEP_TIME);
                     } catch (InterruptedException e) {
                         log.error("", e);
                     }
                 }
 
                 JobUtils.configContext(null);
-                FlinkAction.countRes.remove();
+                DataTransferAction.countRes.remove();
             }, "flink-action-post-thread");
             postThread.start();
 
-            FlinkAction.checkThread.set(postThread);
+            DataTransferAction.checkThread.set(postThread);
 
             // 遍历执行启动flink任务
             for (U unit : execUnits) {

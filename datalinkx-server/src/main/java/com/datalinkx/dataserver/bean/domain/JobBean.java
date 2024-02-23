@@ -30,6 +30,9 @@ import org.hibernate.annotations.DynamicUpdate;
 public class JobBean extends BaseDomainBean {
 	private static final long serialVersionUID = 1L;
 	@NotBlank
+	@Column(name = "name", nullable = false, length = 64, columnDefinition = "char(64)")
+	private String name;
+	@NotBlank
 	@Column(name = "job_id", nullable = false, length = 40, columnDefinition = "char(40)")
 	private String jobId;
 	@Column(name = "reader_ds_id", nullable = false, length = 40, columnDefinition = "char(40)")

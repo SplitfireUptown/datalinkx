@@ -25,7 +25,6 @@ import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.datajob.client.flink.FlinkClient;
 import com.datalinkx.datajob.client.flink.response.FlinkJobAccumulators;
 import com.datalinkx.datajob.client.flink.response.FlinkJobStatus;
-import com.datalinkx.datajob.config.DsProperties;
 import com.datalinkx.datajob.job.ExecutorJobHandler;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
@@ -44,7 +43,7 @@ import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
-public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, FlinkActionParam> {
+public class DataTransferAction extends AbstractDataTransferAction<DataTransJobDetail, FlinkActionParam> {
     public static ThreadLocal<Long> startTime = new ThreadLocal<>();
     public static ThreadLocal<Map<String, JobExecCountDto>> countRes = new ThreadLocal<>();
     public static ThreadLocal<Thread> checkThread = new ThreadLocal<>();
@@ -88,7 +87,7 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, FlinkAc
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
         log.info(String.format("jobid: %s, end to sync", info.getJobId()));
 
-        Thread thread = FlinkAction.checkThread.get();
+        Thread thread = DataTransferAction.checkThread.get();
         if (null != thread && thread.isAlive()) {
             thread.interrupt();
         }
@@ -108,6 +107,8 @@ public class FlinkAction extends AbstractFlinkAction<DataTransJobDetail, FlinkAc
                 .filterCount(jobExecCountDto.getFilterCount())
                 .errmsg(errmsg)
                 .build());
+        // 级联触发子任务
+        datalinkXServerClient.cascadeJob(info.getJobId());
     }
 
     @Override

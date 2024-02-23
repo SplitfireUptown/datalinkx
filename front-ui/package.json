@@ -29,6 +29,7 @@
     "moment": "^2.29.2",
     "nprogress": "^0.2.0",
     "store": "^2.0.12",
+    "vis-network": "^9.1.9",
     "viser-vue": "^2.4.8",
     "vue": "^2.6.14",
     "vue-clipboard2": "^0.2.1",

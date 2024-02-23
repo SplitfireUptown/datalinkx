@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.datajob.action.FlinkAction;
+import com.datalinkx.datajob.action.DataTransferAction;
 import com.datalinkx.datajob.bean.DataTransJobParam;
 import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.datalinkx.datajob.bean.JobStateForm;
@@ -28,7 +28,7 @@ public class DataTransHandler {
     private static Logger logger = LoggerFactory.getLogger(DataTransHandler.class);
 
     @Autowired
-    private FlinkAction flinkAction;
+    private DataTransferAction dataTransferAction;
 
     @Autowired
     private DatalinkXServerClient dataServerClient;
@@ -56,7 +56,7 @@ public class DataTransHandler {
         try {
             jobDetail = this.getJobDetail(jobParam);
             JobUtils.cntx().setTotal(jobDetail.getSyncUnits().size());
-            flinkAction.doAction(jobDetail);
+            dataTransferAction.doAction(jobDetail);
         } catch (InterruptedException e) {
             // cancel job
             throw e;
