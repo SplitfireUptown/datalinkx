@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class JobGraphConnection {
     List<String> table;
     String schema;

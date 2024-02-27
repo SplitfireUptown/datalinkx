@@ -89,17 +89,18 @@ flink：https://archive.apache.org/dist/flink/flink-1.10.3/
 作者是一名纯粹的JavaBoy，前端代码只停留在大学水平，献丑了
 
 1. 登录系统，默认密码admin、admin登录，没有权限相关控制
-
 ![img.png](datalinkx-server/src/main/resources/readme/login.png)
 2. 数据源管理，配置数据流转数据源信息
-
 ![img.png](datalinkx-server/src/main/resources/readme/ds_config.png)
 3. 任务管理，配置from_db与to_db构造job_graph
-
 ![img.png](datalinkx-server/src/main/resources/readme/job_config.png)
-4. 任务调度
+5. 任务级联配置
+![img.png](datalinkx-server/src/main/resources/readme/job_cascade.png)
+6. 任务血缘
+![img.png](datalinkx-server/src/main/resources/readme/job_relation.png)
+6. 任务调度
 ![img.png](datalinkx-server/src/main/resources/readme/xxl.png)
-5. 任务执行
+7. 任务执行
 ![img.png](datalinkx-server/src/main/resources/readme/flink.png)
 
 ## datalinkx交流群
