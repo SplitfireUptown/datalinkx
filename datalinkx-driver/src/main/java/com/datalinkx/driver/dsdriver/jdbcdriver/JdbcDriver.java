@@ -1,7 +1,6 @@
 package com.datalinkx.driver.dsdriver.jdbcdriver;
 
 
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,7 +17,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.datalinkx.common.utils.Base64Utils;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
