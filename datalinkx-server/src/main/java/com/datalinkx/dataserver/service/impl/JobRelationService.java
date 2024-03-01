@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.domain.JobRelationBean;
 import com.datalinkx.dataserver.bean.vo.JobVo;
@@ -168,6 +169,12 @@ public class JobRelationService {
         List<JobVo.JobRelationBloodVoNode> nodes = jobRepository.findByJobIdIn(jobIds)
                 .stream().map(jobBean -> JobVo.JobRelationBloodVoNode.builder().id(jobBean.getJobId()).label(jobBean.getName()).build())
                         .collect(Collectors.toList());
+
+        if (ObjectUtils.isEmpty(nodes)) {
+            jobRepository.findByJobId(jobId).ifPresent(jobBean -> {
+                nodes.add(JobVo.JobRelationBloodVoNode.builder().id(jobBean.getJobId()).label(jobBean.getName()).build());
+            });
+        }
 
         jobRelationBloodVo.setNodes(nodes);
         return jobRelationBloodVo;

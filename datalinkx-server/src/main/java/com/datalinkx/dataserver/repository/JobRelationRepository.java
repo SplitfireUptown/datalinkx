@@ -25,9 +25,9 @@ public interface JobRelationRepository extends CRUDRepository<JobRelationBean, S
     @Query(value = " update JOB_RELATION set is_del = 1 where relation_id = :relationId and is_del = 0 ", nativeQuery = true)
     void logicDeleteByRelationId(String relationId);
 
-    @Query(value = "select * from JOB_RELATION where job_id = :jobId", nativeQuery = true)
+    @Query(value = "select * from JOB_RELATION where job_id = :jobId and is_del = 0", nativeQuery = true)
     List<JobRelationBean> findSubJob(String jobId);
 
-    @Query(value = "select * from JOB_RELATION where sub_job_id = :jobId", nativeQuery = true)
+    @Query(value = "select * from JOB_RELATION where sub_job_id = :jobId and is_del = 0", nativeQuery = true)
     List<JobRelationBean> findParentJob(String jobId);
 }
