@@ -63,7 +63,13 @@ export default {
           title: 'job_id',
           width: '10%',
           dataIndex: 'job_id'
-        }, {
+        },
+        {
+          title: '任务名称',
+          width: '10%',
+          dataIndex: 'job_name'
+        },
+        {
           title: '来源表',
           width: '10%',
           dataIndex: 'from_tb_name'
