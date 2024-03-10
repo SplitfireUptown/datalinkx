@@ -1,6 +1,8 @@
 // CHECKSTYLE:OFF
 package com.datalinkx.datajob.action;
 
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -107,8 +109,10 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
                 .filterCount(jobExecCountDto.getFilterCount())
                 .errmsg(errmsg)
                 .build());
-        // 级联触发子任务
-        datalinkXServerClient.cascadeJob(info.getJobId());
+        // 父任务执行成功后级联触发子任务
+        if (JOB_STATUS_SUCCESS == status) {
+            datalinkXServerClient.cascadeJob(info.getJobId());
+        }
     }
 
     @Override

@@ -126,7 +126,7 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           this.confirmLoading = true
-          addObj(values).then(res => {
+          await addObj(values).then(res => {
             if (res.status !== '0') {
               this.$message.error(res.errstr)
             }
@@ -141,6 +141,8 @@ export default {
     },
     handleCancel () {
       this.visible = false
+      this.job_id = ''
+      this.sub_job_id = ''
       setTimeout(() => {
         this.addable = false
       }, 200)
