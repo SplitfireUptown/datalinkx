@@ -86,7 +86,6 @@ flink：https://archive.apache.org/dist/flink/flink-1.10.3/
 
 
 ## 使用姿势
-作者是一名纯粹的JavaBoy，前端代码只停留在大学水平，献丑了
 
 1. 登录系统，默认密码admin、admin登录，没有权限相关控制
 ![img.png](datalinkx-server/src/main/resources/readme/login.png)
