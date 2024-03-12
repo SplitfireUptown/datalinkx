@@ -4,8 +4,8 @@
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="8" :sm="8">
-            <a-form-item label="任务id">
-              <a-input v-model="queryParam.jobId" placeholder="任务id"/>
+            <a-form-item label="任务名称">
+              <a-input v-model="queryParam.jobName" placeholder="任务名称"/>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="8">
@@ -93,7 +93,7 @@ export default {
         page_no: 1
       },
       queryParam: {
-        jobId: ''
+        jobName: ''
       }
     }
   },
@@ -109,7 +109,7 @@ export default {
         this.loading = false
       }).finally(() => {
         this.loading = false
-        this.queryParam.jobId = ''
+        this.queryParam.jobName = ''
       })
     },
     delete (record) {

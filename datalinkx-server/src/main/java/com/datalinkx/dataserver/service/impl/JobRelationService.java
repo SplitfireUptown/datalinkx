@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.exception.DatalinkXServerException;
@@ -36,9 +37,17 @@ public class JobRelationService {
     @Autowired
     JobRepository jobRepository;
 
-    public PageVo<List<JobVo.JobRelationVo>> page(JobForm.JobLogPageForm jobLogPageForm) {
-        PageRequest pageRequest = PageRequest.of(jobLogPageForm.getPageNo() - 1, jobLogPageForm.getPageSize());
-        Page<JobRelationBean> jobRelationBeans = jobRelationRepository.pageQuery(pageRequest, jobLogPageForm.getJobId());
+    public PageVo<List<JobVo.JobRelationVo>> page(JobForm.JobRelationPageForm jobRelationPageForm) {
+        PageRequest pageRequest = PageRequest.of(jobRelationPageForm.getPageNo() - 1, jobRelationPageForm.getPageSize());
+
+        AtomicReference<String> queryJobId = new AtomicReference<>("");
+        if (!ObjectUtils.isEmpty(jobRelationPageForm.getJobName())) {
+            jobRepository.findByName(jobRelationPageForm.getJobName()).ifPresent(jobBean -> {
+                queryJobId.set(jobBean.getJobId());
+            });
+        }
+
+        Page<JobRelationBean> jobRelationBeans = jobRelationRepository.pageQuery(pageRequest, queryJobId.get());
 
         List<String> jobIds = new ArrayList<>();
         jobRelationBeans.getContent().forEach(jobRelationBean -> {
@@ -58,8 +67,8 @@ public class JobRelationService {
         ).collect(Collectors.toList());
 
         PageVo<List<JobVo.JobRelationVo>> result = new PageVo<>();
-        result.setPageNo(jobLogPageForm.getPageNo());
-        result.setPageSize(jobLogPageForm.getPageSize());
+        result.setPageNo(jobRelationPageForm.getPageNo());
+        result.setPageSize(jobRelationPageForm.getPageSize());
         result.setData(jobRelationVos);
         result.setTotalPage(jobRelationBeans.getTotalPages());
         result.setTotal(jobRelationBeans.getTotalElements());

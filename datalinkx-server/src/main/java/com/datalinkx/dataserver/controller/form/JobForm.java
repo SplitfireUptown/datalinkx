@@ -115,6 +115,13 @@ public class JobForm {
 		private String jobId;
 	}
 
+	@EqualsAndHashCode(callSuper = true)
+	@Data
+	public static class JobRelationPageForm extends JobPageForm {
+		@JsonProperty("job_name")
+		private String jobName;
+	}
+
 	@Data
 	public static class JobRelationForm {
 		@JsonProperty("job_id")

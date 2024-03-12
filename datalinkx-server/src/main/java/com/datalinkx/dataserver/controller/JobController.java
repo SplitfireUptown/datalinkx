@@ -90,8 +90,8 @@ public class JobController {
 
 	@ApiOperation("任务依赖-配置分页查询")
 	@RequestMapping("/relation/page")
-	public PageVo<List<JobVo.JobRelationVo>> relationPage(JobForm.JobLogPageForm jobLogPageForm) {
-		return jobRelationService.page(jobLogPageForm);
+	public PageVo<List<JobVo.JobRelationVo>> relationPage(JobForm.JobRelationPageForm jobRelationPageForm) {
+		return jobRelationService.page(jobRelationPageForm);
 	}
 
 

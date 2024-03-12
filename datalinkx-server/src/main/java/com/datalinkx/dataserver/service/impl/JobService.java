@@ -131,16 +131,19 @@ public class JobService implements DtsJobService {
 		return form.getJobId();
 	}
 
-
+	// 校验流转任务配置合法
 	private void validJobForm(JobForm.JobCreateForm form) {
+		// 1、判断数据源是否存在
 		DsBean fromDsBean = dsRepository.findByDsId(form.getFromDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "来源数据源不存在"));
-		DsBean toBean = dsRepository.findByDsId(form.getToDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "目标数据源不存在"));
+		dsRepository.findByDsId(form.getToDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "目标数据源不存在"));
+		// 2、判断流转任务名称是否重复
+		jobRepository.findByName(form.getJobName()).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "流转任务名称重复"));
 
-
+		// 3、判断增量模式下是否有增量字段
 		if (MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode()) && ObjectUtils.isEmpty(form.getSyncMode().getIncreateField())) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "增量模式必须指定增量字段");
 		}
-
+		// 4、判断增量模式下是否是时间类型或数值类型
 		if (MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode())) {
 			try {
 				IDsReader dsReader = DsDriverFactory.getDsReader(dsService.getConnectId(fromDsBean));
@@ -152,6 +155,7 @@ public class JobService implements DtsJobService {
 				throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, e.getMessage());
 			}
 		}
+		// 5、配置流转任务定时表达式
 		if (ObjectUtils.isEmpty(form.getSchedulerConf())) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "流转任务需要配置crontab表达式");
 		}
