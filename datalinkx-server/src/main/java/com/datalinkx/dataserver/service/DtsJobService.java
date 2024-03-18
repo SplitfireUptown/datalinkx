@@ -8,7 +8,7 @@ import com.datalinkx.driver.model.DataTransJobDetail;
 
 
 public interface DtsJobService {
-    DataTransJobDetail getJobExecInfo(String jobId, List<String> tableIds, Boolean tbDetail);
+    DataTransJobDetail getJobExecInfo(String jobId);
     String updateJobStatus(JobStateForm jobStateForm);
     String updateJobTaskRel(String jobId, String taskId);
     void updateSyncMode(JobForm.SyncModifyForm syncMode);

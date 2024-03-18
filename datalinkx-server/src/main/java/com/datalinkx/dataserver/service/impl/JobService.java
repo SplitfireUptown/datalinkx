@@ -171,9 +171,8 @@ public class JobService implements DtsJobService {
 
 
 	@Override
-	public DataTransJobDetail getJobExecInfo(String jobId, List<String> tableIds, Boolean tbDetail) {
-		JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() ->
-				new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
+	public DataTransJobDetail getJobExecInfo(String jobId) {
+		JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
 		List<JobForm.FieldMappingForm> fieldMappingForms = JsonUtils.toList(jobBean.getConfig(), JobForm.FieldMappingForm.class);
 
 		DataTransJobDetail.SyncUnit syncUnit = DataTransJobDetail.SyncUnit

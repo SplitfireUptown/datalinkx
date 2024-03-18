@@ -27,10 +27,8 @@ public class JobGraphController {
 
     @ApiOperation("获取流转任务job_graph")
     @RequestMapping("/execute_info")
-    public WebResult<DataTransJobDetail> getJobExecInfo(String jobId,
-                                                        @RequestParam(value = "tableIds", required = false) List<String> tableIds,
-                                                        @RequestParam(value = "tbDetail", defaultValue = "false") Boolean tbDetail) {
-        return WebResult.of(dtsJobService.getJobExecInfo(jobId, tableIds, tbDetail));
+    public WebResult<DataTransJobDetail> getJobExecInfo(String jobId) {
+        return WebResult.of(dtsJobService.getJobExecInfo(jobId));
     }
 
     @ApiOperation("级联触发流转任务")
