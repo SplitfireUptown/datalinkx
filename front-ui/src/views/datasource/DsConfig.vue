@@ -1,0 +1,297 @@
+<template>
+  <a-modal
+    :title="title"
+    :width="640"
+    :visible="visible"
+    :confirmLoading="confirmLoading"
+    :maskClosable="false"
+    @cancel="handleCancel"
+  >
+    <a-spin :spinning="confirmLoading">
+      <a-form :form="form">
+        <!-- <a-form-item
+          v-show="false"
+          label="ds_id"
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+        >
+          <a-input
+            v-decorator="['dsId']"
+            :disabled="editable || showable"
+          />
+        </a-form-item> -->
+
+        <a-form-item
+          label="当前数据源"
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+        >
+          <span>{{currentDs.label}}</span>
+        </a-form-item>
+
+        <a-form-item
+          v-for="(item) in currentDsList"
+          :key="item.key"
+          :label="item.label"
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+        >
+          <a-input
+            type="text"
+            v-if="item.type === 'input'"
+            :disabled="showable"
+            v-decorator="[item.key, {rules: [{required: item.isRequired, message: item.decorator}]}]" />
+          <a-textarea
+            type="text"
+            v-if="item.type === 'textarea'"
+            :auto-size="{ minRows: 2, maxRows: 8 }"
+            :disabled="showable"
+            v-decorator="[item.key, {rules: [{required: item.isRequired, message: item.decorator}]}]" />
+          <a-select
+            :disabled="showable"
+            v-if="item.type === 'select'"
+            v-decorator="[item.key, {rules: [{required: item.isRequired, message: item.decorator}]}]"
+            :options="OracleServerTypes"
+          >
+          </a-select>
+        </a-form-item>
+      </a-form>
+    </a-spin>
+    <template slot="footer" >
+      <div
+        v-show="editable || addable"
+      >
+        <a-button key="cancel" @click="handleCancel">取消</a-button>
+        <a-button key="forward" :loading="confirmLoading" type="primary" @click="handleOk">保存</a-button>
+      </div>
+    </template>
+  </a-modal>
+
+</template>
+
+<script>
+import pick from 'lodash.pick'
+import { getObj, addObj, putObj } from '@/api/datasource/datasource'
+import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
+import { dsConfigOriginList, OracleServerTypes } from './const'
+import cloneDeep from 'lodash.clonedeep'
+
+let selectTables = []
+
+export default {
+  name: 'DsConfig',
+  props: {
+    currentDs: {
+      type: Object,
+      default: () => {
+        return {
+          value: 'MySQL',
+          label: 'MySQL',
+          dsTypeKey: 1
+        }
+      }
+    }
+  },
+  data () {
+    return {
+      dsConfigOriginList,
+      OracleServerTypes,
+      labelCol: {
+        xs: { span: 24 },
+        sm: { span: 7 }
+      },
+      wrapperCol: {
+        xs: { span: 24 },
+        sm: { span: 13 }
+      },
+      longWrapperCol: {
+        xs: { span: 44 },
+        sm: { span: 13 }
+      },
+      visible: false,
+      confirmLoading: false,
+      form: this.$form.createForm(this),
+      editable: false,
+      addable: false,
+      showable: false,
+      DataSourceType: DATA_SOURCE_TYPE,
+      type: 'add'
+    }
+  },
+  computed: {
+    title () {
+      switch (this.type) {
+        case 'add':
+          return '新建数据源'
+        case 'edit':
+          return '修改数据源'
+        default:
+          return '查看数据源'
+      }
+    },
+    currentDsList () {
+      const list = cloneDeep(this.dsConfigOriginList)
+      if (this.currentDs.dsTypeKey === 1) return list
+      list.forEach(item => {
+        switch (this.currentDs.dsTypeKey) {
+          case 4:
+          case 2: {
+            item.isRequired = ['host', 'port'].includes(item.key)
+            break
+          }
+          case 3: {
+            item.isRequired = ['host', 'port', 'username', 'password', 'database'].includes(item.key)
+            break
+          }
+        }
+      })
+      if (this.currentDs.dsTypeKey === 3) {
+        list.push({
+          label: '服务器类型',
+          key: 'servertype',
+          type: 'select',
+          decorator: '请选择',
+          isRequired: true
+        }, {
+          label: 'SID或服务器名',
+          key: 'sid',
+          type: 'input',
+          decorator: '请输入',
+          isRequired: true
+        })
+      }
+      return list
+    }
+  },
+  methods: {
+    show (id, type, info) {
+      this.type = type
+      switch (type) {
+        case 'add':
+          this.showable = false
+          this.addable = true
+          break
+        case 'edit':
+          this.showable = false
+          this.editable = true
+          break
+        default:
+          this.showable = true
+          break
+      }
+      this.visible = true
+      const { form: { setFieldsValue, resetFields } } = this
+      if (['edit', 'show'].includes(type)) {
+        if (!info) {
+          this.confirmLoading = true
+          getObj(id).then(res => {
+            const record = res.result
+            this.confirmLoading = false
+            this.$nextTick(() => {
+              setFieldsValue(this.formatData(record))
+            })
+          })
+        } else {
+          this.$nextTick(() => {
+            setFieldsValue(this.formatData(info))
+          })
+        }
+      } else {
+        this.$nextTick(() => {
+          resetFields()
+        })
+      }
+    },
+    // 格式化复显表单数据
+    formatData (info) {
+      const temp = pick(info, ['name', 'host', 'port', 'username', 'database', 'password', 'config'])
+      if (this.currentDs.dsTypeKey === 3) {
+        const config = JSON.parse(info.config)
+        if (config) {
+          const servertype = Object.keys(config)[0]
+          temp['servertype'] = servertype
+          temp[servertype] = config[servertype]
+        }
+      }
+      return temp
+    },
+    // 获取用户信息
+    edit (id, type) {
+      this.visible = true
+      if (type && type === 'add') {
+        this.addable = true
+        this.type = type
+      }
+      if (type === 'edit') {
+        this.editable = true
+        this.type = type
+      }
+      if (type === 'show') {
+        this.showable = true
+        this.type = type
+      }
+
+      const { form: { setFieldsValue, resetFields } } = this
+      if (['edit', 'show'].includes(type)) {
+        this.confirmLoading = true
+        getObj(id).then(res => {
+          const record = res.result
+          this.confirmLoading = false
+          this.$nextTick(() => {
+            setFieldsValue(pick(record, ['name', 'host', 'port', 'username', 'database', 'password', 'config', 'tb_name_list']))
+          })
+        })
+      } else {
+        resetFields()
+      }
+    },
+    handleChange (value) {
+      selectTables.push(value)
+      console.log(`Selected: ${value}`)
+      console.log(selectTables)
+    },
+    // 结束保存用户信息
+    handleOk () {
+      this.form.validateFields(async (err, values) => {
+        if (!err) {
+          if (this.currentDs.dsTypeKey === 3) {
+            const temp = {}
+            temp[values.servertype] = values[values.servertype]
+            values.config = JSON.stringify(temp)
+          }
+          this.confirmLoading = true
+          if (this.type === 'add') {
+            console.log(values)
+            addObj(values).then(res => {
+              if (res.status !== '0') {
+                this.$message.error(res.errstr)
+              }
+            })
+          } else if (this.type === 'edit') {
+            console.log('----', values)
+            await putObj(values)
+          }
+          setTimeout(() => {
+            this.confirmLoading = false
+            this.$emit('ok')
+            this.visible = false
+          }, 1500)
+        }
+      })
+      selectTables = []
+    },
+    handleCancel () {
+      this.visible = false
+      setTimeout(() => {
+        this.addable = false
+        this.showable = false
+        this.editable = false
+      }, 200)
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

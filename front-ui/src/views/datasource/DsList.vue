@@ -39,7 +39,7 @@
     </div>
     <div class="table-operator">
       <!--      v-action="'upms:user:add'"-->
-      <a-button @click="$refs.DsSaveOrUpdate.edit('','add')" icon="plus" type="primary">新建</a-button>
+      <a-button @click="$refs.refDsConfig.show('','add')" icon="plus" type="primary">新建</a-button>
     </div>
     <a-table
       :columns="columns"
@@ -50,9 +50,10 @@
       @change="handleTableChange"
     >
     </a-table>
-    <ds-save-or-update
+    <ds-config
       @ok="handleOk"
-      ref="DsSaveOrUpdate"
+      :currentDs="currentDs"
+      ref="refDsConfig"
     />
   </a-card>
 </div>
@@ -60,14 +61,16 @@
 
 <script>
 import { pageQuery, delObj, getDsGroup } from '@/api/datasource/datasource'
-import DsSaveOrUpdate from './DsSaveOrUpdate.vue'
+// import DsSaveOrUpdate from './DsSaveOrUpdate.vue'
+import DsConfig from './DsConfig.vue'
 import { dsTypeList } from './const'
 import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
 
 export default {
   name: 'ContainerBottom',
   components: {
-    DsSaveOrUpdate
+    // DsSaveOrUpdate,
+    DsConfig
   },
   data () {
     return {
@@ -192,8 +195,8 @@ export default {
     },
 
     edit (record) {
-      this.$refs.DsSaveOrUpdate.edit(record.dsId, 'edit')
-      this.init()
+      this.$refs.refDsConfig.show(record.dsId, 'edit', record)
+      // this.init()
     },
     delete (record) {
       console.log(record)
@@ -203,7 +206,7 @@ export default {
       })
     },
     show (record) {
-      this.$refs.DsSaveOrUpdate.edit(record.dsId, 'show')
+      this.$refs.refDsConfig.show(record.dsId, 'show', record)
     },
     handleOk () {
       this.init()
