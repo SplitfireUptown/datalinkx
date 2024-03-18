@@ -84,4 +84,63 @@ const RedisTypes = [
   }
 ]
 
-export { DataSourceType, dsTypeList, RedisTypes }
+const dsConfigOriginList = [
+  {
+    label: '数据源名称',
+    key: 'name',
+    type: 'input',
+    decorator: '请输入数据源名称',
+    isRequired: true
+  },
+  {
+    label: 'host',
+    key: 'host',
+    type: 'input',
+    decorator: '请输入 host',
+    isRequired: true
+  },
+  {
+    label: 'port',
+    key: 'port',
+    type: 'input',
+    decorator: '请输入 port',
+    isRequired: true
+  },
+  {
+    label: 'username',
+    key: 'username',
+    type: 'input',
+    decorator: '请输入 username',
+    isRequired: true
+  },
+  {
+    label: 'password',
+    key: 'password',
+    type: 'input',
+    decorator: '请输入 password',
+    isRequired: true
+  },
+  {
+    label: 'database',
+    key: 'database',
+    type: 'input',
+    decorator: '请输入 database',
+    isRequired: true
+  }
+  // {
+  //   label: '附加配置',
+  //   key: 'config',
+  //   type: 'textarea',
+  //   decorator: '请输入附加配置',
+  //   isRequired: false
+  // }
+]
+
+const OracleServerTypes = [
+  {
+    label: 'SID',
+    value: 'sid'
+  }
+]
+
+export { DataSourceType, dsTypeList, RedisTypes, dsConfigOriginList, OracleServerTypes }
