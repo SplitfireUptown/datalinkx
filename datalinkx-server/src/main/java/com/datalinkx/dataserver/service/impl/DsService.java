@@ -238,8 +238,11 @@ public class DsService {
 		DsBean dsBean = dsRepository.findByDsId(dsId).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS));
 		List<String> tableList = new ArrayList<>();
 		try {
-			IDsReader dsReader = DsDriverFactory.getDsReader(getConnectId(dsBean));
-			tableList = dsReader.treeTable(dsBean.getDatabase(), dsBean.getSchema()).stream().map(DbTree::getName).collect(Collectors.toList());
+			IDsDriver dsDriver = DsDriverFactory.getDriver(getConnectId(dsBean));
+			if (dsDriver instanceof IDsReader) {
+				IDsReader dsReader = (IDsReader) dsDriver;
+				tableList = dsReader.treeTable(dsBean.getDatabase(), dsBean.getSchema()).stream().map(DbTree::getName).collect(Collectors.toList());
+			}
 		} catch (Exception e) {
 			log.error("connect error", e);
 			throw new DatalinkXServerException(e);
@@ -255,11 +258,15 @@ public class DsService {
 	public List<TableField> fetchFields(String dsId, String tbName) {
 		DsBean dsBean = dsRepository.findByDsId(dsId).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS));
 		try {
-			IDsReader dsReader = DsDriverFactory.getDsReader(getConnectId(dsBean));
-			return dsReader.getFields(dsBean.getDatabase(), dsBean.getSchema(), tbName);
+			IDsDriver dsDriver = DsDriverFactory.getDriver(getConnectId(dsBean));
+			if (dsDriver instanceof IDsReader) {
+				IDsReader dsReader = (IDsReader) dsDriver;
+				return dsReader.getFields(dsBean.getDatabase(), dsBean.getSchema(), tbName);
+			}
 		} catch (Exception e) {
 			log.error("connect error", e);
 			throw new DatalinkXServerException(e);
 		}
+		return new ArrayList<>();
 	}
 }

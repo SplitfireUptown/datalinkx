@@ -198,7 +198,7 @@ export default {
           this.confirmLoading = true
           if (this.type === 'add') {
             console.log(values)
-            addObj(values).then(res => {
+            await addObj(values).then(res => {
               if (res.status !== '0') {
                 this.$message.error(res.errstr)
               }
