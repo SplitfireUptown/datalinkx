@@ -171,6 +171,7 @@ export default {
     },
     getAllDsNumber () {
       getDsGroup().then(res => {
+        this.loading = false
         if (res.status === '0') {
           this.dsGroupNumber = Object.assign({}, this.dsGroupNumber, res.result)
         } else {
@@ -203,13 +204,17 @@ export default {
       delObj(record.dsId).then(res => {
         this.$message.info('删除成功')
         this.init()
+        this.getAllDsNumber()
       })
     },
     show (record) {
       this.$refs.refDsConfig.show(record.dsId, 'show', record)
     },
-    handleOk () {
+    handleOk (data) {
       this.init()
+      if (data.type === 'add') {
+        this.getAllDsNumber()
+      }
     },
     queryData () {
       this.pages.current = 1

@@ -131,8 +131,13 @@ export default {
       }
     },
     currentDsList () {
-      const list = cloneDeep(this.dsConfigOriginList)
+      let list = cloneDeep(this.dsConfigOriginList)
       if (this.currentDs.dsTypeKey === 1) return list
+      if (this.currentDs.dsTypeKey === 2) {
+        list = list.filter(item => {
+          return item.key !== 'database'
+        })
+      }
       list.forEach(item => {
         switch (this.currentDs.dsTypeKey) {
           case 4:
@@ -217,36 +222,6 @@ export default {
       }
       return temp
     },
-    // 获取用户信息
-    edit (id, type) {
-      this.visible = true
-      if (type && type === 'add') {
-        this.addable = true
-        this.type = type
-      }
-      if (type === 'edit') {
-        this.editable = true
-        this.type = type
-      }
-      if (type === 'show') {
-        this.showable = true
-        this.type = type
-      }
-
-      const { form: { setFieldsValue, resetFields } } = this
-      if (['edit', 'show'].includes(type)) {
-        this.confirmLoading = true
-        getObj(id).then(res => {
-          const record = res.result
-          this.confirmLoading = false
-          this.$nextTick(() => {
-            setFieldsValue(pick(record, ['name', 'host', 'port', 'username', 'database', 'password', 'config', 'tb_name_list']))
-          })
-        })
-      } else {
-        resetFields()
-      }
-    },
     handleChange (value) {
       selectTables.push(value)
       console.log(`Selected: ${value}`)
@@ -277,7 +252,7 @@ export default {
           }
           setTimeout(() => {
             this.confirmLoading = false
-            this.$emit('ok')
+            this.$emit('ok', { type: this.type })
             this.visible = false
           }, 1500)
         }
