@@ -115,7 +115,8 @@ export default {
       addable: false,
       showable: false,
       DataSourceType: DATA_SOURCE_TYPE,
-      type: 'add'
+      type: 'add',
+      dsId: ''
     }
   },
   computed: {
@@ -166,6 +167,7 @@ export default {
   methods: {
     show (id, type, info) {
       this.type = type
+      this.dsId = id
       switch (type) {
         case 'add':
           this.showable = false
@@ -254,6 +256,8 @@ export default {
     handleOk () {
       this.form.validateFields(async (err, values) => {
         if (!err) {
+          values.type = this.currentDs.dsTypeKey
+          values.dsId = this.dsId
           if (this.currentDs.dsTypeKey === 3) {
             const temp = {}
             temp[values.servertype] = values[values.servertype]
