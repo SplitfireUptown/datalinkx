@@ -117,15 +117,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
 
     @Override
     protected void beforeExec(FlinkActionParam unit) throws Exception {
-//        String fromDbType = unit.getReader().getType();
-//        String toDbType = unit.getWriter().getType();
-//        if (!this.isSupportedDb(fromDbType, toDbType)) {
-//            log.error(String.format("flink not support from %s to %s", fromDbType, toDbType));
-//            return;
-//        }
-
-        log.info(String.format("jobid: %s, begin from %s to %s",
-                unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
+        log.info(String.format("jobid: %s, begin from %s to %s", unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
 
         // 同步表状态
         IDsReader readDsDriver;
@@ -242,6 +234,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         unitParam.setErrorRecords(errorRecords.get());
         unitParam.setWriteRecords(writeRecords.get() - errorRecords.get());
 
+        // 实时推送流转进度
         ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
         producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
         producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);

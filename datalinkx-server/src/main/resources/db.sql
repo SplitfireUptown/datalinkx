@@ -96,4 +96,6 @@ CREATE TABLE `MESSAGEHUB_TOPIC` (
 INSERT INTO `MESSAGEHUB_TOPIC` (`topic`, `fields`, `info_type`, `desc`) VALUES ('JOB_PROGRESS', '', 'REDIS_STREAM', '任务状态刷新');
 
 
-alter table JOB ADD COLUMN  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL
+alter table JOB ADD COLUMN  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '任务名称';;
+
+alter table JOB ADD COLUMN `cover` tinyint NOT NULL DEFAULT '0' COMMENT '是否开启覆盖';

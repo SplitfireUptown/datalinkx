@@ -93,6 +93,8 @@ public class JobVo {
 		@ApiModelProperty(value = "定时策略")
 		@JsonProperty("scheduler_conf")
 		private String schedulerConf;
+		@ApiModelProperty(value = "数据覆盖")
+		private Integer cover;
 		@ApiModelProperty(value = "字段映射配置")
 		@JsonProperty("field_mappings")
 		private List<JobForm.FieldMappingForm> fieldMappings;

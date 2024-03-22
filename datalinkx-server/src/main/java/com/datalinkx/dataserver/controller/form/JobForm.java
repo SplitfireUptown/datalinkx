@@ -57,6 +57,8 @@ public class JobForm {
 		private SyncModeForm syncMode;
 		@JsonProperty("field_mappings")
 		private List<FieldMappingForm> fieldMappings;
+		@ApiModelProperty("是否覆盖数据")
+		private Integer cover = 0;
 	}
 
 	@Data

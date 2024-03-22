@@ -106,6 +106,7 @@ public class JobService implements DtsJobService {
 		jobBean.setCrontab(form.getSchedulerConf());
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 		jobBean.setName(form.getJobName());
+		jobBean.setCover(form.getCover());
 
 		// 创建 xxljob
 		String xxlJobId = jobClientApi.add(jobId, form.getSchedulerConf(), DataTransJobParam.builder().jobId(jobId).build());
@@ -127,6 +128,7 @@ public class JobService implements DtsJobService {
 		jobBean.setCrontab(form.getSchedulerConf());
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 		jobBean.setName(form.getJobName());
+		jobBean.setCover(form.getCover());
 		jobRepository.save(jobBean);
 		return form.getJobId();
 	}
@@ -429,6 +431,7 @@ public class JobService implements DtsJobService {
 				.fromTbName(dsTbNameMap.get(jobBean.getFromTbId()))
 				.toTbName(dsTbNameMap.get(jobBean.getToTbId()))
 				.schedulerConf(jobBean.getCrontab())
+				.cover(jobBean.getCover())
 				.syncMode(JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class))
 				.build();
 
