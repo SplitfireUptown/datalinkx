@@ -49,6 +49,8 @@ public interface EsService {
 
     String retrieveMax(String tableName, String json, String maxFieldName) throws Exception;
 
+    void truncateData(String indexName) throws Exception;
+
 
     default Map<String, Object> buildRange(String name, String value,
                                            String op, String mustOrShould, String fieldType) throws Exception {

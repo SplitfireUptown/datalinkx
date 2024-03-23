@@ -224,7 +224,7 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
 
     @Override
     public void truncateData(FlinkActionParam param) throws Exception {
-
+        esService.truncateData(param.getWriter().getTableName());
     }
 
     @Override

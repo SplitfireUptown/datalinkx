@@ -182,7 +182,7 @@ public class JobService implements DtsJobService {
 				.reader(this.getReader(jobBean, fieldMappingForms))
 				.writer(this.getWriter(jobBean, fieldMappingForms))
 				.build();
-		return DataTransJobDetail.builder().jobId(jobId).syncUnits(Collections.singletonList(syncUnit)).build();
+		return DataTransJobDetail.builder().jobId(jobId).cover(jobBean.getCover()).syncUnits(Collections.singletonList(syncUnit)).build();
 	}
 
 	@SneakyThrows

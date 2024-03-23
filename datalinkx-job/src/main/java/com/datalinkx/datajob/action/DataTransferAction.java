@@ -65,9 +65,6 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     @Resource(name = "messageHubServiceImpl")
     MessageHubService messageHubService;
 
-//    public boolean isSupportedDb(String fromDbType, String toDbTYpe) {
-//        return dsProperties.getDatasource().contains(fromDbType) && dsProperties.getDatasource().contains(toDbTYpe);
-//    }
 
     @Override
     protected void begin(DataTransJobDetail info) {
@@ -129,6 +126,10 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
             unit.setDsWriter(writeDsDriver);
         } catch (Exception e) {
             throw new Exception("driver init error: ", e);
+        }
+        // 是否覆盖数据
+        if (unit.getCover() == 1) {
+            writeDsDriver.truncateData(unit);
         }
     }
 
@@ -312,7 +313,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
                     .reader(syncUnit.getReader())
                     .writer(syncUnit.getWriter())
                     .jobId(jobDetail.getJobId())
-                    .full(jobDetail.getFull())
+                    .cover(jobDetail.getCover())
                     .build()).collect(Collectors.toList());
     }
 }

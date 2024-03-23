@@ -27,7 +27,7 @@ import lombok.experimental.FieldNameConstants;
 public class DataTransJobDetail {
     String jobId;
     List<SyncUnit> syncUnits;
-    Integer full;
+    Integer cover;
 
     @Data
     @AllArgsConstructor

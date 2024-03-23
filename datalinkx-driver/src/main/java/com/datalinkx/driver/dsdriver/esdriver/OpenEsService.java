@@ -20,6 +20,7 @@ package com.datalinkx.driver.dsdriver.esdriver;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -27,11 +28,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.utils.HttpUtil;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
 import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -243,8 +247,6 @@ public class OpenEsService implements EsService {
         RestClient restClient = ConnectPool.getConnection(esDriver, RestClient.class);
         try {
             HttpEntity entity = new NStringEntity(json, ContentType.APPLICATION_JSON);
-//            Response response = restClient.performRequest("POST",
-//                    String.format("/%s/_search?format=json", tableName), new HashMap<>(), entity);
             Request request = new Request("POST", String.format("/%s/_search?format=json", tableName));
             request.setEntity(entity);
 
@@ -263,6 +265,28 @@ public class OpenEsService implements EsService {
             throw new Exception(getErrorInfo(EntityUtils.toString(e.getResponse().getEntity())));
         } catch (IOException e) {
             log.error("", e);
+            throw e;
+        } finally {
+            ConnectPool.releaseConnection(esDriver.getConnectId(), restClient);
+        }
+    }
+
+    @Override
+    public void truncateData(String indexName) throws Exception {
+        RestClient restClient = ConnectPool.getConnection(esDriver, RestClient.class);
+        try {
+            HashMap<Object, Object> map = Maps.newHashMap();
+            map.put("query", ImmutableMap.of("match_all", Maps.newHashMap()));
+            HttpEntity entity = new NStringEntity(JsonUtils.toJson(map), ContentType.APPLICATION_JSON);
+            Request request = new Request("POST", String.format("/%s/_delete_by_query", indexName));
+            request.setEntity(entity);
+            Response response = restClient.performRequest(request);
+            if (200 != response.getStatusLine().getStatusCode()) {
+                log.error("清除数据失败: {}", EntityUtils.toString(response.getEntity()));
+                throw new DatalinkXJobException("ES清楚数据失败!");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw e;
         } finally {
             ConnectPool.releaseConnection(esDriver.getConnectId(), restClient);

@@ -25,7 +25,7 @@ public class FlinkActionParam {
     String taskId;
     DataTransJobDetail.Reader reader;
     DataTransJobDetail.Writer writer;
-    Integer full;
+    Integer cover;
 
     int readRecords = 0;
     int writeRecords = 0;
