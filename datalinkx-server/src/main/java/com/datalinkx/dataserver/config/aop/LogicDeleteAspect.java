@@ -1,14 +1,5 @@
 package com.datalinkx.dataserver.config.aop;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Scope
 @Aspect
 public class LogicDeleteAspect {
-    static Map<CriteriaQuery<?>, Object> criteriaQueryGenForSpringDataJpaQueryMethod = new ConcurrentHashMap();
 
     public LogicDeleteAspect() {
     }

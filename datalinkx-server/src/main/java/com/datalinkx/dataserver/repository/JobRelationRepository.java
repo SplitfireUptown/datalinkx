@@ -2,7 +2,6 @@ package com.datalinkx.dataserver.repository;
 
 import java.util.List;
 
-import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobRelationBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
