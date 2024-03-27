@@ -201,10 +201,21 @@ export default {
     },
     delete (record) {
       console.log(record)
+      // delObj(record.dsId).then(res => {
+      //   this.$message.info('删除成功')
+      //   this.init()
+      //   this.getAllDsNumber()
+      // })
       delObj(record.dsId).then(res => {
-        this.$message.info('删除成功')
-        this.init()
-        this.getAllDsNumber()
+        if (res.status === '0') {
+          this.$message.info('删除成功')
+          this.init()
+          this.getAllDsNumber()
+        } else {
+          this.$message.error(res.errstr)
+        }
+      }).finally(() => {
+        this.loading = false
       })
     },
     show (record) {

@@ -139,7 +139,15 @@ public class JobService implements DtsJobService {
 		DsBean fromDsBean = dsRepository.findByDsId(form.getFromDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "来源数据源不存在"));
 		dsRepository.findByDsId(form.getToDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "目标数据源不存在"));
 		// 2、判断流转任务名称是否重复
-		jobRepository.findByName(form.getJobName()).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "流转任务名称重复"));
+		jobRepository.findByName(form.getJobName()).ifPresent(jobBean -> {
+			if (form instanceof JobForm.JobModifyForm) {
+				if (!ObjectUtils.nullSafeEquals(jobBean.getJobId(), ((JobForm.JobModifyForm) form).getJobId())) {
+					throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "任务名称已存在");
+				}
+			} else {
+				throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "任务名称已存在");
+			}
+		});
 
 		// 3、判断增量模式下是否有增量字段
 		if (MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode()) && ObjectUtils.isEmpty(form.getSyncMode().getIncreateField())) {

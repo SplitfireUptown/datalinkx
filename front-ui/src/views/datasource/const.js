@@ -116,7 +116,7 @@ const dsConfigOriginList = [
   {
     label: 'password',
     key: 'password',
-    type: 'input',
+    type: 'password',
     decorator: '请输入 password',
     isRequired: true
   },

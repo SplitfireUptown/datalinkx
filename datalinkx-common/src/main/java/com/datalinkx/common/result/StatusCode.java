@@ -9,6 +9,7 @@ public enum StatusCode {
     INVALID_ARGUMENTS(3),
     DS_NOT_EXISTS(101),
     DS_CONFIG_ERROR(102),
+    DS_HAS_JOB_DEPEND(102),
     TB_NOT_EXISTS(201),
 
     JOB_IS_RUNNING(1001),

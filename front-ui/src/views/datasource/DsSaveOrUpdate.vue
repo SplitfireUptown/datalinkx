@@ -82,7 +82,7 @@
           :wrapperCol="wrapperCol"
         >
           <a-input
-            type="text"
+            type="password"
             :disabled="showable"
             v-decorator="['password', {rules: [{required: false, message: '请输入password'}]}]" />
         </a-form-item>

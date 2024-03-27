@@ -19,10 +19,12 @@ import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.DsTbBean;
+import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.DsTbRepository;
+import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
@@ -53,6 +55,8 @@ public class DsService {
 	private DsRepository dsRepository;
 	@Autowired
 	private DsTbRepository dsTbRepository;
+	@Autowired
+	private JobRepository jobRepository;
 
 
 	/**
@@ -201,8 +205,16 @@ public class DsService {
 		return result;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public void del(String dsId) {
+		// 校验任务依赖
+		List<JobBean> dependJobs = jobRepository.findDependJobId(dsId);
+		if (!ObjectUtils.isEmpty(dependJobs)) {
+			throw new DatalinkXServerException(StatusCode.DS_HAS_JOB_DEPEND, "数据源存在流转任务依赖");
+		}
+
 		dsRepository.deleteByDsId(dsId);
+		dsTbRepository.deleteByDsId(dsId);
 	}
 
 	public DsBean info(String dsId) {

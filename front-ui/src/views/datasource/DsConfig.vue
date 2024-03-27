@@ -41,6 +41,11 @@
             v-if="item.type === 'input'"
             :disabled="showable"
             v-decorator="[item.key, {rules: [{required: item.isRequired, message: item.decorator}]}]" />
+          <a-input-password
+            type="text"
+            v-if="item.type === 'password'"
+            :disabled="showable"
+            v-decorator="[item.key, {rules: [{required: item.isRequired, message: item.decorator}]}]" />
           <a-textarea
             type="text"
             v-if="item.type === 'textarea'"

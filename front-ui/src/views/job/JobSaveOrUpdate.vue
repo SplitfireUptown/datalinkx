@@ -252,11 +252,15 @@ export default {
           }
           console.log(this.jobId)
           if (this.type === 'edit') {
-            await modifyObj(formData).catch(err => {
+            modifyObj(formData).catch(err => {
               this.$message.error(err.errstr)
             })
           } else {
-            await addObj(formData)
+            addObj(formData).then(res => {
+              if (res.status !== '0') {
+                this.$message.error(res.errstr)
+              }
+            })
           }
           setTimeout(() => {
             this.confirmLoading = false
@@ -421,6 +425,7 @@ export default {
       this.cover = 0
       this.incrementField = ''
       this.schedulerConf = ''
+      this.jobName = ''
     },
     removeMapping (index) {
       this.mappings.splice(index, 1)
