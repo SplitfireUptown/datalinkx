@@ -21,7 +21,7 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 
 	List<JobBean> findByJobIdIn(List<String> jobIds);
 
-	@Query(value = "select * from JOB where reader_ds_id = :jobId or writer_ds_id = :jobId", nativeQuery = true)
+	@Query(value = "select * from JOB where (reader_ds_id = :jobId or writer_ds_id = :jobId)", nativeQuery = true)
 	List<JobBean> findDependJobId(String jobId);
 
 	@Query(value = "select * from JOB where is_del = 0", nativeQuery = true)
