@@ -84,7 +84,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     @Override
     protected void end(DataTransJobDetail info, int status, String errmsg) {
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
-        log.info(String.format("jobid: %s, end to sync", info.getJobId()));
+        log.info(String.format("jobid: %s, end to transfer", info.getJobId()));
 
         Thread thread = DataTransferAction.checkThread.get();
         if (null != thread && thread.isAlive()) {
@@ -272,16 +272,10 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
                         ).build());
         // 同步表状态
         if (success) {
-            log.info(String.format("jobid: %s, after from %s to %s",
-                    unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
-            try {
-                unit.getDsReader().afterRead(unit);
-                unit.getDsWriter().afterWrite(unit);
-            } catch (Exception e) {
-                success = false;
-                errorMsg = "数据同步完成，合表失败.";
-                log.error(errorMsg, e);
-            }
+            log.info(String.format("jobid: %s, after from %s to %s", unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
+            // 触发after钩子函数，目前是空的
+            unit.getDsReader().afterRead(unit);
+            unit.getDsWriter().afterWrite(unit);
 
             String tableName = unit.getReader().getTableName();
             getExecCount(tableName).setAllCount(getExecCount(tableName).getAllCount() == null ? 0 : getExecCount(tableName).getAllCount());
@@ -299,9 +293,9 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         if (!ObjectUtils.isEmpty(unit.getTaskId())) {
             try {
                 flinkClient.jobStop(unit.getTaskId());
-                log.error(String.format("flink task stop: %s", unit.getTaskId()));
+                log.error(String.format("flink task cancel: %s", unit.getTaskId()));
             } catch (Exception e) {
-                log.error("flink task stop failed: ", e);
+                log.error("flink task cancel failed: ", e);
             }
         }
 

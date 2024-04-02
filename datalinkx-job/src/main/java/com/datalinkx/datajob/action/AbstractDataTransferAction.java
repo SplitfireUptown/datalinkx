@@ -51,7 +51,7 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
 
     @Override
     public void doAction(T actionInfo) throws Exception {
-        LinkedBlockingDeque<U> runningUnit = new LinkedBlockingDeque<U>();
+        LinkedBlockingDeque<U> runningUnit = new LinkedBlockingDeque<>();
         LinkedBlockingDeque<U> unfinished = new LinkedBlockingDeque<>();
         Thread postThread;
         try {
@@ -113,7 +113,7 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
                     try {
                         Thread.sleep(DataTransferAction.SLEEP_TIME);
                     } catch (InterruptedException e) {
-                        log.error("", e);
+                        log.error(e.getMessage(), e);
                     }
                 }
 
@@ -155,12 +155,12 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
             // 整个Job结束后的处理
             end(actionInfo, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
         } catch (InterruptedException e) {
-            log.error("Shutdown job by user.");
+            log.error("cancel job by user.");
             JobUtils.cntx().setCanceled(true);
             end(actionInfo, JOB_STATUS_STOP, "cancel the job");
             throw e;
         } catch (Throwable e) {
-            log.error("sync failed", e);
+            log.error("transfer failed", e);
             end(actionInfo, JOB_STATUS_ERROR, e.getMessage());
         }
     }

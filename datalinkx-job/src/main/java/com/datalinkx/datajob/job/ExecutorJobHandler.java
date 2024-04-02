@@ -88,20 +88,20 @@ public class ExecutorJobHandler {
 		return jobUrl.substring("/jobs/".length());
 	}
 
-		private String generateFlinkCmd(String jobId, String jobJsonFile) {
-			String javaHome = System.getenv("JAVA_HOME");
-			String os = System.getProperty("os.name").toLowerCase();
+	private String generateFlinkCmd(String jobId, String jobJsonFile) {
+		String javaHome = System.getenv("JAVA_HOME");
+		String os = System.getProperty("os.name").toLowerCase();
 
-			return String.format(
-					"%s -cp %s com.dtstack.flinkx.launcher.Launcher -mode standalone -jobid %s  -job %s  -pluginRoot %s -flinkconf %s",
-					javaHome + (os.contains("win") ? "\\bin\\java" : "/bin/java"),
-					flinkXHomePath + (os.contains("win") ? "lib\\*" : "lib/*"),
-					jobId,
-					jobJsonFile,
-					flinkXHomePath + "syncplugins",
-					flinkXHomePath + "flinkconf"
-			);
-		}
+		return String.format(
+				"%s -cp %s com.dtstack.flinkx.launcher.Launcher -mode standalone -jobid %s  -job %s  -pluginRoot %s -flinkconf %s",
+				javaHome + (os.contains("win") ? "\\bin\\java" : "/bin/java"),
+				flinkXHomePath + (os.contains("win") ? "lib\\*" : "lib/*"),
+				jobId,
+				jobJsonFile,
+				flinkXHomePath + "syncplugins",
+				flinkXHomePath + "flinkconf"
+		);
+	}
 
 	private String generateJobJsonFile(String jobId, String reader, String writer, String setting) {
 		String jobJson = String.format("{\"job\":{\"content\":[{\"reader\":%s,\"writer\":%s}],\"setting\":%s}}", reader, writer, setting);
