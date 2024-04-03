@@ -54,18 +54,6 @@ CREATE TABLE `JOB_RELATION` (
                                 KEY `job_id` (`job_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='流转任务级联配置表';
 
-CREATE TABLE `DS_TB` (
-                         `id` int unsigned NOT NULL AUTO_INCREMENT,
-                         `tb_id` char(40) NOT NULL DEFAULT '' COMMENT '导出数据源表',
-                         `ds_id` char(40) DEFAULT NULL COMMENT '数据库id',
-                         `name` varchar(1024) NOT NULL DEFAULT '' COMMENT '表名，不可修改',
-                         `status` tinyint unsigned DEFAULT '0' COMMENT '0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:MIGRATE|5:MIGRATE_ERROR|6:MERGE_ERROR',
-                         `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                         `utime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         `is_del` tinyint NOT NULL DEFAULT '0',
-                         PRIMARY KEY (`id`),
-                         KEY `ds` (`ds_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='数据源中数据表';
 
 CREATE TABLE `JOB_LOG` (
                            `id` int unsigned NOT NULL AUTO_INCREMENT,

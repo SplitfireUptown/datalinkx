@@ -25,8 +25,6 @@ public class DsForm {
 		private Integer port;
 		private Integer type;
 		private String config;
-		@JsonProperty("tb_name_list")
-		private List<String> tbNameList;
 	}
 
 	@Data

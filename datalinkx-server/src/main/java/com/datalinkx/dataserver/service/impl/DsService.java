@@ -18,12 +18,10 @@ import com.datalinkx.common.utils.Base64Utils;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
-import com.datalinkx.dataserver.bean.domain.DsTbBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.repository.DsRepository;
-import com.datalinkx.dataserver.repository.DsTbRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsDriver;
@@ -53,8 +51,6 @@ public class DsService {
 
 	@Autowired
 	private DsRepository dsRepository;
-	@Autowired
-	private DsTbRepository dsTbRepository;
 	@Autowired
 	private JobRepository jobRepository;
 
@@ -100,12 +96,6 @@ public class DsService {
 		// 2.3、检查连接情况
 		this.checkConnect(dsBean);
 
-		// 3、获取选中的表并创建
-		List<String> tbNameList = ObjectUtils.isEmpty(form.getTbNameList()) ? new ArrayList<>() : form.getTbNameList();
-		for (String tbName : tbNameList) {
-			xtbCreate(tbName, dsId);
-		}
-
 		dsRepository.save(dsBean);
 
 		return dsId;
@@ -120,16 +110,6 @@ public class DsService {
 				throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "数据源附加信息转化Json格式异常");
 			}
 		}
-	}
-
-	public String xtbCreate(String tbName, String dsId) {
-		String xtbId = genKey("xtb");
-		DsTbBean dsTbBean = new DsTbBean();
-		dsTbBean.setTbId(xtbId);
-		dsTbBean.setName(tbName);
-		dsTbBean.setDsId(dsId);
-		dsTbRepository.save(dsTbBean);
-		return xtbId;
 	}
 
 
@@ -214,7 +194,6 @@ public class DsService {
 		}
 
 		dsRepository.deleteByDsId(dsId);
-		dsTbRepository.deleteByDsId(dsId);
 	}
 
 	public DsBean info(String dsId) {
