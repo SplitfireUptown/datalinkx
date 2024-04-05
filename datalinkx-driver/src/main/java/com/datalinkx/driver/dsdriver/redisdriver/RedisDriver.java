@@ -1,4 +1,4 @@
-package com.datalinkx.driver.dsdriver.redisDriver;
+package com.datalinkx.driver.dsdriver.redisdriver;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ConnectIdUtils;

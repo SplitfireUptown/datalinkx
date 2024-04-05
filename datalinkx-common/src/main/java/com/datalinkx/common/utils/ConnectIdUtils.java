@@ -37,4 +37,26 @@ public final class ConnectIdUtils {
     public static String getDsType(String connectId) {
         return JsonUtils.json2Map(decodeConnectId(connectId)).get("type").toString();
     }
+
+    public static String toPascalCase(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = true;
+
+        for (char c : input.toCharArray()) {
+            if (Character.isWhitespace(c) || c == '_' || c == '-') {
+                capitalizeNext = true;
+            } else if (capitalizeNext) {
+                result.append(Character.toUpperCase(c));
+                capitalizeNext = false;
+            } else {
+                result.append(Character.toLowerCase(c));
+            }
+        }
+
+        return result.toString();
+    }
 }

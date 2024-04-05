@@ -1,4 +1,4 @@
-package com.datalinkx.driver.dsdriver.redisDriver;
+package com.datalinkx.driver.dsdriver.redisdriver;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;

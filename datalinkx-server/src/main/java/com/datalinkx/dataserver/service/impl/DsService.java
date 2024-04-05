@@ -31,7 +31,7 @@ import com.datalinkx.driver.dsdriver.base.model.TableField;
 import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
 import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
 import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
-import com.datalinkx.driver.dsdriver.redisDriver.RedisSetupInfo;
+import com.datalinkx.driver.dsdriver.redisdriver.RedisSetupInfo;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

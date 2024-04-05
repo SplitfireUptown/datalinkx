@@ -1,4 +1,4 @@
-package com.datalinkx.driver.dsdriver.redisDriver;
+package com.datalinkx.driver.dsdriver.redisdriver;
 
 import com.datalinkx.driver.dsdriver.base.connect.SetupInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

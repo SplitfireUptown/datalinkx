@@ -43,6 +43,10 @@ public class JobClientApi {
     @Value("${xxl-job.exec-handler}")
     String execHandler;
 
+    // 分布式执行器需要配置 - FAILOVER：故障转移策略
+    @Value("${xxl-job.executor-route-strategy:FIRST}")
+    String executorRouteStrategy;
+
     
     public String start(String jobId) {
         return handleResult(client.start(getXxlJobId(jobId)));
@@ -83,7 +87,7 @@ public class JobClientApi {
                 .executorParam(JsonUtils.toJson(dataTransJobParam))
                 .executorBlockStrategy("SERIAL_EXECUTION")
                 .misfireStrategy("DO_NOTHING")
-                .executorRouteStrategy("FIRST")
+                .executorRouteStrategy(executorRouteStrategy)
                 .glueType("BEAN")
                 .jobGroup(jobGroup)
                 .executorFailRetryCount(0)
