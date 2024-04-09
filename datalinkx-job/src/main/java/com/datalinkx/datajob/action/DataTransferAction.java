@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -33,7 +31,6 @@ import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
 import com.datalinkx.driver.model.DataTransJobDetail;
-import com.datalinkx.driver.utils.JobUtils;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,10 +43,8 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @Component
 public class DataTransferAction extends AbstractDataTransferAction<DataTransJobDetail, FlinkActionParam> {
-    public static ThreadLocal<Long> startTime = new ThreadLocal<>();
-    public static ThreadLocal<Map<String, JobExecCountDto>> countRes = new ThreadLocal<>();
-    public static ThreadLocal<Thread> checkThread = new ThreadLocal<>();
-    public static final long SLEEP_TIME = 1000L;
+    public static ThreadLocal<Long> START_TIME = new ThreadLocal<>();
+    public static ThreadLocal<Map<String, JobExecCountDto>> COUNT_RES = new ThreadLocal<>();
 
 
     @Autowired
@@ -69,12 +64,12 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     @Override
     protected void begin(DataTransJobDetail info) {
         // 更新同步任务的状态
-        startTime.set(new Date().getTime());
-        countRes.set(new HashMap<>());
+        START_TIME.set(new Date().getTime());
+        COUNT_RES.set(new HashMap<>());
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
         log.info(String.format("jobid: %s, start to transfer", info.getJobId()));
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
-                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE).startTime(startTime.get()).endTime(null)
+                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE).startTime(START_TIME.get()).endTime(null)
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
                 .filterCount(jobExecCountDto.getFilterCount())
@@ -86,21 +81,16 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
         log.info(String.format("jobid: %s, end to transfer", info.getJobId()));
 
-        Thread thread = DataTransferAction.checkThread.get();
-        if (null != thread && thread.isAlive()) {
-            thread.interrupt();
-        }
 
-        if (countRes.get() != null) {
-            countRes.get().forEach((key, value) -> {
+        if (COUNT_RES.get() != null) {
+            COUNT_RES.get().forEach((key, value) -> {
                 jobExecCountDto.setAllCount(jobExecCountDto.getAllCount() + value.getAllCount());
                 jobExecCountDto.setAppendCount(jobExecCountDto.getAppendCount() + value.getAppendCount());
                 jobExecCountDto.setFilterCount(jobExecCountDto.getFilterCount() + value.getFilterCount());
             });
         }
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
-                .jobStatus(status).startTime(startTime.get()).endTime(new Date().getTime())
-                .tbTotal(JobUtils.cntx().getTotal()).tbSuccess(JobUtils.cntx().getSuccess())
+                .jobStatus(status).startTime(START_TIME.get()).endTime(new Date().getTime())
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
                 .filterCount(jobExecCountDto.getFilterCount())
@@ -251,14 +241,14 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     private JobExecCountDto getExecCount(String tableName) {
-        if (countRes.get() == null) {
-            countRes.set(new HashMap<>());
+        if (COUNT_RES.get() == null) {
+            COUNT_RES.set(new HashMap<>());
         }
 
-        if (countRes.get().get(tableName) == null) {
-            countRes.get().put(tableName, new JobExecCountDto());
+        if (COUNT_RES.get().get(tableName) == null) {
+            COUNT_RES.get().put(tableName, new JobExecCountDto());
         }
-        return countRes.get().get(tableName);
+        return COUNT_RES.get().get(tableName);
     }
 
     @Override
@@ -282,10 +272,6 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
             getExecCount(tableName).setAppendCount(getExecCount(tableName).getAppendCount() + unit.getReadRecords());
             getExecCount(tableName).setFilterCount(getExecCount(tableName).getFilterCount() + unit.getWriteRecords());
         }
-
-        if (success) {
-            JobUtils.cntx().addSuccess();
-        }
     }
 
     @Override
@@ -302,12 +288,12 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected List<FlinkActionParam> getExecUnitList(DataTransJobDetail jobDetail) {
-        return jobDetail.getSyncUnits().stream().map(syncUnit -> FlinkActionParam.builder()
-                    .reader(syncUnit.getReader())
-                    .writer(syncUnit.getWriter())
+    protected FlinkActionParam getExecUnit(DataTransJobDetail jobDetail) {
+        return FlinkActionParam.builder()
+                    .reader(jobDetail.getSyncUnit().getReader())
+                    .writer(jobDetail.getSyncUnit().getWriter())
                     .jobId(jobDetail.getJobId())
                     .cover(jobDetail.getCover())
-                    .build()).collect(Collectors.toList());
+                    .build();
     }
 }

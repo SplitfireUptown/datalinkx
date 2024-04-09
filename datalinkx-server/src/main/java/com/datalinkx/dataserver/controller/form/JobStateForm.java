@@ -16,9 +16,6 @@ public class JobStateForm {
     Long startTime;
     Long endTime;
     String errmsg;
-    Integer tbSuccess;
-    Integer tbTotal;
-
     private Long appendCount = 0L;
     private Long allCount = 0L;
     private Long filterCount = 0L;

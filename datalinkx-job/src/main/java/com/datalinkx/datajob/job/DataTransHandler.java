@@ -10,7 +10,6 @@ import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.datalinkx.datajob.bean.JobStateForm;
 import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.driver.model.DataTransJobDetail;
-import com.datalinkx.driver.utils.JobUtils;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import org.slf4j.Logger;
@@ -46,8 +45,6 @@ public class DataTransHandler {
         XxlJobHelper.log("begin dataTransJobHandler. ");
         DataTransJobParam jobParam = JsonUtils.toObject(XxlJobHelper.getJobParam(), DataTransJobParam.class);
 
-        // 生成任务content
-        JobUtils.initContext();
         // 定时异步调用无法统一trace_id，这里用job_id做trace_id
         MDC.put("trace_id", jobParam.getJobId());
 
@@ -55,7 +52,6 @@ public class DataTransHandler {
         DataTransJobDetail jobDetail;
         try {
             jobDetail = this.getJobDetail(jobParam);
-            JobUtils.cntx().setTotal(jobDetail.getSyncUnits().size());
             dataTransferAction.doAction(jobDetail);
         } catch (InterruptedException e) {
             // cancel job
@@ -67,8 +63,6 @@ public class DataTransHandler {
             XxlJobHelper.handleFail(e.getMessage());
         }
 
-        JobUtils.finiContext();
-
         XxlJobHelper.log("end dataTransJobHandler. ");
         // default success
         XxlJobHelper.handleSuccess("success");
@@ -78,8 +72,7 @@ public class DataTransHandler {
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
         dataServerClient.updateJobStatus(JobStateForm.builder().jobId(jobParam.getJobId())
                 .jobStatus(status).startTime(startTime).endTime(new Date().getTime())
-                .errmsg(message).tbSuccess(JobUtils.cntx().getSuccess()).tbTotal(JobUtils.cntx().getTotal())
-                .allCount(jobExecCountDto.getAllCount())
+                .errmsg(message).allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
                 .build());
     }

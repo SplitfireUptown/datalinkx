@@ -26,7 +26,7 @@ import lombok.experimental.FieldNameConstants;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataTransJobDetail {
     String jobId;
-    List<SyncUnit> syncUnits;
+    SyncUnit syncUnit;
     Integer cover;
 
     @Data

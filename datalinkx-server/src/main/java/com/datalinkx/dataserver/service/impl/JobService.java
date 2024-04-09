@@ -176,7 +176,7 @@ public class JobService implements DtsJobService {
 				.reader(this.getReader(jobBean, fieldMappingForms))
 				.writer(this.getWriter(jobBean, fieldMappingForms))
 				.build();
-		return DataTransJobDetail.builder().jobId(jobId).cover(jobBean.getCover()).syncUnits(Collections.singletonList(syncUnit)).build();
+		return DataTransJobDetail.builder().jobId(jobId).cover(jobBean.getCover()).syncUnit(syncUnit).build();
 	}
 
 	@SneakyThrows
@@ -380,9 +380,9 @@ public class JobService implements DtsJobService {
 			throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务已在运行中，请勿重复触发");
 		}
 
-		if (jobBean.getStatus() == JOB_STATUS_STOP) {
-			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
-		}
+//		if (jobBean.getStatus() == JOB_STATUS_STOP) {
+//			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
+//		}
 
 		jobBean.setStatus(JOB_STATUS_SYNC);
 
