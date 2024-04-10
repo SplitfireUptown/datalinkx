@@ -197,6 +197,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     @Override
     public void afterRead(FlinkActionParam param) {
+        log.info("data-transfer task read finish");
     }
 
     public List<? extends DbTree> generateTree(String catalog, boolean fetchTable, Connection connection) {
@@ -499,7 +500,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     @Override
     public void afterWrite(FlinkActionParam param) {
-
+        log.info("data-transfer task write finish");
     }
 
     protected String columnQuota() {

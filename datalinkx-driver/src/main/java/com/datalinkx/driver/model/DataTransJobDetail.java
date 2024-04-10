@@ -12,11 +12,8 @@ import lombok.experimental.FieldNameConstants;
 
 
 /**
- * @author uptown
- * @Description TODO
- * @createTime 2021年05月25日 19:55:59
+ * 封装用户注册数据源信息DTO类
  */
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -59,8 +56,8 @@ public class DataTransJobDetail {
     @NoArgsConstructor
     @Builder
     public static class Writer {
-        String catalog; // jdbc catalog;
-        String schema; // jdbc catalog;
+        String catalog;
+        String schema;
         String tableName;
         List<Column> columns;
         String connectId;

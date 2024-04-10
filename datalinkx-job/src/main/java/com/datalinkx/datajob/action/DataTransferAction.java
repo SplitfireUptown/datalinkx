@@ -171,7 +171,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         }
 
         if ("failed".equalsIgnoreCase(state)) {
-            String errorMsg = "flink task failed.";
+            String errorMsg = "data-transfer task failed.";
 
             if (flinkClient != null) {
                 JsonNode jsonNode = flinkClient.jobExceptions(taskId);
@@ -188,8 +188,8 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         }
 
         if ("canceled".equalsIgnoreCase(state)) {
-            log.error("flink task canceled.");
-            throw new DatalinkXJobException("flink task canceled.");
+            log.error("data-transfer task canceled.");
+            throw new DatalinkXJobException("data-transfer task canceled.");
         }
 
         computeRecords(unitParam, flinkJobStatus);
@@ -252,7 +252,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected void afterExec(FlinkActionParam unit, boolean success, String errorMsg) {
+    protected void afterExec(FlinkActionParam unit, boolean success) {
         // 记录增量记录
         datalinkXServerClient.updateSyncMode(
                 JobSyncModeForm.builder()
@@ -263,7 +263,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         // 同步表状态
         if (success) {
             log.info(String.format("jobid: %s, after from %s to %s", unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
-            // 触发after钩子函数，目前是空的
+            // 触发after钩子函数，留个后门
             unit.getDsReader().afterRead(unit);
             unit.getDsWriter().afterWrite(unit);
 
@@ -275,20 +275,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected void cancel(FlinkActionParam unit) {
-        if (!ObjectUtils.isEmpty(unit.getTaskId())) {
-            try {
-                flinkClient.jobStop(unit.getTaskId());
-                log.error(String.format("flink task cancel: %s", unit.getTaskId()));
-            } catch (Exception e) {
-                log.error("flink task cancel failed: ", e);
-            }
-        }
-
-    }
-
-    @Override
-    protected FlinkActionParam getExecUnit(DataTransJobDetail jobDetail) {
+    protected FlinkActionParam convertExecUnit(DataTransJobDetail jobDetail) {
         return FlinkActionParam.builder()
                     .reader(jobDetail.getSyncUnit().getReader())
                     .writer(jobDetail.getSyncUnit().getWriter())

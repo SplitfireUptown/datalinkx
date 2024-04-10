@@ -84,16 +84,10 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
             }
         }
 
-        List<Map<String, Object>> shouldList = new ArrayList<>();
 
         Map<String, Object> queryMap = new HashMap<>();
         if (!mustList.isEmpty()) {
             queryMap.put("must", mustList);
-        }
-
-        if (!shouldList.isEmpty()) {
-            queryMap.put("should", shouldList);
-            queryMap.put("minimum_should_match", 1);
         }
 
         Map<String, Object> boolMap = new HashMap<>();

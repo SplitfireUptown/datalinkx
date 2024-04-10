@@ -58,7 +58,7 @@ public class DataTransHandler {
             throw e;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            shutdownJob(startTime, jobParam, MetaConstants.JobStatus.JOB_STATUS_ERROR, e.getMessage());
+            this.shutdownJob(startTime, jobParam, e.getMessage());
 
             XxlJobHelper.handleFail(e.getMessage());
         }
@@ -68,10 +68,10 @@ public class DataTransHandler {
         XxlJobHelper.handleSuccess("success");
     }
 
-    private void shutdownJob(long startTime, DataTransJobParam jobParam, int status, String message) {
+    private void shutdownJob(long startTime, DataTransJobParam jobParam, String message) {
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
         dataServerClient.updateJobStatus(JobStateForm.builder().jobId(jobParam.getJobId())
-                .jobStatus(status).startTime(startTime).endTime(new Date().getTime())
+                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_ERROR).startTime(startTime).endTime(new Date().getTime())
                 .errmsg(message).allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
                 .build());

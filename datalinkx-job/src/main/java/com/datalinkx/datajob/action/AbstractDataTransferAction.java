@@ -21,9 +21,8 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
     protected abstract void beforeExec(U unit) throws Exception;
     protected abstract void execute(U unit) throws Exception;
     protected abstract boolean checkResult(U unit);
-    protected abstract void afterExec(U unit, boolean success, String errorMsg);
-    protected abstract void cancel(U unit);
-    protected abstract U getExecUnit(T info);
+    protected abstract void afterExec(U unit, boolean success);
+    protected abstract U convertExecUnit(T info);
 
     private boolean isStop() {
         JobThread jobThread = ((JobThread)Thread.currentThread());
@@ -53,7 +52,7 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
             this.begin(actionInfo);
 
             // 2、T -> U 获取引擎执行类对象
-            U execUnit = getExecUnit(actionInfo);
+            U execUnit = convertExecUnit(actionInfo);
             Map<String, JobExecCountDto> countRes = DataTransferAction.COUNT_RES.get();
 
             // 3、循环检查任务结果
@@ -65,7 +64,7 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
                         // 3.1、如果任务执行完成
                         if (checkResult(execUnit)) {
                             // 3.2、执行任务后置处理钩子
-                            this.afterExec(execUnit, true, "success");
+                            this.afterExec(execUnit, true);
                             break;
                         }
                     } catch (Exception e) {
@@ -73,7 +72,7 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
                         String errorMsg = e.getMessage();
                         error.append(errorMsg).append("\r\n");
                         log.info(errorMsg);
-                        this.afterExec(execUnit, false, errorMsg);
+                        this.afterExec(execUnit, false);
                     }
                 }
                 DataTransferAction.COUNT_RES.remove();
@@ -97,7 +96,7 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
                 throw e;
             } catch (Throwable e) {
                 log.error("execute flink task error.", e);
-                afterExec(execUnit, false, e.getMessage());
+                afterExec(execUnit, false);
                 error.append(e.getMessage()).append("\r\n");
             }
             // 阻塞至任务完成
