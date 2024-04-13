@@ -11,9 +11,7 @@ import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
 
-/**
- * 封装用户注册数据源信息DTO类
- */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -79,7 +77,7 @@ public class DataTransJobDetail {
     @Builder
     public static class Sync {
         String type; // [overwrite全量更新，increment增量更新]
-        Integer fetchSize; // 每次获取的条数
+        Integer fetchSize = 10000; // 每次获取的条数
         Integer queryTimeOut = 10000; // flinkx查询执行超时时间
         SyncCondition syncCondition;
 

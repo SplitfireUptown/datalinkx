@@ -40,6 +40,13 @@ xxl-job:
     read_timeout_ms: 600000
     logging: true
 
+# 流转配置性能
+data-transfer:
+  # 批次提交行数，读fetch-size行后提交
+  fetch-size: 1000
+  # 读fetch-size行数据的查询超时时间
+  query-time-out: 10000
+
 topic:
   daemon: true
 

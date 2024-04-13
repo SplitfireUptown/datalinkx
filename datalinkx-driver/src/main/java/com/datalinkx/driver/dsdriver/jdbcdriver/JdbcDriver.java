@@ -42,8 +42,6 @@ import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> extends SqlGenerator implements AbstractDriver<T, P, Q>, IDsReader, IDsWriter {
-        private static int defaultFetchSize = 10000;
-    private static int defaultQueryTimeOut = 100000;
     private static String allowNull = "1";
 
     protected T jdbcSetupInfo;
@@ -91,7 +89,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     @Override
     public Object connect(boolean check) throws Exception {
-        Connection connection = null;
+        Connection connection;
 
         String url = jdbcUrl();
         String errorMsg = "";
@@ -447,8 +445,8 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         readerInfo.setParameter((P) JdbcReader.builder()
                 .username(jdbcSetupInfo.getUid())
                 .password(jdbcSetupInfo.getPwd())
-                .fetchSize(defaultFetchSize)
-                .queryTimeOut(defaultQueryTimeOut)
+                .fetchSize(unit.getReader().getSync().getFetchSize())
+                .queryTimeOut(unit.getReader().getSync().getQueryTimeOut())
                 .connection(Collections.singletonList(ReaderConnection.builder()
                         .jdbcUrl(Collections.singletonList(jdbcUrl()))
                         .table(Collections.singletonList(unit.getReader().getTableName()))

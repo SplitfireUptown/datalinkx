@@ -46,6 +46,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -82,6 +83,12 @@ public class JobService implements DtsJobService {
 
 	@Resource(name = "messageHubServiceImpl")
 	MessageHubService messageHubService;
+
+	@Value("${data-transfer.fetch-size:1000}")
+	Integer fetchSize;
+
+	@Value("${data-transfer.query-time-out:10000}")
+	Integer queryTimeOut;
 
 	@Transactional(rollbackFor = Exception.class)
 	public String jobCreate(JobForm.JobCreateForm form) {
@@ -209,6 +216,8 @@ public class JobService implements DtsJobService {
 				.builder()
 				.type(syncModeForm.getMode())
 				.syncCondition(syncCond)
+				.queryTimeOut(queryTimeOut)
+				.fetchSize(fetchSize)
 				.build();
 
 		return DataTransJobDetail.Reader
