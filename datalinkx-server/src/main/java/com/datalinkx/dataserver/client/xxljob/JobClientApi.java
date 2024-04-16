@@ -98,19 +98,6 @@ public class JobClientApi {
         return handleResult(result);
     }
 
-    public String remove(String jobId) {
-        String res = handleResult(client.remove(getXxlJobId(jobId)));
-        jobRepository.logicDeleteByJobId(jobId);
-        return res;
-    }
-
-    public boolean isJobRunning(String jobId) {
-        XxlJobInfo xxlJobInfo = getJobInfo(jobId);
-        Map<String, Object> logs = client.logList(LogQueryParam.builder()
-                .start(0).length(PAGE_SIZE).jobGroup(jobGroup).jobId(xxlJobInfo.getId()).logStatus(LOG_STATUS_RUNNING).build());
-
-        return logs.size() > 0;
-    }
 
     private String handleResult(ReturnT<String> returnT) {
         if (returnT.getCode() == SUCCESS_CODE) {

@@ -51,7 +51,6 @@ public class OracleDriver extends JdbcDriver<OracleSetupInfo, JdbcReader, JdbcWr
             String[] hostAndPort = url.split(":");
             jdbc = String.format(ORACLE_TNS_SID_JDBC_PATTERN, hostAndPort[0], Integer.valueOf(hostAndPort[1]), sidOrServerName);
         }
-        log.info("jdbc of oracle is {}", jdbc);
         return jdbc;
     }
 
@@ -86,13 +85,6 @@ public class OracleDriver extends JdbcDriver<OracleSetupInfo, JdbcReader, JdbcWr
         }
     }
 
-
-    @Override
-    protected boolean getApproximate() {
-        return true;
-    }
-
-
     @Override
     protected Properties connectProp() {
         Properties properties = super.connectProp();
@@ -100,7 +92,6 @@ public class OracleDriver extends JdbcDriver<OracleSetupInfo, JdbcReader, JdbcWr
         properties.setProperty("remarks", "true");
         return properties;
     }
-
 
     @Override
     public void checkConnectAlive(Object conn) throws Exception {

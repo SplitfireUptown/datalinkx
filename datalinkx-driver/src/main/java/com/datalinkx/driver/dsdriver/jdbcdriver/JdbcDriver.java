@@ -42,7 +42,6 @@ import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> extends SqlGenerator implements AbstractDriver<T, P, Q>, IDsReader, IDsWriter {
-    private static String allowNull = "1";
 
     protected T jdbcSetupInfo;
     protected String connectId;
@@ -60,7 +59,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     public JdbcDriver(String connectId) {
         Class clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-
         this.jdbcSetupInfo = (T) JsonUtils.toObject(ConnectIdUtils.decodeConnectId(connectId), clazz);
         jdbcSetupInfo.setPwd(rebuildPassword(jdbcSetupInfo.getPwd()));
         this.connectId = connectId;
@@ -358,8 +356,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     public List<Map<String, Object>> fetchColumn(String catalog, String schema, String table, Connection connection) {
         List<Map<String, Object>> result = new ArrayList<>();
-        Set<String> primaryKeysHash;
-        Set<String> queryIndexHash = new HashSet<String>();
 
         String tableEscaped = table.replace(".", "%");
 
@@ -377,31 +373,12 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 return new ArrayList<>();
             }
 
-            primaryKeysHash = this.fetchPrimaryKeys(catalog, schema, table, connection);
-
-            try {
-                ResultSet queryIndex = connection.getMetaData().getIndexInfo(catalog, schema, table, false, getApproximate());
-                while (queryIndex.next()) {
-                    queryIndexHash.add(queryIndex.getString("COLUMN_NAME"));
-                }
-            } catch (SQLException e) {
-                log.warn(String.format("Get index for %s.%s.%s failed", catalog, schema, table), e);
-            }
-
             ResultSet columns = connection.getMetaData().getColumns(catalog, schema, tableEscaped, null);
             while (columns.next()) {
-                // MySQL中表名包含"."时会导致去不到列. See also: https://github.com/mysql/mysql-connector-j
                 if (StringUtils.equals(table, columns.getString("TABLE_NAME"))) {
                     HashMap<String, Object> column = new HashMap<>();
                     column.put("name", columns.getString("COLUMN_NAME"));
                     column.put("type", columns.getString("TYPE_NAME"));
-                    column.put("raw_type", columns.getString("TYPE_NAME"));
-                    column.put("remark", columns.getString("REMARKS"));
-                    column.put("uniq_index", primaryKeysHash.contains(columns.getString("COLUMN_NAME")));
-                    column.put("query_index", queryIndexHash.contains(columns.getString("COLUMN_NAME")));
-                    column.put("position", columns.getString("ORDINAL_POSITION"));
-                    column.put("allow_null", allowNull.equals(columns.getString("NULLABLE")));
-
                     result.add(column);
                 }
             }
@@ -413,23 +390,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return result;
     }
 
-    protected Set<String> fetchPrimaryKeys(String catalog, String schema, String table, Connection connection) {
-        Set<String> primaryKeysHash = new HashSet<>();
-        try {
-            ResultSet primaryKeys = connection.getMetaData().getPrimaryKeys(catalog, schema, table);
-            while (primaryKeys.next()) {
-                primaryKeysHash.add(primaryKeys.getString("COLUMN_NAME"));
-            }
-        }  catch (SQLException e) {
-            log.error("fetch column error", e);
-            throw new RuntimeException(e);
-        }
-        return primaryKeysHash;
-    }
-
-    protected boolean getApproximate() {
-        return false;
-    }
 
     @Override
     public Object getReaderInfo(FlinkActionParam unit) throws Exception {
