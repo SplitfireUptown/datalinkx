@@ -32,7 +32,7 @@ xxl-job:
   password:
   job-group:
   exec-handler: dataTransJobHandler
-  executor-route-strategy:
+  executor-route-strategy: FIRST
   client:
     url:
     connect_timeout_ms: 20000

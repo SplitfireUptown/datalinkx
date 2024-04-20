@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
+public abstract class AbstractDataTransferAction<T, U> {
     protected abstract void begin(T info);
     protected abstract void end(T info, int status, String errmsg);
     protected abstract void beforeExec(U unit) throws Exception;
@@ -43,7 +43,6 @@ public abstract class AbstractDataTransferAction<T, U> implements IAction<T> {
         return toStop;
     }
 
-    @Override
     public void doAction(T actionInfo) throws Exception {
         Thread taskCheckerThread;
         try {

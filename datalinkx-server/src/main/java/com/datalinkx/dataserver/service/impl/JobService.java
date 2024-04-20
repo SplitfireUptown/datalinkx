@@ -2,7 +2,7 @@ package com.datalinkx.dataserver.service.impl;
 
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNC;
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNCING;
 import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
 
@@ -28,7 +28,7 @@ import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.client.xxljob.JobClientApi;
-import com.datalinkx.dataserver.client.xxljob.request.DataTransJobParam;
+import com.datalinkx.dataserver.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
 import com.datalinkx.dataserver.repository.DsRepository;
@@ -38,7 +38,7 @@ import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.base.model.TableField;
+import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
@@ -61,7 +61,6 @@ import org.springframework.util.ObjectUtils;
 @Log4j2
 public class JobService implements DtsJobService {
 	private static final int FAILED = 3;
-	private static final int SUCCESS = 2;
 
 	@Autowired
 	JobRepository jobRepository;
@@ -110,7 +109,7 @@ public class JobService implements DtsJobService {
 		jobBean.setCover(form.getCover());
 
 		// 创建 xxljob
-		String xxlJobId = jobClientApi.add(jobId, form.getSchedulerConf(), DataTransJobParam.builder().jobId(jobId).build());
+		String xxlJobId = jobClientApi.add(form.getSchedulerConf(), XxlJobParam.builder().jobId(jobId).build());
 
 		jobBean.setXxlId(xxlJobId);
 		jobRepository.save(jobBean);
@@ -207,7 +206,7 @@ public class JobService implements DtsJobService {
 
 		// 4、获取对应增量条件
 		Map<String, String> typeMappings = dsReader.getFields(fromDs.getDatabase(), fromDs.getSchema(), jobBean.getFromTbId())
-				.stream().collect(Collectors.toMap(TableField::getName, TableField::getRawType));
+				.stream().collect(Collectors.toMap(DbTableField::getName, DbTableField::getType));
 		JobForm.SyncModeForm syncModeForm = JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class);
 
 		DataTransJobDetail.Sync.SyncCondition syncCond = this.getSyncCond(syncModeForm, fromCols, typeMappings);
@@ -378,13 +377,13 @@ public class JobService implements DtsJobService {
 		// 1、创建后开启任务
 		jobClientApi.start(jobId);
 		// 2、默认触发一次任务
-		jobClientApi.trigger(jobId, DataTransJobParam.builder().jobId(jobId).build());
+		jobClientApi.trigger(jobId, XxlJobParam.builder().jobId(jobId).build());
 		return jobId;
 	}
 
 	public void jobExec(String jobId) {
 		JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "任务不存在"));
-		if (jobBean.getStatus() == JOB_STATUS_SYNC) {
+		if (jobBean.getStatus() == JOB_STATUS_SYNCING) {
 			throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务已在运行中，请勿重复触发");
 		}
 
@@ -392,17 +391,17 @@ public class JobService implements DtsJobService {
 //			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
 //		}
 
-		jobBean.setStatus(JOB_STATUS_SYNC);
+		jobBean.setStatus(JOB_STATUS_SYNCING);
 
 		// 如果xxl-job未创建任务，新建一个
 		if (!jobClientApi.isXxljobExist(jobId)) {
-			String xxlJobId = jobClientApi.add(jobId, jobBean.getCrontab(), DataTransJobParam.builder().jobId(jobId).build());
+			String xxlJobId = jobClientApi.add(jobBean.getCrontab(), XxlJobParam.builder().jobId(jobId).build());
 			jobBean.setXxlId(xxlJobId);
 			jobClientApi.start(jobId);
 		}
 
 		jobRepository.save(jobBean);
-		jobClientApi.trigger(jobId, DataTransJobParam.builder().jobId(jobId).build());
+		jobClientApi.trigger(jobId, XxlJobParam.builder().jobId(jobId).build());
 	}
 
 

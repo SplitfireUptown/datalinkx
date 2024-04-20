@@ -29,7 +29,7 @@ import com.datalinkx.datajob.job.ExecutorJobHandler;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionParam;
+import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
@@ -42,7 +42,7 @@ import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
-public class DataTransferAction extends AbstractDataTransferAction<DataTransJobDetail, FlinkActionParam> {
+public class DataTransferAction extends AbstractDataTransferAction<DataTransJobDetail, FlinkActionMeta> {
     public static ThreadLocal<Long> START_TIME = new ThreadLocal<>();
     public static ThreadLocal<Map<String, JobExecCountDto>> COUNT_RES = new ThreadLocal<>();
 
@@ -103,7 +103,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected void beforeExec(FlinkActionParam unit) throws Exception {
+    protected void beforeExec(FlinkActionMeta unit) throws Exception {
         log.info(String.format("jobid: %s, begin from %s to %s", unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
 
         // 同步表状态
@@ -125,7 +125,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
 
 
     @Override
-    protected void execute(FlinkActionParam unit) throws Exception {
+    protected void execute(FlinkActionMeta unit) throws Exception {
         log.info(String.format("jobid: %s, exec from %s#%s to %s#%s",
                 unit.getJobId(),
                 unit.getReader().getSchema(),
@@ -155,7 +155,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected boolean checkResult(FlinkActionParam unitParam) throws DatalinkXJobException {
+    protected boolean checkResult(FlinkActionMeta unitParam) throws DatalinkXJobException {
         String taskId = unitParam.getTaskId();
         if (StringUtils.isEmpty(taskId)) {
             throw new DatalinkXJobException("flink task id is empty.");
@@ -196,7 +196,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         return false;
     }
 
-    private void computeRecords(FlinkActionParam unitParam, FlinkJobStatus flinkJobStatus) {
+    private void computeRecords(FlinkActionMeta unitParam, FlinkJobStatus flinkJobStatus) {
         AtomicInteger readRecords = new AtomicInteger(0);
         AtomicInteger writeRecords = new AtomicInteger(0);
         AtomicInteger errorRecords = new AtomicInteger(0);
@@ -252,7 +252,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected void afterExec(FlinkActionParam unit, boolean success) {
+    protected void afterExec(FlinkActionMeta unit, boolean success) {
         // 记录增量记录
         datalinkXServerClient.updateSyncMode(
                 JobSyncModeForm.builder()
@@ -275,8 +275,8 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected FlinkActionParam convertExecUnit(DataTransJobDetail jobDetail) {
-        return FlinkActionParam.builder()
+    protected FlinkActionMeta convertExecUnit(DataTransJobDetail jobDetail) {
+        return FlinkActionMeta.builder()
                     .reader(jobDetail.getSyncUnit().getReader())
                     .writer(jobDetail.getSyncUnit().getWriter())
                     .jobId(jobDetail.getJobId())

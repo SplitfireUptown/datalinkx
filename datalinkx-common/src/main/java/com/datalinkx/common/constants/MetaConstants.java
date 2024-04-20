@@ -29,11 +29,10 @@ public final class MetaConstants {
 
     public static class JobStatus {
         public static final int JOB_STATUS_CREATE = 0;
-        public static final int JOB_STATUS_SYNC = 1;
+        public static final int JOB_STATUS_SYNCING = 1;
         public static final int JOB_STATUS_SUCCESS = 2;
         public static final int JOB_STATUS_ERROR = 3;
-        public static final int JOB_STATUS_QUEUE = 4;
-        public static final int JOB_STATUS_STOP = 5;
+        public static final int JOB_STATUS_STOP = 4;
 
         public static final String SSE_JOB_STATUS = "jobList";
     }

@@ -8,7 +8,7 @@ import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.JobBean;
-import com.datalinkx.dataserver.client.xxljob.request.DataTransJobParam;
+import com.datalinkx.dataserver.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.client.xxljob.request.LogQueryParam;
 import com.datalinkx.dataserver.client.xxljob.request.PageQueryParam;
 import com.datalinkx.dataserver.client.xxljob.request.XxlJobInfo;
@@ -56,7 +56,7 @@ public class JobClientApi {
         return handleResult(client.stop(getXxlJobId(jobId)));
     }
 
-    public String trigger(String jobId, DataTransJobParam jobParam) {
+    public String trigger(String jobId, XxlJobParam jobParam) {
 //        XxlJobInfo xxlJobInfo = getJobInfo(jobId);
         return handleResult(client.trigger(getXxlJobId(jobId), JsonUtils.toJson(jobParam)));
     }
@@ -78,13 +78,13 @@ public class JobClientApi {
         return jobRepository.findByJobId(jobId).isPresent();
     }
 
-    public String add(String jobId, String cronExpr, DataTransJobParam dataTransJobParam) {
+    public String add(String cronExpr, XxlJobParam xxlJobParam) {
         ReturnT<String> result = client.add(XxlJobInfo.builder()
-                .jobDesc(jobId)
+                .jobDesc(xxlJobParam.getJobId())
                 .author("datalinkX")
                 .scheduleType("CRON")
                 .scheduleConf(cronExpr)
-                .executorParam(JsonUtils.toJson(dataTransJobParam))
+                .executorParam(JsonUtils.toJson(xxlJobParam))
                 .executorBlockStrategy("SERIAL_EXECUTION")
                 .misfireStrategy("DO_NOTHING")
                 .executorRouteStrategy(executorRouteStrategy)

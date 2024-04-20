@@ -10,7 +10,7 @@ import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.service.impl.DsService;
-import com.datalinkx.driver.dsdriver.base.model.TableField;
+import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class DsController {
 	}
 
 	@GetMapping("/field/info")
-	public WebResult<List<TableField>> tbInfo(String dsId, String name) {
+	public WebResult<List<DbTableField>> tbInfo(String dsId, String name) {
 		return WebResult.of(dsService.fetchFields(dsId, name));
 	}
 }

@@ -27,7 +27,7 @@ import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
-import com.datalinkx.driver.dsdriver.base.model.TableField;
+import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
 import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
 import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
@@ -246,7 +246,7 @@ public class DsService {
 	}
 
 
-	public List<TableField> fetchFields(String dsId, String tbName) {
+	public List<DbTableField> fetchFields(String dsId, String tbName) {
 		DsBean dsBean = dsRepository.findByDsId(dsId).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS));
 		try {
 			IDsDriver dsDriver = DsDriverFactory.getDriver(getConnectId(dsBean));

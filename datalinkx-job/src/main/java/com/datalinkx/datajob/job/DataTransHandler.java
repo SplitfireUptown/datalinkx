@@ -5,9 +5,9 @@ import java.util.Date;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.datajob.action.DataTransferAction;
-import com.datalinkx.datajob.bean.DataTransJobParam;
 import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.datalinkx.datajob.bean.JobStateForm;
+import com.datalinkx.datajob.bean.XxlJobParam;
 import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.xxl.job.core.context.XxlJobHelper;
@@ -32,8 +32,8 @@ public class DataTransHandler {
     @Autowired
     private DatalinkXServerClient dataServerClient;
 
-    public DataTransJobDetail getJobDetail(DataTransJobParam jobParam) {
-        return dataServerClient.getJobExecInfo(jobParam.getJobId()).getResult();
+    public DataTransJobDetail getJobDetail(String jobId) {
+        return dataServerClient.getJobExecInfo(jobId).getResult();
     }
 
 
@@ -43,22 +43,23 @@ public class DataTransHandler {
     @XxlJob("dataTransJobHandler")
     public void dataTransJobHandler() throws InterruptedException {
         XxlJobHelper.log("begin dataTransJobHandler. ");
-        DataTransJobParam jobParam = JsonUtils.toObject(XxlJobHelper.getJobParam(), DataTransJobParam.class);
+        XxlJobParam jobParam = JsonUtils.toObject(XxlJobHelper.getJobParam(), XxlJobParam.class);
+        String jobId = jobParam.getJobId();
 
         // 定时异步调用无法统一trace_id，这里用job_id做trace_id
-        MDC.put("trace_id", jobParam.getJobId());
+        MDC.put("trace_id", jobId);
 
         long startTime = new Date().getTime();
         DataTransJobDetail jobDetail;
         try {
-            jobDetail = this.getJobDetail(jobParam);
+            jobDetail = this.getJobDetail(jobId);
             dataTransferAction.doAction(jobDetail);
         } catch (InterruptedException e) {
             // cancel job
             throw e;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            this.shutdownJob(startTime, jobParam, e.getMessage());
+            this.shutdownJob(startTime, jobId, e.getMessage());
 
             XxlJobHelper.handleFail(e.getMessage());
         }
@@ -68,9 +69,9 @@ public class DataTransHandler {
         XxlJobHelper.handleSuccess("success");
     }
 
-    private void shutdownJob(long startTime, DataTransJobParam jobParam, String message) {
+    private void shutdownJob(long startTime, String jobId, String message) {
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
-        dataServerClient.updateJobStatus(JobStateForm.builder().jobId(jobParam.getJobId())
+        dataServerClient.updateJobStatus(JobStateForm.builder().jobId(jobId)
                 .jobStatus(MetaConstants.JobStatus.JOB_STATUS_ERROR).startTime(startTime).endTime(new Date().getTime())
                 .errmsg(message).allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
