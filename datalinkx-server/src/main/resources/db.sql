@@ -45,7 +45,7 @@ CREATE TABLE `JOB_RELATION` (
                                 `id` int unsigned NOT NULL AUTO_INCREMENT,
                                 `relation_id` char(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '依赖关系id',
                                 `job_id` char(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '流转任务id',
-                                `parent_id` char(40) NOT NULL DEFAULT '' COMMENT '流转任务父id',
+                                `sub_job_id` char(40) NOT NULL DEFAULT '' COMMENT '流转任务子id',
                                 `priority` int COMMENT '同级任务优先级，越高优先级越高',
                                 `is_del` int NOT NULL DEFAULT '0',
                                 `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
