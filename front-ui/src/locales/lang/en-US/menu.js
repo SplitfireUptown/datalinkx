@@ -6,6 +6,7 @@ export default {
   'menu.batchDataSource': 'BatchDataSource',
   'menu.streamingDataSource': 'StreamingDataSource',
   'menu.transferTask': 'TransferTask',
+  'menu.streamingTransferTask': 'StreamingTransferTask',
   'menu.tasklist': 'TaskList',
   'menu.tasklistlog': 'TaskExecutionLog',
   'menu.taskrelationlist': 'TaskRelationList',

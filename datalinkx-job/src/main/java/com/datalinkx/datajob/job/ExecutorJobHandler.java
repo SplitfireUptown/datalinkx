@@ -1,11 +1,8 @@
 package com.datalinkx.datajob.job;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +14,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
@@ -90,6 +89,7 @@ public class ExecutorJobHandler {
 
 	private String generateFlinkCmd(String jobId, String jobJsonFile) {
 		String javaHome = System.getenv("JAVA_HOME");
+        log.info("javaHome: {}", javaHome);
 		String os = System.getProperty("os.name").toLowerCase();
 
 		return String.format(
@@ -121,9 +121,27 @@ public class ExecutorJobHandler {
 		return tmpFilePath;
 	}
 
-	@SneakyThrows
+	/*@SneakyThrows
 	private String generateJobSetting() {
 		File jsonFile = ResourceUtils.getFile("classpath:job_setting.json");
 		return FileUtils.readFileToString(jsonFile,"UTF-8");
-	}
+	}*/
+
+    @SneakyThrows
+    private String generateJobSetting() {
+        Resource resource = new DefaultResourceLoader().getResource("classpath:job_setting.json");
+
+        log.info(resource.toString());
+
+        InputStream inputStream = resource.getInputStream();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+            return content.toString();
+        }
+    }
 }
