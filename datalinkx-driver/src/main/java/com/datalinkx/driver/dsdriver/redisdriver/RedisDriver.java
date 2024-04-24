@@ -3,7 +3,6 @@ package com.datalinkx.driver.dsdriver.redisdriver;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;

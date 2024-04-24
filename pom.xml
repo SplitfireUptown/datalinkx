@@ -19,9 +19,9 @@
         <module>datalinkx-server</module>
         <module>datalinkx-client</module>
         <module>datalinkx-common</module>
+        <module>datalinkx-driver</module>
         <module>datalinkx-messagehub</module>
         <module>datalinkx-sse</module>
-        <module>datalinkx-connector</module>
     </modules>
 
 

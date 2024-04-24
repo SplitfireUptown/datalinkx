@@ -1,6 +1,5 @@
 package com.datalinkx.driver.dsdriver.oracledriver;
 
-import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
