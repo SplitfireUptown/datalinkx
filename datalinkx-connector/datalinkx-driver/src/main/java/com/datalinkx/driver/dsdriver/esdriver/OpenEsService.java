@@ -229,11 +229,6 @@ public class OpenEsService implements EsService {
         }
     }
 
-    public Integer getVersionByClient(RestClient restClient) throws Exception {
-        Response response = restClient.performRequest(new Request("GET", "?format=json"));
-        String rawBody = EntityUtils.toString(response.getEntity());
-        return Integer.parseInt(JsonUtils.toJsonNode(rawBody).get("version").get("number").asText().split("\\.")[0]);
-    }
 
     @Override
     public String retrieveMax(String tableName, String json, String maxFieldName) throws Exception {

@@ -8,5 +8,4 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @Getter
 public abstract class AbstractReader {
-    public static final int DEFAULT_FETCH_SIZE = 20000;
 }

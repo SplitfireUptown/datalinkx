@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class OracleDriver extends JdbcDriver<OracleSetupInfo, JdbcReader, JdbcWriter> implements IDsDriver, IDsReader, IDsWriter {
+public class OracleDriver extends JdbcDriver<OracleSetupInfo, JdbcReader, JdbcWriter> {
 
     private static final String ORACLE_BASIC_SID_JDBC_PATTERN = "jdbc:oracle:thin:@%s:%s";
     private static final String ORACLE_BASIC_SERVER_NAME_JDBC_PATTERN = "jdbc:oracle:thin:@//%s/%s";

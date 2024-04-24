@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWriter> implements IDsDriver, IDsReader, IDsWriter {
+public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWriter> {
 
     public MysqlDriver(String connectId) {
         super(connectId);
