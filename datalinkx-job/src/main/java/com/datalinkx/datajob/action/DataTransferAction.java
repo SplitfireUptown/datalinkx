@@ -263,10 +263,6 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         // 同步表状态
         if (success) {
             log.info(String.format("jobid: %s, after from %s to %s", unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
-            // 触发after钩子函数，留个后门
-            unit.getDsReader().afterRead(unit);
-            unit.getDsWriter().afterWrite(unit);
-
             String tableName = unit.getReader().getTableName();
             getExecCount(tableName).setAllCount(getExecCount(tableName).getAllCount() == null ? 0 : getExecCount(tableName).getAllCount());
             getExecCount(tableName).setAppendCount(getExecCount(tableName).getAppendCount() + unit.getReadRecords());

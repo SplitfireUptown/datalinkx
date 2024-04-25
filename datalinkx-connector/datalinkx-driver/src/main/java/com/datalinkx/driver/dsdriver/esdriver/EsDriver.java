@@ -200,9 +200,6 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
         return esService.getFields(tableName);
     }
 
-    @Override
-    public void afterRead(FlinkActionMeta param) {
-    }
 
     @Override
     public void truncateData(FlinkActionMeta param) throws Exception {

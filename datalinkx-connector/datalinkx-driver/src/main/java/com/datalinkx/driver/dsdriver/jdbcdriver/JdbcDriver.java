@@ -194,11 +194,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
 
-    @Override
-    public void afterRead(FlinkActionMeta param) {
-        log.info("data-transfer task read finish");
-    }
-
     public List<? extends DbTree> generateTree(String catalog, boolean fetchTable, Connection connection) {
         List<String> schemas = fetchSchema(catalog, connection);
         Map<String, List<Map<String, Object>>> result = new HashMap<>();

@@ -24,13 +24,14 @@ import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.JobRelationRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
+import com.datalinkx.dataserver.service.JobRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JobRelationService {
+public class JobRelationServiceImpl implements JobRelationService {
 
     @Autowired
     JobRelationRepository jobRelationRepository;

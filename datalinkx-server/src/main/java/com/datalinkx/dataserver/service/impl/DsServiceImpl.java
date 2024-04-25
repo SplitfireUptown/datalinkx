@@ -23,6 +23,7 @@ import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
+import com.datalinkx.dataserver.service.DsService;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
@@ -44,10 +45,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 
-@Component
 @Service
 @Log4j2
-public class DsService {
+public class DsServiceImpl implements DsService {
 
 	@Autowired
 	private DsRepository dsRepository;

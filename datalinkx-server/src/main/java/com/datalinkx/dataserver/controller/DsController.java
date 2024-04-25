@@ -9,7 +9,7 @@ import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.DsForm;
-import com.datalinkx.dataserver.service.impl.DsService;
+import com.datalinkx.dataserver.service.impl.DsServiceImpl;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -30,55 +30,55 @@ import org.springframework.web.bind.annotation.RestController;
 public class DsController {
 
 	@Autowired
-	private DsService dsService;
+	private DsServiceImpl dsServiceImpl;
 
 
 	@GetMapping("/page")
 	public PageVo<List<DsBean>> dsPage(DsForm.DataSourcePageForm dataSourcePageForm) {
-		return dsService.dsPage(dataSourcePageForm);
+		return dsServiceImpl.dsPage(dataSourcePageForm);
 	}
 
 	@GetMapping("/list")
 	public WebResult<List<DsBean>> list() {
-		return WebResult.of(dsService.list());
+		return WebResult.of(dsServiceImpl.list());
 	}
 
 
 	@GetMapping("/group")
 	public WebResult<Map> group() {
 		return WebResult.of(
-				dsService.list().stream().collect(Collectors.groupingBy(DsBean::getType,  Collectors.counting()))
+				dsServiceImpl.list().stream().collect(Collectors.groupingBy(DsBean::getType,  Collectors.counting()))
 		);
 	}
 
 
 	@GetMapping("/info/{dsId}")
 	public WebResult<DsBean> info(@PathVariable String dsId) {
-		return WebResult.of(dsService.info(dsId));
+		return WebResult.of(dsServiceImpl.info(dsId));
 	}
 
 	@PostMapping("/modify")
 	public void modify(@RequestBody DsForm.DsCreateForm form) {
-		this.dsService.modify(form);
+		this.dsServiceImpl.modify(form);
 	}
 
 	@PostMapping("/create")
 	public WebResult<String> create(@RequestBody DsForm.DsCreateForm form) throws UnsupportedEncodingException {
-		return WebResult.of(dsService.create(form));
+		return WebResult.of(dsServiceImpl.create(form));
 	}
 
 	@PostMapping("/delete/{dsId}")
 	public void del(@PathVariable String dsId) {
-		dsService.del(dsId);
+		dsServiceImpl.del(dsId);
 	}
 
 	@GetMapping("/tables/{dsId}")
 	public WebResult<List<String>> fetchTables(@PathVariable String dsId) {
-		return WebResult.of(dsService.fetchTables(dsId));
+		return WebResult.of(dsServiceImpl.fetchTables(dsId));
 	}
 
 	@GetMapping("/field/info")
 	public WebResult<List<DbTableField>> tbInfo(String dsId, String name) {
-		return WebResult.of(dsService.fetchFields(dsId, name));
+		return WebResult.of(dsServiceImpl.fetchFields(dsId, name));
 	}
 }

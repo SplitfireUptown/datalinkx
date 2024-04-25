@@ -15,9 +15,10 @@ import com.datalinkx.driver.model.DataTransJobDetail;
 
 public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, KafkaWriter>, IStreamDriver {
     private final KafkaSetupInfo kafkaSetupInfo;
-
+    private final String connectId;
     public KafkaDriver(String connectId) {
         this.kafkaSetupInfo = JsonUtils.toObject(ConnectIdUtils.decodeConnectId(connectId) , KafkaSetupInfo.class);
+        this.connectId = connectId;
     }
 
 
@@ -25,6 +26,11 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
     public Object connect(boolean check) throws Exception {
         TelnetUtil.telnet(this.kafkaSetupInfo.getServer(), this.kafkaSetupInfo.getPort());
         return null;
+    }
+
+    @Override
+    public String getConnectId() {
+        return this.connectId;
     }
 
     @Override
