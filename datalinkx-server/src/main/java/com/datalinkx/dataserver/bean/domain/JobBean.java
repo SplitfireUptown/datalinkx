@@ -59,7 +59,7 @@ public class JobBean extends BaseDomainBean {
 	// CREATE = 0; SYNCING = 1; NORMAL = 2; ERROR = 3; QUEUE = 4; STOP = 5
 	@Column(name = "status", nullable = false, columnDefinition = "int(2)")
 	private Integer status;
-	@Column(name = "error_msg", nullable = true, columnDefinition = "longtext")
+	@Column(name = "error_msg", columnDefinition = "longtext")
 	private String errorMsg;
 	// 0 不覆盖 1 覆盖
 	@Column(name = "cover")

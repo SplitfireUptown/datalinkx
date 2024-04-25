@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KafkaSetupInfo extends SetupInfo {
     public String server;
+    public Integer port;
     public String topic;
     public String mode;
     public String timezone;

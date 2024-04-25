@@ -2,7 +2,8 @@ import {
   mysqlPng,
   oraclePng,
   ESPng,
-  redisPng
+  redisPng,
+  kafkaPng
   // httpPng
 } from '@/core/icons'
 
@@ -22,6 +23,10 @@ const DataSourceType = [
   {
     label: 'REDIS',
     value: 4
+  },
+  {
+    label: 'KAFKA',
+    value: 100
   }
 ]
 const dsTypeList = [
@@ -48,6 +53,12 @@ const dsTypeList = [
     label: 'Redis',
     dsTypeKey: 4,
     img: redisPng
+  },
+  {
+    value: 'kafka',
+    label: 'Kafka',
+    dsTypeKey: 100,
+    img: kafkaPng
   }
   // {
   //   value: 'http',

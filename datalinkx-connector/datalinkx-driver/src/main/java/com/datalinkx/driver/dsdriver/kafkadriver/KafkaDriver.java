@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.driver.dsdriver.IStreamDriver;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
@@ -19,6 +20,12 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
         this.kafkaSetupInfo = JsonUtils.toObject(ConnectIdUtils.decodeConnectId(connectId) , KafkaSetupInfo.class);
     }
 
+
+    @Override
+    public Object connect(boolean check) throws Exception {
+        TelnetUtil.telnet(this.kafkaSetupInfo.getServer(), this.kafkaSetupInfo.getPort());
+        return null;
+    }
 
     @Override
     public Object getReaderInfo(FlinkActionMeta param) {

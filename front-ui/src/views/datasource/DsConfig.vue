@@ -154,6 +154,9 @@ export default {
             item.isRequired = ['host', 'port', 'username', 'password', 'database'].includes(item.key)
             break
           }
+          case 100: {
+            item.isRequired = ['host', 'port'].includes(item.key)
+          }
         }
       })
       if (this.currentDs.dsTypeKey === 3) {

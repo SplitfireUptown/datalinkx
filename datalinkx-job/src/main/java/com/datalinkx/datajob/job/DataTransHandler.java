@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * Data Trans Job Handler
  */
 @Component
-public class DataTransHandler {
+public class  DataTransHandler {
     private static Logger logger = LoggerFactory.getLogger(DataTransHandler.class);
 
     @Autowired

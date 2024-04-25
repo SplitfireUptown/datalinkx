@@ -60,20 +60,20 @@ public interface IDsDriver {
         return " (1=1) ";
     }
 
-
-    default String wrapTableName(String catalog, String schema, String tableName) {
-        List<String> fullName = new ArrayList<>();
-        if (StringUtils.isNotEmpty(catalog)) {
-            fullName.add(String.format("%s%s%s", columnQuota(), catalog, columnQuota()));
-        }
-
-        if (StringUtils.isNotEmpty(schema)) {
-            fullName.add(String.format("%s%s%s", columnQuota(), schema, columnQuota()));
-        }
-
-        if (StringUtils.isNotEmpty(tableName)) {
-            fullName.add(String.format("%s%s%s", columnQuota(), tableName, columnQuota()));
-        }
-        return String.join(".", fullName);
-    }
+//
+//    default String wrapTableName(String catalog, String schema, String tableName) {
+//        List<String> fullName = new ArrayList<>();
+//        if (StringUtils.isNotEmpty(catalog)) {
+//            fullName.add(String.format("%s%s%s", columnQuota(), catalog, columnQuota()));
+//        }
+//
+//        if (StringUtils.isNotEmpty(schema)) {
+//            fullName.add(String.format("%s%s%s", columnQuota(), schema, columnQuota()));
+//        }
+//
+//        if (StringUtils.isNotEmpty(tableName)) {
+//            fullName.add(String.format("%s%s%s", columnQuota(), tableName, columnQuota()));
+//        }
+//        return String.join(".", fullName);
+//    }
 }
