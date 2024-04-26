@@ -18,13 +18,26 @@ import java.util.stream.Collectors;
 import static com.datalinkx.common.utils.IdUtils.genKey;
 
 /**
- * @author: uptown
- * @date: 2024/4/25 22:50
+ * 流转任务血缘级联配置service
  */
 public interface JobRelationService {
+    /**
+     * 分页查询
+     */
     PageVo<List<JobVo.JobRelationVo>> page(JobForm.JobRelationPageForm jobRelationPageForm);
+
+    /**
+     * 删除
+     */
     void del(String relationId);
+
+    /**
+     * 创建
+     */
     String create(JobForm.JobRelationForm form);
-    boolean checkJobHasCyclicDependency(Map<String, List<String>> taskGraph);
+
+    /**
+     * 任务血缘信息
+     */
     JobVo.JobRelationBloodVo relationBloodInfo(String jobId);
 }

@@ -38,6 +38,6 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 	void logicDeleteByJobId(String jobId);
 
 
-	@Query(value = "select * from JOB where is_del = 0 ", nativeQuery = true)
-	Page<JobBean> pageQuery(PageRequest pageRequest);
+	@Query(value = "select * from JOB where is_del = 0 and if(:type != null, type =:type, 1=1)", nativeQuery = true)
+	Page<JobBean> pageQuery(PageRequest pageRequest, Integer type);
 }

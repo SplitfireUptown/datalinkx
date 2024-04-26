@@ -59,6 +59,8 @@ public class JobForm {
 		private List<FieldMappingForm> fieldMappings;
 		@ApiModelProperty("是否覆盖数据")
 		private Integer cover = 0;
+		@ApiModelProperty("任务类型，1 - 流式 0 - 批式")
+		private Integer type = 0;
 	}
 
 	@Data
@@ -108,6 +110,9 @@ public class JobForm {
 		@ApiModelProperty(value = "展示数量")
 		@JsonProperty("page_size")
 		private Integer pageSize = 10;
+
+		@ApiModelProperty(value = "任务类型")
+		private Integer type = 0;
 	}
 
 	@EqualsAndHashCode(callSuper = true)

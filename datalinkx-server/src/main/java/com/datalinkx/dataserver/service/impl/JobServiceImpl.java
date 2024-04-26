@@ -34,7 +34,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -109,7 +108,7 @@ public class JobServiceImpl implements JobService {
 	}
 
 	// 校验流转任务配置合法
-	private void validJobForm(JobForm.JobCreateForm form) {
+	public void validJobForm(JobForm.JobCreateForm form) {
 		// 1、判断数据源是否存在
 		DsBean fromDsBean = dsRepository.findByDsId(form.getFromDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "来源数据源不存在"));
 		dsRepository.findByDsId(form.getToDsId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "目标数据源不存在"));
@@ -141,8 +140,8 @@ public class JobServiceImpl implements JobService {
 			}
 		}
 		// 5、配置流转任务定时表达式
-		if (ObjectUtils.isEmpty(form.getSchedulerConf())) {
-			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "流转任务需要配置crontab表达式");
+		if (ObjectUtils.isEmpty(form.getSchedulerConf()) && form.getType() != MetaConstants.JobType.JOB_TYPE_STREAM) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "批式流转任务需要配置crontab表达式");
 		}
 	}
 
@@ -182,7 +181,7 @@ public class JobServiceImpl implements JobService {
 
 	public PageVo<List<JobVo.JobPageVo>> page(JobForm.JobPageForm form) {
 		PageRequest pageRequest = PageRequest.of(form.getPageNo() - 1, form.getPageSize());
-		Page<JobBean> jobBeans = jobRepository.pageQuery(pageRequest);
+		Page<JobBean> jobBeans = jobRepository.pageQuery(pageRequest, form.getType());
 
 
 		List<String> dsId = new ArrayList<>();

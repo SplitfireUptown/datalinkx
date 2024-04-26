@@ -1,6 +1,8 @@
 package com.datalinkx.dataserver.bean.domain;
 
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -64,4 +66,9 @@ public class JobBean extends BaseDomainBean {
 	// 0 不覆盖 1 覆盖
 	@Column(name = "cover")
 	private Integer cover;
+	// 0 批式任务 1 流转任务
+	@Column(name = "type")
+	private Integer type;
+	@Column(name = "start_time")
+	public Timestamp startTime;
 }

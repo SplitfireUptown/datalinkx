@@ -87,3 +87,5 @@ INSERT INTO `MESSAGEHUB_TOPIC` (`topic`, `fields`, `info_type`, `desc`) VALUES (
 alter table JOB ADD COLUMN  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '任务名称';;
 
 alter table JOB ADD COLUMN `cover` tinyint NOT NULL DEFAULT '0' COMMENT '是否开启覆盖';
+
+alter table JOB ADD COLUMN `type` tinyint NOT NULL DEFAULT '0' COMMENT '是否是流式任务';

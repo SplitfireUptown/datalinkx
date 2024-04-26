@@ -27,6 +27,11 @@ public final class MetaConstants {
         }};
     }
 
+    public static class JobType {
+        public static final int JOB_TYPE_STREAM = 1;
+        public static final int JOB_TYPE_BATCH = 0;
+    }
+
     public static class JobStatus {
         public static final int JOB_STATUS_CREATE = 0;
         public static final int JOB_STATUS_SYNCING = 1;
