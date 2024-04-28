@@ -79,7 +79,7 @@ export const asyncRouterMap = [
           {
             path: '/streaming/job',
             name: 'StreamingJob',
-            component: () => import('@/views/job/JobList.vue'),
+            component: () => import('@/views/job/JobListOfStreaming.vue'),
             meta: { title: 'menu.streamingTaskList', keepAlive: false, icon: taskList }
           }
         ]
