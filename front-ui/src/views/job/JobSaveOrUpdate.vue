@@ -88,7 +88,7 @@
 
       <a-form-item
         label="同步配置"
-        v-show="!isRedisTo"
+        v-show="!isRedisTo && !isStreaming"
       >
         <a-row :gutter="16">
           <a-col :span="6">
@@ -114,6 +114,7 @@
       </a-form-item>
       <a-form-item
         label="定时配置（Spring crontab表达式）"
+        v-show="!isStreaming"
       >
         <a-input
           type="text"
@@ -178,6 +179,7 @@ export default {
   data () {
     return {
       RedisTypes,
+      jobType: 'default',
       form: this.$form.createForm(this),
       selectedDataSource: null,
       selectedTargetSource: null,
@@ -223,6 +225,9 @@ export default {
         temp = this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 4
       }
       return temp
+    },
+    isStreaming () {
+      return this.jobType === 'streaming'
     }
   },
   methods: {
@@ -275,8 +280,9 @@ export default {
       console.log(this.onlyRead)
       this.edit('edit', id)
     },
-    edit (type, id) {
+    edit (type, id, jobType = 'default') {
       this.visible = true
+      this.jobType = jobType
       this.type = type
       this.selectloading = true
       listQuery().then(res => {
