@@ -16,6 +16,7 @@ public final class MetaConstants {
         public static final Integer ELASTICSEARCH = 2;
         public static final Integer ORACLE = 3;
         public static final Integer REDIS = 4;
+        public static final Integer KAFKA = 100;
 
         public static final String REDIS_SPIT_STR = "!-!-!";
 
@@ -24,12 +25,13 @@ public final class MetaConstants {
             put(MetaConstants.DsType.ELASTICSEARCH, "elasticsearch");
             put(MetaConstants.DsType.ORACLE, "oracle");
             put(MetaConstants.DsType.REDIS, "redis");
+            put(MetaConstants.DsType.KAFKA, "kafka");
         }};
     }
 
     public static class JobType {
-        public static final int JOB_TYPE_STREAM = 1;
-        public static final int JOB_TYPE_BATCH = 0;
+        public static final Integer JOB_TYPE_STREAM = 1;
+        public static final Integer JOB_TYPE_BATCH = 0;
     }
 
     public static class JobStatus {

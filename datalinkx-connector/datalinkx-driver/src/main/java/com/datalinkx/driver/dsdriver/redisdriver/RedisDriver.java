@@ -69,9 +69,4 @@ public class RedisDriver implements AbstractDriver<RedisSetupInfo, AbstractReade
                 .build());
         return writerInfo;
     }
-
-    @Override
-    public void afterWrite(FlinkActionMeta param) {
-
-    }
 }

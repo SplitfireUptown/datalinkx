@@ -3,6 +3,7 @@ package com.datalinkx.driver.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,10 @@ import lombok.experimental.FieldNameConstants;
 @ToString(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DataTransJobDetail {
+    @JsonProperty("job_id")
     String jobId;
+    @JsonProperty("sync_unit")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     SyncUnit syncUnit;
     Integer cover;
 
@@ -31,6 +35,7 @@ public class DataTransJobDetail {
     public static class SyncUnit {
         Reader reader;
         Writer writer;
+        String checkpoint;
     }
 
 

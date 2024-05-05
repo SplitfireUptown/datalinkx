@@ -12,6 +12,8 @@ public interface DtsJobService {
      * 获取任务JobGraph
      */
     DataTransJobDetail getJobExecInfo(String jobId);
+
+    DataTransJobDetail getStreamJobExecInfo(String jobId);
     /**
      * 更新流转任务状态
      */

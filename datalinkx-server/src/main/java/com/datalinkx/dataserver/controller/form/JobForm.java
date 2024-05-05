@@ -112,7 +112,7 @@ public class JobForm {
 		private Integer pageSize = 10;
 
 		@ApiModelProperty(value = "任务类型")
-		private Integer type = 0;
+		private Integer type = -1;
 	}
 
 	@EqualsAndHashCode(callSuper = true)

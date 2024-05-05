@@ -63,6 +63,9 @@ public class JobBean extends BaseDomainBean {
 	private Integer status;
 	@Column(name = "error_msg", columnDefinition = "longtext")
 	private String errorMsg;
+	// 流式任务断点续传
+	@Column(name = "checkpoint", columnDefinition = "longtext")
+	private String checkpoint;
 	// 0 不覆盖 1 覆盖
 	@Column(name = "cover")
 	private Integer cover;

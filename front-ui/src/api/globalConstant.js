@@ -14,5 +14,9 @@ export const DATA_SOURCE_TYPE = [
   {
     label: 'REDIS',
     value: 4
+  },
+  {
+    label: 'KAFKA',
+    value: 100
   }
 ]

@@ -34,17 +34,17 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
     }
 
     @Override
-    public Object getReaderInfo(FlinkActionMeta param) {
+    public Object getReaderInfo(DataTransJobDetail.Reader reader) {
         ReaderInfo<KafkaReader> readerInfo = new ReaderInfo<>();
         readerInfo.setName("kafkacustomreader");
 
         readerInfo.setParameter(KafkaReader.builder()
-                .topic(kafkaSetupInfo.getServer())
+                .topic(reader.getTableName())
                 .mode(kafkaSetupInfo.getMode())
                 .codec("text")
                 .blankIgnore(false)
-                .consumerSettings(CommonSetting.builder().bootstrapServers(kafkaSetupInfo.getServer()).build())
-                        .column(param.getReader().getColumns().stream()
+                .consumerSettings(CommonSetting.builder().bootstrapServers(kafkaSetupInfo.getServer() + ":" + kafkaSetupInfo.getPort()).build())
+                        .column(reader.getColumns().stream()
                                         .map(col -> MetaColumn.builder()
                                                 .name(col.getName())
                                                 .build()).collect(Collectors.toList()))
@@ -54,14 +54,14 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
     }
 
     @Override
-    public Object getWriterInfo(FlinkActionMeta param) {
+    public Object getWriterInfo(DataTransJobDetail.Writer writer) {
         WriterInfo<KafkaWriter> writerInfo = new WriterInfo<>();
         writerInfo.setName("kafkacustomwriter");
 
-        writerInfo.setParameter(KafkaWriter.builder().topic(kafkaSetupInfo.getTopic())
+        writerInfo.setParameter(KafkaWriter.builder().topic(writer.getTableName())
                 .timezone(kafkaSetupInfo.getTimezone())
-                .producerSettings(CommonSetting.builder().bootstrapServers(kafkaSetupInfo.server).build())
-                .tableFields(param.getWriter().getColumns().stream().map(DataTransJobDetail.Column::getName).collect(Collectors.toList()))
+                .producerSettings(CommonSetting.builder().bootstrapServers(kafkaSetupInfo.getServer() + ":" + kafkaSetupInfo.getPort()).build())
+                .tableFields(writer.getColumns().stream().map(DataTransJobDetail.Column::getName).collect(Collectors.toList()))
                 .build());
         return writerInfo;
     }

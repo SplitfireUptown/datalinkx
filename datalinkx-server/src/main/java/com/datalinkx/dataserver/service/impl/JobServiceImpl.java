@@ -124,11 +124,12 @@ public class JobServiceImpl implements JobService {
 		});
 
 		// 3、判断增量模式下是否有增量字段
-		if (MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode()) && ObjectUtils.isEmpty(form.getSyncMode().getIncreateField())) {
+		if ((!ObjectUtils.isEmpty(form.getSyncMode()) && MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode()))
+				&& ObjectUtils.isEmpty(form.getSyncMode().getIncreateField())) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "增量模式必须指定增量字段");
 		}
 		// 4、判断增量模式下是否是时间类型或数值类型
-		if (MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode())) {
+		if ((!ObjectUtils.isEmpty(form.getSyncMode()) && MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode()))) {
 			try {
 				IDsReader dsReader = DsDriverFactory.getDsReader(dsServiceImpl.getConnectId(fromDsBean));
 				Boolean isIncremental = dsReader.judgeIncrementalField(fromDsBean.getDatabase(), fromDsBean.getSchema(), form.getFromTbName(), form.getSyncMode().getIncreateField());
@@ -140,7 +141,7 @@ public class JobServiceImpl implements JobService {
 			}
 		}
 		// 5、配置流转任务定时表达式
-		if (ObjectUtils.isEmpty(form.getSchedulerConf()) && form.getType() != MetaConstants.JobType.JOB_TYPE_STREAM) {
+		if (ObjectUtils.isEmpty(form.getSchedulerConf()) && !ObjectUtils.nullSafeEquals(form.getType(), MetaConstants.JobType.JOB_TYPE_STREAM)) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "批式流转任务需要配置crontab表达式");
 		}
 	}

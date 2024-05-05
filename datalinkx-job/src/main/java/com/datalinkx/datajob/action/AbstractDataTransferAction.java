@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import com.datalinkx.datajob.bean.JobExecCountDto;
+import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.xxl.job.core.thread.JobThread;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,14 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractDataTransferAction<T, U> {
     protected abstract void begin(T info);
-    protected abstract void end(T info, int status, String errmsg);
+    protected abstract void end(U unit, int status, String errmsg);
     protected abstract void beforeExec(U unit) throws Exception;
     protected abstract void execute(U unit) throws Exception;
     protected abstract boolean checkResult(U unit);
     protected abstract void afterExec(U unit, boolean success);
-    protected abstract U convertExecUnit(T info);
+    protected abstract U convertExecUnit(T info) throws Exception;
 
     private boolean isStop() {
+        if (!(Thread.currentThread() instanceof  JobThread)) {
+            return false;
+        }
         JobThread jobThread = ((JobThread)Thread.currentThread());
         Field toStopField;
         boolean toStop = false;
@@ -45,13 +49,12 @@ public abstract class AbstractDataTransferAction<T, U> {
 
     public void doAction(T actionInfo) throws Exception {
         Thread taskCheckerThread;
+        // T -> U 获取引擎执行类对象
+        U execUnit = convertExecUnit(actionInfo);
         try {
             StringBuffer error = new StringBuffer();
             // 1、准备执行job
             this.begin(actionInfo);
-
-            // 2、T -> U 获取引擎执行类对象
-            U execUnit = convertExecUnit(actionInfo);
             Map<String, JobExecCountDto> countRes = DataTransferAction.COUNT_RES.get();
 
             // 3、循环检查任务结果
@@ -99,18 +102,20 @@ public abstract class AbstractDataTransferAction<T, U> {
                 error.append(e.getMessage()).append("\r\n");
             }
             // 阻塞至任务完成
-            taskCheckerThread.start();
-            taskCheckerThread.join();
+            if (execUnit instanceof FlinkActionMeta) {
+                taskCheckerThread.start();
+                taskCheckerThread.join();
+            }
 
             // 5、整个Job结束后的处理
-            this.end(actionInfo, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
+            this.end(execUnit, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
         } catch (InterruptedException e) {
             log.error("shutdown job by user.");
-            this.end(actionInfo, JOB_STATUS_STOP, "cancel the job");
+            this.end(execUnit, JOB_STATUS_STOP, "cancel the job");
             throw e;
         } catch (Throwable e) {
             log.error("transfer failed -> ", e);
-            this.end(actionInfo, JOB_STATUS_ERROR, e.getMessage());
+            this.end(execUnit, JOB_STATUS_ERROR, e.getMessage());
         }
     }
 }

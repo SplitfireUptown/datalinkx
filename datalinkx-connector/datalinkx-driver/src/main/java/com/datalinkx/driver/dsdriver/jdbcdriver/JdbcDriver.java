@@ -445,11 +445,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return jdbcWriterInfo;
     }
 
-    @Override
-    public void afterWrite(FlinkActionMeta param) {
-        log.info("data-transfer task write finish");
-    }
-
     public String columnQuota() {
         return "`";
     }

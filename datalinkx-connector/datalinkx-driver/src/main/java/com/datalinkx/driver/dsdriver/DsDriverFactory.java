@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public final class  DsDriverFactory {
+public final class DsDriverFactory {
 
     private DsDriverFactory() {
 
@@ -25,6 +25,14 @@ public final class  DsDriverFactory {
         Class<?> driverClass = Class.forName(driverClassName);
         Constructor<?> constructor = driverClass.getDeclaredConstructor(String.class);
         return (IDsDriver) constructor.newInstance(connectId);
+    }
+
+    public static IStreamDriver getStreamDriver(String connectId) throws Exception {
+        String dsType = ConnectIdUtils.getDsType(connectId);
+        String driverClassName = getDriverClass(dsType);
+        Class<?> driverClass = Class.forName(driverClassName);
+        Constructor<?> constructor = driverClass.getDeclaredConstructor(String.class);
+        return (IStreamDriver) constructor.newInstance(connectId);
     }
 
     public static IDsReader getDsReader(String connectId) throws Exception {

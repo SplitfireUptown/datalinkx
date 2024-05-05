@@ -134,6 +134,7 @@ export default {
         current: 1
       },
       queryParam: {
+        'type': 0
       },
       source: null
     }

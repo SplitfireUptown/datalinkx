@@ -12,7 +12,6 @@ import lombok.EqualsAndHashCode;
 public class KafkaSetupInfo extends SetupInfo {
     public String server;
     public Integer port;
-    public String topic;
     public String mode;
     public String timezone;
 }

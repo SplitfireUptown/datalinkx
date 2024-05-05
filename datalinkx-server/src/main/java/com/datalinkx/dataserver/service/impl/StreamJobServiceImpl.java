@@ -9,20 +9,26 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.exception.DatalinkXServerException;
+import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
+import com.datalinkx.dataserver.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
+import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.dataserver.service.StreamJobService;
+import com.datalinkx.driver.model.DataTransJobDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StreamJobServiceImpl implements StreamJobService {
@@ -35,6 +41,12 @@ public class StreamJobServiceImpl implements StreamJobService {
 
     @Autowired
     DsRepository dsRepository;
+
+    @Autowired
+    DatalinkXJobClient datalinkXJobClient;
+
+    @Autowired
+    DtsJobService dtsJobService;
 
     @Override
     public String createStreamJob(JobForm.JobCreateForm form) {
@@ -56,6 +68,20 @@ public class StreamJobServiceImpl implements StreamJobService {
 
         jobRepository.save(jobBean);
         return jobId;
+    }
+
+    @Override
+    public String modifyStreamJob(JobForm.JobModifyForm form) {
+        jobService.validJobForm(form);
+        JobBean jobBean = jobRepository.findByJobId(form.getJobId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
+        jobBean.setReaderDsId(form.getFromDsId());
+        jobBean.setWriterDsId(form.getToDsId());
+        jobBean.setConfig(toJson(form.getFieldMappings()));
+        jobBean.setFromTbId(form.getFromTbName());
+        jobBean.setToTbId(form.getToTbName());
+        jobBean.setName(form.getJobName());
+        jobRepository.save(jobBean);
+        return form.getJobId();
     }
 
     @Override
@@ -95,6 +121,19 @@ public class StreamJobServiceImpl implements StreamJobService {
 
     @Override
     public void streamJobExec(String jobId) {
+        DataTransJobDetail jobExecInfo = dtsJobService.getStreamJobExecInfo(jobId);
+        datalinkXJobClient.dataTransExec(JsonUtils.toJson(jobExecInfo));
+    }
 
+    @Override
+    public void stop(String jobId) {
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void delete(String jobId) {
+        this.stop(jobId);
+        jobService.del(jobId);
     }
 }

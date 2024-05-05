@@ -17,4 +17,10 @@ public interface FlinkClient {
 
     @GET("/v1/jobs/{jobId}/yarn-cancel")
     JsonNode jobStop(@Path("jobId") String jobId);
+
+    @GET("/jobs/{jobId}/checkpoints")
+    JsonNode jobCheckpoint(@Path("jobId") String jobId);
+
+    @GET("/jobs/{jobId}/stop")
+    JsonNode jobStop(@Path("jobId") String jobId, @Path("checkpointId") String checkpointId);
 }

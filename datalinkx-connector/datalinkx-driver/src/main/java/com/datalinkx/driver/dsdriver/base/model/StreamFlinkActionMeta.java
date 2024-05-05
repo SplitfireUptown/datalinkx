@@ -1,5 +1,7 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
+import com.datalinkx.driver.dsdriver.IDsReader;
+import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +22,10 @@ import lombok.experimental.SuperBuilder;
 @FieldNameConstants
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamFlinkActionMeta extends EngineActionMeta {
+    // 来源库driver驱动
+    IDsReader dsReader;
+    // 目标库driver驱动
+    IDsWriter dsWriter;
     String readerDsInfo;
     String writerDsInfo;
     String checkpoint;

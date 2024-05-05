@@ -17,6 +17,11 @@ public interface StreamJobService {
     String createStreamJob(JobForm.JobCreateForm form);
 
     /**
+     * 编辑流式任务
+     */
+    String modifyStreamJob(JobForm.JobModifyForm form);
+
+    /**
      * 任务分页查询
      */
     PageVo<List<JobVo.JobStreamPageVo>> streamPage(JobForm.JobPageForm form);
@@ -25,4 +30,14 @@ public interface StreamJobService {
      * 执行流式任务
      */
     void streamJobExec(String jobId);
+
+    /**
+     * 停止流式任务
+     */
+    void stop(String jobId);
+
+    /**
+     * 删除流式任务
+     */
+    void delete(String jobId);
 }

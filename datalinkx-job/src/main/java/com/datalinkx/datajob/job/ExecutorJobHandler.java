@@ -25,13 +25,13 @@ import org.springframework.util.ResourceUtils;
 public class ExecutorJobHandler {
 
 	@Value("${flinkx.path}")
-	private String flinkXHomePath;
+	String flinkXHomePath;
 
 	@Value("${reserve.job_graph:false}")
-	private Boolean reserveJobGraph;
+	Boolean reserveJobGraph;
 
 
-	public String execute(String jobId, String reader, String writer) throws Exception {
+	public String execute(String jobId, String reader, String writer, Map<String, String> otherSetting) throws Exception {
 
 		StringBuffer errorRet = new StringBuffer();
 		StringBuffer successRet = new StringBuffer();
@@ -40,7 +40,7 @@ public class ExecutorJobHandler {
 		String jobJsonFile = this.generateJobJsonFile(jobId, reader, writer, jobSettings);
 
 		try {
-			String cmdStr = this.generateFlinkCmd(jobId, jobJsonFile);
+			String cmdStr = this.generateFlinkCmd(jobId, jobJsonFile, otherSetting);
 			try {
 				log.info("job_id: {}, execute job command: {}", jobId, cmdStr);
 				Process process = Runtime.getRuntime().exec(cmdStr);
@@ -87,9 +87,8 @@ public class ExecutorJobHandler {
 		return jobUrl.substring("/jobs/".length());
 	}
 
-	private String generateFlinkCmd(String jobId, String jobJsonFile) {
+	public String generateFlinkCmd(String jobId, String jobJsonFile, Map<String, String> otherSetting) {
 		String javaHome = System.getenv("JAVA_HOME");
-        log.info("javaHome: {}", javaHome);
 		String os = System.getProperty("os.name").toLowerCase();
 
 		return String.format(
@@ -103,7 +102,7 @@ public class ExecutorJobHandler {
 		);
 	}
 
-	private String generateJobJsonFile(String jobId, String reader, String writer, String setting) {
+	public String generateJobJsonFile(String jobId, String reader, String writer, String setting) {
 		String jobJson = String.format("{\"job\":{\"content\":[{\"reader\":%s,\"writer\":%s}],\"setting\":%s}}", reader, writer, setting);
 		log.info("flink job_id: {} graph: {}", jobId, jobJson);
 		String jsonPath = flinkXHomePath;
@@ -128,7 +127,7 @@ public class ExecutorJobHandler {
 	}*/
 
     @SneakyThrows
-    private String generateJobSetting() {
+	public String generateJobSetting() {
         Resource resource = new DefaultResourceLoader().getResource("classpath:job_setting.json");
 
         log.info(resource.toString());

@@ -232,9 +232,4 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 .build());
         return writerInfo;
     }
-
-    @Override
-    public void afterWrite(FlinkActionMeta param) {
-
-    }
 }

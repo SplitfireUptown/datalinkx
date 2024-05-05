@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <div class="table-operator">
-      <a-button @click="$refs.JobSaveOrUpdate.edit('add', '', 'streaming')" icon="plus" type="primary">新建</a-button>
+      <a-button @click="$refs.JobSaveOrUpdateStreaming.edit('add', '', 'streaming')" icon="plus" type="primary">新建</a-button>
     </div>
     <a-table
       :columns="columns"
@@ -12,17 +12,16 @@
       @change="handleTableChange"
     >
     </a-table>
-    <job-save-or-update
+    <job-save-or-update-streaming
       @ok="handleOk"
-      ref="JobSaveOrUpdate"
+      ref="JobSaveOrUpdateStreaming"
     />
   </a-card>
 </template>
 
 <script>
-import { pageQuery, delObj, exec, stop } from '@/api/job/job'
-import { closeConnect } from '@/api/job/sse'
-import JobSaveOrUpdate from '../job/JobSaveOrUpdate.vue'
+import { pageQuery, delObj, stop, streamExec } from '@/api/job/job'
+import JobSaveOrUpdateStreaming from '@/views/job/JobSaveOrUpdateStreaming.vue'
 // 0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING
 const StatusType = [
   {
@@ -53,7 +52,7 @@ const StatusType = [
 export default {
   name: 'JobListOfStreaming',
   components: {
-    JobSaveOrUpdate
+    JobSaveOrUpdateStreaming
   },
   data () {
     return {
@@ -61,17 +60,23 @@ export default {
       columns: [
         {
           title: 'job_id',
-          width: '30%',
+          // width: '30%',
           dataIndex: 'job_id'
         },
         {
-          title: 'topic',
-          width: '20%',
-          dataIndex: 'topic'
+          title: '来源表',
+          // width: '10%',
+          dataIndex: 'from_tb_name'
+        },
+        {
+          title: '目标表',
+          // width: '10%',
+          dataIndex: 'to_tb_name',
+          sorter: true
         },
         {
           title: '任务状态',
-          width: '30%',
+          // width: '30%',
           dataIndex: 'status',
           customRender: (text) => {
             return (
@@ -87,11 +92,18 @@ export default {
         },
         {
           title: '操作',
-          width: '20%',
+          // width: '20%',
           customRender: (record) => {
             return (
               <div>
                 <a href="javascript:;"onClick={(e) => this.stopJob(record)}>停止</a>
+                <a-divider type="vertical" />
+                <a href="javascript:;"onClick={(e) => this.execJob(record)}>触发</a>
+                <a-divider type="vertical" />
+                <a-popconfirm title="是否删除" onConfirm={() => this.delete(record)} okText="是" cancelText="否">
+                  <a-icon slot="icon" type="question-circle-o" style="color: red" />
+                  <a href="javascript:;" style="color: red">删除</a>
+                </a-popconfirm>
               </div>
             )
           }
@@ -109,6 +121,7 @@ export default {
         current: 1
       },
       queryParam: {
+        'type': 1
       },
       source: null
     }
@@ -135,7 +148,7 @@ export default {
     },
 
     edit (record) {
-      this.$refs.JobSaveOrUpdate.edit('edit', record.job_id)
+      this.$refs.JobSaveOrUpdateStreaming.edit('edit', record.job_id)
     },
     delete (record) {
       delObj(record.job_id).then(res => {
@@ -149,11 +162,8 @@ export default {
         this.loading = false
       })
     },
-    show (record) {
-      this.$refs.JobSaveOrUpdate.edit(record.job_id, 'show')
-    },
     execJob (record) {
-      exec(record.job_id).then(res => {
+      streamExec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')
           this.init()
@@ -163,6 +173,9 @@ export default {
       }).finally(() => {
         this.loading = false
       })
+    },
+    show (record) {
+      this.$refs.JobSaveOrUpdateStreaming.edit(record.job_id, 'show')
     },
     stopJob (record) {
       stop(record.job_id).then(res => {
@@ -183,46 +196,10 @@ export default {
     queryData () {
       this.pages.current = 1
       this.init()
-    },
-    createEventSource () {
-      if (window.EventSource) {
-        this.eventSource = new EventSource(
-          `api/api/sse/connect/jobList`, {
-            // 设置重连时间
-            heartbeatTimeout: 60 * 60 * 1000
-            // 添加token
-          })
-        this.eventSource.onopen = (e) => {
-          console.log('connect success')
-        }
-        this.eventSource.onmessage = (e) => {
-          console.log('from server data:', e.data)
-          const flashData = JSON.parse(e.data)
-          console.log(flashData)
-          for (const i of this.tableData) {
-            if (i.job_id === flashData.job_id) {
-              if (flashData.status === 1) {
-                i.status = flashData.status
-                i.progress = (flashData.write_records + '/' + flashData.read_records)
-              } else {
-                // 防止消息先到前端后端未入库
-                i.status = flashData.status
-              }
-            }
-          }
-        }
-      } else {
-        console.log('browser not support SSE')
-      }
     }
-  },
-  beforeDestroy () {
-    this.eventSource.close()
-    closeConnect('jobList')
   },
   created () {
     this.init()
-    this.createEventSource()
   }
 }
 </script>

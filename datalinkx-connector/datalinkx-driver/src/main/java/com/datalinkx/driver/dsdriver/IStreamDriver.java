@@ -1,8 +1,9 @@
 package com.datalinkx.driver.dsdriver;
 
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
+import com.datalinkx.driver.model.DataTransJobDetail;
 
 public interface IStreamDriver extends IDsDriver {
-    Object getReaderInfo(FlinkActionMeta param);
-    Object getWriterInfo(FlinkActionMeta param);
+    Object getReaderInfo(DataTransJobDetail.Reader reader);
+    Object getWriterInfo(DataTransJobDetail.Writer writer);
 }

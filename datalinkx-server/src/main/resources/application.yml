@@ -47,6 +47,14 @@ data-transfer:
   # 读fetch-size行数据的查询超时时间
   query-time-out: 10000
 
+client:
+  datajob:
+    url: http://localhost:23456
+    connect_timeout_ms: 20000
+    call_timeout_ms: 600000
+    read_timeout_ms: 600000
+    logging: true
+
 topic:
   daemon: true
 

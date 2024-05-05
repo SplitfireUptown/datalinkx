@@ -77,9 +77,9 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected void end(DataTransJobDetail info, int status, String errmsg) {
+    protected void end(FlinkActionMeta unit, int status, String errmsg) {
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
-        log.info(String.format("jobid: %s, end to transfer", info.getJobId()));
+        log.info(String.format("jobid: %s, end to transfer", unit.getJobId()));
 
 
         if (COUNT_RES.get() != null) {
@@ -89,7 +89,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
                 jobExecCountDto.setFilterCount(jobExecCountDto.getFilterCount() + value.getFilterCount());
             });
         }
-        datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
+        datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(unit.getJobId())
                 .jobStatus(status).startTime(START_TIME.get()).endTime(new Date().getTime())
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
@@ -98,7 +98,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
                 .build());
         // 父任务执行成功后级联触发子任务
         if (JOB_STATUS_SUCCESS == status) {
-            datalinkXServerClient.cascadeJob(info.getJobId());
+            datalinkXServerClient.cascadeJob(unit.getJobId());
         }
     }
 
@@ -144,7 +144,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
 
             String readerStr = JsonUtils.toJson(reader);
             String writerStr = JsonUtils.toJson(writer);
-            taskId = executorJobHandler.execute(unit.getJobId(), readerStr, writerStr);
+            taskId = executorJobHandler.execute(unit.getJobId(), readerStr, writerStr, new HashMap<>());
             unit.setTaskId(taskId) ;
             // 更新task
             datalinkXServerClient.updateJobTaskRel(unit.getJobId(), taskId);

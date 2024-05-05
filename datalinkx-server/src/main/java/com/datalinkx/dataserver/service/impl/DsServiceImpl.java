@@ -30,6 +30,7 @@ import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
+import com.datalinkx.driver.dsdriver.kafkadriver.KafkaSetupInfo;
 import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
 import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
 import com.datalinkx.driver.dsdriver.redisdriver.RedisSetupInfo;
@@ -165,6 +166,12 @@ public class DsServiceImpl implements DsService {
 				redisSetupInfo.setPwd(dsBean.getPassword());
 				redisSetupInfo.setType(toType);
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(redisSetupInfo));
+			case "kafka":
+				KafkaSetupInfo kafkaSetupInfo = new KafkaSetupInfo();
+				kafkaSetupInfo.setServer(dsBean.getHost());
+				kafkaSetupInfo.setPort(dsBean.getPort());
+				kafkaSetupInfo.setType(toType);
+				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(kafkaSetupInfo));
 			default:
 				Map<String, Object> map = new HashMap<>();
 				map.put("type", MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsBean.getType()));

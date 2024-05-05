@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -34,10 +35,10 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 
 	@Modifying
 	@Transactional
-	@Query(value = "update JOB set is_del = 1 where job_id = ?1", nativeQuery = true)
+	@Query(value = "update JOB set is_del = 1 where job_id = :jobId", nativeQuery = true)
 	void logicDeleteByJobId(String jobId);
 
 
-	@Query(value = "select * from JOB where is_del = 0 and if(:type != null, type =:type, 1=1)", nativeQuery = true)
-	Page<JobBean> pageQuery(PageRequest pageRequest, Integer type);
+	@Query(value = "select * from JOB where if(:type != -1, type =:type, 1=1) AND is_del = 0", nativeQuery = true)
+	Page<JobBean> pageQuery(Pageable pageable, Integer type);
 }

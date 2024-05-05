@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import com.datalinkx.dataclient.client.DatalinkXClientUtils;
+import com.datalinkx.dataserver.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataserver.client.xxljob.XxlJobClient;
 import com.datalinkx.dataserver.client.xxljob.XxlLoginClient;
 import com.datalinkx.dataserver.client.xxljob.interceptor.LoginInterceptor;
@@ -89,5 +90,10 @@ public class WebConfig implements WebMvcConfigurer {
 	public XxlJobClient xxlJobClient(XxlClientProperties xxlClientProperties, LoginInterceptor loginInterceptor) {
 		return DatalinkXClientUtils.createClient("xxljob", xxlClientProperties.getClient(),
 				XxlJobClient.class, loginInterceptor);
+	}
+
+	@Bean
+	public DatalinkXJobClient datalinkXJobClient(ClientProperties clientProperties) {
+		return DatalinkXClientUtils.createClient("datajob", clientProperties.getDatajob(), DatalinkXJobClient.class);
 	}
 }

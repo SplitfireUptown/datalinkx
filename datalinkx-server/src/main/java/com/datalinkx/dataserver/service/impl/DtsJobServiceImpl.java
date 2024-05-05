@@ -35,6 +35,9 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +94,40 @@ public class DtsJobServiceImpl implements DtsJobService {
         return DataTransJobDetail.builder().jobId(jobId).cover(jobBean.getCover()).syncUnit(syncUnit).build();
     }
 
+    @Override
+    public DataTransJobDetail getStreamJobExecInfo(String jobId) {
+        JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
+        List<DataTransJobDetail.Column> columns = JsonUtils.toList(jobBean.getConfig(), JobForm.FieldMappingForm.class).stream()
+                .filter(x -> StringUtils.isNotEmpty(x.getSourceField()) && StringUtils.isNotEmpty(x.getTargetField()))
+                .map(x -> DataTransJobDetail.Column.builder()
+                        .name(x.getSourceField())
+                        .build())
+                .collect(Collectors.toList());
+
+        List<String> dsIds = new ArrayList<>(Arrays.asList(jobBean.getReaderDsId(), jobBean.getWriterDsId()));
+        Map<String, DsBean> dsId2Object = dsRepository.findAllByDsIdIn(dsIds)
+                .stream()
+                .collect(Collectors.toMap(DsBean::getDsId, v -> v));
+
+        DataTransJobDetail.Reader reader = DataTransJobDetail.Reader.builder()
+                .tableName(jobBean.getFromTbId())
+                .columns(columns)
+                .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getReaderDsId())))
+                .build();
+
+        DataTransJobDetail.Writer writer = DataTransJobDetail.Writer.builder()
+                .tableName(jobBean.getToTbId())
+                .columns(columns)
+                .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getWriterDsId())))
+                .build();
+
+        DataTransJobDetail.SyncUnit syncUnit = DataTransJobDetail.SyncUnit
+                .builder()
+                .reader(reader)
+                .writer(writer)
+                .build();
+        return DataTransJobDetail.builder().jobId(jobId).syncUnit(syncUnit).build();
+    }
 
 
     @SneakyThrows
@@ -180,7 +217,6 @@ public class DtsJobServiceImpl implements DtsJobService {
                         () -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "to ds not exist")
                 );
 
-
         List<DataTransJobDetail.Column> toCols = jobConf
                 .stream()
                 .map(x -> DataTransJobDetail
@@ -190,7 +226,6 @@ public class DtsJobServiceImpl implements DtsJobService {
                         .build()
                 )
                 .collect(Collectors.toList());
-
 
         return DataTransJobDetail.Writer.builder()
                 .schema(toDs.getDatabase()).connectId(dsServiceImpl.getConnectId(toDs))
@@ -208,19 +243,21 @@ public class DtsJobServiceImpl implements DtsJobService {
         int status = jobStateForm.getJobStatus();
 
         // 1、实时推送流转进度
-        ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
-        producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
-        producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);
-        producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
-        producerAdapterForm.setMessage(
-                JsonUtils.toJson(
-                        JobDto.StatusRefresh.builder()
-                                .status(status)
-                                .jobId(jobBean.getJobId())
-                                .build()
-                )
-        );
-        messageHubService.produce(producerAdapterForm);
+        if (!MetaConstants.JobType.JOB_TYPE_STREAM.equals(jobBean.getType())) {
+            ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
+            producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
+            producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);
+            producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
+            producerAdapterForm.setMessage(
+                    JsonUtils.toJson(
+                            JobDto.StatusRefresh.builder()
+                                    .status(status)
+                                    .jobId(jobBean.getJobId())
+                                    .build()
+                    )
+            );
+            messageHubService.produce(producerAdapterForm);
+        }
 
         // 2、存储流转任务状态
         JobDto.DataCountDto countVo = JobDto.DataCountDto.builder()
@@ -228,6 +265,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .appendCount(jobStateForm.getAppendCount())
                 .filterCount(jobStateForm.getFilterCount())
                 .build();
+        jobBean.setStartTime(ObjectUtils.isEmpty(jobStateForm.getStartTime()) ? null : new Timestamp(jobStateForm.getStartTime()));
         jobBean.setStatus(status);
         jobBean.setCount(JsonUtils.toJson(countVo));
         jobBean.setErrorMsg(StringUtils.equalsIgnoreCase(jobStateForm.getErrmsg(), "success") ? "任务成功"
@@ -238,7 +276,7 @@ public class DtsJobServiceImpl implements DtsJobService {
         if (!ObjectUtils.isEmpty(jobStateForm.getErrmsg())) {
             jobLogRepository.save(JobLogBean.builder()
                     .jobId(jobStateForm.getJobId())
-                    .startTime(new Timestamp(jobStateForm.getStartTime()))
+                    .startTime(ObjectUtils.isEmpty(jobStateForm.getStartTime()) ? null : new Timestamp(jobStateForm.getStartTime()))
                     .status(ObjectUtils.nullSafeEquals(status, MetaConstants.JobStatus.JOB_STATUS_ERROR) ? 1 : 0)
                     .endTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) ? null : new Timestamp(jobStateForm.getEndTime()))
                     .costTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) ? 0 : (int) ((jobStateForm.getEndTime() - jobStateForm.getStartTime()) / 1000))
