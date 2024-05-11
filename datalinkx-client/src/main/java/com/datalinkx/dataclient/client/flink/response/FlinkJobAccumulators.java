@@ -1,4 +1,4 @@
-package com.datalinkx.datajob.client.flink.response;
+package com.datalinkx.dataclient.client.flink.response;
 
 import java.util.List;
 

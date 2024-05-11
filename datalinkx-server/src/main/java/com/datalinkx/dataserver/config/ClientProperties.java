@@ -1,7 +1,7 @@
 package com.datalinkx.dataserver.config;
 
 
-import com.datalinkx.dataclient.client.ClientConfig;
+import com.datalinkx.dataclient.config.ClientConfig;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -11,4 +11,5 @@ import org.springframework.stereotype.Component;
 @Data
 public class ClientProperties {
     private ClientConfig.ServicePropertieBean datajob;
+    private ClientConfig.ServicePropertieBean flink;
 }

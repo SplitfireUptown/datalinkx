@@ -12,12 +12,11 @@ import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
-import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
-import com.datalinkx.dataserver.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
@@ -82,6 +81,11 @@ public class StreamJobServiceImpl implements StreamJobService {
         jobBean.setName(form.getJobName());
         jobRepository.save(jobBean);
         return form.getJobId();
+    }
+
+    @Override
+    public void startStreamJob(String jobId) {
+        jobRepository.updateJobStatus(jobId, MetaConstants.JobStatus.JOB_STATUS_SYNCING);
     }
 
     @Override

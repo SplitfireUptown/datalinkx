@@ -1,4 +1,4 @@
-package com.datalinkx.dataclient.client;
+package com.datalinkx.dataclient.config;
 
 import java.util.concurrent.TimeUnit;
 

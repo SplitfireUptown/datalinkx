@@ -22,6 +22,11 @@ public interface StreamJobService {
     String modifyStreamJob(JobForm.JobModifyForm form);
 
     /**
+     * 更新任务状态
+     */
+    void startStreamJob(String jobId);
+
+    /**
      * 任务分页查询
      */
     PageVo<List<JobVo.JobStreamPageVo>> streamPage(JobForm.JobPageForm form);

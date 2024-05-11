@@ -54,6 +54,12 @@ client:
     call_timeout_ms: 600000
     read_timeout_ms: 600000
     logging: true
+  flink:
+    url: http://localhost:8081
+    connect_timeout_ms: 20000
+    call_timeout_ms: 600000
+    read_timeout_ms: 600000
+    logging: true
 
 topic:
   daemon: true

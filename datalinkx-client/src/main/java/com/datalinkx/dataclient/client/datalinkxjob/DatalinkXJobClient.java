@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.client.datalinkxjob;
+package com.datalinkx.dataclient.client.datalinkxjob;
 
 import com.datalinkx.common.result.WebResult;
 import retrofit2.http.POST;

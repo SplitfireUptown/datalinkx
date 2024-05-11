@@ -1,7 +1,7 @@
 package com.datalinkx.dataserver.config;
 
 
-import com.datalinkx.dataclient.client.ClientConfig;
+import com.datalinkx.dataclient.config.ClientConfig;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

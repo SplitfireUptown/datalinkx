@@ -1,4 +1,4 @@
-package com.datalinkx.datajob.client.flink;
+package com.datalinkx.dataclient.client.flink;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import retrofit2.http.GET;

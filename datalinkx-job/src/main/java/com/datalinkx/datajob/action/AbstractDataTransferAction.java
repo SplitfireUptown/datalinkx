@@ -102,10 +102,8 @@ public abstract class AbstractDataTransferAction<T, U> {
                 error.append(e.getMessage()).append("\r\n");
             }
             // 阻塞至任务完成
-            if (execUnit instanceof FlinkActionMeta) {
-                taskCheckerThread.start();
-                taskCheckerThread.join();
-            }
+            taskCheckerThread.start();
+            taskCheckerThread.join();
 
             // 5、整个Job结束后的处理
             this.end(execUnit, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());

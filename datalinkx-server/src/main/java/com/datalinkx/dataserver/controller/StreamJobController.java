@@ -61,7 +61,7 @@ public class StreamJobController {
     @ApiOperation("手动执行流式任务")
     @RequestMapping("/exec/{jobId}")
     public WebResult<String> streamJobExec(@PathVariable String jobId) {
-        streamJobService.streamJobExec(jobId);
+        streamJobService.startStreamJob(jobId);
         return WebResult.of(jobId);
     }
 }
