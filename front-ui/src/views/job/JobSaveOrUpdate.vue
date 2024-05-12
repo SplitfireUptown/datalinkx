@@ -257,21 +257,28 @@ export default {
           }
           console.log(this.jobId)
           if (this.type === 'edit') {
-            modifyObj(formData).catch(err => {
+            modifyObj(formData).then(res => {
+              this.confirmLoading = false
+              this.$emit('ok')
+              this.visible = false
+            }).catch(err => {
               this.$message.error(err.errstr)
             })
           } else {
             addObj(formData).then(res => {
               if (res.status !== '0') {
+                this.confirmLoading = false
+                this.$emit('ok')
+                this.visible = false
                 this.$message.error(res.errstr)
               }
             })
           }
-          setTimeout(() => {
-            this.confirmLoading = false
-            this.$emit('ok')
-            this.visible = false
-          }, 1500)
+          // setTimeout(() => {
+          //   this.confirmLoading = false
+          //   this.$emit('ok')
+          //   this.visible = false
+          // }, 1500)
         }
       })
     },
