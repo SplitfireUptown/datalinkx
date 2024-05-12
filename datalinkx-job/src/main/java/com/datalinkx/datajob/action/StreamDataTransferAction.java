@@ -45,7 +45,7 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
         // 修改任务状态
         START_TIME.set(new Date().getTime());
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
-                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE).startTime(START_TIME.get())
+                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_SYNCING).startTime(START_TIME.get())
                 .build());
     }
 
@@ -112,8 +112,10 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
             JsonNode latestResult = checkpointResult.get("latest");
             if (!ObjectUtils.isEmpty(latestResult)) {
                 JsonNode savepoint = latestResult.get("savepoint");
-                String checkpointPath = savepoint.get("external_path").toString();
-                unit.setCheckpoint(checkpointPath);
+                if (!ObjectUtils.isEmpty(savepoint) && !ObjectUtils.isEmpty(savepoint.get("external_path"))) {
+                    String checkpointPath = savepoint.get("external_path").toString();
+                    unit.setCheckpoint(checkpointPath);
+                }
             }
         }
     }

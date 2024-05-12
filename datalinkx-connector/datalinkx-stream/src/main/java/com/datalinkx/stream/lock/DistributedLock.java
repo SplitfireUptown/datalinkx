@@ -1,10 +1,18 @@
 package com.datalinkx.stream.lock;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
 
 
@@ -14,33 +22,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class DistributedLock {
 
+	private static final String LOCK_LUA = "if redis.call('setnx', KEYS[1], ARGV[1]) == 1 then redis.call('expire', KEYS[1], ARGV[2]) return 'true' else return 'false' end";
+	private static final String UNLOCK_LUA = "if redis.call('get', KEYS[1]) == ARGV[1] then redis.call('del', KEYS[1]) end return 'true' ";
 
-	private static final int DEFAULT_APPEND_TIME = 60;
+	private RedisScript lockRedisScript;
+	private RedisScript unLockRedisScript;
 
-	@Resource
-	StringRedisTemplate stringRedisTemplate;
+	private RedisSerializer<String> argsSerializer;
+	private RedisSerializer<String> resultSerializer;
 
-	/**
-	 * 仅保证实例间互斥，无法保证上锁解锁为同一实例
-	 * @param lockKey
-	 * @return
-	 */
-	public boolean setDistributedLock(String lockKey) {
-		return stringRedisTemplate.opsForValue().setIfAbsent(lockKey, "1", DEFAULT_APPEND_TIME, TimeUnit.SECONDS);
-	}
+	@Autowired
+	private RedisTemplate<String, String> redisTemplate;
 
 	/**
-	 * value都为1，不用校验是否为统一client避免原子性问题
-	 * 采用发布订阅统一销毁链接
-	 * @param lockKey
+	 * 初始化lua 脚本
 	 */
-	public void releaseDistributedLock(String lockKey) {
-		stringRedisTemplate.delete(lockKey);
+	@PostConstruct
+	public void init() {
+		argsSerializer = new StringRedisSerializer();
+		resultSerializer = new StringRedisSerializer();
+		lockRedisScript = RedisScript.of(LOCK_LUA, String.class);
+		unLockRedisScript = RedisScript.of(UNLOCK_LUA, String.class);
 	}
 
-
-	public void expandLockTime(String lockKey) {
-		stringRedisTemplate.expire(lockKey, DEFAULT_APPEND_TIME, TimeUnit.SECONDS);
+	public boolean lock(String lock, String val, int second) {
+		List<String> keys = Collections.singletonList(lock);
+		String flag = redisTemplate.execute(lockRedisScript, argsSerializer, resultSerializer, keys, val, String.valueOf(second));
+		return Boolean.parseBoolean(flag);
 	}
 
+	public void unlock(String lock, String val) {
+		List<String> keys = Collections.singletonList(lock);
+		redisTemplate.execute(unLockRedisScript, argsSerializer, resultSerializer, keys, val);
+	}
 }

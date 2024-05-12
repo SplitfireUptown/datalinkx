@@ -6,6 +6,9 @@ import retrofit2.http.Path;
 
 public interface FlinkClient {
 
+    @GET("/jobs/overview")
+    JsonNode jobOverview();
+
     @GET("/jobs/{jobId}/exceptions")
     JsonNode jobExceptions(@Path("jobId") String jobId);
 
