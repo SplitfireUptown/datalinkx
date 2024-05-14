@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,12 @@ public class ExecutorJobHandler {
 
 	@Value("${flinkx.path}")
 	String flinkXHomePath;
+
+	@Value("${flinkx.syncplugins.path:${flinkx.path}}")
+	private String syncPluginsPath;
+
+	@Value("${flinkx.flinkconf.path:${flinkx.path}}")
+	private String flinkConf;
 
 	@Value("${reserve.job_graph:false}")
 	Boolean reserveJobGraph;
@@ -101,8 +108,8 @@ public class ExecutorJobHandler {
 				flinkXHomePath + (os.contains("win") ? "lib\\*" : "lib/*"),
 				jobId,
 				jobJsonFile,
-				flinkXHomePath + "syncplugins",
-				flinkXHomePath + "flinkconf"
+				syncPluginsPath.equals(flinkXHomePath) ? syncPluginsPath + "syncplugins" : syncPluginsPath,
+				flinkConf.equals(flinkXHomePath) ? flinkConf + "flinkconf" : flinkConf
 		);
 	}
 
