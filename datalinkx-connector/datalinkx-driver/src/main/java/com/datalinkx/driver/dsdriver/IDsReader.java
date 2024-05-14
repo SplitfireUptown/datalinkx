@@ -4,9 +4,9 @@ package com.datalinkx.driver.dsdriver;
 import java.util.List;
 
 import com.datalinkx.common.utils.ObjectUtils;
+import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import org.apache.commons.lang3.StringUtils;
 
 

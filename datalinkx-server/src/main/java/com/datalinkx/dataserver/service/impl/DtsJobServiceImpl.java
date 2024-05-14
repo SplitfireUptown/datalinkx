@@ -1,5 +1,17 @@
 package com.datalinkx.dataserver.service.impl;
 
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNCING;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
@@ -32,18 +44,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-
-import javax.annotation.Resource;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNCING;
 
 /**
  * @author: uptown

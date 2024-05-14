@@ -1,6 +1,5 @@
 package com.datalinkx.driver.dsdriver;
 
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.model.DataTransJobDetail;
 
 public interface IStreamDriver extends IDsDriver {

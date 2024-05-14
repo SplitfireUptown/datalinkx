@@ -8,7 +8,6 @@ import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.driver.dsdriver.IStreamDriver;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import com.datalinkx.driver.model.DataTransJobDetail;

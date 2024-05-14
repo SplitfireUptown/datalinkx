@@ -1,20 +1,10 @@
 package com.datalinkx.datajob.job;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.IdUtil;
 import com.datalinkx.common.utils.ObjectUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 @Slf4j

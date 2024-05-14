@@ -1,13 +1,9 @@
 package com.datalinkx.driver.dsdriver.oracledriver;
 
-import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import com.datalinkx.driver.dsdriver.IDsDriver;
-import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcDriver;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcReader;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcWriter;

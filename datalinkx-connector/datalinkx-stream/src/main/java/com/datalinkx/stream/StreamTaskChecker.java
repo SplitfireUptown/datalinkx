@@ -1,6 +1,5 @@
 package com.datalinkx.stream;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TimerTask;
@@ -8,12 +7,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataclient.client.flink.FlinkClient;
 import com.datalinkx.dataclient.client.flink.response.FlinkJobOverview;
-import com.datalinkx.dataclient.client.flink.response.FlinkJobStatus;
 import com.datalinkx.stream.lock.DistributedLock;
 import com.datalinkx.stream.task.StreamTaskBean;
 import com.fasterxml.jackson.databind.JsonNode;

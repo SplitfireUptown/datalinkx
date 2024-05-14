@@ -21,7 +21,6 @@ import com.datalinkx.dataserver.client.xxljob.XxlLoginClient;
 import com.datalinkx.dataserver.client.xxljob.interceptor.LoginInterceptor;
 import com.datalinkx.dataserver.controller.formatter.UserGenericConverter;
 import com.google.common.base.CaseFormat;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
