@@ -21,71 +21,68 @@
       >
         <a-input
           type="text"
-          v-model="jobName"/>
+          v-decorator="['jobName', {rules: [{required: true, message: '请输入任务名称'}],initialValue: jobName}]"
+        />
       </a-form-item>
-      <a-form-item>
-        <a-row :gutter="16">
-          <a-col :span="12" >
-            <label>来源数据源</label>
-            <a-select v-model="selectedDataSource" @change="handleFromChange" placeholder="请选择来源数据源">
+      <a-row :gutter="16">
+        <a-col :span="12">
+          <a-form-item label="来源数据源">
+            <a-select @change="handleFromChange"
+                      v-decorator="['selectedDataSource', {rules: [{required: true, message: '请选择来源数据源'}],initialValue: selectedDataSource}]">
               <a-select-option v-for="table in fromDsList" :value="table.dsId" :key="table.name">
                 {{ table.name }}
               </a-select-option>
             </a-select>
-          </a-col>
-          <a-col :span="12">
-            <label>目标数据源</label>
-            <a-select v-model="selectedTargetSource" @change="handleToDsChange" placeholder="请选择目标数据源">
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="目标数据源">
+            <a-select @change="handleToDsChange"
+                      v-decorator="['selectedTargetSource', {rules: [{required: true, message: '请选择目标数据源'}],initialValue: selectedTargetSource}]">
               <a-select-option v-for="table in toDsList" :value="table.dsId" :key="table.name">
                 {{ table.name }}
               </a-select-option>
             </a-select>
-          </a-col>
-        </a-row>
-      </a-form-item>
-
-      <a-form-item>
-        <a-row :gutter="16">
-          <a-col :span="12" class="job-save-col">
-            <div class="redis-type-lable">
-              <label>来源数据源表</label>
-            </div>
-            <a-select v-model="selectedSourceTable" @change="handleFromTbChange" placeholder="请选择来源数据源表">
-              <a-select-option v-for="table in sourceTables" :value="table" :key="table" >
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row :gutter="16">
+        <a-col :span="12">
+          <a-form-item label="来源数据源表">
+            <a-select @change="handleFromTbChange" v-decorator="['selectedSourceTable', {rules: [{required: true, message: '请选择来源数据源表'}],initialValue: selectedSourceTable}]">
+              <a-select-option v-for="table in sourceTables" :value="table" :key="table">
                 {{ table }}
               </a-select-option>
             </a-select>
-          </a-col>
-          <a-col :span="12" v-show="!isRedisTo">
-            <div class="redis-type-lable">
-              <label>目标数据源表</label>
-            </div>
-            <a-select v-model="selectedTargetTable" @change="handleToTbChange" placeholder="请选择目标数据源表">
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" v-show="!isRedisTo">
+          <a-form-item label="目标数据源表">
+            <a-select @change="handleToTbChange" v-decorator="['selectedTargetTable', {rules: [{required: true, message: '请选择目标数据源表'}],initialValue: selectedTargetTable}]">
               <a-select-option v-for="table in targetTables" :value="table" :key="table">
                 {{ table }}
               </a-select-option>
             </a-select>
-          </a-col>
-          <a-col :span="12" v-show="isRedisTo" class="job-save-col">
-            <div class="redis-type-lable">
-              <label class="redis-lable">type:</label>
-              <label class="redis-lable">key:</label>
-            </div>
-            <div class="redis-type-val">
-              <a-select v-model="redisToType" @change="changeToRedisType" placeholder="请选择Type">
-                <a-select-option v-for="item in RedisTypes" :value="item.value" :key="item.value" >
+          </a-form-item>
+        </a-col>
+        <a-col :span="12" v-show="isRedisTo" class="job-save-col">
+          <div class="redis-type-val">
+            <a-form-item ref="redis_type" label="type:" :required=true>
+              <a-select v-model="redisToType" @change="changeToRedisType;validate_redis" :validateStatus="redis_type_validateStatus" :help="redis_type_help">
+                <a-select-option v-for="item in RedisTypes" :value="item.value" :key="item.value">
                   {{ item.label }}
                 </a-select-option>
               </a-select>
+            </a-form-item>
+            <a-form-item ref="redis_value" label="key:" :required=true :validateStatus="redis_value_validateStatus" :help="redis_value_help">
               <a-input
+                @blur="validate_redis"
                 type="text"
-                placeholder="请输入Value"
                 v-model="redisToValue"/>
-            </div>
-          </a-col>
-        </a-row>
-      </a-form-item>
-
+            </a-form-item>
+          </div>
+        </a-col>
+      </a-row>
       <a-form-item
         label="同步配置"
         v-show="!isRedisTo && !isStreaming"
@@ -101,7 +98,7 @@
               </a-radio-button>
             </a-radio-group>
           </a-col>
-          <a-col :span="6" v-show="!isIncrement">开启数据覆盖: <a-switch v-model="cover" @change="changeCover" /></a-col>
+          <a-col :span="6" v-show="!isIncrement">开启数据覆盖: <a-switch v-model="trans_cover" @change="changeCover" /></a-col>
           <a-col :span="6"><p v-show="isIncrement">请选择增量字段: </p></a-col>
           <a-col :span="12">
             <a-select v-show="isIncrement" v-model="incrementField" placeholder="请选择增量字段">
@@ -118,9 +115,8 @@
       >
         <a-input
           type="text"
-          v-model="schedulerConf"/>
+          v-decorator="['schedulerConf', {rules: [{required: true, message: '请输入crontab表达式', trigger: 'blur'}],initialValue: schedulerConf}]"/>
       </a-form-item>
-
       <a-form-item label="字段映射关系">
         <a-row :gutter="16">
           <a-col :span="8">
@@ -215,7 +211,11 @@ export default {
       incrementField: '',
       selectloading: false,
       redisToType: 'string',
-      redisToValue: ''
+      redisToValue: '',
+      redis_type_validateStatus: '',
+      redis_value_validateStatus: '',
+      redis_type_help: '',
+      redis_value_help: '',
     }
   },
   computed: {
@@ -228,27 +228,52 @@ export default {
     },
     isStreaming () {
       return this.jobType === 'streaming'
+    },
+    // 是否覆盖
+    trans_cover()
+    {
+      return Boolean(this.cover)
     }
   },
   methods: {
+    // 校验redis
+    validate_redis() {
+      if (!this.redisToType) {
+        this.redis_type_validateStatus = 'error'
+        this.redis_type_help = '请选择Type'
+      }else{
+        this.redis_type_validateStatus = ''
+        this.redis_type_help = ''
+      }
+      if (!this.redisToValue) {
+        this.redis_value_validateStatus = 'error'
+        this.redis_value_help = '请输入Value'
+      }else{
+        this.redis_value_validateStatus = ''
+        this.redis_value_help = ''
+      }
+    },
     handleSubmit () {
+      // 如果目标数据源是redis 则设置为全量
+      if (this.isRedisTo) {
+        // 同步redis数据源表单数据
+        this.form.setFieldsValue({['selectedTargetTable']: this.redisToType + this.redisSpitKey + this.redisToValue})
+        // 则校验redis数据
+        this.validate_redis()
+      }
       this.form.validateFields(async (err, values) => {
-        this.confirmLoading = true
         if (!err) {
           this.confirmLoading = true
-          if (this.redisToValue !== '') {
-            this.selectedTargetTable = (this.redisToType + this.redisSpitKey + this.redisToValue)
-          }
-
           const formData = {
             'job_id': this.jobId,
-            'from_ds_id': this.selectedDataSource,
-            'to_ds_id': this.selectedTargetSource,
-            'from_tb_name': this.selectedSourceTable,
-            'to_tb_name': this.selectedTargetTable,
-            'scheduler_conf': this.schedulerConf,
+            // 提交表单数据
+            'from_ds_id': this.form.getFieldValue('selectedDataSource'),
+            'to_ds_id': this.form.getFieldValue('selectedTargetSource'),
+            'from_tb_name': this.form.getFieldValue('selectedSourceTable'),
+            'to_tb_name': this.form.getFieldValue('selectedTargetTable'),
+            'job_name': this.form.getFieldValue('jobName'),
+            'scheduler_conf': this.form.getFieldValue('schedulerConf'),
             'field_mappings': this.mappings,
-            'job_name': this.jobName,
             'cover': this.cover,
             'sync_mode': {
               'mode': this.syncMode,
@@ -258,20 +283,37 @@ export default {
           console.log(this.jobId)
           if (this.type === 'edit') {
             modifyObj(formData).then(res => {
-              this.confirmLoading = false
-              this.$emit('ok')
-              this.visible = false
+              if (res.status === '0') {
+                this.$emit('ok')
+                this.confirmLoading = false
+                // 清楚表单数据
+                this.handleCancel()
+                this.$message.success('修改成功')
+              }
+              else{
+                this.confirmLoading = false
+                this.$message.error(res.errstr)
+              }
             }).catch(err => {
+              this.confirmLoading = false
               this.$message.error(err.errstr)
             })
           } else {
             addObj(formData).then(res => {
-              if (res.status !== '0') {
-                this.confirmLoading = false
+              if (res.status === '0') {
                 this.$emit('ok')
-                this.visible = false
+                this.confirmLoading = false
+                // 清楚表单数据
+                this.handleCancel()
+                this.$message.success('新增成功')
+              }
+              else{
+                this.confirmLoading = false
                 this.$message.error(res.errstr)
               }
+            }).catch(err => {
+              this.confirmLoading = false
+              this.$message.error(err.errstr)
             })
           }
           // setTimeout(() => {
@@ -349,6 +391,10 @@ export default {
     },
     handleFromChange (value) {
       this.selectedDataSource = value
+      // 切换数据源同步表单数据
+      this.form.setFieldsValue({['selectedDataSource']: value})
+      // 清空表单中来源表
+      this.form.setFieldsValue({['selectedSourceTable']: ''})
       this.selectloading = true
       fetchTables(value).then(res => {
         this.selectloading = false
@@ -357,6 +403,10 @@ export default {
     },
     handleToDsChange (value) {
       this.selectedTargetSource = value
+      // 切换目标数据源同步表单数据
+      this.form.setFieldsValue({['selectedTargetSource']: value})
+      // 清空表单中目标表
+      this.form.setFieldsValue({['selectedTargetTable']: ''})
       console.log('当前选中数据源类型', this.selectedTargetSource, this.isRedisTo)
       // 如果目标数据源是redis 则设置为全量
       if (this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 4) {
@@ -372,6 +422,8 @@ export default {
     },
     handleFromTbChange (value) {
       this.selectloading = true
+      // 切换来源表同步表单数据
+      this.form.setFieldsValue({['selectedSourceTable']: value})
       this.selectedSourceTable = value
       this.queryParam = {
         'ds_id': this.selectedDataSource,
@@ -389,11 +441,7 @@ export default {
       console.log(val)
     },
     changeCover (checked) {
-      if (checked) {
-        this.cover = 1
-      } else {
-        this.cover = 0
-      }
+      this.cover = checked
     },
     changeSyncConfig (value) {
       if (value.target.value === 'increment') {
@@ -408,6 +456,8 @@ export default {
     handleToTbChange (value) {
       this.selectloading = true
       this.selectedTargetTable = value
+      // 切换目标表同步表单数据
+      this.form.setFieldsValue({['selectedTargetTable']: value})
       this.queryParam = {
         'ds_id': this.selectedTargetSource,
         'name': value
@@ -439,6 +489,12 @@ export default {
       this.incrementField = ''
       this.schedulerConf = ''
       this.jobName = ''
+      this.syncMode = 'overwrite'
+      this.form.resetFields()
+      this.redis_value_help = ''
+      this.redis_type_help = ''
+      this.redis_value_validateStatus = ''
+      this.redis_type_validateStatus = ''
     },
     removeMapping (index) {
       this.mappings.splice(index, 1)
@@ -450,17 +506,12 @@ export default {
 <style scoped lang="less">
 .job-save-root {
   .job-save-col {
-    .redis-type-lable {
-      display: flex;
-      .redis-lable {
-        display: block;
-        width: 48%;
-      }
-    }
     .redis-type-val {
       display: flex;
-      width: 100%;
-      margin-top: 4px;
+      :nth-child(2)
+      {
+        flex-grow: 1;
+      }
     }
   }
 }

@@ -8,7 +8,7 @@
       :dataSource="tableData"
       :loading="loading"
       :pagination="pagination"
-      :rowKey="record => record.id"
+      :rowKey="record => record.job_id"
       @change="handleTableChange"
     >
     </a-table>

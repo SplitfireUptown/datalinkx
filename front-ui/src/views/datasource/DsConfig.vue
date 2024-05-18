@@ -250,19 +250,40 @@ export default {
           if (this.type === 'add') {
             console.log(values)
             addObj(values).then(res => {
-              if (res.status !== '0') {
+              if (res.status === '0') {
+                this.$emit('ok')
+                this.confirmLoading = false
+                // 清楚表单数据
+                this.handleCancel()
+                this.$message.success('新增成功')
+              }
+              else{
+                this.confirmLoading = false
                 this.$message.error(res.errstr)
               }
+            }).catch(err => {
+              this.confirmLoading = false
+              this.$message.error(err.errstr)
             })
           } else if (this.type === 'edit') {
             console.log('----', values)
-            await putObj(values)
+            await putObj(values).then(res => {
+              if (res.status === '0') {
+                this.$emit('ok')
+                this.confirmLoading = false
+                // 清楚表单数据
+                this.handleCancel()
+                this.$message.success('修改成功')
+              }
+              else{
+                this.confirmLoading = false
+                this.$message.error(res.errstr)
+              }
+            }).catch(err => {
+              this.confirmLoading = false
+              this.$message.error(err.errstr)
+            })
           }
-          setTimeout(() => {
-            this.confirmLoading = false
-            this.$emit('ok', { type: this.type })
-            this.visible = false
-          }, 1500)
         }
       })
       selectTables = []
