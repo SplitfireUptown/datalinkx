@@ -127,18 +127,21 @@ export default {
         if (!err) {
           this.confirmLoading = true
           await addObj(values).then(res => {
-            if (res.status !== '0') {
-              this.confirmLoading = false
+            if (res.status === '0') {
               this.$emit('ok')
-              this.visible = false
+              this.confirmLoading = false
+              // 清楚表单数据
+              this.handleCancel()
+              this.$message.success('新增成功')
+            }
+            else{
+              this.confirmLoading = false
               this.$message.error(res.errstr)
             }
+          }).catch(err => {
+            this.confirmLoading = false
+            this.$message.error(err.errstr)
           })
-          // setTimeout(() => {
-          //   this.confirmLoading = false
-          //   this.$emit('ok')
-          //   this.visible = false
-          // }, 1500)
         }
       })
     },
