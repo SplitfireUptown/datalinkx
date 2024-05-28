@@ -1,3 +1,8 @@
+CREATE database if NOT EXISTS `datalinkx` default character set utf8mb4 collate utf8mb4_unicode_ci;
+use `datalinkx`;
+
+SET NAMES utf8mb4;
+
 CREATE TABLE `DS` (
                       `id` int unsigned NOT NULL AUTO_INCREMENT,
                       `ds_id` char(35) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'ds_[32位uuid]',
@@ -16,7 +21,7 @@ CREATE TABLE `DS` (
                       `is_del` int DEFAULT '0',
                       PRIMARY KEY (`id`) USING BTREE,
                       KEY `ds_id` (`ds_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='数据库信息';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='数据库信息';
 
 
 CREATE TABLE `JOB` (
@@ -39,7 +44,7 @@ CREATE TABLE `JOB` (
                        `error_msg` longtext CHARACTER SET utf8 COLLATE utf8_general_ci,
                        PRIMARY KEY (`id`) USING BTREE,
                        KEY `job_id` (`job_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='流转任务配置信息';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='流转任务配置信息';
 
 CREATE TABLE `JOB_RELATION` (
                                 `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -52,7 +57,7 @@ CREATE TABLE `JOB_RELATION` (
                                 `utime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                 PRIMARY KEY (`id`) USING BTREE,
                                 KEY `job_id` (`job_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='流转任务级联配置表';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='流转任务级联配置表';
 
 
 CREATE TABLE `JOB_LOG` (
@@ -66,7 +71,7 @@ CREATE TABLE `JOB_LOG` (
                            `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '任务启动时间',
                            `status` tinyint unsigned DEFAULT NULL,
                            PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='流转任务日志';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT COMMENT='流转任务日志';
 
 CREATE TABLE `MESSAGEHUB_TOPIC` (
                                     `id` int NOT NULL AUTO_INCREMENT COMMENT '自增id',
@@ -79,7 +84,7 @@ CREATE TABLE `MESSAGEHUB_TOPIC` (
                                     `desc` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'topic描述',
                                     PRIMARY KEY (`id`),
                                     UNIQUE KEY `topic_type_key` (`topic`,`info_type`,`is_del`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='消息队列白名单';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8_unicode_ci COMMENT='消息队列白名单';
 
 INSERT INTO `MESSAGEHUB_TOPIC` (`topic`, `fields`, `info_type`, `desc`) VALUES ('JOB_PROGRESS', '', 'REDIS_STREAM', '任务状态刷新');
 
