@@ -70,7 +70,7 @@ public class SystemMonitor {
         result.setProgramRunTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(ManagementFactory.getRuntimeMXBean().getStartTime())));
         result.setPid(System.getProperty("PID"));
         result.setCpus(String.valueOf(Runtime.getRuntime().availableProcessors()));
-        result.setJavaHome(System.getProperty("java.home"));
+        result.setJavaVersion(System.getProperty("java.version"));
         result.setJvmMemorySize(new DecimalFormat("#.#").format(initTotalMemorySize * 1.0 / 1024 / 1024) + "M");
         result.setJvmMemoryUsed(new DecimalFormat("#.#").format(usedMemorySize * 1.0 / 1024 / 1024) + "M");
         result.setMachineMemorySize(totalMemorySize);

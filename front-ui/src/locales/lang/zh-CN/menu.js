@@ -12,6 +12,7 @@ export default {
   'menu.tasklistlog': '任务执行日志',
   'menu.taskrelationlist': '任务级联配置',
   'menu.taskrelationmap': '任务血缘',
+  'menu.systemMonitor': '系统监控',
 
   // 'menu.dashboard': '仪表盘',
   // 'menu.dashboard.analysis': '分析页',

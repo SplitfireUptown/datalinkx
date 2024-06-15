@@ -23,7 +23,7 @@ public class SystemMonitorVo {
     // cpu使用率
     private String cpuUsage;
     // java home
-    private String javaHome;
+    private String javaVersion;
     // jvm堆内存大小
     private String jvmMemorySize;
     // jvm使用堆内存

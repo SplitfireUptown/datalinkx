@@ -83,6 +83,12 @@ export const asyncRouterMap = [
             meta: { title: 'menu.streamingTaskList', keepAlive: false, icon: taskList }
           }
         ]
+      },
+      {
+        path: '/system/monitor',
+        name: 'systemMonitor',
+        component: () => import('@/views/system/systemMonitor.vue'),
+        meta: { title: 'menu.systemMonitor', keepAlive: true, icon: task }
       }
       // {
       //   path: '/datasource',
