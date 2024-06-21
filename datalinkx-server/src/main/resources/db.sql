@@ -84,12 +84,12 @@ CREATE TABLE `MESSAGEHUB_TOPIC` (
                                     `desc` text COLLATE utf8_unicode_ci NOT NULL COMMENT 'topic描述',
                                     PRIMARY KEY (`id`),
                                     UNIQUE KEY `topic_type_key` (`topic`,`info_type`,`is_del`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8_unicode_ci COMMENT='消息队列白名单';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='消息队列白名单';
 
 INSERT INTO `MESSAGEHUB_TOPIC` (`topic`, `fields`, `info_type`, `desc`) VALUES ('JOB_PROGRESS', '', 'REDIS_STREAM', '任务状态刷新');
 
 
-alter table JOB ADD COLUMN  `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '任务名称';;
+alter table JOB ADD COLUMN  `name` varchar(64) DEFAULT NULL COMMENT '任务名称';;
 
 alter table JOB ADD COLUMN `cover` tinyint NOT NULL DEFAULT '0' COMMENT '是否开启覆盖';
 
