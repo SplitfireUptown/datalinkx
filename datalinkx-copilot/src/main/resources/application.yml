@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: datalinkx-copilot
+  elasticsearch:
+    uris:
+llm:
+  embedding: "shaw/dmeta-embedding-zh"
+  chat: "qwen:7b"
+
+client:
+  ollama:
+    url: http://localhost:11434

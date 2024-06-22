@@ -16,9 +16,6 @@ import retrofit2.Retrofit;
 
 /**
  * 消除默认的返回值Call<T> 使得 可以使用正常的接口返回值 将兼容异步调用的的返回值方式 直接转换成同步调用的结果返回
- *
- * @author jackerxff
- * @date 2020-01-10
  */
 public final class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 
