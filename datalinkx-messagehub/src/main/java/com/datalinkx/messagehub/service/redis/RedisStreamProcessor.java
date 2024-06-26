@@ -22,6 +22,7 @@ import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.yaml.snakeyaml.tokens.ScalarToken;
 
 
 @Slf4j
@@ -90,12 +91,13 @@ public class RedisStreamProcessor extends MessageHubServiceImpl {
                         continue;
                     }
 
-                    ObjectRecord<String, String> record = messageList.get(0);
-                    lastOffset = record.getId().getValue();
-                    invokeMethod.invoke(consumerBean, record.getValue());
+                    for (ObjectRecord<String, String> record : messageList) {
+                        lastOffset = record.getId().getValue();
+                        invokeMethod.invoke(consumerBean, record.getValue());
 
-                    stringRedisTemplate.opsForStream().acknowledge(group, record);
-                } catch (Exception e) {
+                        stringRedisTemplate.opsForStream().acknowledge(group, record);
+                    }
+                } catch (Throwable e) {
                     log.error("messagehub stream consumer {} consume error, last offset: {}", consumerName, lastOffset);
                     log.error(e.getMessage(), e);
                     try {
