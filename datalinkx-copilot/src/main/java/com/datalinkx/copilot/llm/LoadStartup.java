@@ -37,7 +37,7 @@ public class LoadStartup implements InitializingBean {
 
     public void startup(){
         log.info("init vector collection");
-        String collectionName= vectorStorage.getCollectionName();
+        String collectionName = vectorStorage.getCollectionName();
         //向量维度固定768，根据选择的向量Embedding模型的维度确定最终维度
         // 这里因为选择shaw/dmeta-embedding-zh的Embedding模型，维度是768，所以固定为该值
         vectorStorage.initCollection(collectionName,768);
@@ -46,17 +46,17 @@ public class LoadStartup implements InitializingBean {
 
     public List<ChunkResult> segmentCutting(String docId){
         String path= "data/" + docId + ".txt";
-        log.info("start chunk---> docId:{},path:{}",docId,path);
+        log.info("start chunk---> docId:{},path:{}", docId, path);
         ClassPathResource classPathResource = new ClassPathResource(path);
         try {
             String txt = IoUtil.read(classPathResource.getInputStream(), StandardCharsets.UTF_8);
             //按固定字数分割,256
             String[] lines = StrUtil.split(txt,256);
             log.info("chunk size:{}", ArrayUtil.length(lines));
-            List<ChunkResult> results=new ArrayList<>();
-            AtomicInteger atomicInteger=new AtomicInteger(0);
-            for (String line:lines){
-                ChunkResult chunkResult=new ChunkResult();
+            List<ChunkResult> results = new ArrayList<>();
+            AtomicInteger atomicInteger = new AtomicInteger(0);
+            for (String line:lines) {
+                ChunkResult chunkResult = new ChunkResult();
                 chunkResult.setDocId(docId);
                 chunkResult.setContent(line);
                 chunkResult.setChunkId(atomicInteger.incrementAndGet());
@@ -74,17 +74,21 @@ public class LoadStartup implements InitializingBean {
         // 初始化向量
         this.startup();
         // 加载本地知识库
-        List<ChunkResult> chunkResults= this.segmentCutting("001");
+        List<ChunkResult> chunkResults = this.segmentCutting("001");
         // embedding
         EmbeddingReq embeddingReq = EmbeddingReq.builder().model(embeddingModel).build();
         for (ChunkResult chunkResult : chunkResults) {
-            embeddingReq.setPrompt(chunkResult.getContent());
-            EmbeddingResult embeddingResult = ollamaClient.embedding(embeddingReq);
-            // store vector
-            String collection= vectorStorage.getCollectionName();
-            embeddingResult.setContent(chunkResult.getContent());
-            vectorStorage.store(collection, embeddingResult);
+            try {
+                embeddingReq.setPrompt(chunkResult.getContent());
+                EmbeddingResult embeddingResult = ollamaClient.embedding(embeddingReq);
+                // store vector
+                String collection = vectorStorage.getCollectionName();
+                embeddingResult.setContent(chunkResult.getContent());
+                vectorStorage.store(collection, embeddingResult);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
         }
-        log.info("local knowledge lib load finish");
     }
 }

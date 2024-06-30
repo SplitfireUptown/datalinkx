@@ -20,6 +20,9 @@ spring:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  elasticsearch:
+    reset:
+      uris:
   redis:
     database: 0       # Redis数据库索引（默认为0）,如果设置为1，那么存入的key-value都存放在select 1中
     host:
@@ -60,6 +63,8 @@ client:
     call_timeout_ms: 600000
     read_timeout_ms: 600000
     logging: true
+  ollama:
+    url: http://localhost:11434
 
 topic:
   daemon: true
@@ -84,3 +89,7 @@ retrofit:
     global-log-level: info
     # 全局日志打印策略
     global-log-strategy: body
+
+llm:
+  embedding: "shaw/dmeta-embedding-zh"
+  chat: "qwen:7b"

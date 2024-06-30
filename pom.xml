@@ -22,6 +22,7 @@
         <module>datalinkx-messagehub</module>
         <module>datalinkx-sse</module>
         <module>datalinkx-connector</module>
+        <module>datalinkx-copilot</module>
     </modules>
 
 

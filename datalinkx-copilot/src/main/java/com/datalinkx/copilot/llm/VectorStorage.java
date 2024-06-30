@@ -9,26 +9,34 @@ import java.util.Objects;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
+import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.copilot.bean.ElasticVectorData;
 import com.datalinkx.copilot.client.response.EmbeddingResult;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.IndicesClient;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.lucene.search.function.ScriptScoreFunction;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.index.query.functionscore.ScriptScoreQueryBuilder;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
-import org.springframework.data.elasticsearch.core.IndexOperations;
-import org.springframework.data.elasticsearch.core.IndexedObjectInformation;
-import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.document.Document;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.IndexQuery;
-import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -36,7 +44,7 @@ import org.springframework.stereotype.Component;
 public class VectorStorage {
 
     @Autowired
-    ElasticsearchRestTemplate elasticsearchRestTemplate;
+    RestHighLevelClient esClient;
 
     public String getCollectionName(){
         //演示效果使用，固定前缀+日期
@@ -48,53 +56,64 @@ public class VectorStorage {
      * @param collectionName 名称
      * @param dim 维度
      */
-    public boolean initCollection(String collectionName,int dim){
+    @SneakyThrows
+    public void initCollection(String collectionName, int dim) {
         // 查看向量索引是否存在，此方法为固定默认索引字段
-        IndexOperations indexOperations = elasticsearchRestTemplate.indexOps(IndexCoordinates.of(collectionName));
-        if (!indexOperations.exists()) {
-            // 索引不存在，直接创建
-            log.info("index not exists,create");
-            //创建es的结构，简化处理
-            Document document = Document.from(this.elasticMapping(dim));
-            // 创建
-            indexOperations.create(new HashMap<>(), document);
-            return true;
+        IndicesClient indices = esClient.indices();
+        GetIndexRequest getIndexRequest = new GetIndexRequest(collectionName);
+        if (!indices.exists(getIndexRequest, RequestOptions.DEFAULT)) {
+            CreateIndexRequest request = new CreateIndexRequest(collectionName);
+            request.mapping(this.elasticMapping(dim));
+            this.esClient.indices().create(request, RequestOptions.DEFAULT);
         }
-        return true;
     }
 
-    public void store(String collectionName, EmbeddingResult embeddingResult){
-
-        List<IndexQuery> results = new ArrayList<>();
+    @SneakyThrows
+    public void store(String collectionName, EmbeddingResult embeddingResult) {
         ElasticVectorData ele = new ElasticVectorData();
         ele.setVector(embeddingResult.getEmbedding());
         ele.setContent(embeddingResult.getContent());
-        results.add(new IndexQueryBuilder().withObject(ele).build());
-        // 构建数据包
-        List<IndexedObjectInformation> bulkedResult = elasticsearchRestTemplate.bulkIndex(results, IndexCoordinates.of(collectionName));
-        int size = CollectionUtil.size(bulkedResult);
-        log.info("保存向量成功-size:{}", size);
+
+        IndexRequest indexRequest = new IndexRequest(collectionName)
+                .source(JsonUtils.toJson(ele), XContentType.JSON);
+
+        BulkRequest bulkRequest = new BulkRequest();
+        bulkRequest.add(indexRequest);
+
+        BulkResponse bulkResponse = esClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+        if (bulkResponse.hasFailures()) {
+            log.error("vector data save error: {}", bulkResponse.buildFailureMessage());
+            throw new RuntimeException("vector data save error" + bulkResponse.buildFailureMessage());
+        }
     }
 
-    public String retrieval(String collectionName,double[] vector){
-        // Build the script,查询向量
+    @SneakyThrows
+    public String retrieval(String collectionName, double[] vector) {
         Map<String, Object> params = new HashMap<>();
         params.put("query_vector", vector);
+
+        int page = 0;
+        int size = 5;
+        // 最低得分
+        float minScore = 1.0f;
+
+        // 构建查询向量
         // 计算cos值+1，避免出现负数的情况，得到结果后，实际score值在减1再计算
         Script script = new Script(ScriptType.INLINE, Script.DEFAULT_SCRIPT_LANG, "cosineSimilarity(params.query_vector, 'vector')+1", params);
         ScriptScoreQueryBuilder scriptScoreQueryBuilder = new ScriptScoreQueryBuilder(QueryBuilders.boolQuery(), script);
-        // 构建请求
-        NativeSearchQuery nativeSearchQuery = new NativeSearchQueryBuilder()
-                .withQuery(scriptScoreQueryBuilder)
-                .withPageable(Pageable.ofSize(3)).build();
-        SearchHits<ElasticVectorData> dataSearchHits = this.elasticsearchRestTemplate.search(nativeSearchQuery, ElasticVectorData.class, IndexCoordinates.of(collectionName));
-        //log.info("检索成功，size:{}", dataSearchHits.getTotalHits());
-        List<SearchHit<ElasticVectorData>> data = dataSearchHits.getSearchHits();
+
+        SearchRequest searchRequest = new SearchRequest(collectionName);
+        searchRequest.source(new SearchSourceBuilder().query(scriptScoreQueryBuilder).from(page).size(size).minScore(minScore));
+
+        SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits searchHits = searchResponse.getHits();
         List<String> results = new LinkedList<>();
-        for (SearchHit<ElasticVectorData> ele : data) {
-            results.add(ele.getContent().getContent());
+        for (SearchHit hit : searchHits) {
+            ElasticVectorData ele = JsonUtils.toObject(hit.getSourceAsString(), ElasticVectorData.class);
+            results.add(ele.getContent());
         }
-        return CollectionUtil.join(results,"");
+
+        return CollectionUtil.join(results, "");
     }
 
     private Map<String, Object> elasticMapping(int dims) {
