@@ -92,4 +92,5 @@ retrofit:
 
 llm:
   embedding: "shaw/dmeta-embedding-zh"
-  chat: "qwen:7b"
+  model: "qwen:7b"
+  vector: "elasticsearch"

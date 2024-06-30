@@ -1,5 +1,6 @@
 package com.datalinkx.dataserver.service.impl;
 
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
 import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
 
@@ -17,6 +18,7 @@ import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
+import com.datalinkx.dataserver.client.xxljob.JobClientApi;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
@@ -46,6 +48,9 @@ public class StreamJobServiceImpl implements StreamJobService {
 
     @Autowired
     DtsJobService dtsJobService;
+
+    @Autowired
+    JobClientApi jobClientApi;
 
     @Override
     public String createStreamJob(JobForm.JobCreateForm form) {
@@ -131,7 +136,8 @@ public class StreamJobServiceImpl implements StreamJobService {
 
     @Override
     public void stop(String jobId) {
-
+        jobRepository.updateJobStatus(jobId, JOB_STATUS_STOP);
+        jobClientApi.stop(jobId);
     }
 
     @Transactional(rollbackFor = Exception.class)

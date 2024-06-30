@@ -8,7 +8,7 @@ import com.datalinkx.copilot.client.request.EmbeddingReq;
 import com.datalinkx.copilot.client.response.ChatResult;
 import com.datalinkx.copilot.client.response.EmbeddingResult;
 import com.datalinkx.copilot.llm.LLMUtils;
-import com.datalinkx.copilot.llm.VectorStorage;
+import com.datalinkx.copilot.vector.ElasticSearchVectorStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,11 +20,11 @@ public class ChatServiceImpl implements ChatService {
     OllamaClient ollamaClient;
 
     @Autowired
-    VectorStorage vectorStorage;
+    ElasticSearchVectorStorage elasticSearchStorage;
 
     @Value("${llm.embedding}")
     String embeddingModel;
-    @Value("${llm.chat}")
+    @Value("${llm.model}")
     String chatModel;
 
     @Override
@@ -39,8 +39,8 @@ public class ChatServiceImpl implements ChatService {
         double[] vector = result.getEmbedding();
 
         // 向量召回
-        String collection = vectorStorage.getCollectionName();
-        String vectorData = vectorStorage.retrieval(collection, vector);
+        String collection = elasticSearchStorage.getCollectionName();
+        String vectorData = elasticSearchStorage.retrieval(collection, vector);
         // 构建Prompt
         String prompt = LLMUtils.buildPrompt(question, vectorData);
         ChatReq chatReq = ChatReq.builder()

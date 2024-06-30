@@ -1,6 +1,5 @@
-package com.datalinkx.copilot.llm;
+package com.datalinkx.copilot.vector;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,12 +23,8 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.common.lucene.search.function.ScriptScoreFunction;
-import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 import org.elasticsearch.index.query.functionscore.ScriptScoreQueryBuilder;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
@@ -41,15 +36,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class VectorStorage {
+public class ElasticSearchVectorStorage extends VectorStorageImpl {
 
     @Autowired
     RestHighLevelClient esClient;
 
-    public String getCollectionName(){
-        //演示效果使用，固定前缀+日期
-        return "datalinkx-local-knowledge-lib";
-    }
 
     /**
      * 初始化向量数据库index
@@ -57,6 +48,7 @@ public class VectorStorage {
      * @param dim 维度
      */
     @SneakyThrows
+    @Override
     public void initCollection(String collectionName, int dim) {
         // 查看向量索引是否存在，此方法为固定默认索引字段
         IndicesClient indices = esClient.indices();
@@ -69,6 +61,7 @@ public class VectorStorage {
     }
 
     @SneakyThrows
+    @Override
     public void store(String collectionName, EmbeddingResult embeddingResult) {
         ElasticVectorData ele = new ElasticVectorData();
         ele.setVector(embeddingResult.getEmbedding());
@@ -88,6 +81,7 @@ public class VectorStorage {
     }
 
     @SneakyThrows
+    @Override
     public String retrieval(String collectionName, double[] vector) {
         Map<String, Object> params = new HashMap<>();
         params.put("query_vector", vector);

@@ -52,4 +52,8 @@ public final class MetaConstants {
     public static class CommonConstant {
         public static final String TRACE_ID = "trace_id";
     }
+
+    public static class CopilotConstant {
+        public static final String VECTOR_ES_ENGINE = "elasticsearch";
+    }
 }

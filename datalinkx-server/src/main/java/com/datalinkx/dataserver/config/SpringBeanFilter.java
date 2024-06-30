@@ -27,7 +27,7 @@ public class SpringBeanFilter implements TypeFilter {
     @Override
     public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) {
         // 如果配置了大模型配置，则加载
-        if (metadataReader.getClassMetadata().getClassName().startsWith(COPILOT_PACKAGE) && ObjectUtils.isEmpty(environment.getProperty("llm.chat"))) {
+        if (metadataReader.getClassMetadata().getClassName().startsWith(COPILOT_PACKAGE) && ObjectUtils.isEmpty(environment.getProperty("llm.model"))) {
             return true;
         }
         return false;
