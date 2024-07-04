@@ -13,6 +13,7 @@ import com.datalinkx.copilot.bean.ElasticVectorData;
 import com.datalinkx.copilot.client.response.EmbeddingResult;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -26,6 +27,7 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.ScriptScoreQueryBuilder;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
@@ -47,17 +49,22 @@ public class ElasticSearchVectorStorage extends VectorStorageImpl {
      * @param collectionName 名称
      * @param dim 维度
      */
-    @SneakyThrows
     @Override
     public void initCollection(String collectionName, int dim) {
-        // 查看向量索引是否存在，此方法为固定默认索引字段
-        IndicesClient indices = esClient.indices();
-        GetIndexRequest getIndexRequest = new GetIndexRequest(collectionName);
-        if (!indices.exists(getIndexRequest, RequestOptions.DEFAULT)) {
-            CreateIndexRequest request = new CreateIndexRequest(collectionName);
-            request.mapping(this.elasticMapping(dim));
-            this.esClient.indices().create(request, RequestOptions.DEFAULT);
+        try {
+            // 查看向量索引是否存在，此方法为固定默认索引字段
+            IndicesClient indices = esClient.indices();
+            GetIndexRequest getIndexRequest = new GetIndexRequest(collectionName);
+            if (!indices.exists(getIndexRequest, RequestOptions.DEFAULT)) {
+                CreateIndexRequest request = new CreateIndexRequest(collectionName);
+                request.mapping(this.elasticMapping(dim));
+                this.esClient.indices().create(request, RequestOptions.DEFAULT);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
+
     }
 
     @SneakyThrows
@@ -77,6 +84,17 @@ public class ElasticSearchVectorStorage extends VectorStorageImpl {
         if (bulkResponse.hasFailures()) {
             log.error("vector data save error: {}", bulkResponse.buildFailureMessage());
             throw new RuntimeException("vector data save error" + bulkResponse.buildFailureMessage());
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public void truncate(String collectionName) {
+        IndicesClient indices = esClient.indices();
+        GetIndexRequest getIndexRequest = new GetIndexRequest(collectionName);
+        if (indices.exists(getIndexRequest, RequestOptions.DEFAULT)) {
+            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(collectionName);
+            esClient.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
         }
     }
 

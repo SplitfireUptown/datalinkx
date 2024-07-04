@@ -42,6 +42,7 @@ public final class MetaConstants {
         public static final int JOB_STATUS_STOP = 4;
 
         public static final String SSE_JOB_STATUS = "jobList";
+        public static final String SSE_COPILOT = "datalinkx_copilot";
     }
 
     public static class JobSyncMode {

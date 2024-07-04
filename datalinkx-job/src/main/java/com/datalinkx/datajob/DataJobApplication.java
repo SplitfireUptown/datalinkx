@@ -1,4 +1,4 @@
-// CHECKSTYLE:OFF
+
 package com.datalinkx.datajob;
 
 import org.springframework.boot.SpringApplication;

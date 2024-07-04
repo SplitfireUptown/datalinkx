@@ -10,6 +10,8 @@ public interface VectorStorage {
     void initCollection(String collectionName, int dim);
     // 存储向量库
     void store(String collectionName, EmbeddingResult embeddingResult);
+    // 清空
+    void truncate(String collectionName);
     // 检索向量库
     String retrieval(String collectionName, double[] vector);
 }

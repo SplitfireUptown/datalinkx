@@ -20,6 +20,8 @@ import './core/lazy_use' // use lazy load components
 import './permission' // permission control
 import './utils/filter' // global filter
 import './global.less' // global style
+// 调用自定义指令
+
 
 Vue.config.productionTip = false
 

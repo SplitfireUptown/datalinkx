@@ -1,4 +1,3 @@
-// CHECKSTYLE:OFF
 package com.datalinkx.dataserver;
 
 import com.datalinkx.dataserver.config.SpringBeanFilter;

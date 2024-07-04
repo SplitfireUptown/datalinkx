@@ -1,4 +1,4 @@
-// CHECKSTYLE:OFF
+
 package com.datalinkx.datajob.action;
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_ERROR;
