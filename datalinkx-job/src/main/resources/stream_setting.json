@@ -1,0 +1,9 @@
+{
+  "restore": {
+    "isRestore": true,
+    "isStream": true
+  },
+  "speed": {
+    "channel": 1
+  }
+}

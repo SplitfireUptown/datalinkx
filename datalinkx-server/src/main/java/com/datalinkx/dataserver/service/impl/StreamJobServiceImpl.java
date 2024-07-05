@@ -5,15 +5,20 @@ import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
+import com.datalinkx.dataclient.client.flink.FlinkClient;
+import com.datalinkx.dataclient.client.flink.request.FlinkJobStopReq;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.JobVo;
@@ -25,7 +30,9 @@ import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.dataserver.service.StreamJobService;
 import com.datalinkx.driver.model.DataTransJobDetail;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -51,6 +58,15 @@ public class StreamJobServiceImpl implements StreamJobService {
 
     @Autowired
     JobClientApi jobClientApi;
+
+    @Autowired
+    FlinkClient flinkClient;
+
+    @Autowired
+    LinkedBlockingQueue<String> streamTaskQueue;
+
+    @Value("${data-transfer.checkpoint-path:file:///tmp}")
+    String checkpointPath;
 
     @Override
     public String createStreamJob(JobForm.JobCreateForm form) {
@@ -90,6 +106,10 @@ public class StreamJobServiceImpl implements StreamJobService {
 
     @Override
     public void startStreamJob(String jobId) {
+        JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
+        if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == jobBean.getStatus()) {
+            throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务运行中");
+        }
         jobRepository.updateJobStatus(jobId, MetaConstants.JobStatus.JOB_STATUS_SYNCING);
     }
 
@@ -134,10 +154,26 @@ public class StreamJobServiceImpl implements StreamJobService {
         datalinkXJobClient.dataTransExec(JsonUtils.toJson(jobExecInfo));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void stop(String jobId) {
-        jobRepository.updateJobStatus(jobId, JOB_STATUS_STOP);
-        jobClientApi.stop(jobId);
+        JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
+        if (JOB_STATUS_STOP == jobBean.getStatus()) {
+            throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务已暂停");
+        }
+
+        // 记录checkpoint
+        if (!ObjectUtils.isEmpty(jobBean.getTaskId())) {
+            FlinkJobStopReq flinkJobStopReq = new FlinkJobStopReq();
+            flinkJobStopReq.setDrain(true);
+            String checkpoint = String.format("%s/%s", checkpointPath, jobId);
+            flinkJobStopReq.setTargetDirectory(checkpoint);
+            flinkClient.jobStop(jobBean.getTaskId(), flinkJobStopReq);
+            jobBean.setCheckpoint(checkpoint);
+        }
+
+        jobBean.setStatus(JOB_STATUS_STOP);
+        jobRepository.save(jobBean);
     }
 
     @Transactional(rollbackFor = Exception.class)

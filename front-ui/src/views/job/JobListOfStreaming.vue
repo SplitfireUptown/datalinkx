@@ -41,12 +41,8 @@ const StatusType = [
     value: 3
   },
   {
-    label: '排队中',
-    value: 4
-  },
-  {
     label: '流转停止',
-    value: 5
+    value: 4
   }
 ]
 export default {

@@ -1,7 +1,11 @@
 package com.datalinkx.dataclient.client.flink;
 
+import com.datalinkx.dataclient.client.flink.request.FlinkJobStopReq;
 import com.fasterxml.jackson.databind.JsonNode;
+import retrofit2.http.Body;
+import retrofit2.http.Field;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface FlinkClient {
@@ -24,6 +28,6 @@ public interface FlinkClient {
     @GET("/jobs/{jobId}/checkpoints")
     JsonNode jobCheckpoint(@Path("jobId") String jobId);
 
-    @GET("/jobs/{jobId}/stop")
-    JsonNode jobStop(@Path("jobId") String jobId, @Path("checkpointId") String checkpointId);
+    @POST("/jobs/{jobId}/stop")
+    JsonNode jobStop(@Path("jobId") String jobId, @Body FlinkJobStopReq flinkJobStopReq);
 }

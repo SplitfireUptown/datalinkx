@@ -42,15 +42,8 @@ public class StreamExecutorJobHandler extends ExecutorJobHandler {
     }
 
     @SneakyThrows
-    public String generateJobSetting() {
-        return "{\n" +
-                "            \"restore\": {\n" +
-                "                \"isRestore\": true,\n" +
-                "                \"isStream\": true\n" +
-                "            },\n" +
-                "            \"speed\": {\n" +
-                "                \"channel\": 1\n" +
-                "            }\n" +
-                "        }";
+    @Override
+    public String generateJobSetting(String jobSettingPath) {
+        return super.generateJobSetting("classpath:stream_setting.json");
     }
 }

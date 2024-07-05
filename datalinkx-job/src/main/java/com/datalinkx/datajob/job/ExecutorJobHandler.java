@@ -47,7 +47,7 @@ public class ExecutorJobHandler {
 		StringBuffer errorRet = new StringBuffer();
 		StringBuffer successRet = new StringBuffer();
 
-		String jobSettings = this.generateJobSetting();
+		String jobSettings = this.generateJobSetting("classpath:job_setting.json");
 		String jobJsonFile = this.generateJobJsonFile(jobId, reader, writer, jobSettings);
 
 		try {
@@ -138,8 +138,8 @@ public class ExecutorJobHandler {
 	}*/
 
     @SneakyThrows
-	public String generateJobSetting() {
-        Resource resource = new DefaultResourceLoader().getResource("classpath:job_setting.json");
+	public String generateJobSetting(String jobSettingPath) {
+        Resource resource = new DefaultResourceLoader().getResource(jobSettingPath);
 
         log.info(resource.toString());
 

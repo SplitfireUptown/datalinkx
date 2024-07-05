@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -71,6 +72,8 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
         }};
         String taskId = streamExecutorJobHandler.execute(unit.getJobId(), unit.getReaderDsInfo(), unit.getWriterDsInfo(), otherSetting);
         unit.setTaskId(taskId);
+        // 更新task
+        datalinkXServerClient.updateJobTaskRel(unit.getJobId(), taskId);
     }
 
     @Override
@@ -96,6 +99,10 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
         if ("canceled".equalsIgnoreCase(state)) {
             log.error("data-transfer task canceled.");
             throw new DatalinkXJobException("data-transfer task canceled.");
+        }
+
+        if ("finished".equalsIgnoreCase(state)) {
+            return true;
         }
         return false;
     }

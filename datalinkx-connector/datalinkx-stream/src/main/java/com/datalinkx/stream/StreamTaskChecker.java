@@ -58,7 +58,7 @@ public class StreamTaskChecker extends TimerTask {
         for (StreamTaskBean streamTaskBean : streamTaskBeans) {
             // 如果任务是同步中，检查flink任务是否存在
             if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == streamTaskBean.getStatus()) {
-                String taskId = streamTaskBean.getTaskId();
+                String jobId = streamTaskBean.getJobId();
                 try {
                     JsonNode jsonNode = flinkClient.jobOverview();
                     Set<String> runningJobIds = JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
@@ -66,7 +66,7 @@ public class StreamTaskChecker extends TimerTask {
                             .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
                             .map(FlinkJobOverview::getName)
                             .collect(Collectors.toSet());
-                    if (!runningJobIds.contains(taskId) && !streamTaskQueue.contains(streamTaskBean.getJobId())) {
+                    if (!runningJobIds.contains(jobId) && !streamTaskQueue.contains(streamTaskBean.getJobId())) {
                         streamTaskQueue.add(streamTaskBean.getJobId());
                     }
                 } catch (Throwable t) {

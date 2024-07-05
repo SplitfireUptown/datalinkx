@@ -49,6 +49,8 @@ data-transfer:
   fetch-size: 1000
   # 读fetch-size行数据的查询超时时间
   query-time-out: 10000
+  # 流式checkpoint地址
+  checkpoint-path: file:///tmp
 
 client:
   datajob:
