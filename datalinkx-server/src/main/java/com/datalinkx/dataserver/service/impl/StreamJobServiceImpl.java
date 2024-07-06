@@ -161,6 +161,8 @@ public class StreamJobServiceImpl implements StreamJobService {
                 if (!ObjectUtils.isEmpty(files)) {
                     jobExecInfo.getSyncUnit().setCheckpoint(files[0].getPath());
                 }
+            } else {
+                jobExecInfo.getSyncUnit().setCheckpoint("");
             }
         }
         datalinkXJobClient.dataTransExec(JsonUtils.toJson(jobExecInfo));
