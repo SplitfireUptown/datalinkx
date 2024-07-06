@@ -4,6 +4,7 @@ import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_
 import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,6 +152,17 @@ public class StreamJobServiceImpl implements StreamJobService {
     @Override
     public void streamJobExec(String jobId) {
         DataTransJobDetail jobExecInfo = dtsJobService.getStreamJobExecInfo(jobId);
+        if (!ObjectUtils.isEmpty(jobExecInfo.getSyncUnit().getCheckpoint())) {
+            String checkpoint = jobExecInfo.getSyncUnit().getCheckpoint().replace("file://", "");
+            // 如果之前记录的checkpoint目录存在，则删除
+            File directory = new File(checkpoint);
+            if (directory.exists()) {
+                File[] files = directory.listFiles();
+                if (!ObjectUtils.isEmpty(files)) {
+                    jobExecInfo.getSyncUnit().setCheckpoint(files[0].getPath());
+                }
+            }
+        }
         datalinkXJobClient.dataTransExec(JsonUtils.toJson(jobExecInfo));
     }
 
@@ -167,6 +179,18 @@ public class StreamJobServiceImpl implements StreamJobService {
             FlinkJobStopReq flinkJobStopReq = new FlinkJobStopReq();
             flinkJobStopReq.setDrain(true);
             String checkpoint = String.format("%s/%s", checkpointPath, jobId);
+
+            // 如果之前记录的checkpoint目录存在，则删除
+            File directory = new File(checkpoint);
+            if (!directory.exists()) {
+                File[] files = directory.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        file.delete();
+                    }
+                }
+            }
+
             flinkJobStopReq.setTargetDirectory(checkpoint);
             flinkClient.jobStop(jobBean.getTaskId(), flinkJobStopReq);
             jobBean.setCheckpoint(checkpoint);

@@ -35,7 +35,7 @@ public class StreamExecutorJobHandler extends ExecutorJobHandler {
 
         if (!ObjectUtils.isEmpty(otherSetting.get("savePointPath"))) {
             executeCmd += " -confProp \"{\"flink.checkpoint.interval\":60000}\" ";
-            executeCmd = executeCmd + " -s savePointPath " + otherSetting.get("savePointPath");
+            executeCmd = executeCmd + " -s " + otherSetting.get("savePointPath");
         }
 
         return executeCmd;

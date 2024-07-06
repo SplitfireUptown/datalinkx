@@ -1,7 +1,8 @@
 {
   "restore": {
     "isRestore": true,
-    "isStream": true
+    "isStream": true,
+    "maxRowNumForCheckpoint": 5
   },
   "speed": {
     "channel": 1

@@ -33,7 +33,7 @@ const StatusType = [
     value: 1
   },
   {
-    label: '流转完成',
+    label: '流转停止',
     value: 2
   },
   {
@@ -67,8 +67,7 @@ export default {
         {
           title: '目标表',
           // width: '10%',
-          dataIndex: 'to_tb_name',
-          sorter: true
+          dataIndex: 'to_tb_name'
         },
         {
           title: '任务状态',

@@ -125,6 +125,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .builder()
                 .reader(reader)
                 .writer(writer)
+                .checkpoint(jobBean.getCheckpoint())
                 .build();
         return DataTransJobDetail.builder().jobId(jobId).syncUnit(syncUnit).build();
     }
