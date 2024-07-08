@@ -28,7 +28,6 @@ import com.dtstack.flinkx.latch.MetricLatch;
 import com.dtstack.flinkx.log.DtLogger;
 import com.dtstack.flinkx.metrics.AccumulatorCollector;
 import com.dtstack.flinkx.metrics.BaseMetric;
-import com.dtstack.flinkx.metrics.RateCounter;
 import com.dtstack.flinkx.restore.FormatState;
 import com.dtstack.flinkx.util.ExceptionUtil;
 import com.dtstack.flinkx.util.GsonUtil;
@@ -37,7 +36,6 @@ import com.dtstack.flinkx.writer.DirtyDataManager;
 import com.dtstack.flinkx.writer.ErrorLimiter;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
 import org.apache.flink.api.common.accumulators.LongCounter;
 import org.apache.flink.api.common.io.CleanupWhenUnsuccessful;
 import org.apache.flink.configuration.Configuration;
@@ -161,9 +159,6 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
     private long startTime;
 
     protected boolean initAccumulatorAndDirty = true;
-
-    protected RateCounter rateCounter;
-    protected final static String rateCounterName = "Writer";
 
     public String getDirtyPath() {
         return dirtyPath;
@@ -319,8 +314,6 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
         startTime = System.currentTimeMillis();
 
         long packageLimit = batchInterval > 1 ? batchInterval : 1000;
-        rateCounter = new RateCounter(rateCounterName, packageLimit, outputMetric, context);
-        rateCounter.reset();
     }
 
     private void openErrorLimiter(){
@@ -503,13 +496,6 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
         updateDuration();
         if(bytesWriteCounter!=null){
             bytesWriteCounter.add(bytesLen);
-        }
-
-        if (rateCounter != null) {
-            rateCounter.record(1, bytesLen, writeTs);
-            if (writeTs > 0) {
-                rateCounter.report();
-            }
         }
     }
 

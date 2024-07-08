@@ -27,7 +27,6 @@ import com.dtstack.flinkx.log.DtLogger;
 import com.dtstack.flinkx.metrics.AccumulatorCollector;
 import com.dtstack.flinkx.metrics.BaseMetric;
 import com.dtstack.flinkx.metrics.CustomPrometheusReporter;
-import com.dtstack.flinkx.metrics.RateCounter;
 import com.dtstack.flinkx.reader.ByteRateLimiter;
 import com.dtstack.flinkx.restore.FormatState;
 import com.dtstack.flinkx.util.CustomLoggerUtils;
@@ -42,11 +41,9 @@ import org.apache.flink.core.io.InputSplitAssigner;
 import org.apache.flink.types.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -103,9 +100,7 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
 
     protected long numReadeForTest;
 
-    protected RateCounter rateCounter;
     protected long rateCounterLimit = 1000;
-    protected final static String rateCounterName = "Reader";
 
     /**
      * 有子类实现，打开数据连接
@@ -268,9 +263,6 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
         inputMetric.addMetric(Metrics.NUM_READS, numReadCounter, true);
         inputMetric.addMetric(Metrics.READ_BYTES, bytesReadCounter, true);
         inputMetric.addMetric(Metrics.READ_DURATION, durationCounter);
-
-        rateCounter = new RateCounter(rateCounterName, this.rateCounterLimit, inputMetric, getRuntimeContext());
-        rateCounter.reset();
     }
 
     private void initRestoreInfo(){
@@ -304,10 +296,6 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
             long bytesLen = internalRow.toString().getBytes().length;
             if(bytesReadCounter!=null){
                 bytesReadCounter.add(bytesLen);
-            }
-            if (rateCounter != null) {
-                rateCounter.record(1, bytesLen, System.currentTimeMillis() - startTs);
-                rateCounter.report();
             }
         }
 
