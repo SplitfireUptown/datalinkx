@@ -118,12 +118,6 @@ export default {
       confirmLoading: false,
       jobName: '',
       onlyRead: true,
-      dataSources: [
-        { id: 1, name: '数据源1' },
-        { id: 2, name: '数据源2' },
-        { id: 3, name: '数据源3' }
-        // 其他数据源选项
-      ],
       visible: false,
       type: '',
       fromDsList: [],
@@ -209,12 +203,12 @@ export default {
               name: a.name,
               type: a.type
             })
-            this.toDsList.push({
-              dsId: a.dsId,
-              name: a.name,
-              type: a.type
-            })
           }
+          this.toDsList.push({
+            dsId: a.dsId,
+            name: a.name,
+            type: a.type
+          })
         }
       })
       console.log(this.fromDsList)
@@ -243,12 +237,12 @@ export default {
     },
     handleFromChange (value) {
       this.selectedDataSource = value
-      this.selectloading = true
-      console.log('当前选中数据源类型', this.selectedDataSource)
-      fetchTables(value).then(res => {
-        this.selectloading = false
-        this.sourceTables = res.result
-      })
+      // this.selectloading = true
+      // console.log('当前选中数据源类型', this.selectedDataSource)
+      // fetchTables(value).then(res => {
+      //   this.selectloading = false
+      //   this.sourceTables = res.result
+      // })
     },
     handleToDsChange (value) {
       this.selectedTargetSource = value

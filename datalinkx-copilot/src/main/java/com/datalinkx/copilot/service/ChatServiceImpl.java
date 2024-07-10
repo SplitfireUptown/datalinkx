@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.copilot.client.OllamaClient;
 import com.datalinkx.copilot.client.request.ChatReq;
 import com.datalinkx.copilot.client.request.EmbeddingReq;
@@ -40,7 +41,7 @@ public class ChatServiceImpl implements ChatService {
         // 向量召回
         String vectorData = this.callBackQuestion(question);
         // 构建Prompt
-        String prompt = LLMUtils.buildPrompt(question, vectorData);
+        String prompt = ObjectUtils.isEmpty(vectorData) ? LLMUtils.buildPrompt(question) : LLMUtils.buildRAGPrompt(question, vectorData);
         ChatReq chatReq = ChatReq.builder()
                 .messages(Collections.singletonList(ChatReq.Content.builder().role("user").content(prompt).build()))
                 .stream(false)
@@ -58,7 +59,7 @@ public class ChatServiceImpl implements ChatService {
         // 向量召回
         String vectorData = this.callBackQuestion(question);
         // 构建Prompt
-        String prompt = LLMUtils.buildPrompt(question, vectorData);
+        String prompt = ObjectUtils.isEmpty(vectorData) ? LLMUtils.buildPrompt(question) : LLMUtils.buildRAGPrompt(question, vectorData);
         ChatReq chatReq = ChatReq.builder()
                 .messages(Collections.singletonList(ChatReq.Content.builder().role("user").content(prompt).build()))
                 .stream(true)

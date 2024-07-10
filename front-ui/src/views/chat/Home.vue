@@ -1,43 +1,41 @@
 <template>
-  <a-config-provider :locale="locale">
-    <div id="app">
-      <router-view/>
-      <div class="chat-container">
-        <beautiful-chat
-          :participants="participants"
-          :titleImageUrl="titleImageUrl"
-          :onMessageWasSent="onMessageWasSent"
-          :messageList="messageList"
-          :newMessagesCount="newMessagesCount"
-          :isOpen="isChatOpen"
-          :close="closeChat"
-          :open="openChat"
-          :showEmoji="true"
-          :showFile="true"
-          :showEdition="true"
-          :showDeletion="true"
-          :showTypingIndicator="showTypingIndicator"
-          :showLauncher="true"
-          :showCloseButton="true"
-          :colors="colors"
-          :alwaysScrollToBottom="alwaysScrollToBottom"
-          :disableUserListToggle="false"
-          :messageStyling="messageStyling"
-          @onType="handleOnType"
-          @edit="editMessage" />
-      </div>
-    </div>
-  </a-config-provider>
+  <div class="hello">
+    <h1>{{ msg }}</h1>
+    <!-- <SuspensionBall @clickDB="showChatBox"/> -->
+    <!-- :icons="icons" -->
+    <beautiful-chat
+      :participants="participants"
+      :titleImageUrl="titleImageUrl"
+      :onMessageWasSent="onMessageWasSent"
+      :messageList="messageList"
+      :newMessagesCount="newMessagesCount"
+      :isOpen="isChatOpen"
+      :close="closeChat"
+      :open="openChat"
+      :showEmoji="true"
+      :showFile="true"
+      :showEdition="true"
+      :showDeletion="true"
+      :showTypingIndicator="showTypingIndicator"
+      :showLauncher="true"
+      :showCloseButton="true"
+      :colors="colors"
+      :alwaysScrollToBottom="alwaysScrollToBottom"
+      :disableUserListToggle="false"
+      :messageStyling="messageStyling"
+      @onType="handleOnType"
+      @edit="editMessage" />
+  </div>
 </template>
 
 <script>
-import { domTitle, setDocumentTitle } from '@/utils/domUtil'
-import { copilotChat } from '@/api/system/copilot'
-import { i18nRender } from '@/locales'
-import EVA from '@/assets/eva.png'
-import TitleImg from '@/assets/titleImg.png'
-
+import TitleImg from './../../assets/titleImg.png'
+import DB from './../../assets/dabai.png'
+import EVA from './../../assets/eva.png'
+// import SuspensionBall from './SuspensionBall.vue'
 export default {
+  name: 'Home',
+  // components: { SuspensionBall },
   data () {
     return {
       msg: '聊天浮球',
@@ -46,12 +44,17 @@ export default {
           id: 'user1',
           name: 'Matteo',
           imageUrl: EVA
+        },
+        {
+          id: 'user2',
+          name: 'Support',
+          imageUrl: DB
         }
       ], // the list of all the participant of the conversation. `name` is the user name, `id` is used to establish the author of a message, `imageUrl` is supposed to be the user avatar.
       titleImageUrl: TitleImg,
       messageList: [
-        // { type: 'text', author: `me`, data: { text: `Say yes!` } },
-        { type: 'text', author: `user1`, data: { text: `你好，我是DatalinkX智能问答助手` } }
+        { type: 'text', author: `me`, data: { text: `Say yes!` } },
+        { type: 'text', author: `user1`, data: { text: `No.` } }
       ], // the list of the messages to show, can be paginated and adjusted dynamically
       newMessagesCount: 0,
       isChatOpen: false, // to determine whether the chat window should be open or closed
@@ -97,18 +100,6 @@ export default {
     onMessageWasSent (message) {
       // called when the user sends a message
       this.messageList = [ ...this.messageList, message ]
-      copilotChat({
-        'question': message.data.text
-      }).then(res => {
-        let answer = {
-          type: 'text',
-          author: `user1`,
-          data: {
-            text: res.result
-          }
-        }
-        this.messageList.push(answer);
-      })
     },
     openChat () {
       // called when the user clicks on the fab button to open the chat
@@ -131,19 +122,11 @@ export default {
       m.isEdited = true
       m.data.text = message.data.text
     }
-  },
-  computed: {
-    locale () {
-      // 只是为了切换语言时，更新标题
-      const { title } = this.$route.meta
-      title && (setDocumentTitle(`${i18nRender(title)} - ${domTitle}`))
-
-      return this.$i18n.getLocaleMessage(this.$store.getters.lang).antLocale
-    }
   }
 }
 </script>
 
+<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;
@@ -158,9 +141,5 @@ li {
 }
 a {
   color: #42b983;
-}
-.chat-container {
-  position: relative;
-  z-index: 9999;
 }
 </style>

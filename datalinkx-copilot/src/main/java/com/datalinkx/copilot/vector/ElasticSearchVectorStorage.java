@@ -107,7 +107,7 @@ public class ElasticSearchVectorStorage extends VectorStorageImpl {
         int page = 0;
         int size = 5;
         // 最低得分
-        float minScore = 1.0f;
+        float minScore = 1.7f;
 
         // 构建查询向量
         // 计算cos值+1，避免出现负数的情况，得到结果后，实际score值在减1再计算
