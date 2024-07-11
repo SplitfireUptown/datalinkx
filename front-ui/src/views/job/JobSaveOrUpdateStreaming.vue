@@ -56,7 +56,12 @@
             <div class="redis-type-lable">
               <label>目标数据源表</label>
             </div>
-            <a-input v-model="selectedTargetTable" placeholder="目标topic"/>
+            <a-select mode="tags" :show-search=true style="width: 100%" placeholder="目标topic" @change="handleToTbChange">
+              <a-select-option v-for="table in targetTables" :value="table" :key="table">
+                {{ table }}
+              </a-select-option>
+            </a-select>
+<!--            <a-input v-model="selectedTargetTable" placeholder="目标topic"/>-->
           </a-col>
         </a-row>
       </a-form-item>
@@ -143,13 +148,18 @@ export default {
         this.confirmLoading = true
         if (!err) {
           this.confirmLoading = true
+          if (this.selectedTargetTable.length > 1) {
+            this.$message.error("仅支持单表流转")
+            this.confirmLoading = false
+            return
+          }
 
           const formData = {
             'job_id': this.jobId,
             'from_ds_id': this.selectedDataSource,
             'to_ds_id': this.selectedTargetSource,
             'from_tb_name': this.selectedSourceTable,
-            'to_tb_name': this.selectedTargetTable,
+            'to_tb_name': this.selectedTargetTable[0],
             'field_mappings': this.mappings,
             'job_name': this.jobName
           }
@@ -244,12 +254,18 @@ export default {
       //   this.sourceTables = res.result
       // })
     },
+    handleToTbChange (value) {
+      this.selectedTargetTable = value
+    },
     handleToDsChange (value) {
+      this.selectloading = true
       this.selectedTargetSource = value
       console.log('当前选中数据源类型', this.selectedTargetSource)
       fetchTables(value).then(res => {
         this.selectloading = false
         this.targetTables = res.result
+      }).then(res => {
+        this.selectloading = false
       })
     },
     addMapping () {

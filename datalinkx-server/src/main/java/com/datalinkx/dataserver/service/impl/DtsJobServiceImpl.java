@@ -113,12 +113,14 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .tableName(jobBean.getFromTbId())
                 .columns(columns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getReaderDsId())))
+                .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsId2Object.get(jobBean.getReaderDsId()).getType()))
                 .build();
 
         DataTransJobDetail.Writer writer = DataTransJobDetail.Writer.builder()
                 .tableName(jobBean.getToTbId())
                 .columns(columns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getWriterDsId())))
+                .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsId2Object.get(jobBean.getWriterDsId()).getType()))
                 .build();
 
         DataTransJobDetail.SyncUnit syncUnit = DataTransJobDetail.SyncUnit

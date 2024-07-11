@@ -1,7 +1,9 @@
 package com.datalinkx.common.constants;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class MetaConstants {
@@ -26,6 +28,10 @@ public final class MetaConstants {
             put(MetaConstants.DsType.ORACLE, "oracle");
             put(MetaConstants.DsType.REDIS, "redis");
             put(MetaConstants.DsType.KAFKA, "kafka");
+        }};
+
+        public static final List<String> STREAM_DB_LIST = new ArrayList<String>() {{
+            add("kafka");
         }};
     }
 

@@ -74,6 +74,7 @@ public abstract class AbstractDataTransferAction<T, U> {
                         error.append(errorMsg).append("\r\n");
                         log.info(errorMsg);
                         this.afterExec(execUnit, false);
+                        break;
                     }
                 }
                 DataTransferAction.COUNT_RES.remove();

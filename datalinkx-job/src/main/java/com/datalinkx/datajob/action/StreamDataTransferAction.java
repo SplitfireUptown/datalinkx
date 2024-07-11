@@ -15,6 +15,7 @@ import com.datalinkx.datajob.bean.JobStateForm;
 import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.datajob.job.StreamExecutorJobHandler;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
+import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.StreamFlinkActionMeta;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -131,7 +132,27 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
     @Override
     protected StreamFlinkActionMeta convertExecUnit(DataTransJobDetail info) {
         Object readerDsInfo = DsDriverFactory.getStreamDriver(info.getSyncUnit().getReader().getConnectId()).getReaderInfo(info.getSyncUnit().getReader());
-        Object writerDsInfo = DsDriverFactory.getStreamDriver(info.getSyncUnit().getReader().getConnectId()).getWriterInfo(info.getSyncUnit().getWriter());
+
+        // 实时任务的writer不一定是流式数据源
+        Object writerDsInfo;
+        if (MetaConstants.DsType.STREAM_DB_LIST.contains(info.getSyncUnit().getWriter().getType())) {
+            writerDsInfo = DsDriverFactory.getStreamDriver(info.getSyncUnit().getWriter().getConnectId()).getWriterInfo(info.getSyncUnit().getWriter());
+        } else {
+            FlinkActionMeta writerMeta = FlinkActionMeta.builder()
+                    .writer(
+                            DataTransJobDetail
+                                    .Writer
+                                    .builder()
+                                    .type(info.getSyncUnit().getWriter().getType())
+                                    .connectId(info.getSyncUnit().getWriter().getConnectId())
+                                    .tableName(info.getSyncUnit().getWriter().getTableName())
+                                    .schema(info.getSyncUnit().getWriter().getSchema())
+                                    .columns(info.getSyncUnit().getWriter().getColumns())
+                                    .build()
+                    )
+                    .build();
+            writerDsInfo = DsDriverFactory.getDsWriter(info.getSyncUnit().getWriter().getConnectId()).getWriterInfo(writerMeta);
+        }
 
         return StreamFlinkActionMeta.builder()
                 .writerDsInfo(JsonUtils.toJson(writerDsInfo))
