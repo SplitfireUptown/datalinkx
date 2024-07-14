@@ -50,12 +50,6 @@ export const asyncRouterMap = [
             meta: { title: 'menu.taskList', keepAlive: false, icon: taskList }
           },
           {
-            path: '/job_log',
-            name: 'joblog',
-            component: () => import('@/views/joblog/JobLogList.vue'),
-            meta: { title: 'menu.tasklistlog', keepAlive: false, icon: taskLog }
-          },
-          {
             path: '/job_relation',
             name: 'job_relation',
             component: () => import('@/views/jobrelation/JobRelationList.vue'),
@@ -83,6 +77,12 @@ export const asyncRouterMap = [
             meta: { title: 'menu.streamingTaskList', keepAlive: false, icon: taskList }
           }
         ]
+      },
+      {
+        path: '/job_log',
+        name: 'joblog',
+        component: () => import('@/views/joblog/JobLogList.vue'),
+        meta: { title: 'menu.tasklistlog', keepAlive: false, icon: taskLog }
       },
       {
         path: '/system/monitor',

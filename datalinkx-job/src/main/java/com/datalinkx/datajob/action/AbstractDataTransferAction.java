@@ -8,14 +8,17 @@ import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.utils.IdUtils;
 import com.datalinkx.datajob.bean.JobExecCountDto;
+import com.datalinkx.driver.model.DataTransJobDetail;
 import com.xxl.job.core.thread.JobThread;
 import lombok.extern.slf4j.Slf4j;
 
 
 
 @Slf4j
-public abstract class AbstractDataTransferAction<T, U> {
+public abstract class AbstractDataTransferAction<T extends DataTransJobDetail, U> {
     protected abstract void begin(T info);
     protected abstract void end(U unit, int status, String errmsg);
     protected abstract void beforeExec(U unit) throws Exception;
@@ -56,6 +59,11 @@ public abstract class AbstractDataTransferAction<T, U> {
             this.begin(actionInfo);
             Map<String, JobExecCountDto> countRes = DataTransferAction.COUNT_RES.get();
 
+            String healthCheck = "patch-data-job-check-thread";
+            if (MetaConstants.DsType.STREAM_DB_LIST.contains(actionInfo.getSyncUnit().getReader().getType())) {
+                healthCheck = IdUtils.getHealthThreadName(actionInfo.getJobId());
+            }
+
             // 3、循环检查任务结果
             taskCheckerThread = new Thread(() -> {
                 DataTransferAction.COUNT_RES.set(countRes);
@@ -78,7 +86,7 @@ public abstract class AbstractDataTransferAction<T, U> {
                     }
                 }
                 DataTransferAction.COUNT_RES.remove();
-            }, "data-transfer-check-thread");
+            }, healthCheck);
 
             // 4、执行flink任务
             try {

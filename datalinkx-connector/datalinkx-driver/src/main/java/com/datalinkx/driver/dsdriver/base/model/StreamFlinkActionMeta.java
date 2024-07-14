@@ -29,4 +29,5 @@ public class StreamFlinkActionMeta extends EngineActionMeta {
     String readerDsInfo;
     String writerDsInfo;
     String checkpoint;
+    String lockId;
 }

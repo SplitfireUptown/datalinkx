@@ -18,6 +18,7 @@ import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.StreamFlinkActionMeta;
 import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.stream.lock.DistributedLock;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,9 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
 
     @Autowired
     StreamExecutorJobHandler streamExecutorJobHandler;
+
+    @Autowired
+    DistributedLock distributedLock;
 
     @Override
     protected void begin(DataTransJobDetail info) {
@@ -105,6 +109,16 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
         if ("finished".equalsIgnoreCase(state)) {
             return true;
         }
+        // 看门狗，续约分布式锁，防止其他节点重复提交任务
+        distributedLock.lock(unit.getJobId(), unit.getLockId(), DistributedLock.LOCK_TIME);
+
+        // 流式任务不用检测太频繁，歇会
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
+
         return false;
     }
 
@@ -159,6 +173,7 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
                 .readerDsInfo(JsonUtils.toJson(readerDsInfo))
                 .checkpoint(info.getSyncUnit().getCheckpoint())
                 .jobId(info.getJobId())
+                .lockId(info.getLockId())
                 .build();
     }
 }

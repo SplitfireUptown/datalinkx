@@ -1,11 +1,16 @@
 package com.datalinkx.dataserver.config;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.Resource;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.IdUtils;
+import com.datalinkx.dataserver.bean.domain.JobBean;
+import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.StreamJobService;
 import com.datalinkx.stream.StreamTaskChecker;
 import com.datalinkx.stream.lock.DistributedLock;
@@ -25,14 +30,19 @@ public class StreamTaskDaemonConfig implements InitializingBean {
     StreamTaskChecker streamTaskChecker;
 
     @Autowired
-    LinkedBlockingQueue<String> streamTaskQueue;
+    StreamJobService streamJobService;
 
     @Autowired
-    StreamJobService streamJobService;
+    JobRepository jobRepository;
 
     @Resource
     DistributedLock distributedLock;
 
+    @Autowired
+    LinkedBlockingQueue<String> streamTaskQueue;
+
+    @Autowired
+    LinkedBlockingQueue<String> stopTaskQueue;
 
     @Bean
     public void streamTaskCheck() {
@@ -42,21 +52,39 @@ public class StreamTaskDaemonConfig implements InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         streamTaskChecker.run();
     }
 
     @Scheduled(fixedDelay = 10000) // 每10秒检查
     public void processQueueItems() {
+        log.info("stream task daemon check");
+        // 先停止
+        while (!stopTaskQueue.isEmpty()) {
+            String jobId = stopTaskQueue.poll();
+            streamJobService.pause(jobId);
+        }
+
+        // 再启动
         while (!streamTaskQueue.isEmpty()) {
             String lockId = IdUtils.generateShortUuid();
             String jobId = streamTaskQueue.poll();
 
-            boolean isLock = distributedLock.lock(jobId, lockId, 10);
+            boolean isLock = distributedLock.lock(jobId, lockId, DistributedLock.LOCK_TIME);
             try {
                 // 拿到了流式任务的锁就提交任务，任务状态在datalinkx-job提交流程中更改
                 if (isLock) {
-                    streamJobService.streamJobExec(jobId);
+                    // 双重检查
+                    Optional<JobBean> jobBeanOp = jobRepository.findByJobId(jobId);
+                    if (!jobBeanOp.isPresent()) {
+                        continue;
+                    }
+                    if (!Arrays.asList(
+                            MetaConstants.JobStatus.JOB_STATUS_SYNCING,
+                            MetaConstants.JobStatus.JOB_STATUS_ERROR).contains(jobBeanOp.get().getStatus())) {
+                        continue;
+                    }
+                    streamJobService.streamJobExec(jobId, lockId);
                 }
             } finally {
                 // 无论提交任务成功还是失败都要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来

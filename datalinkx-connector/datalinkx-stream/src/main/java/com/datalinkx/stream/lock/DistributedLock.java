@@ -27,6 +27,7 @@ public class DistributedLock {
 
 	private RedisSerializer<String> argsSerializer;
 	private RedisSerializer<String> resultSerializer;
+	public static Integer LOCK_TIME = 15;
 
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;

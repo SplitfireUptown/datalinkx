@@ -23,6 +23,8 @@ import lombok.experimental.FieldNameConstants;
 public class DataTransJobDetail {
     @JsonProperty("job_id")
     String jobId;
+    @JsonProperty("lock_id")
+    String lockId;
     @JsonProperty("sync_unit")
     @JsonIgnoreProperties(ignoreUnknown = true)
     SyncUnit syncUnit;

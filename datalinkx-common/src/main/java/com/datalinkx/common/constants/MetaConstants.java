@@ -38,6 +38,8 @@ public final class MetaConstants {
     public static class JobType {
         public static final Integer JOB_TYPE_STREAM = 1;
         public static final Integer JOB_TYPE_BATCH = 0;
+
+        public static final String STREAM_JOB_HEALTH_CHECK = "stream_health_check";
     }
 
     public static class JobStatus {

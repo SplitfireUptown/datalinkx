@@ -16,6 +16,7 @@ public enum StatusCode {
     SYNC_STATUS_ERROR(1002),
     JOB_NOT_EXISTS(1000),
     JOB_CONFIG_ERROR(1003),
+    JOB_IS_STOP(1004),
 
 
     XTB_NOT_EXISTS(2000);

@@ -34,12 +34,17 @@ public interface StreamJobService {
     /**
      * 执行流式任务
      */
-    void streamJobExec(String jobId);
+    void streamJobExec(String jobId, String lockId);
 
     /**
      * 停止流式任务
      */
     void stop(String jobId);
+
+    /**
+     * 暂停流式任务，只停止flink任务，不修改datalinkx任务状态
+     */
+    void pause(String jobId);
 
     /**
      * 删除流式任务

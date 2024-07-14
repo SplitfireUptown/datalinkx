@@ -150,8 +150,9 @@ public class StreamJobServiceImpl implements StreamJobService {
     }
 
     @Override
-    public void streamJobExec(String jobId) {
+    public void streamJobExec(String jobId, String lockId) {
         DataTransJobDetail jobExecInfo = dtsJobService.getStreamJobExecInfo(jobId);
+        jobExecInfo.setLockId(lockId);
         if (!ObjectUtils.isEmpty(jobExecInfo.getSyncUnit().getCheckpoint())) {
             String checkpoint = jobExecInfo.getSyncUnit().getCheckpoint().replace("file://", "");
             // 如果之前记录的checkpoint目录存在，则删除
@@ -173,14 +174,25 @@ public class StreamJobServiceImpl implements StreamJobService {
     public void stop(String jobId) {
         JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
         if (JOB_STATUS_STOP == jobBean.getStatus()) {
-            throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务已暂停");
+            throw new DatalinkXServerException(StatusCode.JOB_IS_STOP, "任务已停止");
         }
 
+        // 记录checkpoint
+        this.stopFlinkTask(jobBean);
+
+        jobBean.setStatus(JOB_STATUS_STOP);
+        jobRepository.save(jobBean);
+    }
+
+    /**
+     * 停止flink任务
+     */
+    private void stopFlinkTask(JobBean jobBean) {
         // 记录checkpoint
         if (!ObjectUtils.isEmpty(jobBean.getTaskId())) {
             FlinkJobStopReq flinkJobStopReq = new FlinkJobStopReq();
             flinkJobStopReq.setDrain(true);
-            String checkpoint = String.format("%s/%s", checkpointPath, jobId);
+            String checkpoint = String.format("%s/%s", checkpointPath, jobBean.getJobId());
 
             // 如果之前记录的checkpoint目录存在，则删除
             File directory = new File(checkpoint);
@@ -197,9 +209,14 @@ public class StreamJobServiceImpl implements StreamJobService {
             flinkClient.jobStop(jobBean.getTaskId(), flinkJobStopReq);
             jobBean.setCheckpoint(checkpoint);
         }
+    }
 
-        jobBean.setStatus(JOB_STATUS_STOP);
-        jobRepository.save(jobBean);
+    @Override
+    public void pause(String jobId) {
+        JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
+        if (!ObjectUtils.isEmpty(jobBean.getTaskId())) {
+            this.stopFlinkTask(jobBean);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
