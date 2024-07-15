@@ -78,6 +78,9 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Value("${data-transfer.fetch-size:1000}")
     Integer fetchSize;
 
+    @Value("${data-transfer.stream-batch-size:10}")
+    Integer streamBatchSize;
+
     @Value("${data-transfer.query-time-out:10000}")
     Integer queryTimeOut;
 
@@ -120,6 +123,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .tableName(jobBean.getToTbId())
                 .columns(columns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getWriterDsId())))
+                .batchSize(streamBatchSize)
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsId2Object.get(jobBean.getWriterDsId()).getType()))
                 .build();
 

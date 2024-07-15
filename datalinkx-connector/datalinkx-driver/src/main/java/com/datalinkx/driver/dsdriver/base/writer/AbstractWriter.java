@@ -8,4 +8,5 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public abstract class AbstractWriter {
+    Integer batchSize;
 }

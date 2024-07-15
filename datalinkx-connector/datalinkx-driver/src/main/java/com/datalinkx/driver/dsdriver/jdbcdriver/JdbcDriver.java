@@ -439,6 +439,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .column(unit.getWriter().getColumns().stream().map(DataTransJobDetail.Column::getName).collect(Collectors.toList()))
                 .insertSqlMode("copy")
                 .writeMode("insert")
+                .batchSize(unit.getWriter().getBatchSize())
                 .preSql(preSql)
                 .build());
 

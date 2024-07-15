@@ -66,6 +66,7 @@ public class DataTransJobDetail {
         String tableName;
         List<Column> columns;
         String connectId;
+        Integer batchSize;
         String type;
     }
 

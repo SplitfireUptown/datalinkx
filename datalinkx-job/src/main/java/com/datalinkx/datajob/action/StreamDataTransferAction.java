@@ -162,6 +162,7 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
                                     .tableName(info.getSyncUnit().getWriter().getTableName())
                                     .schema(info.getSyncUnit().getWriter().getSchema())
                                     .columns(info.getSyncUnit().getWriter().getColumns())
+                                    .batchSize(info.getSyncUnit().getWriter().getBatchSize())
                                     .build()
                     )
                     .build();

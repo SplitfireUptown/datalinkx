@@ -27,7 +27,6 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.ScriptScoreQueryBuilder;
-import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
@@ -131,9 +130,7 @@ public class ElasticSearchVectorStorage extends VectorStorageImpl {
     private Map<String, Object> elasticMapping(int dims) {
         Map<String, Object> properties = new HashMap<>();
         properties.put("_class", MapUtil.builder("type", "keyword").put("doc_values", "false").put("index", "false").build());
-        properties.put("chunkId", MapUtil.builder("type", "keyword").build());
         properties.put("content", MapUtil.builder("type", "keyword").build());
-        properties.put("docId", MapUtil.builder("type", "keyword").build());
         // 向量
         properties.put("vector", MapUtil.builder("type", "dense_vector").put("dims", Objects.toString(dims)).build());
         Map<String, Object> root = new HashMap<>();
