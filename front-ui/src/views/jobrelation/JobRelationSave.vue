@@ -130,8 +130,10 @@ export default {
             if (res.status !== '0') {
               this.confirmLoading = false
               this.$emit('ok')
-              this.visible = false
               this.$message.error(res.errstr)
+            } else {
+              this.confirmLoading = false
+              this.visible = false
             }
           })
           // setTimeout(() => {

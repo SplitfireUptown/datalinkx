@@ -84,7 +84,8 @@ public class ExecutorJobHandler {
 
 		if (!matcher.find()) {
 			log.error(errorRet.toString());
-			throw new Exception(errorRet.toString());
+			log.error(successRet.toString());
+			throw new Exception(ObjectUtils.isEmpty(errorRet.toString()) ? successRet.toString() : errorRet.toString());
 		}
 
 		String received = matcher.group();
