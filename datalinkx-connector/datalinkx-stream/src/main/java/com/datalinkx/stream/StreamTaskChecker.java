@@ -70,18 +70,18 @@ public class StreamTaskChecker extends TimerTask {
                 .taskId((String) item.get("task_id"))
                 .build()).collect(Collectors.toList());
 
-        JsonNode jsonNode = flinkClient.jobOverview();
-        Set<String> runningJobIds = JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
-                .stream()
-                .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
-                .map(FlinkJobOverview::getName)
-                .collect(Collectors.toSet());
+        try {
+            JsonNode jsonNode = flinkClient.jobOverview();
+            Set<String> runningJobIds = JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
+                    .stream()
+                    .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
+                    .map(FlinkJobOverview::getName)
+                    .collect(Collectors.toSet());
 
-        for (StreamTaskBean streamTaskBean : streamTaskBeans) {
-            // 如果任务是同步中，检查flink任务是否存在
-            if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == streamTaskBean.getStatus()) {
-                String jobId = streamTaskBean.getJobId();
-                try {
+            for (StreamTaskBean streamTaskBean : streamTaskBeans) {
+                // 如果任务是同步中，检查flink任务是否存在
+                if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == streamTaskBean.getStatus()) {
+                    String jobId = streamTaskBean.getJobId();
                     // 如果flink任务不存在，则重新提交任务
                     if (!runningJobIds.contains(jobId)) {
                         this.addStreamTaskQueue(jobId);
@@ -98,15 +98,15 @@ public class StreamTaskChecker extends TimerTask {
                     if (runningJobIds.contains(jobId) && MetaConstants.JobStatus.JOB_STATUS_STOP == streamTaskBean.getStatus()) {
                         this.addStopTaskQueue(jobId);
                     }
-                } catch (Throwable t) {
-                    log.error(t.getMessage(), t);
+                }
+
+                // 如果任务是失败，重新提交
+                if (MetaConstants.JobStatus.JOB_STATUS_ERROR == streamTaskBean.getStatus() && !streamTaskQueue.contains(streamTaskBean.getJobId())) {
+                    streamTaskQueue.add(streamTaskBean.getJobId());
                 }
             }
-
-            // 如果任务是失败，重新提交
-            if (MetaConstants.JobStatus.JOB_STATUS_ERROR == streamTaskBean.getStatus() && !streamTaskQueue.contains(streamTaskBean.getJobId())) {
-                streamTaskQueue.add(streamTaskBean.getJobId());
-            }
+        } catch (Throwable t) {
+            log.error(t.getMessage(), t);
         }
     }
 
