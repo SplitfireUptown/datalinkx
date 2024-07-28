@@ -86,8 +86,8 @@ public class StreamTaskDaemonConfig implements InitializingBean {
                     }
                     streamJobService.streamJobExec(jobId, lockId);
                 }
-            } finally {
-                // 无论提交任务成功还是失败都要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来
+            } catch (Exception e){
+                // 成功一直持有锁，失败需要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来
                 distributedLock.unlock(jobId, lockId);
             }
         }

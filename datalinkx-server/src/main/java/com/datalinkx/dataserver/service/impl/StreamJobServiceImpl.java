@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -149,6 +150,7 @@ public class StreamJobServiceImpl implements StreamJobService {
         return result;
     }
 
+    @Async
     @Override
     public void streamJobExec(String jobId, String lockId) {
         DataTransJobDetail jobExecInfo = dtsJobService.getStreamJobExecInfo(jobId);
