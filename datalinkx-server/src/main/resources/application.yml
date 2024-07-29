@@ -25,8 +25,8 @@ spring:
       uris:
   redis:
     database: 0       # Redis数据库索引（默认为0）,如果设置为1，那么存入的key-value都存放在select 1中
-    host: 10.0.0.1
-    port: 1111
+    host:
+    port:
     password:
     timeout: 10000
 
@@ -37,7 +37,7 @@ xxl-job:
   exec-handler: dataTransJobHandler
   executor-route-strategy: FIRST
   client:
-    url: http://60.204.201.0:8080
+    url:
     connect_timeout_ms: 20000
     call_timeout_ms: 600000
     read_timeout_ms: 600000
