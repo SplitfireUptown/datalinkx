@@ -108,6 +108,8 @@ export default {
           }
         }
         this.messageList.push(answer);
+      }).catch((e) => {
+
       })
     },
     openChat () {
