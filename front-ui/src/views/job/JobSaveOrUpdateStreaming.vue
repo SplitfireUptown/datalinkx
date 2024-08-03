@@ -29,7 +29,12 @@
             <label>来源数据源</label>
             <a-select v-model="selectedDataSource" @change="handleFromChange" placeholder="请选择来源数据源">
               <a-select-option v-for="table in fromDsList" :value="table.dsId" :key="table.name">
-                {{ table.name }}
+                <div>
+                  <span class="ds-icon">
+                    <img :src="dsImgObj[table.type]" alt="">
+                  </span>
+                  <span>{{ table.name }}</span>
+                </div>
               </a-select-option>
             </a-select>
           </a-col>
@@ -37,7 +42,12 @@
             <label>目标数据源</label>
             <a-select v-model="selectedTargetSource" @change="handleToDsChange" placeholder="请选择目标数据源">
               <a-select-option v-for="table in toDsList" :value="table.dsId" :key="table.name">
-                {{ table.name }}
+                <div>
+                  <span class="ds-icon">
+                    <img :src="dsImgObj[table.type]" alt="">
+                  </span>
+                  <span>{{ table.name }}</span>
+                </div>
               </a-select-option>
             </a-select>
           </a-col>
@@ -108,12 +118,14 @@
 import { fetchTables, listQuery } from '@/api/datasource/datasource'
 import { streamAddObj, getObj, streamModifyObj } from '@/api/job/job'
 import LoadingDx from './../../components/common/loading-dx.vue'
+import { dsImgObj } from './../datasource/const'
 export default {
   components: {
     LoadingDx
   },
   data () {
     return {
+      dsImgObj,
       jobType: 'default',
       form: this.$form.createForm(this),
       selectedDataSource: null,
@@ -301,6 +313,21 @@ export default {
         width: 48%;
       }
     }
+  }
+}
+::v-deep .ds-icon {
+  float: left;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-right: 4px;
+  img {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    border: 0;
   }
 }
 </style>
