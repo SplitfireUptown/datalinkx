@@ -97,6 +97,9 @@ public abstract class AbstractDataTransferAction<T, U> {
                 log.error("execute flink task error.", e);
                 afterExec(execUnit, false);
                 error.append(e.getMessage()).append("\r\n");
+                // 任务提交失败，直接返回
+                this.end(actionInfo, JOB_STATUS_ERROR, error.toString());
+                return;
             }
             // 阻塞至任务完成
             taskCheckerThread.start();

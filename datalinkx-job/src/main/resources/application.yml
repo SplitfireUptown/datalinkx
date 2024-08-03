@@ -46,9 +46,26 @@ client:
     logging: true
 
 flinkx:
-  path: /Users/lixiaofei/work/datalinkX/flinkx/
+  path: ${user.dir}/flinkx/
+  #  如果使用容器化部署，请开启下面配置
 
+  #  syncplugins:
+  #    path: /datalinkx/flinkx/syncplugins/ #  这里填写“宿主机”`flinkx插件`挂载路径
+  #  flinkconf:
+  #    path: ${user.dir}/flinkx/flinkconf/ #  这里填写“容器内部”flinkconf的路径，请勿擅自修改
 
+  #  1.在容器内部创建与宿主机挂载的相同路径及文件
+  #   例如:
+  #   docker -v  /{dir_path}/flinkx/syncplugins:/datalinkx/flinkx/syncplugins
+  #
+  #   则需要进入容器内并创建/{dir_path}/flinkx/syncplugins相同路径及文件
+  #
+  #   参考命令
+  #
+  #    docker exec -it my_container /bin/bash && mkdir -p /{dir_path}/flinkx && exit
+  #    docker cp /{dir_path}/flinkx/syncplugins my_container:/{dir_path}/flinkx
+
+#  2.修改宿主机flinkconf的配置文件中的配置
 support:
   datasource:
     - mysql

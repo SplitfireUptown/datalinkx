@@ -128,14 +128,19 @@ export default {
           this.confirmLoading = true
           await addObj(values).then(res => {
             if (res.status !== '0') {
+              this.confirmLoading = false
+              this.$emit('ok')
               this.$message.error(res.errstr)
+            } else {
+              this.confirmLoading = false
+              this.visible = false
             }
           })
-          setTimeout(() => {
-            this.confirmLoading = false
-            this.$emit('ok')
-            this.visible = false
-          }, 1500)
+          // setTimeout(() => {
+          //   this.confirmLoading = false
+          //   this.$emit('ok')
+          //   this.visible = false
+          // }, 1500)
         }
       })
     },
