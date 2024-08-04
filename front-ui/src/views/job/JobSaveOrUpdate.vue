@@ -30,7 +30,12 @@
             <a-select @change="handleFromChange"
                       v-decorator="['selectedDataSource', {rules: [{required: true, message: '请选择来源数据源'}],initialValue: selectedDataSource}]">
               <a-select-option v-for="table in fromDsList" :value="table.dsId" :key="table.name">
-                {{ table.name }}
+                <div>
+                  <span class="ds-icon">
+                    <img :src="dsImgObj[table.type]" alt="">
+                  </span>
+                  <span>{{ table.name }}</span>
+                </div>
               </a-select-option>
             </a-select>
           </a-form-item>
@@ -40,7 +45,12 @@
             <a-select @change="handleToDsChange"
                       v-decorator="['selectedTargetSource', {rules: [{required: true, message: '请选择目标数据源'}],initialValue: selectedTargetSource}]">
               <a-select-option v-for="table in toDsList" :value="table.dsId" :key="table.name">
-                {{ table.name }}
+                <div>
+                  <span class="ds-icon">
+                    <img :src="dsImgObj[table.type]" alt="">
+                  </span>
+                  <span>{{ table.name }}</span>
+                </div>
               </a-select-option>
             </a-select>
           </a-form-item>
@@ -167,7 +177,7 @@
 import { fetchTables, getDsTbFieldsInfo, listQuery } from '@/api/datasource/datasource'
 import { addObj, getObj, modifyObj } from '@/api/job/job'
 import LoadingDx from './../../components/common/loading-dx.vue'
-import { RedisTypes } from './../datasource/const'
+import { RedisTypes, dsImgObj } from './../datasource/const'
 export default {
   components: {
     LoadingDx
@@ -175,6 +185,7 @@ export default {
   data () {
     return {
       RedisTypes,
+      dsImgObj,
       jobType: 'default',
       form: this.$form.createForm(this),
       selectedDataSource: null,
@@ -513,6 +524,22 @@ export default {
         flex-grow: 1;
       }
     }
+  }
+}
+
+::v-deep .ds-icon {
+  float: left;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-right: 4px;
+  img {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    border: 0;
   }
 }
 </style>

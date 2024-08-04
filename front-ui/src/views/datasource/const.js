@@ -67,6 +67,13 @@ const dsTypeList = [
   //   img: httpPng
   // }
 ]
+const dsImgObj = {
+  1: mysqlPng,
+  2: ESPng,
+  3: oraclePng,
+  4: redisPng,
+  100: kafkaPng
+}
 // 目标数据源 redis 类型
 const RedisTypes = [
   {
@@ -154,4 +161,4 @@ const OracleServerTypes = [
   }
 ]
 
-export { DataSourceType, dsTypeList, RedisTypes, dsConfigOriginList, OracleServerTypes }
+export { DataSourceType, dsTypeList, RedisTypes, dsConfigOriginList, OracleServerTypes, dsImgObj }
