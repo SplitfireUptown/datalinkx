@@ -97,6 +97,8 @@ export default {
     onMessageWasSent (message) {
       // called when the user sends a message
       this.messageList = [ ...this.messageList, message ]
+      const lastChild = document.querySelector('.sc-message-list').lastElementChild
+      lastChild.style.display = 'block'
       copilotChat({
         'question': message.data.text
       }).then(res => {
@@ -107,6 +109,7 @@ export default {
             text: res.result
           }
         }
+        lastChild.style.display = 'none'
         this.messageList.push(answer);
       }).catch((e) => {
 
