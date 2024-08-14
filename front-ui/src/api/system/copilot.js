@@ -7,3 +7,10 @@ export function copilotChat (params) {
     params: params
   })
 }
+export function copilotStreamChat (params) {
+  return axios({
+    url: '/api/copilot/stream/chat',
+    method: 'GET',
+    params: params
+  })
+}

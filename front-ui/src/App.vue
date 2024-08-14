@@ -20,7 +20,7 @@
           :showLauncher="true"
           :showCloseButton="true"
           :colors="colors"
-          :alwaysScrollToBottom="alwaysScrollToBottom"
+          :alwaysScrollToBottocom="alwaysScrollToBottom"
           :disableUserListToggle="false"
           :messageStyling="messageStyling"
           @onType="handleOnType"
@@ -102,7 +102,7 @@ export default {
       copilotChat({
         'question': message.data.text
       }).then(res => {
-        let answer = {
+        const answer = {
           type: 'text',
           author: `user1`,
           data: {
@@ -110,7 +110,7 @@ export default {
           }
         }
         lastChild.style.display = 'none'
-        this.messageList.push(answer);
+        this.messageList.push(answer)
       }).catch((e) => {
 
       })

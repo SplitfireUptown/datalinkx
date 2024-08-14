@@ -1,6 +1,7 @@
 package com.datalinkx.copilot.service;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.JsonUtils;
@@ -74,7 +75,7 @@ public class ChatServiceImpl implements ChatService {
         RequestBody requestBody = RequestBody.create(mediaType, bodyBytes);
         okRequestBuilder.post(requestBody);
 
-        return SseTransformUtil.transformRequest(okRequestBuilder.build(), MetaConstants.JobStatus.SSE_COPILOT);
+        return SseTransformUtil.transformRequest(okRequestBuilder.build(), UUID.randomUUID().toString().replaceAll("-", ""));
     }
 
 
