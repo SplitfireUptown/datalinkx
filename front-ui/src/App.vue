@@ -85,35 +85,49 @@ export default {
     }
   },
   methods: {
-    showChatBox () {
-      console.log('show chat box')
-    },
-    sendMessage (text) {
-      if (text.length > 0) {
-        this.newMessagesCount = this.isChatOpen ? this.newMessagesCount : this.newMessagesCount + 1
-        this.onMessageWasSent({ author: 'support', type: 'text', data: { text } })
-      }
-    },
     onMessageWasSent (message) {
       // called when the user sends a message
       this.messageList = [ ...this.messageList, message ]
       const lastChild = document.querySelector('.sc-message-list').lastElementChild
       lastChild.style.display = 'block'
-      copilotChat({
-        'question': message.data.text
-      }).then(res => {
-        const answer = {
-          type: 'text',
-          author: `user1`,
-          data: {
-            text: res.result
-          }
-        }
-        lastChild.style.display = 'none'
-        this.messageList.push(answer)
-      }).catch((e) => {
 
-      })
+      const eventSource = new EventSource('api/api/copilot/stream/chat?question=' + message.data.text)
+      eventSource.onopen = function (event) {
+        console.log(event.data)
+      }
+      const answerId = this.getTimestamp()
+      var self = this
+      eventSource.onmessage = function (event) {
+        console.log(event.data)
+        var modelMessage = JSON.parse(event.data)
+
+        console.log(answerId)
+        let flag = 0
+        for (const message of self.messageList) {
+           if (message.id === answerId) {
+             flag = 1
+             console.log(message.data.text)
+             message.data.text = message.data.text.concat(modelMessage.message.content)
+           }
+        }
+        if (flag === 0) {
+          const answer = {
+            type: 'text',
+            author: `user1`,
+            id: answerId,
+            data: {
+              text: modelMessage.message.content
+            }
+          }
+          self.messageList.push(answer)
+        }
+      }
+      eventSource.onerror = function (error) {
+        console.error('Error:', error)
+        lastChild.style.display = 'none'
+        eventSource.close()
+      }
+      // eventSource.close()
     },
     openChat () {
       // called when the user clicks on the fab button to open the chat
@@ -135,6 +149,9 @@ export default {
       const m = this.messageList.find(m => m.id === message.id)
       m.isEdited = true
       m.data.text = message.data.text
+    },
+    getTimestamp() {
+      return new Date().getTime() + Math.random()
     }
   },
   computed: {
