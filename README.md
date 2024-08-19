@@ -19,7 +19,7 @@
   <a href="#项目文档"><img src="https://img.shields.io/badge/前端UI-AntDesignUI-red.svg" alt="前端"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/RPC-Retrofit2-blue.svg" alt="RPC框架"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/同步框架-Chunjun(FlinkX)-green.svg" alt="同步框架"></a>
-<a href="#项目文档"><img src="https://img.shields.io/badge/向量库-ElasticSearch-blue.svg" alt="向量库"></a>
+<a href="#项目文档"><img src="https://img.shields.io/badge/向量库-ElasticSearch 7.9.3-blue.svg" alt="向量库"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/大模型框架-ollama-orange.svg" alt="大模型框架"></a>
 </p>
 

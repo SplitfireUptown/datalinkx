@@ -5266,6 +5266,11 @@ event-pubsub@4.3.0:
   resolved "https://registry.npmjs.org/event-pubsub/-/event-pubsub-4.3.0.tgz"
   integrity sha512-z7IyloorXvKbFx9Bpie2+vMJKKx1fH1EN5yiTfp8CiLOTptSYy1g8H4yDpGlEdshL1PBiFtBHepF2cNsqeEeFQ==
 
+event-source-polyfill@^1.0.31:
+  version "1.0.31"
+  resolved "https://registry.npmmirror.com/event-source-polyfill/-/event-source-polyfill-1.0.31.tgz#45fb0a6fc1375b2ba597361ba4287ffec5bf2e0c"
+  integrity sha512-4IJSItgS/41IxN5UVAVuAyczwZF7ZIEsM1XAoUzIHA6A+xzusEZUutdXz2Nr+MQPLxfTiCvqE79/C8HT8fKFvA==
+
 eventemitter3@^2.0.3:
   version "2.0.3"
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-2.0.3.tgz"

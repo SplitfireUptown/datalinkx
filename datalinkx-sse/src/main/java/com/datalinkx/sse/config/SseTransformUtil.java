@@ -1,6 +1,7 @@
 package com.datalinkx.sse.config;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import com.datalinkx.common.utils.JsonUtils;
@@ -47,6 +48,22 @@ public class SseTransformUtil {
             @Override
             public void onClosed(EventSource eventSource) {
                 log.info("SSE close");
+//                try {
+//                    HashMap<String, HashMap> completeData = new HashMap<String, HashMap>() {{
+//                        put("message",
+//                                new HashMap<String, String>() {{
+//                                    put("content", "complete");
+//                                }}
+//                        );
+//                    }};
+//                    SseEmitter.SseEventBuilder event = SseEmitter.event()
+//                            .data(JsonUtils.toJson(completeData))
+//                            .id("complete")
+//                            .name("complete");
+//                    sseEmitter.send(event);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
                 sseEmitter.complete();
             }
 

@@ -6,9 +6,9 @@ spring:
     name: datalinkx-server
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username:
-    password:
-    url: jdbc:mysql://mysql:3306/datalinkx?characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:123456}
+    url: jdbc:mysql://${MYSQL_URL:127.0.0.1}:3306/datalinkx?characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
@@ -20,13 +20,10 @@ spring:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-  elasticsearch:
-    reset:
-      uris:
   redis:
     database: 0       # Redis数据库索引（默认为0）,如果设置为1，那么存入的key-value都存放在select 1中
-    host:
-    port:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:123456}
     password:
     timeout: 10000
 
@@ -37,7 +34,7 @@ xxl-job:
   exec-handler: dataTransJobHandler
   executor-route-strategy: FIRST
   client:
-    url:
+    url: http://127.0.0.1
     connect_timeout_ms: 20000
     call_timeout_ms: 600000
     read_timeout_ms: 600000
@@ -92,7 +89,7 @@ retrofit:
     # 全局日志打印策略
     global-log-strategy: body
 
-#llm:
-#  embedding: "shaw/dmeta-embedding-zh"
-#  model: "qwen:7b"
-#  vector: "elasticsearch"
+llm:
+  embedding: "shaw/dmeta-embedding-zh"
+  model: "qwen:7b"
+  vector: "elasticsearch"
