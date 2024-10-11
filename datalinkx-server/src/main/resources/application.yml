@@ -26,6 +26,9 @@ spring:
     port: ${REDIS_PORT:123456}
     password:
     timeout: 10000
+  elasticsearch:
+    rest:
+      uris:
 
 xxl-job:
   username:
