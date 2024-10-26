@@ -1,0 +1,894 @@
+<template>
+  <div class="g6-wrap">
+    <a-drawer
+      title="Basic Drawer"
+      placement="right"
+      :closable="false"
+      :visible="visible"
+      :after-visible-change="afterVisibleChange"
+      @close="onClose"
+    >
+
+    </a-drawer>
+    <!-- <a-layout>
+      <a-layout-header>Header</a-layout-header>
+      <a-layout>
+        <a-layout-sider>Sider</a-layout-sider>
+        <a-layout-content>Content</a-layout-content>
+      </a-layout>
+      <a-layout-footer>Footer</a-layout-footer>
+    </a-layout>-->
+    <div class="top-box">
+      <div class="tools-box">
+        <div
+          v-for="tool in tools"
+          :key="tool.key"
+          class="tool"
+          @click="handleTrigger(tool.key)">
+<!--          <img :src="require(`@/assets/images/${tool.iconClass}.png`)" alt="">-->
+          <div class="word">{{ tool.title }}</div>
+        </div>
+      </div>
+    </div>
+    <div id="stencil">
+      <div>
+        <div class="dnd-circle dnd-start" @mousedown="startDrag('start',$event)">
+          <span>来源数据源</span>
+        </div>
+      </div>
+      <div>
+        <div class="dnd-rect" @mousedown="startDrag('rect',$event)">
+          <span>SQL算子</span>
+        </div>
+      </div>
+      <div>
+        <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">
+          <span>节点2</span>
+        </div>
+      </div>
+      <div>
+        <div class="dnd-circle" @mousedown="startDrag('end',$event)">
+          <span>目标数据源</span>
+        </div>
+      </div>
+
+    </div>
+    <div id="container">
+      <div id="graph-container"></div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+  import { Graph, Shape } from '@antv/x6'
+  import { Stencil } from '@antv/x6-plugin-stencil'
+  import { Transform } from '@antv/x6-plugin-transform'
+  import { Selection } from '@antv/x6-plugin-selection'
+  import { Snapline } from '@antv/x6-plugin-snapline'
+  import { Keyboard } from '@antv/x6-plugin-keyboard'
+  import { Clipboard } from '@antv/x6-plugin-clipboard'
+  import { MiniMap } from '@antv/x6-plugin-minimap'
+  import { Dnd } from '@antv/x6-plugin-dnd'
+  import { History } from '@antv/x6-plugin-history'
+  import { register } from '@antv/x6-vue-shape'
+  import insertCss from 'insert-css'
+
+  export default {
+    name: 'Index',
+    data () {
+      return {
+        visible: false,
+        tools: [
+          {
+            title: '保存',
+            iconClass: 'save',
+            key: 'save'
+          },
+          {
+            title: '撤销',
+            iconClass: 'left',
+            key: 'onUndo'
+          },
+          {
+            title: '前进',
+            iconClass: 'right',
+            key: 'onRedo'
+          },
+          {
+            title: '放大',
+            iconClass: 'zoomIn',
+            key: 'zoomIn'
+          },
+          {
+            title: '缩小',
+            iconClass: 'zoomOut',
+            key: 'zoomOut'
+          },
+          {
+            title: '居中',
+            iconClass: 'center',
+            key: 'centerContent'
+          },
+          {
+            title: '预览',
+            iconClass: 'view',
+            key: 'view'
+          },
+          {
+            title: '开启框选',
+            iconClass: 'select',
+            key: 'select',
+            status: false
+          },
+          {
+            title: '开启平移',
+            iconClass: 'move',
+            key: 'move',
+            status: false
+          },
+          {
+            title: '退出',
+            iconClass: 'exit',
+            key: 'exit'
+          }
+        ]
+      }
+    },
+    mounted () {
+      this.initGraph()
+    },
+    inject: ["closeDraw"],
+    methods: {
+      afterVisibleChange (val) {
+        console.log('visible', val)
+      },
+      showDrawer () {
+        this.visible = true
+      },
+      onClose () {
+        this.visible = false
+      },
+      handleTrigger (command) {
+        switch (command) {
+          case 'save':
+            this.handleSave()
+            break
+          case 'onUndo':
+            this.graph.undo()
+            break
+          case 'onRedo':
+            this.graph.redo()
+            break
+          case 'zoomIn':
+            this.graph.zoom(0.2)
+            break
+          case 'zoomOut':
+            this.graph.zoom(-0.2)
+            break
+          case 'centerContent':
+            this.graph.centerContent()
+            break
+          case 'view':
+            this.exportJson()
+            break
+          case 'select':
+            this.changeRubberband(command)
+            break
+          case 'move':
+            this.changePann(command)
+            break
+          case 'exit':
+            console.log('exit')
+            this.closeDraw()
+            this.$router.push('/compute/job')
+            break
+          default:
+            break
+        }
+      },
+      // 保存的方法 根据业务需要达到数据处理成想要的
+      handleSave () {
+        const data = this.graph.toJSON() // 可以拿到画完图的数s据
+        const nodeArr = data.cells
+        const filterCell = nodeArr.filter(item => item.shape !== 'edge')// 这里过滤我们需要的数据，可以根据自己的业务需要来做
+        const rulesNodeDTOList = []
+        for (const item of filterCell) {
+          const nodeAttribute = item.data ? item.data.nodeAttribute : {}
+          if (nodeAttribute) {
+            rulesNodeDTOList.push(nodeAttribute)
+          }
+        }
+      },
+      // 预览的方法，根据业务我这里预览转成了G6
+      exportJson () {
+        const data = this.graph.toJSON()
+        this.$store.dispatch('g6/setG6data', data)
+        console.log(JSON.stringify(data))
+        console.log(data)
+        // this.$router.push('g6')
+        this.dialogTableVisible = true
+      },
+      // 开/关框选的方法
+      changeRubberband (key) {
+        this.tools.forEach(item => {
+          if (item.key === key) {
+            item.status = !item.status
+            item.status ? item.title = '关闭框选' : item.title = '开启框选'
+            // this.graph.toggleSelection(item.status)
+            this.graph.toggleRubberband(item.status)
+            this.graph.toggleStrictRubberband(item.status)
+            this.graph.cleanSelection(item.status)
+          }
+        })
+      },
+      // 开/关画布平移的方法
+      changePann (key) {
+        this.tools.forEach(item => {
+          if (item.key === key) {
+            item.status = !item.status
+            item.status ? item.title = '关闭平移' : item.title = '开启平移'
+            this.graph.togglePanning(item.status)
+          }
+        })
+        // graph.togglePanning(val)
+        // val ? graph.enablePanning() : graph.disablePanning();
+      },
+      startDrag (type, e) {
+        this.startDragToGraph(this.graph, type, e)
+      },
+      startDragToGraph (graph, type, e) {
+        const startNode = this.graph.createNode({
+          shape: 'custom-circle-start',
+          width: 38,
+          height: 38,
+          attrs: {
+            body: {
+              strokeWidth: 1,
+              stroke: '#000000',
+              fill: '#ffffff',
+              rx: 10,
+              ry: 10
+            }
+          }
+        })
+        const polygonNode = this.graph.createNode({
+          shape: 'custom-polygon',
+          width: 80,
+          height: 60,
+          attrs: {
+            body: {
+              strokeWidth: 1,
+              stroke: '#000000',
+              fill: '#ffffff',
+              rx: 10,
+              ry: 10
+            },
+            label: {
+              fontSize: 13,
+              fontWeight: 'bold'
+            }
+          }
+
+        })
+        const rectNode = this.graph.createNode({
+          shape: 'custom-rect',
+          width: 80,
+          height: 60,
+          attrs: {
+            body: {
+              strokeWidth: 1,
+              stroke: '#000000',
+              fill: '#ffffff',
+              rx: 10,
+              ry: 10
+            },
+            label: {
+              fontSize: 13,
+              fontWeight: 'bold'
+            }
+          }
+        })
+        const endNode = this.graph.createNode({
+          shape: 'custom-circle-start',
+          width: 38,
+          height: 38,
+          key: 'end',
+          attrs: {
+            body: {
+              strokeWidth: 4,
+              stroke: '#000000',
+              fill: '#ffffff',
+              rx: 10,
+              ry: 10
+            },
+            label: {
+              fontSize: 13,
+              fontWeight: 'bold'
+            }
+          }
+        })
+        let dragNode
+        if (type === 'start') {
+          dragNode = startNode
+        } else if (type === 'end') {
+          dragNode = endNode
+        } else if (type === 'rect') {
+          dragNode = rectNode
+        } else if (type === 'polygon') {
+          dragNode = polygonNode
+        }
+
+        this.dnd.start(dragNode, e)
+      },
+      initGraph () {
+        const nodeWidth = 80; const nodeHeight = 60
+
+        this.graph = new Graph({
+          container: document.getElementById('graph-container'),
+          autoResize: true,
+          translating: {
+            restrict: true
+          },
+          mousewheel: {
+            enabled: true,
+            modifiers: 'Ctrl',
+            maxScale: 4,
+            minScale: 0.2
+          },
+          grid: {
+            visible: true,
+            type: 'mesh',
+            args: [
+              {
+                color: '#c5c5c5', // 主网格线颜色
+                thickness: 1 // 主网格线宽度
+              }
+            ]
+          },
+          connecting: {
+            snap: true, // 是否自动吸附
+            allowMulti: true, // 是否允许在相同的起始节点和终止之间创建多条边
+            allowNode: false, // 是否允许边链接到节点（非节点上的链接桩）
+            allowBlank: false, // 是否允许连接到空白点
+            allowLoop: false, // 是否允许创建循环连线，即边的起始节点和终止节点为同一节点，
+            allowEdge: false, // 是否允许边链接到另一个边
+            highlight: true, // 拖动边时，是否高亮显示所有可用的连接桩或节点
+            router: {
+              name: 'manhattan',
+              args: {
+                startDirections: ['top', 'right', 'bottom', 'left'],
+                endDirections: ['top', 'right', 'bottom', 'left']
+              }
+            },
+            // connector: {
+            //     name: 'rounded',
+            //     // args: { radius: 10, },
+            // },
+            anchor: 'center',
+            connectionPoint: 'anchor',
+            validateConnection ({ targetMagnet }) {
+              return !!targetMagnet
+            }
+          },
+          highlighting: {
+            // 连接桩可以被连接时在连接桩外围围渲染一个包围框
+            magnetAvailable: {
+              name: 'stroke',
+              args: {
+                attrs: {
+                  fill: '#fff',
+                  stroke: '#A4DEB1',
+                  strokeWidth: 4
+                }
+              }
+            },
+            // 连接桩吸附连线时在连接桩外围围渲染一个包围框
+            magnetAdsorbed: {
+              name: 'stroke',
+              args: {
+                attrs: {
+                  fill: '#fff',
+                  stroke: '#31d0c6',
+                  strokeWidth: 4
+                }
+              }
+            }
+          }
+        })
+
+        this.dnd = new Dnd({
+          target: this.graph,
+          scaled: false
+        })
+
+        this.graph
+          .use(new Selection({ showNodeSelectionBox: true, pointerEvents: 'none' }))
+          .use(new Snapline())
+          .use(new Keyboard())
+          .use(new Clipboard())
+          .use(new History())
+          .use(new MiniMap({ container: document.getElementById('minimap') }))
+        // 连接桩配置
+        const ports = {
+          groups: {
+            top: {
+              position: 'top',
+              attrs: {
+                circle: {
+                  r: 4,
+                  magnet: true,
+                  stroke: '#5F95FF',
+                  strokeWidth: 2,
+                  fill: '#fff',
+                  style: {
+                    visibility: 'hidden'
+                  }
+                }
+              }
+            },
+            right: {
+              position: 'right',
+              attrs: {
+                circle: {
+                  r: 4,
+                  magnet: true,
+                  stroke: '#5F95FF',
+                  strokeWidth: 2,
+                  fill: '#fff',
+                  style: {
+                    visibility: 'hidden'
+                  }
+                }
+              }
+            },
+            bottom: {
+              position: 'bottom',
+              attrs: {
+                circle: {
+                  r: 4,
+                  magnet: true,
+                  stroke: '#5F95FF',
+                  strokeWidth: 2,
+                  fill: '#fff',
+                  style: {
+                    visibility: 'hidden'
+                  }
+                }
+              }
+            },
+            left: {
+              position: 'left',
+              attrs: {
+                circle: {
+                  r: 4,
+                  magnet: true,
+                  stroke: '#5F95FF',
+                  strokeWidth: 2,
+                  fill: '#fff',
+                  style: {
+                    visibility: 'hidden'
+                  }
+                }
+              }
+            }
+          },
+          items: [
+            // {
+            //   group: 'top'
+            // },
+            {
+              group: 'right'
+            },
+            // {
+            //   group: 'bottom'
+            // },
+            {
+              group: 'left'
+            }
+          ]
+        }
+        // 控制连接桩显示/隐藏
+        const showPorts = (ports, show) => {
+          for (let i = 0, len = ports.length; i < len; i += 1) {
+            ports[i].style.visibility = show ? 'visible' : 'hidden'
+          }
+        }
+
+        Graph.registerNode(
+          'custom-rect',
+          {
+            inherit: 'rect',
+            // attrs 可自定义
+            ports: { ...ports }
+          },
+          true
+        )
+
+        Graph.registerNode(
+          'custom-polygon',
+          {
+            inherit: 'polygon',
+            points: '0,10 10,0 20,10 10,20',
+            ports: {
+              ...ports
+            }
+          },
+          true
+        )
+
+        Graph.registerNode(
+          'custom-circle-start',
+          {
+            inherit: 'circle',
+            ports: { ...ports }
+          },
+          true
+        )
+        this.graph.bindKey(['meta+c', 'ctrl+c'], () => {
+          const cells = this.graph.getSelectedCells()
+          if (cells.length) {
+            this.graph.copy(cells)
+          }
+          return false
+        })
+
+        this.graph.bindKey(['meta+x', 'ctrl+x'], () => {
+          const cells = this.graph.getSelectedCells()
+          if (cells.length) {
+            this.graph.cut(cells)
+          }
+          return false
+        })
+
+        this.graph.bindKey(['meta+v', 'ctrl+v'], () => {
+          if (!this.graph.isClipboardEmpty()) {
+            const cells = this.graph.paste({ offset: 32 })
+            this.graph.cleanSelection()
+            this.graph.select(cells)
+          }
+          return false
+        })
+
+        this.graph.bindKey(['meta+z', 'ctrl+z'], () => {
+          if (this.graph.canUndo()) {
+            this.graph.undo()
+          }
+          return false
+        })
+
+        this.graph.bindKey(['meta+shift+z', 'ctrl+shift+z'], () => {
+          if (this.graph.canRedo()) {
+            this.graph.redo()
+          }
+          return false
+        })
+
+        this.graph.bindKey(['meta+a', 'ctrl+a'], () => {
+          const nodes = this.graph.getNodes()
+          if (nodes) {
+            this.graph.select(nodes)
+          }
+        })
+
+        this.graph.bindKey('backspace', () => {
+          const cells = this.graph.getSelectedCells()
+          if (cells.length) {
+            this.graph.removeCells(cells)
+          }
+        })
+
+        this.graph.bindKey(['ctrl+1', 'meta+1'], () => {
+          const zoom = this.graph.zoom()
+          if (zoom < 1.5) {
+            this.graph.zoom(0.1)
+          }
+        })
+
+        this.graph.bindKey(['ctrl+2', 'meta+2'], () => {
+          const zoom = graph.zoom()
+          if (zoom > 0.5) {
+            this.graph.zoom(-0.1)
+          }
+        })
+
+        this.graph.on('cell:mouseenter', ({ cell }) => {
+          console.log(cell.isNode(), '123')
+          const container = document.getElementById('graph-container')
+          const ports = container.querySelectorAll('.x6-port-body')
+          showPorts(ports, !cell.attrs.typeName)
+          if (cell.isNode()) {
+            cell.addTools([
+              {
+                name: 'button-remove',
+                args: {
+                  x: 0,
+                  y: 0,
+                  offset: { x: 10, y: 10 }
+                }
+              }
+            ])
+          } else {
+            cell.addTools([
+              {
+                name: 'button-remove',
+                args: { distance: -40 }
+              }
+            ])
+          }
+        })
+
+        this.graph.on('cell:mouseleave', ({ cell }) => {
+          if (cell.hasTool('button-remove')) {
+            cell.removeTool('button-remove')
+          }
+        })
+        this.graph.on('node:click', ({ x, y, node, cell }) => {
+          this.currentCell = cell
+          if (cell.isNode() && !cell.attrs.typeName) {
+            // 这可以写一些点击节点时和右侧表单交互的效果
+            const selectedCell = this.graph.getSelectedCells()
+          }
+          if (cell.hasTool('button')) {
+            cell.removeTool('button')
+          } else {
+            const markup = [
+              {
+                tagName: 'circle',
+                selector: 'button',
+                attrs: {
+                  r: 10,
+                  stroke: '#6d6d6d',
+                  'stroke-width': 3,
+                  fill: 'white',
+                  cursor: 'pointer'
+                }
+              }
+            ]
+          }
+        })
+
+        this.graph.on('blank:click', () => {
+          // this.currentCell && this.currentCell.removeTools();
+          if (this.currentCell) {
+            this.currentCell.removeTool('button')
+            this.currentCell.removeTool('button-move')
+          }
+          this.isClose = true
+          this.isGloable = true
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="less" scoped>
+  .g6-wrap {
+    width: 100%;
+    height: 1500px;
+
+    .el-dialog {
+      display: flex;
+      flex-direction: column;
+      margin: 0 !important;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /*height:600px;*/
+      max-height: calc(100% - 30px);
+      max-width: calc(100% - 30px);
+      border-radius: 2px;
+    }
+
+    .el-dialog .el-dialog__body {
+      flex: 1;
+      overflow: auto;
+    }
+
+    position: relative;
+
+    .top-box {
+      height: 40px;
+      z-index: 999;
+      background: #FFFFFF;
+      position: absolute;
+      top: 0;
+      left: 100px;
+
+      .tools-box {
+        display: flex;
+        align-items: center;
+
+        .tool {
+          width: 50px;
+          margin-right: 5px;
+          cursor: pointer;
+          padding: 2px;
+          text-align: center;
+
+          img {
+            width: 20px;
+            height: 20px;
+          }
+
+          .word {
+            font-size: 10px;
+          }
+        }
+
+        .tool:hover {
+          background: #d7d7d7;
+          border-radius: 2px;
+        }
+      }
+
+      .goBack {
+        height: 38px;
+        line-height: 38px;
+      }
+    }
+
+    #container {
+      display: flex;
+      height: 100%;
+      margin: 0 10px;
+
+      .x6-widget-selection-box {
+        border: 3px dashed #239edd;
+        border-radius: 1px;
+      }
+
+      .x6-widget-selection-inner {
+        border: 2px solid #239edd;
+        border-radius: 10px;
+      }
+
+      #minimap {
+        position: absolute;
+        top: 30px;
+        right: 30%;
+      }
+
+      #stencil {
+        width: 100px;
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-right: 1px solid #dfe3e8;
+        text-align: center;
+        font-size: 12px;
+
+        .dnd-rect {
+          width: 50px;
+          height: 30px;
+          line-height: 40px;
+          text-align: center;
+          border: 2px solid #000000;
+          border-radius: 6px;
+          cursor: move;
+          font-size: 12px;
+          margin-top: 30px;
+        }
+
+        .dnd-polygon {
+          width: 35px;
+          height: 35px;
+          border: 2px solid #000000;
+          transform: rotate(45deg);
+          cursor: move;
+          font-size: 12px;
+          margin-top: 30px;
+          margin-bottom: 10px;
+        }
+
+        .dnd-circle {
+          width: 35px;
+          height: 35px;
+          line-height: 45px;
+          text-align: center;
+          border: 5px solid #000000;
+          border-radius: 100%;
+          cursor: move;
+          font-size: 12px;
+          margin-top: 30px;
+        }
+
+        .dnd-start {
+          border: 2px solid #000000;
+        }
+
+        .x6-widget-stencil {
+          background-color: #f8f9fb;
+        }
+
+        .x6-widget-stencil-title {
+          background: #eee;
+          font-size: 1rem;
+        }
+
+        .x6-widget-stencil-group-title {
+          font-size: 1rem !important;
+          background-color: #fff !important;
+          height: 40px !important;
+        }
+
+        .x6-widget-transform {
+          margin: -1px 0 0 -1px;
+          padding: 0px;
+          border: 1px solid #239edd;
+        }
+
+        .x6-widget-transform > div {
+          border: 1px solid #239edd;
+        }
+
+        .x6-widget-transform > div:hover {
+          background-color: #3dafe4;
+        }
+
+        .x6-widget-transform-active-handle {
+          background-color: #3dafe4;
+        }
+
+        .x6-widget-transform-resize {
+          border-radius: 0;
+        }
+
+      }
+    }
+
+    .right-box {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 30%;
+      height: 100%;
+      border-left: 2px solid #ccc;
+      background: #FFFFFF;
+      overflow: auto;
+      transition: display .3s;
+    }
+
+    .close {
+      display: none;
+    }
+
+    .open {
+      position: absolute;
+      top: 50%;
+      right: 30%;
+      width: 20px;
+      height: 100px;
+      font-size: 25px;
+      background: #FFFFFF;
+      text-align: center;
+      line-height: 100px;
+      border: 2px solid #ccc;
+      border-right: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: right;
+    }
+
+    .right0 {
+      right: 10px;
+    }
+
+    #graph-container {
+      width: calc(100% - 220px);
+      border-right: 2px solid #ccc;
+      /*margin: 45px 10px 10px;*/
+    }
+
+    .el-drawer__header {
+      margin-bottom: 0;
+      font-weight: bold;
+      font-size: 20px;
+      color: #000;
+    }
+  }
+</style>

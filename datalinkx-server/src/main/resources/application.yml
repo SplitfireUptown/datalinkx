@@ -26,18 +26,18 @@ spring:
     port: ${REDIS_PORT:123456}
     password:
     timeout: 10000
-  elasticsearch:
-    rest:
-      uris:
+#  elasticsearch:  # 开启大模型时打开注解
+#    rest:
+#      uris:
 
 xxl-job:
-  username:
-  password:
+  username: admin
+  password: 123456
   job-group: 1
   exec-handler: dataTransJobHandler
   executor-route-strategy: FIRST
   client:
-    url: http://127.0.0.1
+    url: http://127.0.0.1:8080
     connect_timeout_ms: 20000
     call_timeout_ms: 600000
     read_timeout_ms: 600000
@@ -92,7 +92,7 @@ retrofit:
     # 全局日志打印策略
     global-log-strategy: body
 
-llm:
-  embedding: "shaw/dmeta-embedding-zh"
-  model: "qwen:7b"
-  vector: "elasticsearch"
+#llm:
+#  embedding: "shaw/dmeta-embedding-zh"
+#  model: "qwen:7b"
+#  vector: "elasticsearch"

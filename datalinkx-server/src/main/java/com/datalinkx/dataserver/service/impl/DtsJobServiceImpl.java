@@ -250,21 +250,21 @@ public class DtsJobServiceImpl implements DtsJobService {
         int status = jobStateForm.getJobStatus();
 
         // 1、实时推送流转进度
-        if (!MetaConstants.JobType.JOB_TYPE_STREAM.equals(jobBean.getType())) {
-            ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
-            producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
-            producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);
-            producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
-            producerAdapterForm.setMessage(
-                    JsonUtils.toJson(
-                            JobDto.StatusRefresh.builder()
-                                    .status(status)
-                                    .jobId(jobBean.getJobId())
-                                    .build()
-                    )
-            );
-            messageHubService.produce(producerAdapterForm);
-        }
+//        if (!MetaConstants.JobType.JOB_TYPE_STREAM.equals(jobBean.getType())) {
+//            ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
+//            producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
+//            producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);
+//            producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
+//            producerAdapterForm.setMessage(
+//                    JsonUtils.toJson(
+//                            JobDto.StatusRefresh.builder()
+//                                    .status(status)
+//                                    .jobId(jobBean.getJobId())
+//                                    .build()
+//                    )
+//            );
+//            messageHubService.produce(producerAdapterForm);
+//        }
 
         // 2、存储流转任务状态
         JobDto.DataCountDto countVo = JobDto.DataCountDto.builder()

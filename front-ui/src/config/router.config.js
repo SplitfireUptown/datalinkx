@@ -79,6 +79,21 @@ export const asyncRouterMap = [
         ]
       },
       {
+        path: '/compute/transferTask',
+        name: 'computeTransferTask',
+        redirect: '/computeTransferTask/workplace',
+        component: RouteView,
+        meta: { title: 'menu.computeTransferTask', keepAlive: true, icon: task },
+        children: [
+          {
+            path: '/compute/job',
+            name: 'ComputeJob',
+            component: () => import('@/views/job/JobListOfCompute.vue'),
+            meta: { title: 'menu.computeTaskList', keepAlive: false, icon: taskList }
+          }
+        ]
+      },
+      {
         path: '/job_log',
         name: 'joblog',
         component: () => import('@/views/joblog/JobLogList.vue'),

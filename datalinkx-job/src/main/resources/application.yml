@@ -5,10 +5,10 @@ spring:
   application:
     name: datalinkx-job
   redis:
-    database:       # Redis数据库索引（默认为0）,如果设置为1，那么存入的key-value都存放在select 1中
-    host:
-    port:
-    password:
+    database: 0
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:123456}
+    password: ${REDIS_PASSWORD:123456}
 
 logging:
   pattern:
@@ -22,7 +22,7 @@ xxl:
   job:
     accessToken:
     admin:
-      addresses: http://xxl/xxl-job-admin
+      addresses: http://127.0.0.1:8080/xxl-job-admin
     executor:
       address: ''
       appname: dataTransJobHandler
@@ -39,12 +39,13 @@ client:
     read_timeout_ms: 600000
     logging: true
   flink:
-    url:
+    url: http://localhost:8081
     connect_timeout_ms: 20000
     call_timeout_ms: 600000
     read_timeout_ms: 600000
     logging: true
-
+reserve:
+  job_graph: false
 flinkx:
   path: ${user.dir}/flinkx/
   #  如果使用容器化部署，请开启下面配置
@@ -66,8 +67,3 @@ flinkx:
   #    docker cp /{dir_path}/flinkx/syncplugins my_container:/{dir_path}/flinkx
 
 #  2.修改宿主机flinkconf的配置文件中的配置
-support:
-  datasource:
-    - mysql
-    - elasticsearch
-    - oracle

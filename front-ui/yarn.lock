@@ -189,6 +189,84 @@
   dependencies:
     "@antv/gl-matrix" "^2.7.1"
 
+"@antv/x6-common@^2.0.16":
+  version "2.0.17"
+  resolved "https://registry.yarnpkg.com/@antv/x6-common/-/x6-common-2.0.17.tgz#a40a0920859faadf567452dea81132783a19aaa4"
+  integrity sha512-37g7vmRkNdYzZPdwjaMSZEGv/MMH0S4r70/Jwoab1mioycmuIBN73iyziX8m56BvJSDucZ3J/6DU07otWqzS6A==
+  dependencies:
+    lodash-es "^4.17.15"
+    utility-types "^3.10.0"
+
+"@antv/x6-geometry@^2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@antv/x6-geometry/-/x6-geometry-2.0.5.tgz#c158317d74135bedd78c2fdeb76f9c7cfa0ef0aa"
+  integrity sha512-MId6riEQkxphBpVeTcL4ZNXL4lScyvDEPLyIafvWMcWNTGK0jgkK7N20XSzqt8ltJb0mGUso5s56mrk8ysHu2A==
+
+"@antv/x6-plugin-clipboard@^2.1.6":
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-clipboard/-/x6-plugin-clipboard-2.1.6.tgz#98886d5b16a175b67f142ef66c75907de7c1b069"
+  integrity sha512-roZPLnZx6PK8MBvee0QMo90fz/TXeF0WNe4EGin2NBq5M1I5XTWrYvA6N2XVIiWAAI67gjQeEE8TpkL7f8QdqA==
+
+"@antv/x6-plugin-dnd@^2.x":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-dnd/-/x6-plugin-dnd-2.1.1.tgz#4d9afed8e8105e01e31cdf526068fa686fb6b4aa"
+  integrity sha512-v0szzik1RkadPDn4Qi5mOSaB2AeI78D40/YuCYbPVzplG+HydGsHwO3MLTgJPQ+R5n0eM0W5F850p1VfTOHR7g==
+
+"@antv/x6-plugin-history@^2.2.4":
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-history/-/x6-plugin-history-2.2.4.tgz#c4a543b8a2b6ae8b6934ec69067688459cae6c48"
+  integrity sha512-9gHHvEW4Fla+1hxUV49zNgJyIMoV9CjVM52MrFgAJcvyRn1Kvxz4MfxiKlG+DEZUs+/zvfjl9pS6gJOd8laRkg==
+
+"@antv/x6-plugin-keyboard@^2.2.3":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-keyboard/-/x6-plugin-keyboard-2.2.3.tgz#4f774ad27527596400ba85ce8597cf8ad7e65ff8"
+  integrity sha512-pnCIC+mDyKKfkcDyLePfGxKVIqXBcldTgannITkHC1kc0IafRS1GMvzpvuDGrM5haRYd6Nwz8kjkJyHkJE4GPA==
+  dependencies:
+    mousetrap "^1.6.5"
+
+"@antv/x6-plugin-minimap@^2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-minimap/-/x6-plugin-minimap-2.0.7.tgz#1f319ac04de7d05ca895ea6e2784489efe068791"
+  integrity sha512-8zzESCx0jguFPCOKCA0gPFb6JmRgq81CXXtgJYe34XhySdZ6PB23I5Po062lNsEuTjTjnzli4lju8vvU+jzlGw==
+
+"@antv/x6-plugin-selection@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-selection/-/x6-plugin-selection-2.2.2.tgz#681c843124c2150af51594e8e1fc947b5e95e858"
+  integrity sha512-s2gtR9Onlhr7HOHqyqg0d+4sG76JCcQEbvrZZ64XmSChlvieIPlC3YtH4dg1KMNhYIuBmBmpSum6S0eVTEiPQw==
+
+"@antv/x6-plugin-snapline@^2.1.7":
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-snapline/-/x6-plugin-snapline-2.1.7.tgz#1b4e3be0a281ba324117b7ac7b9b8c39e484cce2"
+  integrity sha512-AsysoCb9vES0U2USNhEpYuO/W8I0aYfkhlbee5Kt4NYiMfQfZKQyqW/YjDVaS2pm38C1NKu1LdPVk/BBr4CasA==
+
+"@antv/x6-plugin-stencil@^2.1.5":
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-stencil/-/x6-plugin-stencil-2.1.5.tgz#27d96ead99027cfa6ce2537e76301c0d46035f01"
+  integrity sha512-q7wx7XRMFkUKPv3WsHkvZda6O1GW+6q6H/+c1lcrwlQoEKOFv1Djc4Hu2J4SGhV2z98P2JLfVJiT5m7YoOoCHw==
+  dependencies:
+    "@antv/x6-plugin-dnd" "^2.x"
+
+"@antv/x6-plugin-transform@^2.1.8":
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/@antv/x6-plugin-transform/-/x6-plugin-transform-2.1.8.tgz#0a40cf63f1a0a882b08c800e37319973ba12e4c1"
+  integrity sha512-GvJuiJ4BKp0H7+qx3R1I+Vzbw5gXp9+oByXo/WyVxE3urOC7LC5sqnaDfIjyYMN6ROLPYPZraLSeSyYBgMgcDw==
+
+"@antv/x6-vue-shape@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@antv/x6-vue-shape/-/x6-vue-shape-2.1.2.tgz#880abc2842f47f668c3de97cbacd1618bee1427a"
+  integrity sha512-lfLNJ2ztK8NP2JBAWTD6m5Wol0u6tOqj2KdOhWZoT8EtEw9rMmAdxsr8uTi9MRJO9pDMM0nbsR3cidnMh7VeDQ==
+  dependencies:
+    vue-demi latest
+
+"@antv/x6@^2.18.1":
+  version "2.18.1"
+  resolved "https://registry.yarnpkg.com/@antv/x6/-/x6-2.18.1.tgz#4f3fab8c24119ca5f83583188657fc243cc5a0bc"
+  integrity sha512-FkWdbLOpN9J7dfJ+kiBxzowSx2N6syBily13NMVdMs+wqC6Eo5sLXWCZjQHateTFWgFw7ZGi2y9o3Pmdov1sXw==
+  dependencies:
+    "@antv/x6-common" "^2.0.16"
+    "@antv/x6-geometry" "^2.0.5"
+    utility-types "^3.10.0"
+
 "@babel/code-frame@7.12.11":
   version "7.12.11"
   resolved "https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.12.11.tgz"
@@ -6436,7 +6514,7 @@ inquirer@8.2.5:
 
 insert-css@^2.0.0:
   version "2.0.0"
-  resolved "https://registry.npmjs.org/insert-css/-/insert-css-2.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/insert-css/-/insert-css-2.0.0.tgz#eb5d1097b7542f4c79ea3060d3aee07d053880f4"
   integrity sha512-xGq5ISgcUP5cvGkS2MMFLtPDBtrtQPSFfC6gA6U8wHKqfjTIMZLZNxOItQnoSjdOzlXOLU/yD32RKC4SvjNbtA==
 
 internal-slot@^1.0.5:
@@ -7722,6 +7800,11 @@ locate-path@^6.0.0:
   dependencies:
     p-locate "^5.0.0"
 
+lodash-es@^4.17.15:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
+  integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
+
 lodash.clonedeep@^4.5.0:
   version "4.5.0"
   resolved "https://registry.npmjs.org/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz"
@@ -8200,6 +8283,11 @@ moment@^2.21.0, moment@^2.29.2:
   version "2.29.4"
   resolved "https://registry.npmjs.org/moment/-/moment-2.29.4.tgz"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
+
+mousetrap@^1.6.5:
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/mousetrap/-/mousetrap-1.6.5.tgz#8a766d8c272b08393d5f56074e0b5ec183485bf9"
+  integrity sha512-QNo4kEepaIBwiT8CDhP98umTetp+JNfQYBWvC1pc6/OAibuXtRcxZ58Qz8skvEHYvURne/7R8T5VoOI7rDsEUA==
 
 mrmime@^1.0.0:
   version "1.0.1"
@@ -9754,6 +9842,13 @@ safe-regex@^1.1.0:
   resolved "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
+sass-loader@^16.0.2:
+  version "16.0.2"
+  resolved "https://registry.yarnpkg.com/sass-loader/-/sass-loader-16.0.2.tgz#e581bc13d7cb5090e27f155c6aa2855c08cafe86"
+  integrity sha512-Ll6iXZ1EYwYT19SqW4mSBb76vSSi8JgzElmzIerhEGgzB5hRjDQIWsPmuk1UrAXkR16KJHqVY0eH+5/uw9Tmfw==
+  dependencies:
+    neo-async "^2.6.2"
+
 sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.npmjs.org/sax/-/sax-1.2.4.tgz"
@@ -11086,6 +11181,11 @@ utila@~0.4:
   resolved "https://registry.npmjs.org/utila/-/utila-0.4.0.tgz"
   integrity sha512-Z0DbgELS9/L/75wZbro8xAnT50pBVFQZ+hUEueGDU5FN51YSCYM+jdxsfCiHjwNP/4LCDD0i/graKpeBnOXKRA==
 
+utility-types@^3.10.0:
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.11.0.tgz#607c40edb4f258915e901ea7995607fdf319424c"
+  integrity sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==
+
 utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/utils-merge/-/utils-merge-1.0.1.tgz"
@@ -11211,6 +11311,11 @@ vue-cropper@0.4.9:
   version "0.4.9"
   resolved "https://registry.npmjs.org/vue-cropper/-/vue-cropper-0.4.9.tgz"
   integrity sha512-Uf1i/sCh+ZqSM9hb2YTGRENzJFH+mvDuv8N2brGLjK7UBuF7XDP7zbis8g/dcqZiMojAcBDtObFCn4ERFbRMxQ==
+
+vue-demi@latest:
+  version "0.14.10"
+  resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.14.10.tgz#afc78de3d6f9e11bf78c55e8510ee12814522f04"
+  integrity sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==
 
 vue-eslint-parser@^5.0.0:
   version "5.0.0"
