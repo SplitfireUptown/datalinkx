@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class StreamExecutorJobHandler extends ExecutorJobHandler {
+public class ExecutorStreamJobHandler extends ExecutorJobHandler {
 
     public String execute(String jobId, String reader, String writer, Map<String, String> otherSetting) throws Exception {
         return super.execute(jobId, reader, writer, otherSetting);

@@ -1,4 +1,4 @@
-package com.datalinkx.datajob.job;
+package com.datalinkx.common.utils;
 
 import java.io.IOException;
 import java.io.LineNumberReader;
