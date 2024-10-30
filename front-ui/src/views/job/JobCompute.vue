@@ -7,56 +7,64 @@
       :visible="visible"
       :after-visible-change="afterVisibleChange"
       @close="onClose"
+      width="500"
     >
-
+      <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
+        <a-form-item label="Note">
+          <a-input
+            v-decorator="['note', { rules: [{ required: true, message: 'Please input your note!' }] }]"
+          />
+        </a-form-item>
+      </a-form>
     </a-drawer>
-    <!-- <a-layout>
-      <a-layout-header>Header</a-layout-header>
-      <a-layout>
-        <a-layout-sider>Sider</a-layout-sider>
-        <a-layout-content>Content</a-layout-content>
-      </a-layout>
-      <a-layout-footer>Footer</a-layout-footer>
-    </a-layout>-->
-    <div class="top-box">
-      <div class="tools-box">
-        <div
-          v-for="tool in tools"
-          :key="tool.key"
-          class="tool"
-          @click="handleTrigger(tool.key)">
-<!--          <img :src="require(`@/assets/images/${tool.iconClass}.png`)" alt="">-->
-          <div class="word">{{ tool.title }}</div>
+     <a-layout>
+      <a-layout-header>
+        <div class="top-box">
+          <div class="tools-box">
+            <div
+              v-for="tool in tools"
+              :key="tool.key"
+              class="tool"
+              @click="handleTrigger(tool.key)">
+              <!--          <img :src="require(`@/assets/images/${tool.iconClass}.png`)" alt="">-->
+              <div class="word">{{ tool.title }}</div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div id="stencil">
-      <div>
-        <div class="dnd-circle dnd-start" @mousedown="startDrag('start',$event)">
-          <span>来源数据源</span>
-        </div>
-      </div>
-      <div>
-        <div class="dnd-rect" @mousedown="startDrag('rect',$event)">
-          <span>SQL算子</span>
-        </div>
-      </div>
-      <div>
-        <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">
-          <span>节点2</span>
-        </div>
-      </div>
-      <div>
-        <div class="dnd-circle" @mousedown="startDrag('end',$event)">
-          <span>目标数据源</span>
-        </div>
-      </div>
+      </a-layout-header>
+       <a-layout>
+          <a-layout-sider style="background: transparent">
+            <div id="stencil">
+              <div>
+                <div class="dnd-circle dnd-start" @mousedown="startDrag('start',$event)">
+                  <span>来源数据源</span>
+                </div>
+              </div>
+              <div>
+                <div class="dnd-rect" @mousedown="startDrag('rect',$event)">
+                  <span>SQL算子</span>
+                </div>
+              </div>
+              <div>
+                <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">
+                  <span>节点2</span>
+                </div>
+              </div>
+              <div>
+                <div class="dnd-circle" @mousedown="startDrag('end',$event)">
+                  <span>目标数据源</span>
+                </div>
+              </div>
 
-    </div>
-    <div id="container">
-      <div id="graph-container"></div>
-    </div>
-
+            </div>
+          </a-layout-sider>
+         <a-layout-content style="height: calc(100vh - 64px)">
+           <div id="container">
+             <div id="graph-container"></div>
+           </div>
+         </a-layout-content>
+       </a-layout>
+    </a-layout>
   </div>
 </template>
 
@@ -403,7 +411,7 @@
         })
 
         this.graph
-          .use(new Selection({ showNodeSelectionBox: true, pointerEvents: 'none' }))
+          .use(new Selection({ shelectionBox: true, pointerEvents: 'none' }))
           .use(new Snapline())
           .use(new Keyboard())
           .use(new Clipboard())
@@ -623,8 +631,11 @@
             cell.removeTool('button-remove')
           }
         })
-        this.graph.on('node:click', ({ x, y, node, cell }) => {
-          this.currentCell = cell
+        this.graph.on('node:click', (e) => {
+          this.currentCell = e.cell
+          console.log('this.currentCell',this.currentCell)
+          console.log('this.node',e)
+          this.visible = true
           if (cell.isNode() && !cell.attrs.typeName) {
             // 这可以写一些点击节点时和右侧表单交互的效果
             const selectedCell = this.graph.getSelectedCells()
@@ -691,10 +702,10 @@
     .top-box {
       height: 40px;
       z-index: 999;
-      background: #FFFFFF;
-      position: absolute;
-      top: 0;
-      left: 100px;
+      //background: #FFFFFF;
+      //position: absolute;
+      //top: 0;
+      //left: 100px;
 
       .tools-box {
         display: flex;
@@ -728,7 +739,6 @@
         line-height: 38px;
       }
     }
-
     #container {
       display: flex;
       height: 100%;
