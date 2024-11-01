@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MySQLSink extends PluginNode {
+public class JdbcSink extends PluginNode {
     private String url;
     private String driver;
     private String user;

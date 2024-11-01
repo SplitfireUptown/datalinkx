@@ -1,6 +1,7 @@
 package com.datalinkx.datajob.config;
 
 import com.datalinkx.dataclient.client.flink.FlinkClient;
+import com.datalinkx.dataclient.client.seatunnel.SeaTunnelClient;
 import com.datalinkx.dataclient.config.DatalinkXClientUtils;
 import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,5 +22,11 @@ public class WebClientConfig implements WebMvcConfigurer {
 	@ConditionalOnProperty(prefix = "client.flink", name = "url")
 	public FlinkClient flinkClient(ClientProperties clientProperties) {
 		return DatalinkXClientUtils.createClient("flink", clientProperties.getFlink(), FlinkClient.class);
+	}
+
+	@Bean
+	@ConditionalOnProperty(prefix = "client.seatunnel", name = "url")
+	public SeaTunnelClient seaTunnelClient(ClientProperties clientProperties) {
+		return DatalinkXClientUtils.createClient("seatunnel", clientProperties.getSeatunnel(), SeaTunnelClient.class);
 	}
 }

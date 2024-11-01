@@ -6,4 +6,7 @@ import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 public interface IDsWriter extends IDsDriver {
     void truncateData(FlinkActionMeta param) throws Exception;
     Object getWriterInfo(FlinkActionMeta param) throws Exception;
+    default Object getComputeSinkInfo(FlinkActionMeta param) {
+        return "";
+    };
 }

@@ -19,7 +19,7 @@ import java.util.Map;
 @Builder
 @ToString(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ComputeJobDetail<T extends PluginNode, C extends TransformNode, E extends PluginNode> {
+public class ComputeJobGraph<T extends PluginNode, C extends TransformNode, E extends PluginNode> {
     @JsonProperty("job_id")
     private String jobId;
     private Map<String, Object> env;

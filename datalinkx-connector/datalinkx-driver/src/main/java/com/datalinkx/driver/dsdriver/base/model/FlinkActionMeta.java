@@ -1,8 +1,10 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.datalinkx.compute.model.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.model.DataTransJobDetail;
@@ -33,6 +35,8 @@ public class FlinkActionMeta extends EngineActionMeta {
     IDsReader dsReader;
     // 目标库driver驱动
     IDsWriter dsWriter;
+    // 计算任务的中间节点
+    List<TransformNode> transformNodes;
     // 是否覆盖 0 - 否 1 - 是
     Integer cover;
     // 数据总读行数

@@ -21,6 +21,7 @@ import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.common.utils.TelnetUtil;
+import com.datalinkx.compute.connector.jdbc.JdbcSource;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -124,45 +125,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return this.connectId;
     }
 
-    public List<DbTree> tree(Boolean fetchTable) throws Exception {
-        Connection connection = ConnectPool.getConnection(this, Connection.class);
-        try {
-            List<String> catalogs = fetchCatalog(connection);
-            List<DbTree> result = new ArrayList<>();
-
-            if (!ObjectUtils.isEmpty(catalogs)) {
-                List<DbTree> catalogList = catalogs.stream().map(catalog -> {
-                    DbTree catalogItem = new DbTree();
-                    catalogItem.setName(catalog);
-                    catalogItem.setLevel("catalog");
-                    catalogItem.setRef(refEncode(Lists.newArrayList(catalog, null, null)));
-                    List<? extends DbTree> dbTrees = generateTree(catalog, fetchTable, connection);
-                    if (dbTrees.size() > 0) {
-                        if (dbTrees.get(0) instanceof DbTree.DbTreeTable) {
-                            catalogItem.setTable(dbTrees.stream()
-                                    .map(dbTree -> (DbTree.DbTreeTable) dbTree).collect(Collectors.toList()));
-                        } else {
-                            catalogItem.setFolder(dbTrees.stream()
-                                    .map(dbTree -> (DbTree) dbTree).collect(Collectors.toList()));
-                        }
-                    }
-                    return catalogItem;
-                }).collect(Collectors.toList());
-
-                List<DbTree> schemaList = new ArrayList<>();
-                catalogList.forEach(catalog -> schemaList.addAll(catalog.getFolder()));
-                result.addAll(schemaList);
-                return result;
-            } else {
-                List<? extends DbTree> tree = generateTree(null, fetchTable, connection);
-                result.addAll(tree);
-            }
-
-            return result;
-        } finally {
-            ConnectPool.releaseConnection(this.connectId, connection);
-        }
-    }
 
     public List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception {
         Connection connection = ConnectPool.getConnection(this, Connection.class);
@@ -194,25 +156,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
 
-    public List<? extends DbTree> generateTree(String catalog, boolean fetchTable, Connection connection) {
-        List<String> schemas = fetchSchema(catalog, connection);
-        Map<String, List<Map<String, Object>>> result = new HashMap<>();
-        if (schemas == null) {
-            if (fetchTable) {
-                return generateTree(catalog, null, connection);
-            }
-            return new ArrayList<>();
-        }
-
-        return schemas.stream().map(schema -> {
-            DbTree schemaItem = new DbTree();
-            schemaItem.setName(schema);
-            schemaItem.setLevel("schema");
-            schemaItem.setRef(refEncode(Lists.newArrayList(catalog, schema, null)));
-            schemaItem.setTable(fetchTable ? generateTree(catalog, schema, connection) : new ArrayList<>());
-            return schemaItem;
-        }).collect(Collectors.toList());
-    }
 
     public List<DbTree.DbTreeTable> generateTree(String catalog, String schema, Connection connection) {
         List<String> tableList = fetchTable(catalog, schema, connection);
@@ -274,34 +217,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         }
     }
 
-
-    public List<String> fetchCatalog(Connection connection) {
-        ResultSet resultSet = null;
-        List<String> catalogs = new ArrayList<>();
-        try {
-            resultSet = connection.getMetaData().getCatalogs();
-            while (resultSet.next()) {
-                catalogs.add(resultSet.getString("TABLE_CAT"));
-            }
-        } catch (SQLException e) {
-            log.error("fetch catalog error", e);
-        }
-        return catalogs;
-    }
-
-    public List<String> fetchSchema(String catalog, Connection connection) {
-        ResultSet resultSet = null;
-        List<String> schemas = new ArrayList<>();
-        try {
-            resultSet = connection.getMetaData().getSchemas(catalog, null);
-            while (resultSet.next()) {
-                schemas.add(resultSet.getString("TABLE_SCHEM"));
-            }
-        } catch (SQLException e) {
-            log.error("fetch schema error", e);
-        }
-        return schemas;
-    }
 
     public List<String> fetchTable(String catalog, String schema, Connection connection) {
         List<String> tables = new ArrayList<>();
@@ -454,6 +369,18 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return "'";
     }
 
+
+    @Override
+    public Object getComputedReaderInfo(FlinkActionMeta meta) {
+        String schema = meta.getReader().getSchema();
+
+        return JdbcSource.builder()
+                .url(jdbcUrl())
+                .driver(driverClass())
+                .user(jdbcSetupInfo.getUid())
+                .password(jdbcSetupInfo.getPwd())
+                .build();
+    }
 
     public String wrapTableName(String catalog, String schema, String tableName) {
         List<String> fullName = new ArrayList<>();

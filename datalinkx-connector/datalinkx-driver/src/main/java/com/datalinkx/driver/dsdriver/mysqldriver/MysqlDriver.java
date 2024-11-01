@@ -33,7 +33,6 @@ public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWrit
         DATE_TYPE_SET.add("time");
     }
 
-
     @Override
     protected String jdbcUrl() {
         return String.format(
@@ -49,6 +48,7 @@ public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWrit
                 this.jdbcSetupInfo.getServerTimezone()
         );
     }
+
 
 
     @Override
