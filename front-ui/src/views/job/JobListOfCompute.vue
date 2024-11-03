@@ -216,7 +216,6 @@ export default {
   },
   created () {
     this.init()
-    this.createEventSource()
   }
 }
 </script>

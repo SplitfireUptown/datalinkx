@@ -9,15 +9,30 @@
       @close="onClose"
       width="500"
     >
-      <a-form :form="form" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }" @submit="handleSubmit">
-        <a-form-item label="Note">
-          <a-input
-            v-decorator="['note', { rules: [{ required: true, message: 'Please input your note!' }] }]"
-          />
-        </a-form-item>
-      </a-form>
+      <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
+      <div class="select-container">
+        <a-select class="input-full-width" @change="handleFromChange"
+                  v-decorator="['selectedDataSource', {rules: [{required: true, message: '请选择来源数据源'}],initialValue: selectedDataSource}]">
+          <a-select-option v-for="table in fromDsList" :value="table.dsId" :key="table.name">
+            <div>
+          <span class="ds-icon">
+            <img :src="dsImgObj[table.type]" alt="">
+          </span>
+              <span>{{ table.name }}</span>
+            </div>
+          </a-select-option>
+        </a-select>
+      </div>
+
+      <div class="input-container">
+        <a-select class="input-full-width" @change="handleFromTbChange" v-decorator="['selectedSourceTable', {rules: [{required: true, message: '请选择来源数据源表'}],initialValue: selectedSourceTable}]">
+          <a-select-option v-for="table in sourceTables" :value="table" :key="table">
+            {{ table }}
+          </a-select-option>
+        </a-select>
+      </div>
     </a-drawer>
-     <a-layout>
+    <a-layout>
       <a-layout-header>
         <div class="top-box">
           <div class="tools-box">
@@ -26,52 +41,52 @@
               :key="tool.key"
               class="tool"
               @click="handleTrigger(tool.key)">
-              <!--          <img :src="require(`@/assets/images/${tool.iconClass}.png`)" alt="">-->
+              <img :src="require(`@/assets/icons/${tool.iconClass}.png`)" alt="">
               <div class="word">{{ tool.title }}</div>
             </div>
           </div>
         </div>
       </a-layout-header>
-       <a-layout>
-          <a-layout-sider style="background: transparent">
-            <div id="stencil">
-              <div>
-                <div class="dnd-circle dnd-start" @mousedown="startDrag('start',$event)">
-                  <span>来源数据源</span>
-                </div>
+      <a-layout>
+        <a-layout-sider style="background: transparent">
+          <div id="stencil">
+            <div>
+              <div class="dnd-circle dnd-start" @mousedown="startDrag('start',$event)">
+                <span>来源数据源</span>
               </div>
-              <div>
-                <div class="dnd-rect" @mousedown="startDrag('rect',$event)">
-                  <span>SQL算子</span>
-                </div>
-              </div>
-              <div>
-                <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">
-                  <span>节点2</span>
-                </div>
-              </div>
-              <div>
-                <div class="dnd-circle" @mousedown="startDrag('end',$event)">
-                  <span>目标数据源</span>
-                </div>
-              </div>
-
             </div>
-          </a-layout-sider>
-         <a-layout-content style="height: calc(100vh - 64px)">
-           <div id="container">
-             <div id="graph-container"></div>
-           </div>
-         </a-layout-content>
-       </a-layout>
+            <div>
+              <div class="dnd-rect" @mousedown="startDrag('rect',$event)">
+                <span>SQL算子</span>
+              </div>
+            </div>
+            <div>
+              <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">
+                <span>节点2</span>
+              </div>
+            </div>
+            <div>
+              <div class="dnd-circle" @mousedown="startDrag('end',$event)">
+                <span>目标数据源</span>
+              </div>
+            </div>
+
+          </div>
+        </a-layout-sider>
+        <a-layout-content style="height: calc(100vh - 64px)">
+          <div id="container">
+            <div id="graph-container"></div>
+          </div>
+        </a-layout-content>
+      </a-layout>
     </a-layout>
   </div>
 </template>
-
+``
 <script>
+  import { dsImgObj } from './../datasource/const'
   import { Graph, Shape } from '@antv/x6'
-  import { Stencil } from '@antv/x6-plugin-stencil'
-  import { Transform } from '@antv/x6-plugin-transform'
+  import LoadingDx from './../../components/common/loading-dx.vue'
   import { Selection } from '@antv/x6-plugin-selection'
   import { Snapline } from '@antv/x6-plugin-snapline'
   import { Keyboard } from '@antv/x6-plugin-keyboard'
@@ -79,14 +94,24 @@
   import { MiniMap } from '@antv/x6-plugin-minimap'
   import { Dnd } from '@antv/x6-plugin-dnd'
   import { History } from '@antv/x6-plugin-history'
-  import { register } from '@antv/x6-vue-shape'
-  import insertCss from 'insert-css'
+  import { fetchTables, listQuery } from '@/api/datasource/datasource'
 
   export default {
-    name: 'Index',
+    components: {
+      LoadingDx
+    },
     data () {
       return {
         visible: false,
+        dsImgObj,
+        fromDsList: [],
+        toDsList: [],
+        sourceTables: [],
+        selectloading: false,
+        selectedDataSource: null,
+        selectedTargetSource: null,
+        selectedSourceTable: null,
+        selectedTargetTable: null,
         tools: [
           {
             title: '保存',
@@ -143,11 +168,44 @@
         ]
       }
     },
+    created () {
+
+    },
     mounted () {
       this.initGraph()
+      listQuery().then(res => {
+        this.selectloading = false
+        const record = res.result
+        for (var a of record) {
+          // redis数据源暂不支持读
+          if (a.type !== 4) {
+            this.fromDsList.push({
+              dsId: a.dsId,
+              name: a.name,
+              type: a.type
+            })
+          }
+          this.toDsList.push({
+            dsId: a.dsId,
+            name: a.name,
+            type: a.type
+          })
+        }
+      })
     },
-    inject: ["closeDraw"],
+    inject: ['closeDraw'],
     methods: {
+      handleFromTbChange (value) {
+        console.log(value)
+      },
+      handleFromChange (value) {
+        this.selectedDataSource = value
+        this.selectloading = true
+        fetchTables(value).then(res => {
+          this.selectloading = false
+          this.sourceTables = res.result
+        })
+      },
       afterVisibleChange (val) {
         console.log('visible', val)
       },
@@ -631,10 +689,10 @@
             cell.removeTool('button-remove')
           }
         })
-        this.graph.on('node:click', (e) => {
-          this.currentCell = e.cell
-          console.log('this.currentCell',this.currentCell)
-          console.log('this.node',e)
+        this.graph.on('node:click', ({ x, y, node, cell }) => {
+          this.currentCell = cell
+          console.log('this.currentCell', this.currentCell)
+          console.log('this.currentCell', this.currentCell.shape)
           this.visible = true
           if (cell.isNode() && !cell.attrs.typeName) {
             // 这可以写一些点击节点时和右侧表单交互的效果
@@ -673,6 +731,14 @@
   }
 </script>
 
+<style>
+  .select-container {
+    margin-bottom: 10px; /* 添加底部间距 */
+  }
+  .input-full-width {
+    width: 100%;
+  }
+</style>
 <style lang="less" scoped>
   .g6-wrap {
     width: 100%;
