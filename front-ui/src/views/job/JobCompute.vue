@@ -32,6 +32,17 @@
         </a-select>
       </div>
     </a-drawer>
+    <a-drawer
+      title="Basic Drawer"
+      placement="right"
+      :closable="false"
+      :visible="sqlVisible"
+      :after-visible-change="afterVisibleChange"
+      @close="onClose"
+      width="500"
+    >
+      <a-textarea></a-textarea>
+    </a-drawer>
     <a-layout>
       <a-layout-header>
         <div class="top-box">
@@ -103,6 +114,7 @@
     data () {
       return {
         visible: false,
+        sqlVisible: false,
         dsImgObj,
         fromDsList: [],
         toDsList: [],
@@ -209,11 +221,9 @@
       afterVisibleChange (val) {
         console.log('visible', val)
       },
-      showDrawer () {
-        this.visible = true
-      },
       onClose () {
         this.visible = false
+        this.sqlVisible = false
       },
       handleTrigger (command) {
         switch (command) {
@@ -359,7 +369,6 @@
           shape: 'custom-circle-start',
           width: 38,
           height: 38,
-          key: 'end',
           attrs: {
             body: {
               strokeWidth: 4,
@@ -692,8 +701,13 @@
         this.graph.on('node:click', ({ x, y, node, cell }) => {
           this.currentCell = cell
           console.log('this.currentCell', this.currentCell)
-          console.log('this.currentCell', this.currentCell.shape)
-          this.visible = true
+          console.log('this.currentCell', this.currentCell.key)
+          if (this.currentCell.shape === 'custom-circle-start') {
+            this.visible = true
+          }
+          if (this.currentCell.shape === 'custom-rect') {
+            this.sqlVisible = true
+          }
           if (cell.isNode() && !cell.attrs.typeName) {
             // 这可以写一些点击节点时和右侧表单交互的效果
             const selectedCell = this.graph.getSelectedCells()
