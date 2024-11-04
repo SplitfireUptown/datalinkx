@@ -1,7 +1,7 @@
 <template>
   <div class="g6-wrap">
     <a-drawer
-      title="Basic Drawer"
+      title="来源数据源"
       placement="right"
       :closable="false"
       :visible="visible"
@@ -11,13 +11,15 @@
     >
       <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
       <div class="select-container">
-        <a-select class="input-full-width" @change="handleFromChange"
-                  v-decorator="['selectedDataSource', {rules: [{required: true, message: '请选择来源数据源'}],initialValue: selectedDataSource}]">
+        <a-select
+          class="input-full-width"
+          @change="handleFromChange"
+          v-decorator="['selectedDataSource', {rules: [{required: true, message: '请选择来源数据源'}],initialValue: selectedDataSource}]">
           <a-select-option v-for="table in fromDsList" :value="table.dsId" :key="table.name">
             <div>
-          <span class="ds-icon">
-            <img :src="dsImgObj[table.type]" alt="">
-          </span>
+              <span class="ds-icon">
+                <img :src="dsImgObj[table.type]" alt="">
+              </span>
               <span>{{ table.name }}</span>
             </div>
           </a-select-option>
@@ -31,9 +33,30 @@
           </a-select-option>
         </a-select>
       </div>
+      <a-form-item label="选择流转字段">
+        <a-row :gutter="16" v-for="(mapping, index) in mappings" :key="index">
+          <a-col :span="8">
+            <a-select v-model="mapping.sourceField" placeholder="请选择来源字段" class="input-full-width">
+              <a-select-option v-for="field in sourceFields" :value="field.name" :key="field.name">
+                {{ field.name }}
+              </a-select-option>
+            </a-select>
+          </a-col>
+          <a-col :span="4">
+            <a-icon type="minus-circle-o" @click="removeMapping(index)" v-show="mappings.length > 1" />
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-button type="dashed" @click="addMapping" style="width: 100%">
+              <a-icon type="plus" /> 添加字段映射关系
+            </a-button>
+          </a-col>
+        </a-row>
+      </a-form-item>
     </a-drawer>
     <a-drawer
-      title="Basic Drawer"
+      title="SQL算子"
       placement="right"
       :closable="false"
       :visible="sqlVisible"
@@ -41,7 +64,12 @@
       @close="onClose"
       width="500"
     >
-      <a-textarea></a-textarea>
+      <span>select</span>
+      <a-textarea placeholder="SQL算子, 基于来源表构造SQL逻辑, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
+      <span>from</span>
+      <a-input v-model="this.selectedSourceTable" disabled="true"/>
+      <span>where</span>
+      <a-textarea placeholder="SQL算子, 基于来源表构造SQL逻辑, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
     </a-drawer>
     <a-layout>
       <a-layout-header>
@@ -71,11 +99,11 @@
                 <span>SQL算子</span>
               </div>
             </div>
-            <div>
-              <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">
-                <span>节点2</span>
-              </div>
-            </div>
+            <!--            <div>-->
+            <!--              <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">-->
+            <!--                <span>节点2</span>-->
+            <!--              </div>-->
+            <!--            </div>-->
             <div>
               <div class="dnd-circle" @mousedown="startDrag('end',$event)">
                 <span>目标数据源</span>
@@ -105,7 +133,7 @@
   import { MiniMap } from '@antv/x6-plugin-minimap'
   import { Dnd } from '@antv/x6-plugin-dnd'
   import { History } from '@antv/x6-plugin-history'
-  import { fetchTables, listQuery } from '@/api/datasource/datasource'
+  import { fetchTables, getDsTbFieldsInfo, listQuery } from '@/api/datasource/datasource'
 
   export default {
     components: {
@@ -119,11 +147,15 @@
         fromDsList: [],
         toDsList: [],
         sourceTables: [],
+        sourceFields: [],
         selectloading: false,
         selectedDataSource: null,
-        selectedTargetSource: null,
         selectedSourceTable: null,
+        selectedTargetSource: null,
         selectedTargetTable: null,
+        mappings: [
+          { sourceField: '' }
+        ],
         tools: [
           {
             title: '保存',
@@ -208,7 +240,18 @@
     inject: ['closeDraw'],
     methods: {
       handleFromTbChange (value) {
-        console.log(value)
+        this.selectedSourceTable = value
+        this.selectloading = true
+        this.queryParam = {
+          'ds_id': this.selectedDataSource,
+          'name': value
+        }
+        getDsTbFieldsInfo({
+          ...this.queryParam
+        }).then(res => {
+          this.selectloading = false
+          this.sourceFields = res.result
+        })
       },
       handleFromChange (value) {
         this.selectedDataSource = value
@@ -217,6 +260,12 @@
           this.selectloading = false
           this.sourceTables = res.result
         })
+      },
+      addMapping () {
+        this.mappings.push({ sourceField: '' })
+      },
+      removeMapping (index) {
+        this.mappings.splice(index, 1)
       },
       afterVisibleChange (val) {
         console.log('visible', val)
@@ -255,7 +304,6 @@
             this.changePann(command)
             break
           case 'exit':
-            console.log('exit')
             this.closeDraw()
             this.$router.push('/compute/job')
             break
@@ -315,9 +363,9 @@
       },
       startDragToGraph (graph, type, e) {
         const startNode = this.graph.createNode({
-          shape: 'custom-circle-start',
-          width: 38,
-          height: 38,
+          shape: 'custom-start-node',
+          width: 55,
+          height: 55,
           attrs: {
             body: {
               strokeWidth: 1,
@@ -348,9 +396,9 @@
 
         })
         const rectNode = this.graph.createNode({
-          shape: 'custom-rect',
-          width: 80,
-          height: 60,
+          shape: 'custom-sql-node',
+          width: 55,
+          height: 55,
           attrs: {
             body: {
               strokeWidth: 1,
@@ -366,12 +414,12 @@
           }
         })
         const endNode = this.graph.createNode({
-          shape: 'custom-circle-start',
-          width: 38,
-          height: 38,
+          shape: 'custom-end-node',
+          width: 55,
+          height: 55,
           attrs: {
             body: {
-              strokeWidth: 4,
+              strokeWidth: 1,
               stroke: '#000000',
               fill: '#ffffff',
               rx: 10,
@@ -570,12 +618,53 @@
           }
         }
 
+        // Graph.registerNode(
+        //   'custom-sql-node',
+        //   {
+        //     inherit: 'rect',
+        //     // attrs 可自定义
+        //     ports: { ...ports }
+        //   },
+        //   true
+        // )
         Graph.registerNode(
-          'custom-rect',
+          'custom-sql-node',
           {
-            inherit: 'rect',
-            // attrs 可自定义
-            ports: { ...ports }
+            inherit: 'rect', // 继承于 rect 节点
+            ports: { ...ports },
+            width: 100,
+            height: 40,
+            markup: [
+              {
+                tagName: 'rect', // 标签名称
+                selector: 'body' // 选择器
+              },
+              {
+                tagName: 'image',
+                selector: 'img'
+              },
+              {
+                tagName: 'text',
+                selector: 'label'
+              }
+            ],
+            attrs: {
+              body: {
+                stroke: '#8f8f8f',
+                strokeWidth: 1,
+                fill: '#fff',
+                rx: 6,
+                ry: 6
+              },
+              img: {
+                'xlink:href':
+                  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgZD0iTTEyIDhhMiAyIDAgMCAxIDIgMnY0YTIgMiAwIDEgMS00IDB2LTRhMiAyIDAgMCAxIDItMm01IDB2OGg0bS04LTFsMSAxTTMgMTVhMSAxIDAgMCAwIDEgMWgyYTEgMSAwIDAgMCAxLTF2LTJhMSAxIDAgMCAwLTEtMUg0YTEgMSAwIDAgMS0xLTFWOWExIDEgMCAwIDEgMS0xaDJhMSAxIDAgMCAxIDEgMSIvPjwvc3ZnPg==',
+                width: 45,
+                height: 45,
+                x: 6,
+                y: 6
+              }
+            }
           },
           true
         )
@@ -592,11 +681,93 @@
           true
         )
 
+        // Graph.registerNode(
+        //   'custom-start-node',
+        //   {
+        //     inherit: 'circle',
+        //     ports: { ...ports }
+        //   },
+        //   true
+        // )
         Graph.registerNode(
-          'custom-circle-start',
+          'custom-start-node',
           {
-            inherit: 'circle',
-            ports: { ...ports }
+            inherit: 'rect', // 继承于 rect 节点
+            ports: { ...ports },
+            width: 100,
+            height: 40,
+            markup: [
+              {
+                tagName: 'rect', // 标签名称
+                selector: 'body' // 选择器
+              },
+              {
+                tagName: 'image',
+                selector: 'img'
+              },
+              {
+                tagName: 'text',
+                selector: 'label'
+              }
+            ],
+            attrs: {
+              body: {
+                stroke: '#8f8f8f',
+                strokeWidth: 1,
+                fill: '#fff',
+                rx: 6,
+                ry: 6
+              },
+              img: {
+                'xlink:href':
+                  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgOWgtMnY0aC0ydi00aC0ybDMtM3oiLz48L3N2Zz4=',
+                width: 45,
+                height: 45,
+                x: 6,
+                y: 6
+              }
+            }
+          },
+          true
+        )
+        Graph.registerNode(
+          'custom-end-node',
+          {
+            inherit: 'rect', // 继承于 rect 节点
+            ports: { ...ports },
+            width: 100,
+            height: 40,
+            markup: [
+              {
+                tagName: 'rect', // 标签名称
+                selector: 'body' // 选择器
+              },
+              {
+                tagName: 'image',
+                selector: 'img'
+              },
+              {
+                tagName: 'text',
+                selector: 'label'
+              }
+            ],
+            attrs: {
+              body: {
+                stroke: '#8f8f8f',
+                strokeWidth: 1,
+                fill: '#fff',
+                rx: 6,
+                ry: 6
+              },
+              img: {
+                'xlink:href':
+                  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgMTFsLTMgM2wtMy0zaDJ2LTRoMnY0eiIvPjwvc3ZnPg==',
+                width: 45,
+                height: 45,
+                x: 6,
+                y: 6
+              }
+            }
           },
           true
         )
@@ -701,11 +872,10 @@
         this.graph.on('node:click', ({ x, y, node, cell }) => {
           this.currentCell = cell
           console.log('this.currentCell', this.currentCell)
-          console.log('this.currentCell', this.currentCell.key)
-          if (this.currentCell.shape === 'custom-circle-start') {
+          if (this.currentCell.shape === 'custom-start-node') {
             this.visible = true
           }
-          if (this.currentCell.shape === 'custom-rect') {
+          if (this.currentCell.shape === 'custom-sql-node') {
             this.sqlVisible = true
           }
           if (cell.isNode() && !cell.attrs.typeName) {
