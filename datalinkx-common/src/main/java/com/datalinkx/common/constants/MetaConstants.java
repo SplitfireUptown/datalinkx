@@ -36,6 +36,7 @@ public final class MetaConstants {
     }
 
     public static class JobType {
+        public static final Integer JOB_TYPE_COMPUTE = 2;
         public static final Integer JOB_TYPE_STREAM = 1;
         public static final Integer JOB_TYPE_BATCH = 0;
 

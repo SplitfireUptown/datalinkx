@@ -59,8 +59,10 @@ public class JobForm {
 		private List<FieldMappingForm> fieldMappings;
 		@ApiModelProperty("是否覆盖数据")
 		private Integer cover = 0;
-		@ApiModelProperty("任务类型，1 - 流式 0 - 批式")
+		@ApiModelProperty("任务类型， 2 - 计算, 1 - 流式, 0 - 批式")
 		private Integer type = 0;
+		@JsonProperty("画布")
+		private String graph;
 	}
 
 	@Data

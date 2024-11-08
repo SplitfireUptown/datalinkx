@@ -121,6 +121,7 @@ public class JobVo {
 		private List<JobForm.FieldMappingForm> fieldMappings;
 		@JsonProperty("sync_mode")
 		private JobForm.SyncModeForm syncMode;
+		private String graph;
 	}
 
 

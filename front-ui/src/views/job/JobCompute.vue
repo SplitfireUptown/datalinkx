@@ -65,11 +65,45 @@
       width="500"
     >
       <span>select</span>
-      <a-textarea placeholder="SQL算子, 基于来源表构造SQL逻辑, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
+      <a-textarea v-model="this.sqlOperatorValue" placeholder="基于上游节点字段, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
       <span>from</span>
       <a-input v-model="this.selectedSourceTable" disabled="true"/>
       <span>where</span>
-      <a-textarea placeholder="SQL算子, 基于来源表构造SQL逻辑, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
+      <a-textarea placeholder="基于上游节点字段, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
+    </a-drawer>
+    <a-drawer
+      title="目标数据源"
+      placement="right"
+      :closable="false"
+      :visible="toDsVisible"
+      :after-visible-change="afterVisibleChange"
+      @close="onClose"
+      width="500"
+    >
+      <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
+      <div class="select-container">
+        <a-select
+          class="input-full-width"
+          @change="handleFromChange"
+          v-decorator="['selectedDataSource', {rules: [{required: true, message: '请选择目标数据源'}],initialValue: selectedDataSource}]">
+          <a-select-option v-for="table in toDsList" :value="table.dsId" :key="table.name">
+            <div>
+              <span class="ds-icon">
+                <img :src="dsImgObj[table.type]" alt="">
+              </span>
+              <span>{{ table.name }}</span>
+            </div>
+          </a-select-option>
+        </a-select>
+      </div>
+
+      <div class="input-container">
+        <a-select class="input-full-width" @change="handleToTbChange" v-decorator="['selectedSourceTable', {rules: [{required: true, message: '请选择来源数据源表'}],initialValue: selectedSourceTable}]">
+          <a-select-option v-for="table in targetTables" :value="table" :key="table">
+            {{ table }}
+          </a-select-option>
+        </a-select>
+      </div>
     </a-drawer>
     <a-layout>
       <a-layout-header>
@@ -143,11 +177,14 @@
       return {
         visible: false,
         sqlVisible: false,
+        toDsVisible: false,
         dsImgObj,
         fromDsList: [],
         toDsList: [],
         sourceTables: [],
+        targetTables: [],
         sourceFields: [],
+        targetFields: [],
         selectloading: false,
         selectedDataSource: null,
         selectedSourceTable: null,
@@ -156,6 +193,7 @@
         mappings: [
           { sourceField: '' }
         ],
+        sqlOperatorValue: '',
         tools: [
           {
             title: '保存',
@@ -253,6 +291,21 @@
           this.sourceFields = res.result
         })
       },
+      handleToTbChange (value) {
+        this.selectloading = true
+        this.selectedTargetTable = value
+        // 切换目标表同步表单数据
+        this.queryParam = {
+          'ds_id': this.selectedTargetSource,
+          'name': value
+        }
+        getDsTbFieldsInfo({
+          ...this.queryParam
+        }).then(res => {
+          this.selectloading = false
+          this.targetFields = res.result
+        })
+      },
       handleFromChange (value) {
         this.selectedDataSource = value
         this.selectloading = true
@@ -273,6 +326,7 @@
       onClose () {
         this.visible = false
         this.sqlVisible = false
+        this.toDsVisible = false
       },
       handleTrigger (command) {
         switch (command) {
@@ -314,6 +368,7 @@
       // 保存的方法 根据业务需要达到数据处理成想要的
       handleSave () {
         const data = this.graph.toJSON() // 可以拿到画完图的数s据
+        console.log(data)
         const nodeArr = data.cells
         const filterCell = nodeArr.filter(item => item.shape !== 'edge')// 这里过滤我们需要的数据，可以根据自己的业务需要来做
         const rulesNodeDTOList = []
@@ -444,8 +499,9 @@
 
         this.dnd.start(dragNode, e)
       },
-      initGraph () {
-        const nodeWidth = 80; const nodeHeight = 60
+      initGraph: function() {
+        const nodeWidth = 80
+        const nodeHeight = 60
 
         this.graph = new Graph({
           container: document.getElementById('graph-container'),
@@ -490,7 +546,7 @@
             // },
             anchor: 'center',
             connectionPoint: 'anchor',
-            validateConnection ({ targetMagnet }) {
+            validateConnection({ targetMagnet }) {
               return !!targetMagnet
             }
           },
@@ -872,15 +928,20 @@
         this.graph.on('node:click', ({ x, y, node, cell }) => {
           this.currentCell = cell
           console.log('this.currentCell', this.currentCell)
+          console.log('node', node._model.outgoings)
           if (this.currentCell.shape === 'custom-start-node') {
             this.visible = true
           }
           if (this.currentCell.shape === 'custom-sql-node') {
             this.sqlVisible = true
           }
+          if (this.currentCell.shape === 'custom-end-node') {
+            this.toDsVisible = true
+          }
           if (cell.isNode() && !cell.attrs.typeName) {
             // 这可以写一些点击节点时和右侧表单交互的效果
             const selectedCell = this.graph.getSelectedCells()
+            console.log(selectedCell)
           }
           if (cell.hasTool('button')) {
             cell.removeTool('button')

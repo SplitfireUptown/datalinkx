@@ -81,6 +81,7 @@ public class JobServiceImpl implements JobService {
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 		jobBean.setName(form.getJobName());
 		jobBean.setCover(form.getCover());
+		jobBean.setGraph(form.getGraph());
 
 		// 创建 xxljob
 		String xxlJobId = jobClientApi.add(form.getSchedulerConf(), XxlJobParam.builder().jobId(jobId).build());
@@ -172,6 +173,7 @@ public class JobServiceImpl implements JobService {
 				.toTbName(jobBean.getToTbId())
 				.schedulerConf(jobBean.getCrontab())
 				.cover(jobBean.getCover())
+				.graph(jobBean.getGraph())
 				.syncMode(JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class))
 				.build();
 
