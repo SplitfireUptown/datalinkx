@@ -11,6 +11,7 @@
     >
       <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
       <div class="select-container">
+        来源数据源
         <a-select
           class="input-full-width"
           @change="handleFromChange"
@@ -27,6 +28,7 @@
       </div>
 
       <div class="input-container">
+        来源数据表
         <a-select class="input-full-width" @change="handleFromTbChange" v-decorator="['selectedSourceTable', {rules: [{required: true, message: '请选择来源数据源表'}],initialValue: selectedSourceTable}]">
           <a-select-option v-for="table in sourceTables" :value="table" :key="table">
             {{ table }}
@@ -64,10 +66,28 @@
       @close="onClose"
       width="500"
     >
-      <span>select</span>
-      <a-textarea v-model="this.sqlOperatorValue" placeholder="基于上游节点字段, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
+      <div>
+        <a-tag v-for="tag in tags" :key="tag" draggable @dragstart="handleDragStart(tag, $event)">{{ tag }}</a-tag>
+      </div>
+      <a-input
+        v-if="inputVisible"
+        ref="input"
+        type="text"
+        size="small"
+        :style="{ width: '78px' }"
+        :value="inputValue"
+        @change="handleInputChange"
+        @blur="handleInputConfirm"
+        @keyup.enter="handleInputConfirm"
+      />
+      <a-tag v-else style="background: #fff; borderStyle: dashed;" @click="showInput">
+        <a-icon type="plus" /> New Field
+      </a-tag>
+      <br>
+      <span class="">select</span>
+      <a-textarea @drop="handleDrop" @dragover.prevent v-model="this.sqlOperatorValue" placeholder="基于上游节点字段, 从上面的标签中拖拽至此处"/>
       <span>from</span>
-      <a-input v-model="this.selectedSourceTable" disabled="true"/>
+      <a-input v-model="this.selectedSourceTable" :disabled="disabledTrue"/>
       <span>where</span>
       <a-textarea placeholder="基于上游节点字段, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
     </a-drawer>
@@ -81,11 +101,13 @@
       width="500"
     >
       <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
+      <div class="select-container">任务名称<a-input v-model="jobName"/></div>
       <div class="select-container">
+        目标数据源
         <a-select
           class="input-full-width"
-          @change="handleFromChange"
-          v-decorator="['selectedDataSource', {rules: [{required: true, message: '请选择目标数据源'}],initialValue: selectedDataSource}]">
+          @change="handleToChange"
+          v-decorator="['selectedTargetSource', {rules: [{required: true, message: '请选择目标数据源'}],initialValue: selectedTargetSource}]">
           <a-select-option v-for="table in toDsList" :value="table.dsId" :key="table.name">
             <div>
               <span class="ds-icon">
@@ -96,14 +118,51 @@
           </a-select-option>
         </a-select>
       </div>
-
       <div class="input-container">
+        目标数据表
         <a-select class="input-full-width" @change="handleToTbChange" v-decorator="['selectedSourceTable', {rules: [{required: true, message: '请选择来源数据源表'}],initialValue: selectedSourceTable}]">
           <a-select-option v-for="table in targetTables" :value="table" :key="table">
             {{ table }}
           </a-select-option>
         </a-select>
       </div>
+
+      <a-form-item label="字段映射关系">
+        <a-row :gutter="16">
+          <a-col :span="8">
+            <span>来源字段</span>
+          </a-col>
+          <a-col :span="8">
+            <span>目标字段</span>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16" v-for="(mapping, index) in targetMappings" :key="index">
+          <a-col :span="8">
+            <a-select v-model="mapping.sourceField"  placeholder="请选择来源字段" class="input-full-width">
+              <a-select-option v-for="field in sqlOperatorList" :value="field" :key="field">
+                {{ field }}
+              </a-select-option>
+            </a-select>
+          </a-col>
+          <a-col :span="8">
+            <a-select v-model="mapping.targetField" placeholder="请选择目标字段" class="input-full-width">
+              <a-select-option v-for="field in targetFields" :value="field.name" :key="field.name">
+                {{ field.name }}
+              </a-select-option>
+            </a-select>
+          </a-col>
+          <a-col :span="4">
+            <a-icon type="minus-circle-o" @click="removeTargetMapping(index)" v-show="targetMappings.length > 1" />
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-button type="dashed" @click="addTargetMapping" style="width: 100%">
+              <a-icon type="plus" /> 添加字段映射关系
+            </a-button>
+          </a-col>
+        </a-row>
+      </a-form-item>
     </a-drawer>
     <a-layout>
       <a-layout-header>
@@ -158,7 +217,7 @@
 ``
 <script>
   import { dsImgObj } from './../datasource/const'
-  import { Graph, Shape } from '@antv/x6'
+  import { Graph } from '@antv/x6'
   import LoadingDx from './../../components/common/loading-dx.vue'
   import { Selection } from '@antv/x6-plugin-selection'
   import { Snapline } from '@antv/x6-plugin-snapline'
@@ -168,6 +227,7 @@
   import { Dnd } from '@antv/x6-plugin-dnd'
   import { History } from '@antv/x6-plugin-history'
   import { fetchTables, getDsTbFieldsInfo, listQuery } from '@/api/datasource/datasource'
+  import { addObj } from '@/api/job/job'
 
   export default {
     components: {
@@ -178,6 +238,7 @@
         visible: false,
         sqlVisible: false,
         toDsVisible: false,
+        jobName: '',
         dsImgObj,
         fromDsList: [],
         toDsList: [],
@@ -186,6 +247,7 @@
         sourceFields: [],
         targetFields: [],
         selectloading: false,
+        disabledTrue: true,
         selectedDataSource: null,
         selectedSourceTable: null,
         selectedTargetSource: null,
@@ -193,7 +255,13 @@
         mappings: [
           { sourceField: '' }
         ],
+        targetMappings: [
+        ],
+        tags: [],
         sqlOperatorValue: '',
+        sqlOperatorList: [],
+        inputVisible: false,
+        inputValue: '',
         tools: [
           {
             title: '保存',
@@ -314,19 +382,76 @@
           this.sourceTables = res.result
         })
       },
+      handleToChange (value) {
+        this.selectedTargetSource = value
+        this.selectloading = true
+        fetchTables(value).then(res => {
+          this.selectloading = false
+          this.targetTables = res.result
+        })
+      },
+      showInput () {
+        this.inputVisible = true
+        this.$nextTick(function () {
+          this.$refs.input.focus()
+        })
+      },
+      handleInputChange (e) {
+        this.inputValue = e.target.value
+      },
+      handleInputConfirm () {
+        const inputValue = this.inputValue
+        let tags = this.tags
+        if (inputValue && tags.indexOf(inputValue) === -1) {
+          tags = [...tags, inputValue]
+        }
+        console.log(tags)
+        Object.assign(this, {
+          tags,
+          inputVisible: false,
+          inputValue: ''
+        })
+      },
       addMapping () {
         this.mappings.push({ sourceField: '' })
       },
       removeMapping (index) {
         this.mappings.splice(index, 1)
       },
+      addTargetMapping () {
+        this.targetMappings.push({ sourceField: '' })
+      },
+      removeTargetMapping (index) {
+        this.targetMappings.splice(index, 1)
+      },
       afterVisibleChange (val) {
         console.log('visible', val)
+      },
+      handleDrop (event) {
+        event.preventDefault()
+        const tag = event.dataTransfer.getData('text')
+        if (this.sqlOperatorValue === '') {
+          this.sqlOperatorValue += tag
+        } else {
+          this.sqlOperatorValue += ', '
+          this.sqlOperatorValue += tag
+        }
+        this.sqlOperatorList.push(tag)
+        this.targetMappings.push({ sourceField: tag, targetField: '' })
+      },
+      handleDragStart (tag, event) {
+        event.dataTransfer.setData('text', tag)
       },
       onClose () {
         this.visible = false
         this.sqlVisible = false
         this.toDsVisible = false
+        this.tags = []
+        for (const i in this.mappings) {
+          if (this.mappings[i].sourceField !== '') {
+            this.tags.push(this.mappings[i].sourceField)
+          }
+        }
       },
       handleTrigger (command) {
         switch (command) {
@@ -369,15 +494,43 @@
       handleSave () {
         const data = this.graph.toJSON() // 可以拿到画完图的数s据
         console.log(data)
-        const nodeArr = data.cells
-        const filterCell = nodeArr.filter(item => item.shape !== 'edge')// 这里过滤我们需要的数据，可以根据自己的业务需要来做
-        const rulesNodeDTOList = []
-        for (const item of filterCell) {
-          const nodeAttribute = item.data ? item.data.nodeAttribute : {}
-          if (nodeAttribute) {
-            rulesNodeDTOList.push(nodeAttribute)
-          }
+        const formData = {
+          'job_id': this.jobId,
+          // 提交表单数据
+          'from_ds_id': this.selectedDataSource,
+          'to_ds_id': this.selectedTargetSource,
+          'from_tb_name': this.selectedSourceTable,
+          'to_tb_name': this.selectedTargetTable,
+          'job_name': this.jobName,
+          'scheduler_conf': '0 0 18 28-31 * ?',
+          'field_mappings': this.targetMappings,
+          'graph': JSON.stringify(data),
+          'type': 2
         }
+        addObj(formData).then(res => {
+          if (res.status === '0') {
+            this.$emit('ok')
+            this.confirmLoading = false
+            // 清楚表单数据
+            this.handleCancel()
+            this.$message.success('新增成功')
+          } else {
+            this.confirmLoading = false
+            this.$message.error(res.errstr)
+          }
+        }).catch(err => {
+          this.confirmLoading = false
+          this.$message.error(err.errstr)
+        })
+        // const nodeArr = data.cells
+        // const filterCell = nodeArr.filter(item => item.shape !== 'edge')// 这里过滤我们需要的数据，可以根据自己的业务需要来做
+        // const rulesNodeDTOList = []
+        // for (const item of filterCell) {
+        //   const nodeAttribute = item.data ? item.data.nodeAttribute : {}
+        //   if (nodeAttribute) {
+        //     rulesNodeDTOList.push(nodeAttribute)
+        //   }
+        // }
       },
       // 预览的方法，根据业务我这里预览转成了G6
       exportJson () {
@@ -421,6 +574,7 @@
           shape: 'custom-start-node',
           width: 55,
           height: 55,
+          data: '',
           attrs: {
             body: {
               strokeWidth: 1,
@@ -454,6 +608,7 @@
           shape: 'custom-sql-node',
           width: 55,
           height: 55,
+          data: '',
           attrs: {
             body: {
               strokeWidth: 1,
@@ -472,6 +627,7 @@
           shape: 'custom-end-node',
           width: 55,
           height: 55,
+          data: '',
           attrs: {
             body: {
               strokeWidth: 1,
@@ -499,7 +655,7 @@
 
         this.dnd.start(dragNode, e)
       },
-      initGraph: function() {
+      initGraph: function () {
         const nodeWidth = 80
         const nodeHeight = 60
 
@@ -546,7 +702,7 @@
             // },
             anchor: 'center',
             connectionPoint: 'anchor',
-            validateConnection({ targetMagnet }) {
+            validateConnection ({ targetMagnet }) {
               return !!targetMagnet
             }
           },
@@ -927,9 +1083,10 @@
         })
         this.graph.on('node:click', ({ x, y, node, cell }) => {
           this.currentCell = cell
-          console.log('this.currentCell', this.currentCell)
+          console.log('click this.currentCell', this.currentCell)
           console.log('node', node._model.outgoings)
           if (this.currentCell.shape === 'custom-start-node') {
+            node.setData('123123123')
             this.visible = true
           }
           if (this.currentCell.shape === 'custom-sql-node') {
@@ -961,7 +1118,12 @@
             ]
           }
         })
-
+        this.graph.on('cell:added', ({ cell, index, options }) => {
+          if (!cell.isNode()) {
+            console.log('11111111111111111')
+          }
+          console.log('add cell', cell)
+        })
         this.graph.on('blank:click', () => {
           // this.currentCell && this.currentCell.removeTools();
           if (this.currentCell) {

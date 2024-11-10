@@ -61,7 +61,7 @@ public class JobForm {
 		private Integer cover = 0;
 		@ApiModelProperty("任务类型， 2 - 计算, 1 - 流式, 0 - 批式")
 		private Integer type = 0;
-		@JsonProperty("画布")
+		@JsonProperty("graph")
 		private String graph;
 	}
 
