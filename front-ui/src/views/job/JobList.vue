@@ -159,7 +159,6 @@ export default {
       this.pages.current = pagination.current
       this.init()
     },
-
     edit (record) {
       this.$refs.JobSaveOrUpdate.edit('edit', record.job_id)
     },

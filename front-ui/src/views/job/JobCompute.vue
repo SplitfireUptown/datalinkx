@@ -227,7 +227,7 @@
   import { Dnd } from '@antv/x6-plugin-dnd'
   import { History } from '@antv/x6-plugin-history'
   import { fetchTables, getDsTbFieldsInfo, listQuery } from '@/api/datasource/datasource'
-  import { addObj } from '@/api/job/job'
+  import { addObj, getObj } from '@/api/job/job'
 
   export default {
     components: {
@@ -358,6 +358,7 @@
           this.selectloading = false
           this.sourceFields = res.result
         })
+        this.sqlOperatorValue = ''
       },
       handleToTbChange (value) {
         this.selectloading = true
@@ -453,6 +454,40 @@
           }
         }
       },
+      edit (jobId) {
+        getObj(jobId).then(res => {
+          const record = res.result
+          this.selectedTargetSource = record.to_ds_id
+          this.selectedDataSource = record.from_ds_id
+          this.selectedSourceTable = record.from_tb_name
+          this.selectedTargetTable = record.to_tb_name
+          this.schedulerConf = record.scheduler_conf
+          this.targetMappings = record.field_mappings
+          this.jobId = record.job_id
+          // this.syncMode = record.sync_mode.mode
+          this.jobName = record.job_name
+          this.cover = record.cover
+          console.log(this.syncMode)
+          if (this.selectedTargetTable.includes(this.redisSpitKey)) {
+            const arr = this.selectedTargetTable.split(this.redisSpitKey)
+            this.redisToValue = arr[1]
+            this.redisToType = arr[0]
+          }
+
+          this.incrementField = record.sync_mode.increate_field
+          if (this.syncMode === 'increment') {
+            this.isIncrement = true
+          }
+          fetchTables(this.selectedTargetSource).then(res => {
+            this.targetTables = res.result
+          })
+          this.handleFromTbChange(this.selectedSourceTable)
+          fetchTables(this.selectedDataSource).then(res => {
+            this.sourceTables = res.result
+          })
+          this.handleToTbChange(this.selectedTargetTable)
+        })
+      },
       handleTrigger (command) {
         switch (command) {
           case 'save':
@@ -509,17 +544,13 @@
         }
         addObj(formData).then(res => {
           if (res.status === '0') {
-            this.$emit('ok')
-            this.confirmLoading = false
-            // 清楚表单数据
-            this.handleCancel()
+            console.log(res)
             this.$message.success('新增成功')
+            this.closeDraw()
           } else {
-            this.confirmLoading = false
             this.$message.error(res.errstr)
           }
         }).catch(err => {
-          this.confirmLoading = false
           this.$message.error(err.errstr)
         })
         // const nodeArr = data.cells

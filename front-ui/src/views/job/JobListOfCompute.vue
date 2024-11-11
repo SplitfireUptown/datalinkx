@@ -13,7 +13,8 @@
     >
     </a-table>
     <div v-if="showJobCompute" class="job-compute-overlay">
-      <JobCompute />
+<!--      <JobCompute />-->
+      <job-compute  ref="JobCompute"></job-compute>
     </div>
   </a-card>
 </template>
@@ -159,10 +160,13 @@ export default {
       this.init()
     },
     edit (record) {
-      this.$refs.JobCompute.edit('edit', record.job_id)
+      console.log(record.job_id)
+      this.showJobCompute = true
+      this.$refs.JobCompute.edit(record.job_id)
     },
     closeDraw () {
       this.showJobCompute = false
+      this.init()
     },
     delete (record) {
       delObj(record.job_id).then(res => {
@@ -175,9 +179,6 @@ export default {
       }).finally(() => {
         this.loading = false
       })
-    },
-    show (record) {
-      this.$refs.JobCompute.edit(record.job_id, 'show')
     },
     execJob (record) {
       exec(record.job_id).then(res => {

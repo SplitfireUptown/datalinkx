@@ -82,6 +82,7 @@ public class JobServiceImpl implements JobService {
 		jobBean.setName(form.getJobName());
 		jobBean.setCover(form.getCover());
 		jobBean.setGraph(form.getGraph());
+		jobBean.setType(form.getType());
 
 		// 创建 xxljob
 		String xxlJobId = jobClientApi.add(form.getSchedulerConf(), XxlJobParam.builder().jobId(jobId).build());
