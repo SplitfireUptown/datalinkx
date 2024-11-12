@@ -138,7 +138,7 @@
         </a-row>
         <a-row :gutter="16" v-for="(mapping, index) in targetMappings" :key="index">
           <a-col :span="8">
-            <a-select v-model="mapping.sourceField"  placeholder="请选择来源字段" class="input-full-width">
+            <a-select v-model="mapping.sourceField" placeholder="请选择来源字段" class="input-full-width">
               <a-select-option v-for="field in sqlOperatorList" :value="field" :key="field">
                 {{ field }}
               </a-select-option>
@@ -461,23 +461,17 @@
           this.selectedDataSource = record.from_ds_id
           this.selectedSourceTable = record.from_tb_name
           this.selectedTargetTable = record.to_tb_name
-          this.schedulerConf = record.scheduler_conf
+
           this.targetMappings = record.field_mappings
           this.jobId = record.job_id
-          // this.syncMode = record.sync_mode.mode
           this.jobName = record.job_name
-          this.cover = record.cover
-          console.log(this.syncMode)
-          if (this.selectedTargetTable.includes(this.redisSpitKey)) {
-            const arr = this.selectedTargetTable.split(this.redisSpitKey)
-            this.redisToValue = arr[1]
-            this.redisToType = arr[0]
+
+          for (const i in record.field_mappings) {
+            if (record.field_mappings[i].sourceField !== '') {
+              this.mappings.push({ sourceField: record.field_mappings[i].sourceField })
+            }
           }
 
-          this.incrementField = record.sync_mode.increate_field
-          if (this.syncMode === 'increment') {
-            this.isIncrement = true
-          }
           fetchTables(this.selectedTargetSource).then(res => {
             this.targetTables = res.result
           })
@@ -486,6 +480,8 @@
             this.sourceTables = res.result
           })
           this.handleToTbChange(this.selectedTargetTable)
+
+          this.graph.fromJSON(JSON.parse(record.graph))
         })
       },
       handleTrigger (command) {

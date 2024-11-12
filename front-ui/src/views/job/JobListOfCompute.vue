@@ -12,9 +12,9 @@
       @change="handleTableChange"
     >
     </a-table>
-    <div v-if="showJobCompute" class="job-compute-overlay">
-<!--      <JobCompute />-->
-      <job-compute  ref="JobCompute"></job-compute>
+    <div v-show="showJobCompute" class="job-compute-overlay">
+      <!--      <JobCompute />-->
+      <job-compute ref="JobCompute"></job-compute>
     </div>
   </a-card>
 </template>
