@@ -1,7 +1,6 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
-import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.IDsWriter;
+import com.datalinkx.compute.model.TransformNode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
-/**
- * @author: uptown
- * @date: 2024/4/27 17:15
- */
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
@@ -21,9 +18,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @FieldNameConstants
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StreamFlinkActionMeta extends EngineActionMeta {
-    String readerDsInfo;
-    String writerDsInfo;
-    String checkpoint;
-    String lockId;
+public class SeatunnelActionMeta extends EngineActionMeta {
+    private String sourceInfo;
+    private String sinkInfo;
+    // 计算任务的中间节点
+    private String transformInfo;
+    private String jobMode;
+    private Integer parallelism;
 }

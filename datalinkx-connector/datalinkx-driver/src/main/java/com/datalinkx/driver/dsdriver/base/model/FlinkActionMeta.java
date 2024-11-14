@@ -35,8 +35,6 @@ public class FlinkActionMeta extends EngineActionMeta {
     IDsReader dsReader;
     // 目标库driver驱动
     IDsWriter dsWriter;
-    // 计算任务的中间节点
-    List<TransformNode> transformNodes;
     // 是否覆盖 0 - 否 1 - 是
     Integer cover;
     // 数据总读行数

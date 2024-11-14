@@ -21,7 +21,9 @@ import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.common.utils.TelnetUtil;
+import com.datalinkx.compute.connector.jdbc.JdbcSink;
 import com.datalinkx.compute.connector.jdbc.JdbcSource;
+import com.datalinkx.driver.dsdriver.IComputeDriver;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -42,7 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
-public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> implements AbstractDriver<T, P, Q>, IDsDriver, IDsReader, IDsWriter {
+public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> implements
+        AbstractDriver<T, P, Q>, IDsDriver, IDsReader, IDsWriter, IComputeDriver {
 
     protected T jdbcSetupInfo;
     protected String connectId;
@@ -396,5 +399,27 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
             fullName.add(String.format("%s%s%s", columnQuota(), tableName, columnQuota()));
         }
         return String.join(".", fullName);
+    }
+
+    @Override
+    public Object getSourceInfo(DataTransJobDetail.Reader reader) {
+        return JdbcSource.builder()
+                .url(this.jdbcUrl())
+                .driver(this.driverClass())
+                .user(this.jdbcSetupInfo.getUid())
+                .password(this.jdbcSetupInfo.getPwd())
+                .query(reader.getQuerySql())
+                .build();
+    }
+
+    @Override
+    public Object getSinkInfo(DataTransJobDetail.Writer writer) {
+        return JdbcSink.builder()
+                .url(this.jdbcUrl())
+                .driver(this.driverClass())
+                .user(this.jdbcSetupInfo.getUid())
+                .password(this.jdbcSetupInfo.getPwd())
+                .query(writer.getInsertSql())
+                .build();
     }
 }

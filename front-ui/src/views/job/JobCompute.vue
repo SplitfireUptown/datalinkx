@@ -15,7 +15,7 @@
         <a-select
           class="input-full-width"
           @change="handleFromChange"
-          v-decorator="['selectedDataSource', {rules: [{required: true, message: '请选择来源数据源'}],initialValue: selectedDataSource}]">
+          v-model="this.selectedDataSource">
           <a-select-option v-for="table in fromDsList" :value="table.dsId" :key="table.name">
             <div>
               <span class="ds-icon">
@@ -29,7 +29,7 @@
 
       <div class="input-container">
         来源数据表
-        <a-select class="input-full-width" @change="handleFromTbChange" v-decorator="['selectedSourceTable', {rules: [{required: true, message: '请选择来源数据源表'}],initialValue: selectedSourceTable}]">
+        <a-select class="input-full-width" @change="handleFromTbChange" v-model="this.selectedSourceTable">
           <a-select-option v-for="table in sourceTables" :value="table" :key="table">
             {{ table }}
           </a-select-option>
@@ -89,7 +89,7 @@
       <span>from</span>
       <a-input v-model="this.selectedSourceTable" :disabled="disabledTrue"/>
       <span>where</span>
-      <a-textarea placeholder="基于上游节点字段, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
+      <a-textarea v-model="this.sqlOperatorWhereValue" placeholder="基于上游节点字段, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
     </a-drawer>
     <a-drawer
       title="目标数据源"
@@ -107,7 +107,7 @@
         <a-select
           class="input-full-width"
           @change="handleToChange"
-          v-decorator="['selectedTargetSource', {rules: [{required: true, message: '请选择目标数据源'}],initialValue: selectedTargetSource}]">
+          v-model="this.selectedTargetSource">
           <a-select-option v-for="table in toDsList" :value="table.dsId" :key="table.name">
             <div>
               <span class="ds-icon">
@@ -120,7 +120,7 @@
       </div>
       <div class="input-container">
         目标数据表
-        <a-select class="input-full-width" @change="handleToTbChange" v-decorator="['selectedSourceTable', {rules: [{required: true, message: '请选择来源数据源表'}],initialValue: selectedSourceTable}]">
+        <a-select class="input-full-width" @change="handleToTbChange" v-model="selectedTargetTable">
           <a-select-option v-for="table in targetTables" :value="table" :key="table">
             {{ table }}
           </a-select-option>
@@ -227,7 +227,7 @@
   import { Dnd } from '@antv/x6-plugin-dnd'
   import { History } from '@antv/x6-plugin-history'
   import { fetchTables, getDsTbFieldsInfo, listQuery } from '@/api/datasource/datasource'
-  import { addObj, getObj } from '@/api/job/job'
+  import { addObj, getObj, modifyObj } from '@/api/job/job'
 
   export default {
     components: {
@@ -239,6 +239,7 @@
         sqlVisible: false,
         toDsVisible: false,
         jobName: '',
+        jobId: '',
         dsImgObj,
         fromDsList: [],
         toDsList: [],
@@ -253,12 +254,13 @@
         selectedTargetSource: null,
         selectedTargetTable: null,
         mappings: [
-          { sourceField: '' }
+          // { sourceField: '' }
         ],
         targetMappings: [
         ],
         tags: [],
         sqlOperatorValue: '',
+        sqlOperatorWhereValue: '',
         sqlOperatorList: [],
         inputVisible: false,
         inputValue: '',
@@ -317,9 +319,6 @@
           }
         ]
       }
-    },
-    created () {
-
     },
     mounted () {
       this.initGraph()
@@ -467,9 +466,7 @@
           this.jobName = record.job_name
 
           for (const i in record.field_mappings) {
-            if (record.field_mappings[i].sourceField !== '') {
-              this.mappings.push({ sourceField: record.field_mappings[i].sourceField })
-            }
+            this.mappings.push({ sourceField: record.field_mappings[i].sourceField })
           }
 
           fetchTables(this.selectedTargetSource).then(res => {
@@ -523,6 +520,12 @@
       },
       // 保存的方法 根据业务需要达到数据处理成想要的
       handleSave () {
+        console.log(this.graph.getNodes())
+        for (const node of this.graph.getNodes()) {
+          if (node.shape === 'custom-sql-node') {
+            node.data = 'select ' + this.sqlOperatorValue + ' from ' + this.selectedSourceTable + ' where ' + this.sqlOperatorWhereValue
+          }
+        }
         const data = this.graph.toJSON() // 可以拿到画完图的数s据
         console.log(data)
         const formData = {
@@ -538,17 +541,29 @@
           'graph': JSON.stringify(data),
           'type': 2
         }
-        addObj(formData).then(res => {
-          if (res.status === '0') {
-            console.log(res)
-            this.$message.success('新增成功')
-            this.closeDraw()
-          } else {
-            this.$message.error(res.errstr)
-          }
-        }).catch(err => {
-          this.$message.error(err.errstr)
-        })
+        if (this.jobId !== '') {
+          modifyObj(formData).then(res => {
+            if (res.status === '0') {
+              this.$message.success('修改成功')
+            } else {
+              this.$message.error(res.errstr)
+            }
+          }).catch(err => {
+            this.$message.error(err.errstr)
+          })
+        } else {
+          addObj(formData).then(res => {
+            if (res.status === '0') {
+              this.$message.success('新增成功')
+              this.closeDraw()
+            } else {
+              this.$message.error(res.errstr)
+            }
+          }).catch(err => {
+            this.$message.error(err.errstr)
+          })
+        }
+
         // const nodeArr = data.cells
         // const filterCell = nodeArr.filter(item => item.shape !== 'edge')// 这里过滤我们需要的数据，可以根据自己的业务需要来做
         // const rulesNodeDTOList = []
@@ -635,7 +650,7 @@
           shape: 'custom-sql-node',
           width: 55,
           height: 55,
-          data: '',
+          data: 'select ' + this.sqlOperatorValue + ' from ' + this.selectedSourceTable + ' where ' + this.sqlOperatorWhereValue,
           attrs: {
             body: {
               strokeWidth: 1,

@@ -2,6 +2,7 @@ package com.datalinkx.driver.model;
 
 import java.util.List;
 
+import com.datalinkx.compute.model.TransformNode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -54,6 +55,7 @@ public class DataTransJobDetail {
         String connectId;
         String type;
         String maxValue;
+        String querySql;
     }
 
     @Data
@@ -68,6 +70,7 @@ public class DataTransJobDetail {
         String connectId;
         Integer batchSize;
         String type;
+        String insertSql;
     }
 
     @Data
