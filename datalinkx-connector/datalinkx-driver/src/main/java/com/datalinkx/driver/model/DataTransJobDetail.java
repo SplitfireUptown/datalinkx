@@ -2,7 +2,6 @@ package com.datalinkx.driver.model;
 
 import java.util.List;
 
-import com.datalinkx.compute.model.TransformNode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -24,6 +23,7 @@ import lombok.experimental.FieldNameConstants;
 public class DataTransJobDetail {
     @JsonProperty("job_id")
     String jobId;
+    Integer type;
     @JsonProperty("lock_id")
     String lockId;
     @JsonProperty("sync_unit")
@@ -38,9 +38,20 @@ public class DataTransJobDetail {
     public static class SyncUnit {
         Reader reader;
         Writer writer;
+        Compute compute;
         String checkpoint;
     }
 
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Compute {
+        private String type;
+        // 算子内容
+        private String meta;
+    }
 
     @Data
     @AllArgsConstructor

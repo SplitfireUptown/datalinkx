@@ -1,4 +1,4 @@
-package com.datalinkx.compute.model;
+package com.datalinkx.compute.connector.model;
 
 import lombok.Data;
 

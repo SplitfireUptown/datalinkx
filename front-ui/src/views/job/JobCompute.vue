@@ -479,6 +479,13 @@
           this.handleToTbChange(this.selectedTargetTable)
 
           this.graph.fromJSON(JSON.parse(record.graph))
+          for (const node of this.graph.getNodes()) {
+            if (node.shape === 'custom-sql-node') {
+              this.sqlOperatorValue = node.data[0]
+              this.selectedSourceTable = node.data[1]
+              this.sqlOperatorWhereValue = node.data[2]
+            }
+          }
         })
       },
       handleTrigger (command) {
@@ -520,12 +527,14 @@
       },
       // 保存的方法 根据业务需要达到数据处理成想要的
       handleSave () {
-        console.log(this.graph.getNodes())
         for (const node of this.graph.getNodes()) {
           if (node.shape === 'custom-sql-node') {
-            node.data = 'select ' + this.sqlOperatorValue + ' from ' + this.selectedSourceTable + ' where ' + this.sqlOperatorWhereValue
+            node.data.push(this.sqlOperatorValue)
+            node.data.push(this.selectedSourceTable)
+            node.data.push(this.sqlOperatorWhereValue)
           }
         }
+        console.log(this.graph.getNodes())
         const data = this.graph.toJSON() // 可以拿到画完图的数s据
         console.log(data)
         const formData = {
@@ -650,7 +659,6 @@
           shape: 'custom-sql-node',
           width: 55,
           height: 55,
-          data: 'select ' + this.sqlOperatorValue + ' from ' + this.selectedSourceTable + ' where ' + this.sqlOperatorWhereValue,
           attrs: {
             body: {
               strokeWidth: 1,
@@ -888,6 +896,7 @@
             ports: { ...ports },
             width: 100,
             height: 40,
+            data: [],
             markup: [
               {
                 tagName: 'rect', // 标签名称
@@ -1093,7 +1102,7 @@
         })
 
         this.graph.on('cell:mouseenter', ({ cell }) => {
-          console.log(cell.isNode(), '123')
+          // console.log(cell.isNode(), '123')
           const container = document.getElementById('graph-container')
           const ports = container.querySelectorAll('.x6-port-body')
           showPorts(ports, !cell.attrs.typeName)

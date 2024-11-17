@@ -34,16 +34,10 @@ xxl:
 client:
   dataserver:
     url: http://localhost:12345
-    connect_timeout_ms: 20000
-    call_timeout_ms: 600000
-    read_timeout_ms: 600000
-    logging: true
   flink:
     url: http://localhost:8081
-    connect_timeout_ms: 20000
-    call_timeout_ms: 600000
-    read_timeout_ms: 600000
-    logging: true
+  seatunnel:
+    url: http://localhost:5801
 reserve:
   job_graph: false
 flinkx:

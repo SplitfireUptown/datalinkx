@@ -79,7 +79,6 @@ public class JobForm {
 		private String sourceField;
 		@ApiModelProperty(value = "to表字段名称")
 		private String targetField;
-		private String mappingValue = "string";
 	}
 
 	@Data

@@ -3,11 +3,7 @@ package com.datalinkx.dataserver.service.impl;
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNCING;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -37,6 +33,7 @@ import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +91,14 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .reader(this.getReader(jobBean, fieldMappingForms))
                 .writer(this.getWriter(jobBean, fieldMappingForms))
                 .build();
-        return DataTransJobDetail.builder().jobId(jobId).cover(jobBean.getCover()).syncUnit(syncUnit).build();
+
+        // 解析计算任务
+        if (MetaConstants.JobType.JOB_TYPE_COMPUTE.equals(jobBean.getType())) {
+            DataTransJobDetail.Compute computeOperator = this.analysisComputeGraph(jobBean.getGraph());
+            syncUnit.setCompute(computeOperator);
+        }
+
+        return DataTransJobDetail.builder().jobId(jobId).type(jobBean.getType()).cover(jobBean.getCover()).syncUnit(syncUnit).build();
     }
 
     @Override
@@ -172,6 +176,8 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .fetchSize(fetchSize)
                 .build();
 
+        String querySQL = jobConf.stream().map(JobForm.FieldMappingForm::getSourceField).collect(Collectors.joining(", "));
+
         return DataTransJobDetail.Reader
                 .builder()
                 .connectId(dsServiceImpl.getConnectId(fromDs))
@@ -181,12 +187,16 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .maxValue(syncModeForm.getIncreateValue())
                 .tableName(jobBean.getFromTbId())
                 .columns(fromCols)
+                .querySql(querySQL)
                 .build();
     }
 
     private DataTransJobDetail.Sync.SyncCondition getSyncCond(JobForm.SyncModeForm exportMode,
                                                               List<DataTransJobDetail.Column> syncFields, Map<String, String> typeMappings) {
         DataTransJobDetail.Sync.SyncCondition syncCon = null;
+        if (ObjectUtils.isEmpty(exportMode) || ObjectUtils.isEmpty(exportMode.getMode())) {
+            return syncCon;
+        }
         if ("increment".equalsIgnoreCase(exportMode.getMode())) {
             for (DataTransJobDetail.Column field : syncFields) {
                 if (!ObjectUtils.nullSafeEquals(field.getName(), exportMode.getIncreateField())) {
@@ -214,6 +224,26 @@ public class DtsJobServiceImpl implements DtsJobService {
         return syncCon;
     }
 
+    // 解析计算任务图 TODO: 仅支持单SQL节点
+    private DataTransJobDetail.Compute analysisComputeGraph(String graph) {
+        DataTransJobDetail.Compute compute = new DataTransJobDetail.Compute();
+        if (ObjectUtils.isEmpty(graph)) {
+            return compute;
+        }
+        Set<String> finalSqlArray = new HashSet<>();
+        JsonNode jsonNode = JsonUtils.toJsonNode(graph);
+        for (JsonNode node : jsonNode.get("cells")) {
+            if ("custom-sql-node".equals(node.get("shape").asText())) {
+                for (JsonNode sqlNode : node.get("data")) {
+                    finalSqlArray.add(sqlNode.asText());
+                }
+                compute.setMeta(String.join(" ", finalSqlArray));
+                compute.setType("sql");
+            }
+        }
+        return compute;
+    }
+
     @SneakyThrows
     private DataTransJobDetail.Writer getWriter(JobBean jobBean,
                                                 List<JobForm.FieldMappingForm> jobConf) {
@@ -234,9 +264,12 @@ public class DtsJobServiceImpl implements DtsJobService {
                 )
                 .collect(Collectors.toList());
 
+        String insertQuerySQL = jobConf.stream().map(JobForm.FieldMappingForm::getTargetField).collect(Collectors.joining(", "));
+
         return DataTransJobDetail.Writer.builder()
                 .schema(toDs.getDatabase()).connectId(dsServiceImpl.getConnectId(toDs))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
+                .insertSql(insertQuerySQL)
                 .tableName(jobBean.getToTbId()).columns(toCols).build();
     }
 
@@ -250,21 +283,21 @@ public class DtsJobServiceImpl implements DtsJobService {
         int status = jobStateForm.getJobStatus();
 
         // 1、实时推送流转进度
-//        if (!MetaConstants.JobType.JOB_TYPE_STREAM.equals(jobBean.getType())) {
-//            ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
-//            producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
-//            producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);
-//            producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
-//            producerAdapterForm.setMessage(
-//                    JsonUtils.toJson(
-//                            JobDto.StatusRefresh.builder()
-//                                    .status(status)
-//                                    .jobId(jobBean.getJobId())
-//                                    .build()
-//                    )
-//            );
-//            messageHubService.produce(producerAdapterForm);
-//        }
+        if (MetaConstants.JobType.JOB_TYPE_BATCH.equals(jobBean.getType())) {
+            ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
+            producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
+            producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);
+            producerAdapterForm.setGroup(MessageHubConstants.GLOBAL_COMMON_GROUP);
+            producerAdapterForm.setMessage(
+                    JsonUtils.toJson(
+                            JobDto.StatusRefresh.builder()
+                                    .status(status)
+                                    .jobId(jobBean.getJobId())
+                                    .build()
+                    )
+            );
+            messageHubService.produce(producerAdapterForm);
+        }
 
         // 2、存储流转任务状态
         JobDto.DataCountDto countVo = JobDto.DataCountDto.builder()

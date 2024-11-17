@@ -1,6 +1,5 @@
-package com.datalinkx.compute.transform;
+package com.datalinkx.compute.connector.model;
 
-import com.datalinkx.compute.model.TransformNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,5 +24,10 @@ public class LLMNode extends TransformNode {
     @JsonProperty("openai.api_path")
     private String openaiApiPath;
     @JsonProperty("custom_config")
-    private Map<String, Object> customConfig;
+    private CustomConfig customConfig;
+
+    @Data
+    public static class CustomConfig {
+
+    }
 }

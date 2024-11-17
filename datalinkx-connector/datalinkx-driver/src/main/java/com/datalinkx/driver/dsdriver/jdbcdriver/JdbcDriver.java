@@ -23,7 +23,7 @@ import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.compute.connector.jdbc.JdbcSink;
 import com.datalinkx.compute.connector.jdbc.JdbcSource;
-import com.datalinkx.driver.dsdriver.IComputeDriver;
+import com.datalinkx.compute.transform.ITransformDriver;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -45,7 +45,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> implements
-        AbstractDriver<T, P, Q>, IDsDriver, IDsReader, IDsWriter, IComputeDriver {
+        AbstractDriver<T, P, Q>, IDsDriver, IDsReader, IDsWriter {
 
     protected T jdbcSetupInfo;
     protected String connectId;
@@ -370,19 +370,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     public String valueQuota() {
         return "'";
-    }
-
-
-    @Override
-    public Object getComputedReaderInfo(FlinkActionMeta meta) {
-        String schema = meta.getReader().getSchema();
-
-        return JdbcSource.builder()
-                .url(jdbcUrl())
-                .driver(driverClass())
-                .user(jdbcSetupInfo.getUid())
-                .password(jdbcSetupInfo.getPwd())
-                .build();
     }
 
     public String wrapTableName(String catalog, String schema, String tableName) {

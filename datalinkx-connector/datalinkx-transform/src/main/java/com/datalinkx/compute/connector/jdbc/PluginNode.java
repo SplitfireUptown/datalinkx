@@ -1,4 +1,4 @@
-package com.datalinkx.compute.model;
+package com.datalinkx.compute.connector.jdbc;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

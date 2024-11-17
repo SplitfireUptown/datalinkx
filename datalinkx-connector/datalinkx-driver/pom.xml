@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>com.datalinkx</groupId>
-            <artifactId>datalinkx-compute</artifactId>
+            <artifactId>datalinkx-transform</artifactId>
             <version>1.0.0</version>
         </dependency>
 

@@ -1,7 +1,5 @@
 package com.datalinkx.compute.connector.jdbc;
 
-import com.datalinkx.compute.model.PluginNode;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

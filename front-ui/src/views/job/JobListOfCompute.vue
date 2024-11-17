@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <div class="table-operator">
-      <a-button @click="showJobCompute = true" icon="plus" type="primary">新建</a-button>
+      <a-button @click="newCompute" icon="plus" type="primary">新建</a-button>
     </div>
     <a-table
       :columns="columns"
@@ -12,213 +12,218 @@
       @change="handleTableChange"
     >
     </a-table>
-    <div v-show="showJobCompute" class="job-compute-overlay">
-      <!--      <JobCompute />-->
-      <job-compute ref="JobCompute"></job-compute>
+    <div v-if="showJobCompute" class="job-compute-overlay">
+      <job-compute ref="JobCompute" :jobId="this.currentJobId"></job-compute>
     </div>
   </a-card>
 </template>
 
 <script>
-import { pageQuery, delObj, exec, stop } from '@/api/job/job'
-import JobCompute from '../job/JobCompute.vue'
-// 0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING
-const StatusType = [
-  {
-    label: '新建',
-    value: 0
-  },
-  {
-    label: '流转中',
-    value: 1
-  },
-  {
-    label: '流转完成',
-    value: 2
-  },
-  {
-    label: '流转失败',
-    value: 3
-  },
-  {
-    label: '排队中',
-    value: 4
-  },
-  {
-    label: '流转停止',
-    value: 5
-  }
-]
-export default {
-  name: 'JobList',
-  components: {
-    JobCompute
-  },
-  data () {
-    return {
-      loading: false,
-      showJobCompute: false,
-      columns: [
-        {
-          title: 'job_id',
-          width: '10%',
-          dataIndex: 'job_id'
-        },
-        {
-          title: '任务名称',
-          width: '10%',
-          dataIndex: 'job_name'
-        },
-        {
-          title: '来源表',
-          width: '10%',
-          dataIndex: 'from_tb_name'
-        },
-        {
-          title: '目标表',
-          width: '10%',
-          dataIndex: 'to_tb_name',
-          sorter: true
-        },
-        {
-          title: '任务状态',
-          width: '10%',
-          dataIndex: 'status',
-          customRender: (text) => {
-            return (
-              <div>
+  import { pageQuery, delObj, exec, stop } from '@/api/job/job'
+  import JobCompute from '../job/JobCompute.vue'
+  // 0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING
+  const StatusType = [
+    {
+      label: '新建',
+      value: 0
+    },
+    {
+      label: '流转中',
+      value: 1
+    },
+    {
+      label: '流转完成',
+      value: 2
+    },
+    {
+      label: '流转失败',
+      value: 3
+    },
+    {
+      label: '排队中',
+      value: 4
+    },
+    {
+      label: '流转停止',
+      value: 5
+    }
+  ]
+  export default {
+    name: 'JobList',
+    components: {
+      JobCompute
+    },
+    data () {
+      return {
+        loading: false,
+        currentJobId: '',
+        showJobCompute: false,
+        columns: [
+          {
+            title: 'job_id',
+            width: '10%',
+            dataIndex: 'job_id'
+          },
+          {
+            title: '任务名称',
+            width: '10%',
+            dataIndex: 'job_name'
+          },
+          {
+            title: '来源表',
+            width: '10%',
+            dataIndex: 'from_tb_name'
+          },
+          {
+            title: '目标表',
+            width: '10%',
+            dataIndex: 'to_tb_name',
+            sorter: true
+          },
+          {
+            title: '任务状态',
+            width: '10%',
+            dataIndex: 'status',
+            customRender: (text) => {
+              return (
+                <div>
                 {StatusType.map(item => {
-                  if (item.value === text) {
-                    return <span>{item.label}</span>
-                  }
-                })}
-              </div>
+                    if (item.value === text) {
+                      return <span>{item.label}</span>
+                    }
+                  })}
+                </div>
             )
-          }
-        },
-        {
-          title: '操作',
-          width: '15%',
-          customRender: (record) => {
-            return (
-              <div>
+            }
+          },
+          {
+            title: '操作',
+            width: '15%',
+            customRender: (record) => {
+              return (
+                <div>
                 <a onClick={(e) => this.edit(record)}>修改</a>
-                <a-divider type="vertical" />
+              <a-divider type="vertical" />
                 <a-popconfirm title="是否删除" onConfirm={() => this.delete(record)} okText="是" cancelText="否">
-                  <a-icon slot="icon" type="question-circle-o" style="color: red" />
-                  <a href="javascript:;" style="color: red">删除</a>
+                <a-icon slot="icon" type="question-circle-o" style="color: red" />
+                <a href="javascript:;" style="color: red">删除</a>
                 </a-popconfirm>
                 <a-divider type="vertical" />
                 <a href="javascript:;"onClick={(e) => this.execJob(record)}>手动触发</a>
-                <a-divider type="vertical" />
+              <a-divider type="vertical" />
                 <a href="javascript:;"onClick={(e) => this.stopJob(record)}>暂停流转</a>
               </div>
             )
+            }
           }
-        }
-      ],
-      tableData: [],
-      pagination: {
-        pageSize: 10,
-        current: 1,
-        total: 0,
-        showSizeChanger: true
+        ],
+        tableData: [],
+        pagination: {
+          pageSize: 10,
+          current: 1,
+          total: 0,
+          showSizeChanger: true
+        },
+        pages: {
+          size: 10,
+          current: 1
+        },
+        queryParam: {
+          'type': 2
+        },
+        source: null
+      }
+    },
+    provide () {
+      return {
+        closeDraw: this.closeDraw
+      }
+    },
+    methods: {
+      init () {
+        this.loading = true
+        pageQuery({
+          ...this.queryParam,
+          ...this.pages
+        }).then(res => {
+          this.tableData = res.result.data
+          this.pagination.total = +res.result.total
+          this.loading = false
+        }).finally(() => {
+          this.loading = false
+        })
       },
-      pages: {
-        size: 10,
-        current: 1
+      newCompute () {
+        this.showJobCompute = true
       },
-      queryParam: {
-        'type': 2
+      handleTableChange (pagination) {
+        this.pagination = pagination
+        this.pages.size = pagination.pageSize
+        this.pages.current = pagination.current
+        this.init()
       },
-      source: null
-    }
-  },
-  provide () {
-    return {
-      closeDraw: this.closeDraw
-    }
-  },
-  methods: {
-    init () {
-      this.loading = true
-      pageQuery({
-        ...this.queryParam,
-        ...this.pages
-      }).then(res => {
-        this.tableData = res.result.data
-        this.pagination.total = +res.result.total
-        this.loading = false
-      }).finally(() => {
-        this.loading = false
-      })
+      edit (record) {
+        console.log(record.job_id)
+        this.showJobCompute = true
+        setTimeout(() => {
+          this.$refs.JobCompute.edit(record.job_id)
+        }, 10)
+      },
+      closeDraw () {
+        this.showJobCompute = false
+        this.init()
+      },
+      delete (record) {
+        delObj(record.job_id).then(res => {
+          if (res.status === '0') {
+            this.$message.info('删除成功')
+            this.init()
+          } else {
+            this.$message.error(res.errstr)
+          }
+        }).finally(() => {
+          this.loading = false
+        })
+      },
+      execJob (record) {
+        exec(record.job_id).then(res => {
+          if (res.status === '0') {
+            this.$message.info('触发成功')
+            this.init()
+          } else {
+            this.$message.error(res.errstr)
+          }
+        }).finally(() => {
+          this.loading = false
+        })
+      },
+      stopJob (record) {
+        stop(record.job_id).then(res => {
+          if (res.status === '0') {
+            this.$message.info('停止成功')
+            this.init()
+          } else {
+            this.$message.error(res.errstr)
+          }
+        }).finally(() => {
+          this.loading = false
+        })
+      },
+      handleOk () {
+        this.init()
+      },
+      queryData () {
+        this.pages.current = 1
+        this.init()
+      }
     },
-    handleTableChange (pagination) {
-      this.pagination = pagination
-      this.pages.size = pagination.pageSize
-      this.pages.current = pagination.current
-      this.init()
+    beforeDestroy () {
+      this.eventSource.close()
     },
-    edit (record) {
-      console.log(record.job_id)
-      this.showJobCompute = true
-      this.$refs.JobCompute.edit(record.job_id)
-    },
-    closeDraw () {
-      this.showJobCompute = false
-      this.init()
-    },
-    delete (record) {
-      delObj(record.job_id).then(res => {
-        if (res.status === '0') {
-          this.$message.info('删除成功')
-          this.init()
-        } else {
-          this.$message.error(res.errstr)
-        }
-      }).finally(() => {
-        this.loading = false
-      })
-    },
-    execJob (record) {
-      exec(record.job_id).then(res => {
-        if (res.status === '0') {
-          this.$message.info('触发成功')
-          this.init()
-        } else {
-          this.$message.error(res.errstr)
-        }
-      }).finally(() => {
-        this.loading = false
-      })
-    },
-    stopJob (record) {
-      stop(record.job_id).then(res => {
-        if (res.status === '0') {
-          this.$message.info('停止成功')
-          this.init()
-        } else {
-          this.$message.error(res.errstr)
-        }
-      }).finally(() => {
-        this.loading = false
-      })
-    },
-    handleOk () {
-      this.init()
-    },
-    queryData () {
-      this.pages.current = 1
+    created () {
       this.init()
     }
-  },
-  beforeDestroy () {
-    this.eventSource.close()
-  },
-  created () {
-    this.init()
   }
-}
 </script>
 
 <style scoped>

@@ -7,6 +7,7 @@ import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
+import com.datalinkx.driver.model.DataTransJobDetail;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -16,12 +17,12 @@ public interface IDsReader extends IDsDriver {
     List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception;
     List<DbTableField> getFields(String catalog, String schema, String tableName) throws Exception;
 
-    default Object getComputedReaderInfo(FlinkActionMeta param) {
-        return "";
-    };
-
     default Boolean judgeIncrementalField(String catalog, String schema, String tableName, String field) throws Exception {
         return false;
+    }
+
+    default Object getSourceInfo(DataTransJobDetail.Reader reader) {
+        return "";
     }
 
     default String genWhere(FlinkActionMeta unit) throws Exception {

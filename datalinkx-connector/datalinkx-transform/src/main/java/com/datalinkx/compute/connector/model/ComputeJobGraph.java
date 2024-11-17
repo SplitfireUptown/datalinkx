@@ -1,5 +1,6 @@
-package com.datalinkx.compute.model;
+package com.datalinkx.compute.connector.model;
 
+import com.datalinkx.compute.connector.jdbc.PluginNode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -19,11 +20,11 @@ import java.util.Map;
 @Builder
 @ToString(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ComputeJobGraph<T extends PluginNode, C extends TransformNode, E extends PluginNode> {
+public class ComputeJobGraph {
     @JsonProperty("job_id")
     private String jobId;
     private Map<String, Object> env;
-    private List<T> source;
-    private List<C> transform;
-    private List<E> sink;
+    private List<String> source;
+    private List<String> transform;
+    private List<String> sink;
 }

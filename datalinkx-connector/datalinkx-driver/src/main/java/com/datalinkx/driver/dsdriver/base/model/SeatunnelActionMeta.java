@@ -1,6 +1,8 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
-import com.datalinkx.compute.model.TransformNode;
+import com.datalinkx.driver.dsdriver.IDsReader;
+import com.datalinkx.driver.dsdriver.IDsWriter;
+import com.datalinkx.driver.model.DataTransJobDetail;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +21,7 @@ import java.util.List;
 @FieldNameConstants
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SeatunnelActionMeta extends EngineActionMeta {
+    IDsWriter writerDsDriver;
     private String sourceInfo;
     private String sinkInfo;
     // 计算任务的中间节点

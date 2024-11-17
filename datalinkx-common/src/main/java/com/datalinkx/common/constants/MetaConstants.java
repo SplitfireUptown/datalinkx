@@ -61,6 +61,8 @@ public final class MetaConstants {
 
     public static class CommonConstant {
         public static final String TRACE_ID = "trace_id";
+        public static final String SOURCE_TABLE = "source_table";
+        public static final String RESULT_TABLE = "result_table";
     }
 
     public static class CopilotConstant {

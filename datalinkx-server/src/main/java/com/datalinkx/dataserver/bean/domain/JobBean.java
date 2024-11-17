@@ -71,7 +71,7 @@ public class JobBean extends BaseDomainBean {
 	// 0 不覆盖 1 覆盖
 	@Column(name = "cover")
 	private Integer cover;
-	// 0 批式任务 1 流转任务
+	// 0 批式任务 1 流式任务 2 计算任务
 	@Column(name = "type")
 	private Integer type;
 	@Column(name = "start_time")

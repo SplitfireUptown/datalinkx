@@ -15,7 +15,7 @@
     <modules>
         <module>datalinkx-driver</module>
         <module>datalinkx-stream</module>
-        <module>datalinkx-compute</module>
+        <module>datalinkx-transform</module>
     </modules>
 
     <artifactId>datalinkx-connector</artifactId>
