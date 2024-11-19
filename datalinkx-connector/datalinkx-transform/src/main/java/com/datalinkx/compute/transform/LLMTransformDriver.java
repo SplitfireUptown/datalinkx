@@ -1,5 +1,7 @@
 package com.datalinkx.compute.transform;
 
+import com.datalinkx.compute.connector.model.TransformNode;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 /**
@@ -13,7 +15,12 @@ public class LLMTransformDriver implements ITransformDriver {
     }
 
     @Override
-    public Object transferInfo(String transferMeta) {
+    public TransformNode transferInfo(String transferMeta) {
+        return null;
+    }
+
+    @Override
+    public String analysisTransferMeta(JsonNode nodeMeta) {
         return null;
     }
 }

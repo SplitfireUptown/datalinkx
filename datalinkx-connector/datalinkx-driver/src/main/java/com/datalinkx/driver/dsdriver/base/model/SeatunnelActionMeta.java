@@ -1,5 +1,7 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
+import com.datalinkx.compute.connector.jdbc.PluginNode;
+import com.datalinkx.compute.connector.model.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.model.DataTransJobDetail;
@@ -22,10 +24,12 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SeatunnelActionMeta extends EngineActionMeta {
     IDsWriter writerDsDriver;
-    private String sourceInfo;
-    private String sinkInfo;
+    DataTransJobDetail.Writer writer;
+    private PluginNode sourceInfo;
+    private PluginNode sinkInfo;
     // 计算任务的中间节点
-    private String transformInfo;
+    private TransformNode transformInfo;
     private String jobMode;
     private Integer parallelism;
+    Integer cover;
 }

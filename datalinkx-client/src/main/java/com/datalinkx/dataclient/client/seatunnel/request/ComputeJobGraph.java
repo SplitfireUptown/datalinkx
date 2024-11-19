@@ -1,6 +1,5 @@
-package com.datalinkx.compute.connector.model;
+package com.datalinkx.dataclient.client.seatunnel.request;
 
-import com.datalinkx.compute.connector.jdbc.PluginNode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -24,7 +23,7 @@ public class ComputeJobGraph {
     @JsonProperty("job_id")
     private String jobId;
     private Map<String, Object> env;
-    private List<String> source;
-    private List<String> transform;
-    private List<String> sink;
+    private List<Object> source;
+    private List<Object> transform;
+    private List<Object> sink;
 }

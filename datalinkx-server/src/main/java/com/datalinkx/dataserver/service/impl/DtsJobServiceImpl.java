@@ -1,6 +1,7 @@
 package com.datalinkx.dataserver.service.impl;
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNCING;
+import static com.datalinkx.compute.transform.ITransformFactory.TRANSFORM_DRIVER_MAP;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -13,6 +14,7 @@ import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.compute.transform.ITransformDriver;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.domain.JobLogBean;
@@ -90,13 +92,8 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .builder()
                 .reader(this.getReader(jobBean, fieldMappingForms))
                 .writer(this.getWriter(jobBean, fieldMappingForms))
+                .compute(this.analysisComputeGraph(jobBean.getGraph()))
                 .build();
-
-        // 解析计算任务
-        if (MetaConstants.JobType.JOB_TYPE_COMPUTE.equals(jobBean.getType())) {
-            DataTransJobDetail.Compute computeOperator = this.analysisComputeGraph(jobBean.getGraph());
-            syncUnit.setCompute(computeOperator);
-        }
 
         return DataTransJobDetail.builder().jobId(jobId).type(jobBean.getType()).cover(jobBean.getCover()).syncUnit(syncUnit).build();
     }
@@ -224,21 +221,19 @@ public class DtsJobServiceImpl implements DtsJobService {
         return syncCon;
     }
 
-    // 解析计算任务图 TODO: 仅支持单SQL节点
+    // 解析计算任务图 FIXME: 仅支持单SQL节点
     private DataTransJobDetail.Compute analysisComputeGraph(String graph) {
         DataTransJobDetail.Compute compute = new DataTransJobDetail.Compute();
         if (ObjectUtils.isEmpty(graph)) {
             return compute;
         }
-        Set<String> finalSqlArray = new HashSet<>();
         JsonNode jsonNode = JsonUtils.toJsonNode(graph);
         for (JsonNode node : jsonNode.get("cells")) {
-            if ("custom-sql-node".equals(node.get("shape").asText())) {
-                for (JsonNode sqlNode : node.get("data")) {
-                    finalSqlArray.add(sqlNode.asText());
-                }
-                compute.setMeta(String.join(" ", finalSqlArray));
-                compute.setType("sql");
+            String transformType = node.get("shape").asText();
+            ITransformDriver transformDriver = TRANSFORM_DRIVER_MAP.get(transformType);
+            if (!ObjectUtils.isEmpty(transformDriver)) {
+                compute.setMeta(transformDriver.analysisTransferMeta(node));
+                compute.setType(transformType);
             }
         }
         return compute;

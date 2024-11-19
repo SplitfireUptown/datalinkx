@@ -264,6 +264,10 @@
         sqlOperatorList: [],
         inputVisible: false,
         inputValue: '',
+        syncMode: 'overwrite',
+        cover: 0,
+        incrementField: '',
+        schedulerConf: '0 0 18 28-31 * ?',
         tools: [
           {
             title: '保存',
@@ -480,7 +484,7 @@
 
           this.graph.fromJSON(JSON.parse(record.graph))
           for (const node of this.graph.getNodes()) {
-            if (node.shape === 'custom-sql-node') {
+            if (node.shape === 'sql') {
               this.sqlOperatorValue = node.data[0]
               this.selectedSourceTable = node.data[1]
               this.sqlOperatorWhereValue = node.data[2]
@@ -528,7 +532,7 @@
       // 保存的方法 根据业务需要达到数据处理成想要的
       handleSave () {
         for (const node of this.graph.getNodes()) {
-          if (node.shape === 'custom-sql-node') {
+          if (node.shape === 'sql') {
             node.data.push(this.sqlOperatorValue)
             node.data.push(this.selectedSourceTable)
             node.data.push(this.sqlOperatorWhereValue)
@@ -545,9 +549,14 @@
           'from_tb_name': this.selectedSourceTable,
           'to_tb_name': this.selectedTargetTable,
           'job_name': this.jobName,
-          'scheduler_conf': '0 0 18 28-31 * ?',
+          'scheduler_conf': this.schedulerConf,
           'field_mappings': this.targetMappings,
           'graph': JSON.stringify(data),
+          'cover': this.cover,
+          'sync_mode': {
+            'mode': this.syncMode,
+            'increate_field': this.incrementField
+          },
           'type': 2
         }
         if (this.jobId !== '') {
@@ -656,7 +665,7 @@
 
         })
         const rectNode = this.graph.createNode({
-          shape: 'custom-sql-node',
+          shape: 'sql',
           width: 55,
           height: 55,
           attrs: {
@@ -881,7 +890,7 @@
         }
 
         // Graph.registerNode(
-        //   'custom-sql-node',
+        //   'sql',
         //   {
         //     inherit: 'rect',
         //     // attrs 可自定义
@@ -890,7 +899,7 @@
         //   true
         // )
         Graph.registerNode(
-          'custom-sql-node',
+          'sql',
           {
             inherit: 'rect', // 继承于 rect 节点
             ports: { ...ports },
@@ -1140,7 +1149,7 @@
             node.setData('123123123')
             this.visible = true
           }
-          if (this.currentCell.shape === 'custom-sql-node') {
+          if (this.currentCell.shape === 'sql') {
             this.sqlVisible = true
           }
           if (this.currentCell.shape === 'custom-end-node') {

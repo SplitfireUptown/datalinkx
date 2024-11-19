@@ -23,7 +23,7 @@ import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.compute.connector.jdbc.JdbcSink;
 import com.datalinkx.compute.connector.jdbc.JdbcSource;
-import com.datalinkx.compute.transform.ITransformDriver;
+import com.datalinkx.compute.connector.jdbc.PluginNode;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -49,6 +49,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     protected T jdbcSetupInfo;
     protected String connectId;
+    protected String PLUGIN_NAME = "Jdbc";
 
 
     private static final Set<String> INCREMENTAL_TYPE_SET = new HashSet<>();
@@ -389,24 +390,26 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
     @Override
-    public Object getSourceInfo(DataTransJobDetail.Reader reader) {
+    public PluginNode getSourceInfo(DataTransJobDetail.Reader reader) {
         return JdbcSource.builder()
                 .url(this.jdbcUrl())
                 .driver(this.driverClass())
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
                 .query(reader.getQuerySql())
+                .pluginName(PLUGIN_NAME)
                 .build();
     }
 
     @Override
-    public Object getSinkInfo(DataTransJobDetail.Writer writer) {
+    public PluginNode getSinkInfo(DataTransJobDetail.Writer writer) {
         return JdbcSink.builder()
                 .url(this.jdbcUrl())
                 .driver(this.driverClass())
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
                 .query(writer.getInsertSql())
+                .pluginName(PLUGIN_NAME)
                 .build();
     }
 }

@@ -105,7 +105,7 @@ public abstract class AbstractDataTransferAction<T extends DataTransJobDetail, U
                 // 用户手动取消任务
                 throw e;
             } catch (Throwable e) {
-                log.error("execute flink task error.", e);
+                log.error("execute task error.", e);
                 afterExec(execUnit, false);
                 error.append(e.getMessage()).append("\r\n");
                 this.end(execUnit,  JOB_STATUS_ERROR, error.toString());

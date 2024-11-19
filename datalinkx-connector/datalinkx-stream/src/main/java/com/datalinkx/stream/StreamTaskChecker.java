@@ -69,6 +69,9 @@ public class StreamTaskChecker extends TimerTask {
                 .status((Integer) item.get("status"))
                 .taskId((String) item.get("task_id"))
                 .build()).collect(Collectors.toList());
+        if (ObjectUtils.isEmpty(streamTaskBeans)) {
+            return;
+        }
 
         try {
             JsonNode jsonNode = flinkClient.jobOverview();
