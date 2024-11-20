@@ -408,7 +408,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .driver(this.driverClass())
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
-                .query(writer.getInsertSql())
                 .pluginName(PLUGIN_NAME)
                 .build();
     }

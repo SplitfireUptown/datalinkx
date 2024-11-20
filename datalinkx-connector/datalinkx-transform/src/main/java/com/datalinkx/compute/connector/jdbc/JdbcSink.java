@@ -16,5 +16,4 @@ public class JdbcSink extends PluginNode {
     private String driver;
     private String user;
     private String password;
-    private String query;
 }

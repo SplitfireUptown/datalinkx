@@ -173,7 +173,8 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .fetchSize(fetchSize)
                 .build();
 
-        String querySQL = jobConf.stream().map(JobForm.FieldMappingForm::getSourceField).collect(Collectors.joining(", "));
+        String selectField = jobConf.stream().map(JobForm.FieldMappingForm::getSourceField).collect(Collectors.joining(", "));
+        String querySQL = String.format("select %s from %s.%s", selectField, fromDs.getDatabase(), jobBean.getFromTbId());
 
         return DataTransJobDetail.Reader
                 .builder()

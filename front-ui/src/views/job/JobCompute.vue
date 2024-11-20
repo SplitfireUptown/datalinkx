@@ -249,10 +249,11 @@
         targetFields: [],
         selectloading: false,
         disabledTrue: true,
-        selectedDataSource: null,
-        selectedSourceTable: null,
-        selectedTargetSource: null,
-        selectedTargetTable: null,
+        selectedDataSourceName: '',
+        selectedDataSource: '',
+        selectedSourceTable: '',
+        selectedTargetSource: '',
+        selectedTargetTable: '',
         mappings: [
           // { sourceField: '' }
         ],
@@ -326,8 +327,8 @@
     },
     mounted () {
       this.initGraph()
+      this.selectloading = true
       listQuery().then(res => {
-        this.selectloading = false
         const record = res.result
         for (var a of record) {
           // redis数据源暂不支持读
@@ -335,7 +336,8 @@
             this.fromDsList.push({
               dsId: a.dsId,
               name: a.name,
-              type: a.type
+              type: a.type,
+              catalog: a.database
             })
           }
           this.toDsList.push({
@@ -344,11 +346,18 @@
             type: a.type
           })
         }
+        this.selectloading = false
       })
     },
     inject: ['closeDraw'],
     methods: {
       handleFromTbChange (value) {
+        for (const i in this.fromDsList) {
+          if (this.fromDsList[i].dsId === this.selectedDataSource) {
+            this.selectedDataSourceName = this.fromDsList[i].catalog
+          }
+        }
+        console.log(this.selectedDataSourceName)
         this.selectedSourceTable = value
         this.selectloading = true
         this.queryParam = {
@@ -534,7 +543,7 @@
         for (const node of this.graph.getNodes()) {
           if (node.shape === 'sql') {
             node.data.push(this.sqlOperatorValue)
-            node.data.push(this.selectedSourceTable)
+            node.data.push(this.selectedDataSourceName + '.' + this.selectedSourceTable)
             node.data.push(this.sqlOperatorWhereValue)
           }
         }

@@ -1,8 +1,10 @@
 package com.datalinkx.compute.connector.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -13,8 +15,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class LLMNode extends TransformNode {
-    @JsonProperty("source_table_name")
-    private String sourceTableName;
+
     @JsonProperty("model_provider")
     private String modelProvider;
     private String model;

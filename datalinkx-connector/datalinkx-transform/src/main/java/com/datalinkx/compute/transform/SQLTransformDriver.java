@@ -24,17 +24,17 @@ public class SQLTransformDriver implements ITransformDriver {
                 .query(transferSQLMeta)
                 .sourceTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
                 .resultTableName(MetaConstants.CommonConstant.RESULT_TABLE)
+                .pluginName("sql")
                 .build();
     }
 
     // 分成了三部分select、from where
     @Override
     public String analysisTransferMeta(JsonNode nodeMeta) {
-        Set<String> finalSqlArray = new HashSet<>();
         JsonNode dataMeta = nodeMeta.get("data");
-        String sql = String.format("select %s from %s", dataMeta.get(0), dataMeta.get(1));
+        String sql = String.format("select %s from %s", dataMeta.get(0).asText(), dataMeta.get(1).asText());
         if (ObjectUtils.isEmpty(dataMeta.get(2))) {
-            sql += String.format(" where %s", dataMeta.get(2));
+            sql += String.format(" where %s", dataMeta.get(2).asText());
         }
         return sql;
     }

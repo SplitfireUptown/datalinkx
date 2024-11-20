@@ -4,18 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 /**
  * @author: uptown
  * @date: 2024/10/27 18:00
  */
-@Builder
+@SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class SQLNode extends TransformNode {
-    @JsonProperty("source_table_name")
-    private String sourceTableName;
-    @JsonProperty("result_table_name")
-    private String resultTableName;
     private String query;
 }
