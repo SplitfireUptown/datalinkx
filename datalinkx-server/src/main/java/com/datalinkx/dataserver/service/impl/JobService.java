@@ -468,8 +468,9 @@ public class JobService implements DtsJobService {
 
 	@Transactional(rollbackFor = Exception.class)
 	public void del(String jobId) {
-		this.jobRepository.logicDeleteByJobId(jobId);
 		this.jobLogRepository.logicDeleteByJobId(jobId);
+		this.jobClientApi.del(jobId);
+		this.jobRepository.logicDeleteByJobId(jobId);
 	}
 
 	public PageVo<List<JobVo.JobLogPageVo>> logPage(JobForm.JobLogPageForm jobLogPageForm) {
