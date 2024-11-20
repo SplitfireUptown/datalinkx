@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.dataserver.bean.domain.JobBean;
+import com.datalinkx.dataserver.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.client.xxljob.request.LogQueryParam;
 import com.datalinkx.dataserver.client.xxljob.request.PageQueryParam;
 import com.datalinkx.dataserver.client.xxljob.request.XxlJobInfo;
@@ -56,6 +58,10 @@ public class JobClientApi {
         return handleResult(client.stop(getXxlJobId(jobId)));
     }
 
+    public String del(String jobId) {
+        return handleResult(client.remove(getXxlJobId(jobId)));
+    }
+
     public String trigger(String jobId, XxlJobParam jobParam) {
 //        XxlJobInfo xxlJobInfo = getJobInfo(jobId);
         return handleResult(client.trigger(getXxlJobId(jobId), JsonUtils.toJson(jobParam)));
@@ -75,7 +81,9 @@ public class JobClientApi {
     }
 
     public boolean isXxljobExist(String jobId) {
-        return jobRepository.findByJobId(jobId).isPresent();
+        JobBean jobNotExist = jobRepository.findByJobId(jobId).orElseThrow(
+                () -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
+        return !ObjectUtils.isEmpty(jobNotExist.getXxlId());
     }
 
     public String add(String cronExpr, XxlJobParam xxlJobParam) {
