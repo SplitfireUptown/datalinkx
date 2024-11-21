@@ -66,7 +66,7 @@ public class DataTransJobDetail {
         String connectId;
         String type;
         String maxValue;
-        String querySql;
+        String queryFields;
     }
 
     @Data
@@ -81,7 +81,7 @@ public class DataTransJobDetail {
         String connectId;
         Integer batchSize;
         String type;
-        String insertSql;
+        String insertFields;
     }
 
     @Data

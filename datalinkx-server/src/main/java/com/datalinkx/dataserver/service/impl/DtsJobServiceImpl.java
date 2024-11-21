@@ -174,7 +174,6 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .build();
 
         String selectField = jobConf.stream().map(JobForm.FieldMappingForm::getSourceField).collect(Collectors.joining(", "));
-        String querySQL = String.format("select %s from %s.%s", selectField, fromDs.getDatabase(), jobBean.getFromTbId());
 
         return DataTransJobDetail.Reader
                 .builder()
@@ -185,7 +184,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .maxValue(syncModeForm.getIncreateValue())
                 .tableName(jobBean.getFromTbId())
                 .columns(fromCols)
-                .querySql(querySQL)
+                .queryFields(selectField)
                 .build();
     }
 
@@ -260,12 +259,12 @@ public class DtsJobServiceImpl implements DtsJobService {
                 )
                 .collect(Collectors.toList());
 
-        String insertQuerySQL = jobConf.stream().map(JobForm.FieldMappingForm::getTargetField).collect(Collectors.joining(", "));
+        String insertFields = jobConf.stream().map(JobForm.FieldMappingForm::getTargetField).collect(Collectors.joining(", "));
 
         return DataTransJobDetail.Writer.builder()
                 .schema(toDs.getDatabase()).connectId(dsServiceImpl.getConnectId(toDs))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
-                .insertSql(insertQuerySQL)
+                .insertFields(insertFields)
                 .tableName(jobBean.getToTbId()).columns(toCols).build();
     }
 

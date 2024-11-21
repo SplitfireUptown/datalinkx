@@ -51,7 +51,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     protected String connectId;
     protected String PLUGIN_NAME = "Jdbc";
 
-
     private static final Set<String> INCREMENTAL_TYPE_SET = new HashSet<>();
     static {
         INCREMENTAL_TYPE_SET.add("datetime");
@@ -391,24 +390,50 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     @Override
     public PluginNode getSourceInfo(DataTransJobDetail.Reader reader) {
+
         return JdbcSource.builder()
                 .url(this.jdbcUrl())
                 .driver(this.driverClass())
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
-                .query(reader.getQuerySql())
+                .query(this.transferSourceSQL(reader))
                 .pluginName(PLUGIN_NAME)
                 .build();
     }
 
     @Override
+    public String transferSourceSQL(DataTransJobDetail.Reader reader) {
+        return String.format("select %s from %s.%s", reader.getQueryFields(), reader.getSchema(), reader.getTableName());
+    }
+
+    @Override
     public PluginNode getSinkInfo(DataTransJobDetail.Writer writer) {
+
+
         return JdbcSink.builder()
                 .url(this.jdbcUrl())
                 .driver(this.driverClass())
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
                 .pluginName(PLUGIN_NAME)
+                .query(this.transferSinkSQL(writer))
                 .build();
+    }
+
+    @Override
+    public String transferSinkSQL(DataTransJobDetail.Writer writer) {
+        StringBuilder abstractQuery = new StringBuilder();
+        for (int i = 0; i < writer.getInsertFields().split(",").length; i++) {
+            if (i == 0) {
+
+                abstractQuery.append("?");
+            } else {
+
+                abstractQuery.append(",?");
+            }
+        }
+
+
+        return String.format("insert into %s.%s(%s) value(%s)", writer.getSchema(), writer.getTableName(), writer.getInsertFields(), abstractQuery);
     }
 }

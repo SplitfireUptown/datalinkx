@@ -51,7 +51,7 @@
         <a-row :gutter="16">
           <a-col :span="24">
             <a-button type="dashed" @click="addMapping" style="width: 100%">
-              <a-icon type="plus" /> 添加字段映射关系
+              <a-icon type="plus" /> 选择来源字段
             </a-button>
           </a-col>
         </a-row>
@@ -543,7 +543,7 @@
         for (const node of this.graph.getNodes()) {
           if (node.shape === 'sql') {
             node.data.push(this.sqlOperatorValue)
-            node.data.push(this.selectedDataSourceName + '.' + this.selectedSourceTable)
+            node.data.push(this.selectedSourceTable)
             node.data.push(this.sqlOperatorWhereValue)
           }
         }

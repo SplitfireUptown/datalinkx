@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 
 public interface IDsReader extends IDsDriver {
+    // ============= Flink引擎
     String retrieveMax(FlinkActionMeta param, String field) throws Exception;
     Object getReaderInfo(FlinkActionMeta param) throws Exception;
     List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception;
@@ -21,11 +22,6 @@ public interface IDsReader extends IDsDriver {
     default Boolean judgeIncrementalField(String catalog, String schema, String tableName, String field) throws Exception {
         return false;
     }
-
-    default PluginNode getSourceInfo(DataTransJobDetail.Reader reader) {
-        return null;
-    }
-
     default String genWhere(FlinkActionMeta unit) throws Exception {
 
         if (unit.getReader().getSync().getSyncCondition() != null) {
@@ -58,4 +54,14 @@ public interface IDsReader extends IDsDriver {
         return " (1=1) ";
     }
 
+    // ============= Seatunnel引擎
+    // 构造seatunnel引擎读信息
+    default PluginNode getSourceInfo(DataTransJobDetail.Reader reader) {
+        return null;
+    }
+
+    // 构造seatunnel引擎source中sql
+    default String transferSourceSQL(DataTransJobDetail.Reader reader) {
+        return "";
+    }
 }
