@@ -1,5 +1,6 @@
 <template>
   <div class="g6-wrap">
+    <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
     <a-drawer
       title="来源数据源"
       placement="right"
@@ -214,7 +215,7 @@
     </a-layout>
   </div>
 </template>
-``
+
 <script>
   import { dsImgObj } from './../datasource/const'
   import { Graph } from '@antv/x6'
@@ -467,6 +468,7 @@
         }
       },
       edit (jobId) {
+        this.selectloading = true
         getObj(jobId).then(res => {
           const record = res.result
           this.selectedTargetSource = record.to_ds_id
@@ -500,6 +502,7 @@
             }
           }
         })
+        this.selectloading = false
       },
       handleTrigger (command) {
         switch (command) {

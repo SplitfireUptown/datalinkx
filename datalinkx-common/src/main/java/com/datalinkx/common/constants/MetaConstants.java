@@ -50,6 +50,10 @@ public final class MetaConstants {
         public static final int JOB_STATUS_ERROR = 3;
         public static final int JOB_STATUS_STOP = 4;
 
+        public static final String SEATUNNEL_JOB_FINISH = "FINISHED";
+        public static final String SEATUNNEL_JOB_RUNNING = "RUNNING";
+        public static final String SEATUNNEL_JOB_FAILED = "FAILED";
+
         public static final String SSE_JOB_STATUS = "jobList";
         public static final String SSE_COPILOT = "datalinkx_copilot";
     }

@@ -107,7 +107,7 @@ public class DataTransHandler {
         String jobId = jobParam.getJobId();
 
         // 定时异步调用无法统一trace_id，这里用job_id做trace_id
-        MDC.put("trace_id", jobId);
+        MDC.put("trace_id", new Date().getTime() + ":" + jobId);
 
         long startTime = new Date().getTime();
         DataTransJobDetail jobDetail;

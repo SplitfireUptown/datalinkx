@@ -1,11 +1,15 @@
 package com.datalinkx.datajob.action;
 
 import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.compute.transform.ITransformDriver;
 import com.datalinkx.dataclient.client.seatunnel.request.ComputeJobGraph;
 import com.datalinkx.compute.transform.ITransformFactory;
 import com.datalinkx.dataclient.client.seatunnel.SeaTunnelClient;
+import com.datalinkx.dataclient.client.seatunnel.response.JobCommitResp;
+import com.datalinkx.dataclient.client.seatunnel.response.JobOverviewResp;
 import com.datalinkx.datajob.bean.JobStateForm;
 import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
@@ -19,10 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
 
@@ -54,11 +60,6 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
                 .jobStatus(status).endTime(new Date().getTime()).startTime(START_TIME.get())
                 .errmsg(errmsg)
                 .build());
-
-        // 父任务执行成功后级联触发子任务
-        if (JOB_STATUS_SUCCESS == status) {
-            datalinkXServerClient.cascadeJob(unit.getJobId());
-        }
     }
 
     @Override
@@ -82,12 +83,30 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
         computeJobGraph.setSource(Collections.singletonList(unit.getSourceInfo()));
         computeJobGraph.setTransform(Collections.singletonList(unit.getTransformInfo()));
         computeJobGraph.setSink(Collections.singletonList(unit.getSinkInfo()));
-        JsonNode jsonNode = seaTunnelClient.jobSubmit(computeJobGraph);
-        unit.setTaskId(jsonNode.get("jobId").asText());
+        JobCommitResp jobCommitResp = seaTunnelClient.jobSubmit(computeJobGraph);
+        String taskId = jobCommitResp.getJobId();
+        unit.setTaskId(taskId);
+        // 更新task
+        datalinkXServerClient.updateJobTaskRel(unit.getJobId(), taskId);
     }
 
     @Override
-    protected boolean checkResult(SeatunnelActionMeta unit) {
+    protected boolean checkResult(SeatunnelActionMeta unit) throws DatalinkXJobException {
+        String taskId = unit.getTaskId();
+        if (ObjectUtils.isEmpty(taskId)) {
+            throw new DatalinkXJobException("task id is empty.");
+        }
+
+        JobOverviewResp jobOverviewResp = seaTunnelClient.jobOverview(taskId);
+        if (MetaConstants.JobStatus.SEATUNNEL_JOB_FINISH.equalsIgnoreCase(jobOverviewResp.getJobStatus())) {
+            return true;
+        }
+
+        if (MetaConstants.JobStatus.SEATUNNEL_JOB_FAILED.equalsIgnoreCase(jobOverviewResp.getJobStatus())) {
+            log.error(jobOverviewResp.getErrorMsg());
+            throw new DatalinkXJobException(jobOverviewResp.getErrorMsg());
+        }
+
         return false;
     }
 
