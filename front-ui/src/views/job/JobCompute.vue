@@ -183,26 +183,24 @@
       <a-layout>
         <a-layout-sider style="background: transparent">
           <div id="stencil">
-            <div>
-              <div class="dnd-circle dnd-start" @mousedown="startDrag('start',$event)">
+              <div class="dnd-rect" @mousedown="startDrag('start',$event)">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgOWgtMnY0aC0ydi00aC0ybDMtM3oiLz48L3N2Zz4=" alt="" width="50px" height="50px">
                 <span>来源数据源</span>
               </div>
-            </div>
-            <div>
               <div class="dnd-rect" @mousedown="startDrag('rect',$event)">
-                <span>SQL算子</span>
+                  <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgZD0iTTEyIDhhMiAyIDAgMCAxIDIgMnY0YTIgMiAwIDEgMS00IDB2LTRhMiAyIDAgMCAxIDItMm01IDB2OGg0bS04LTFsMSAxTTMgMTVhMSAxIDAgMCAwIDEgMWgyYTEgMSAwIDAgMCAxLTF2LTJhMSAxIDAgMCAwLTEtMUg0YTEgMSAwIDAgMS0xLTFWOWExIDEgMCAwIDEgMS0xaDJhMSAxIDAgMCAxIDEgMSIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
+                  <span>SQL算子</span>
               </div>
-            </div>
             <!--            <div>-->
             <!--              <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">-->
             <!--                <span>节点2</span>-->
             <!--              </div>-->
             <!--            </div>-->
-            <div>
-              <div class="dnd-circle" @mousedown="startDrag('end',$event)">
+              <div class="dnd-rect" @mousedown="startDrag('end',$event)">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgMTFsLTMgM2wtMy0zaDJ2LTRoMnY0eiIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
                 <span>目标数据源</span>
               </div>
-            </div>
+
 
           </div>
         </a-layout-sider>
@@ -1284,6 +1282,7 @@
         line-height: 38px;
       }
     }
+
     #container {
       display: flex;
       height: 100%;
@@ -1304,95 +1303,101 @@
         top: 30px;
         right: 30%;
       }
+    }
+    #stencil {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-right: 1px solid #dfe3e8;
+      text-align: center;
+      font-size: 12px;
+      padding: 5px 10px;
 
-      #stencil {
-        width: 100px;
-        height: 100%;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        border-right: 1px solid #dfe3e8;
+      .dnd-rect {
+        cursor: pointer;
+        border: .5px solid #000;
+        width: 100%;
+        border-radius: 10px;
+        margin: 5px 0;
+     /*   width: 50px;
+        height: 30px;
+        line-height: 40px;
         text-align: center;
+        border: 2px solid #000000;
+        border-radius: 6px;
+        cursor: move;
         font-size: 12px;
+        margin-top: 30px;*/
+      }
 
-        .dnd-rect {
-          width: 50px;
-          height: 30px;
-          line-height: 40px;
-          text-align: center;
-          border: 2px solid #000000;
-          border-radius: 6px;
-          cursor: move;
-          font-size: 12px;
-          margin-top: 30px;
-        }
+      .dnd-polygon {
+        width: 35px;
+        height: 35px;
+        border: 2px solid #000000;
+        transform: rotate(45deg);
+        cursor: move;
+        font-size: 12px;
+        margin-top: 30px;
+        margin-bottom: 10px;
+      }
 
-        .dnd-polygon {
-          width: 35px;
-          height: 35px;
-          border: 2px solid #000000;
-          transform: rotate(45deg);
-          cursor: move;
-          font-size: 12px;
-          margin-top: 30px;
-          margin-bottom: 10px;
-        }
+      .dnd-circle {
+        width: 35px;
+        height: 35px;
+        line-height: 45px;
+        text-align: center;
+        border: 5px solid #000000;
+        border-radius: 100%;
+        cursor: move;
+        font-size: 12px;
+        margin-top: 30px;
+      }
 
-        .dnd-circle {
-          width: 35px;
-          height: 35px;
-          line-height: 45px;
-          text-align: center;
-          border: 5px solid #000000;
-          border-radius: 100%;
-          cursor: move;
-          font-size: 12px;
-          margin-top: 30px;
-        }
-
-        .dnd-start {
-          border: 2px solid #000000;
-        }
-
-        .x6-widget-stencil {
-          background-color: #f8f9fb;
-        }
-
-        .x6-widget-stencil-title {
-          background: #eee;
-          font-size: 1rem;
-        }
-
-        .x6-widget-stencil-group-title {
-          font-size: 1rem !important;
-          background-color: #fff !important;
-          height: 40px !important;
-        }
-
-        .x6-widget-transform {
-          margin: -1px 0 0 -1px;
-          padding: 0px;
-          border: 1px solid #239edd;
-        }
-
-        .x6-widget-transform > div {
-          border: 1px solid #239edd;
-        }
-
-        .x6-widget-transform > div:hover {
-          background-color: #3dafe4;
-        }
-
-        .x6-widget-transform-active-handle {
-          background-color: #3dafe4;
-        }
-
-        .x6-widget-transform-resize {
-          border-radius: 0;
-        }
+      .dnd-start {
+        //border: 2px solid #000000;
 
       }
+
+      .x6-widget-stencil {
+        background-color: #f8f9fb;
+      }
+
+      .x6-widget-stencil-title {
+        background: #eee;
+        font-size: 1rem;
+      }
+
+      .x6-widget-stencil-group-title {
+        font-size: 1rem !important;
+        background-color: #fff !important;
+        height: 40px !important;
+      }
+
+      .x6-widget-transform {
+        margin: -1px 0 0 -1px;
+        padding: 0px;
+        border: 1px solid #239edd;
+      }
+
+      .x6-widget-transform > div {
+        border: 1px solid #239edd;
+      }
+
+      .x6-widget-transform > div:hover {
+        background-color: #3dafe4;
+      }
+
+      .x6-widget-transform-active-handle {
+        background-color: #3dafe4;
+      }
+
+      .x6-widget-transform-resize {
+        border-radius: 0;
+      }
+
     }
 
     .right-box {
