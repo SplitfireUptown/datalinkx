@@ -124,9 +124,22 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
         return SeatunnelActionMeta.builder()
                 .writer(info.getSyncUnit().getWriter())
                 .writerDsDriver(dsWriter)
-                .sourceInfo(dsReader.getSourceInfo(info.getSyncUnit().getReader()))
-                .sinkInfo(dsWriter.getSinkInfo(info.getSyncUnit().getWriter()))
-                .transformInfo(computeDriver.transferInfo(info.getSyncUnit().getCompute().getMeta()))
+                .sourceInfo(
+                        dsReader.getSourceInfo(
+                                info.getSyncUnit().getReader()
+                        )
+                )
+                .sinkInfo(
+                        dsWriter.getSinkInfo(
+                                info.getSyncUnit().getWriter()
+                        )
+                )
+                .transformInfo(
+                        computeDriver.transferInfo(
+                                info.getSyncUnit().getCompute().getCommonSettings(),
+                                info.getSyncUnit().getCompute().getMeta()
+                        )
+                )
                 .jobMode("batch")
                 .jobId(info.getJobId())
                 .cover(info.getCover())

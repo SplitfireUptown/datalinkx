@@ -4,22 +4,22 @@ import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.compute.connector.model.SQLNode;
 import com.datalinkx.compute.connector.model.TransformNode;
+import com.datalinkx.compute.transform.ITransformDriver;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @author: uptown
  * @date: 2024/11/17 17:33
  */
-public class SQLTransformDriver implements ITransformDriver {
+public class SQLTransformDriver extends ITransformDriver {
 
-    public SQLTransformDriver() {
-    }
 
     @Override
-    public TransformNode transferInfo(String transferSQLMeta) {
+    public TransformNode transferInfo(Map<String, Object> commonSettings, String transferSQLMeta) {
         return SQLNode.builder()
                 .query(transferSQLMeta)
                 .sourceTableName(MetaConstants.CommonConstant.SOURCE_TABLE)

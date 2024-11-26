@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +31,23 @@ public class LLMNode extends TransformNode {
 
     @Data
     public static class CustomConfig {
+        @JsonProperty("custom_response_parse")
+        private String customResponseParse;
+        @JsonProperty("custom_request_body")
+        private customRequestBody customRequestBody;
+    }
 
+    @Data
+    public static class customRequestBody {
+        private String model;
+        private List<Message> message = new ArrayList<Message>() {{
+            add(new Message());
+        }};
+    }
+
+    @Data
+    public static class Message {
+        private String role = "system";
+        private String content = "${prompt}";
     }
 }

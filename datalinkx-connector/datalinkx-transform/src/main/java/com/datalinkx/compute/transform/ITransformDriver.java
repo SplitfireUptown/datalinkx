@@ -1,11 +1,13 @@
 package com.datalinkx.compute.transform;
 
 
+import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.compute.connector.model.TransformNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public interface ITransformDriver {
-    TransformNode transferInfo(String transferMeta);
+import java.util.Map;
 
-    String analysisTransferMeta(JsonNode nodeMeta);
+public abstract class ITransformDriver {
+    public abstract TransformNode transferInfo(Map<String, Object> commonSettings, String meta);
+    public abstract String analysisTransferMeta(JsonNode nodeMeta);
 }

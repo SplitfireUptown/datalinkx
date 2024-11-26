@@ -1,6 +1,5 @@
 <template>
   <div class="g6-wrap">
-    <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
     <a-drawer
       title="来源数据源"
       placement="right"
@@ -91,6 +90,18 @@
       <a-input v-model="this.selectedSourceTable" :disabled="disabledTrue"/>
       <span>where</span>
       <a-textarea v-model="this.sqlOperatorWhereValue" placeholder="基于上游节点字段, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
+    </a-drawer>
+    <a-drawer
+      title="大模型算子"
+      placement="right"
+      :closable="false"
+      :visible="llmVisible"
+      :after-visible-change="afterVisibleChange"
+      @close="onClose"
+      width="500"
+    >
+      <span>大模型prompt:</span>
+      <a-textarea v-model="this.llmPrompt" style="height: 121px;" placeholder="所有字段都将用作模型输入，直接使用字段名称编写prompt，只支持英文，例：Determine whether someone is Chinese or American by their name(根据名字判断某人是中国人还是美国人)"/>
     </a-drawer>
     <a-drawer
       title="目标数据源"
@@ -191,22 +202,21 @@
                   <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgZD0iTTEyIDhhMiAyIDAgMCAxIDIgMnY0YTIgMiAwIDEgMS00IDB2LTRhMiAyIDAgMCAxIDItMm01IDB2OGg0bS04LTFsMSAxTTMgMTVhMSAxIDAgMCAwIDEgMWgyYTEgMSAwIDAgMCAxLTF2LTJhMSAxIDAgMCAwLTEtMUg0YTEgMSAwIDAgMS0xLTFWOWExIDEgMCAwIDEgMS0xaDJhMSAxIDAgMCAxIDEgMSIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
                   <span>SQL算子</span>
               </div>
-            <!--            <div>-->
-            <!--              <div class="dnd-polygon" @mousedown="startDrag('polygon',$event)">-->
-            <!--                <span>节点2</span>-->
-            <!--              </div>-->
-            <!--            </div>-->
+              <div class="dnd-rect" @mousedown="startDrag('polygon',$event)">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMzIgMzIiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTI5IDI0LjE4NFY3LjgxNkEzIDMgMCAwIDAgMzEgNWMwLTEuNjU0LTEuMzQ2LTMtMy0zcy0zIDEuMzQ2LTMgM2MwIC4zOTIuMDguNzYzLjIxNyAxLjEwNkwxNiAxNC4xNzFMNi43ODMgNi4xMDZBMyAzIDAgMCAwIDcgNWMwLTEuNjU0LTEuMzQ2LTMtMy0zUzEgMy4zNDYgMSA1YzAgMS4zMDIuODM4IDIuNDAxIDIgMi44MTV2MTYuMzdBMi45OTUgMi45OTUgMCAwIDAgMSAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYTIuOTcgMi45NyAwIDAgMC0uNTk1LTEuNzc1bDUuMzMzLTQuNjY4bDIuMzY1IDQuMTM4QTIuOTggMi45OCAwIDAgMCAxMyAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYzAtLjkzMS0uNDM1LTEuNzU0LTEuMTAzLTIuMzA1bDIuMzY1LTQuMTM4bDUuMzMzIDQuNjY3QTIuOTcgMi45NyAwIDAgMCAyNSAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYTMgMyAwIDAgMC0yLTIuODE2TTI4IDRhMS4wMDEgMS4wMDEgMCAwIDEgMCAyYTEgMSAwIDAgMSAwLTJtLTMuODIyIDUuNjczbC00LjQ0IDcuNzdsLTIuMjItMS45NDN6TTE0LjQ4MiAxNS41bC0yLjIyIDEuOTQybC00LjQ0LTcuNzd6TTQgNGExLjAwMSAxLjAwMSAwIDAgMSAwIDJhMSAxIDAgMCAxIDAtMm0wIDI0YTEuMDAxIDEuMDAxIDAgMCAxIDAtMmExLjAwMSAxLjAwMSAwIDAgMSAwIDJtMS00LjIwNFY4Ljc2Nmw1LjcyNiAxMC4wMnpNMTYgMjhhMS4wMDEgMS4wMDEgMCAwIDEgMC0yYTEuMDAxIDEuMDAxIDAgMCAxIDAgMm0wLTQuMDE1bC0yLjcyNi00Ljc3MUwxNiAxNi44MjlsMi43MjYgMi4zODV6bTExLTE1LjIydjE1LjAzMWwtNS43MjYtNS4wMXpNMjggMjhhMS4wMDEgMS4wMDEgMCAwIDEgMC0yYTEuMDAxIDEuMDAxIDAgMCAxIDAgMiIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
+                <span>大模型算子</span>
+              </div>
               <div class="dnd-rect" @mousedown="startDrag('end',$event)">
                 <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgMTFsLTMgM2wtMy0zaDJ2LTRoMnY0eiIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
                 <span>目标数据源</span>
               </div>
-
-
           </div>
         </a-layout-sider>
         <a-layout-content style="height: calc(100vh - 64px)">
           <div id="container">
-            <div id="graph-container"></div>
+            <div id="graph-container">
+              <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
+            </div>
           </div>
         </a-layout-content>
       </a-layout>
@@ -236,6 +246,7 @@
       return {
         visible: false,
         sqlVisible: false,
+        llmVisible: false,
         toDsVisible: false,
         jobName: '',
         jobId: '',
@@ -261,6 +272,7 @@
         tags: [],
         sqlOperatorValue: '',
         sqlOperatorWhereValue: '',
+        llmPrompt: '',
         sqlOperatorList: [],
         inputVisible: false,
         inputValue: '',
@@ -458,6 +470,7 @@
         this.visible = false
         this.sqlVisible = false
         this.toDsVisible = false
+        this.llmVisible = false
         this.tags = []
         for (const i in this.mappings) {
           if (this.mappings[i].sourceField !== '') {
@@ -656,9 +669,9 @@
           }
         })
         const polygonNode = this.graph.createNode({
-          shape: 'custom-polygon',
-          width: 80,
-          height: 60,
+          shape: 'llm',
+          width: 55,
+          height: 55,
           attrs: {
             body: {
               strokeWidth: 1,
@@ -672,7 +685,6 @@
               fontWeight: 'bold'
             }
           }
-
         })
         const rectNode = this.graph.createNode({
           shape: 'sql',
@@ -898,16 +910,6 @@
             ports[i].style.visibility = show ? 'visible' : 'hidden'
           }
         }
-
-        // Graph.registerNode(
-        //   'sql',
-        //   {
-        //     inherit: 'rect',
-        //     // attrs 可自定义
-        //     ports: { ...ports }
-        //   },
-        //   true
-        // )
         Graph.registerNode(
           'sql',
           {
@@ -952,12 +954,43 @@
         )
 
         Graph.registerNode(
-          'custom-polygon',
+          'llm',
           {
-            inherit: 'polygon',
-            points: '0,10 10,0 20,10 10,20',
-            ports: {
-              ...ports
+            inherit: 'rect',
+            ports: { ...ports },
+            width: 100,
+            height: 40,
+            data: [],
+            markup: [
+              {
+                tagName: 'rect', // 标签名称
+                selector: 'body' // 选择器
+              },
+              {
+                tagName: 'image',
+                selector: 'img'
+              },
+              {
+                tagName: 'text',
+                selector: 'label'
+              }
+            ],
+            attrs: {
+              body: {
+                stroke: '#8f8f8f',
+                strokeWidth: 1,
+                fill: '#fff',
+                rx: 6,
+                ry: 6
+              },
+              img: {
+                'xlink:href':
+                  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMzIgMzIiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTI5IDI0LjE4NFY3LjgxNkEzIDMgMCAwIDAgMzEgNWMwLTEuNjU0LTEuMzQ2LTMtMy0zcy0zIDEuMzQ2LTMgM2MwIC4zOTIuMDguNzYzLjIxNyAxLjEwNkwxNiAxNC4xNzFMNi43ODMgNi4xMDZBMyAzIDAgMCAwIDcgNWMwLTEuNjU0LTEuMzQ2LTMtMy0zUzEgMy4zNDYgMSA1YzAgMS4zMDIuODM4IDIuNDAxIDIgMi44MTV2MTYuMzdBMi45OTUgMi45OTUgMCAwIDAgMSAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYTIuOTcgMi45NyAwIDAgMC0uNTk1LTEuNzc1bDUuMzMzLTQuNjY4bDIuMzY1IDQuMTM4QTIuOTggMi45OCAwIDAgMCAxMyAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYzAtLjkzMS0uNDM1LTEuNzU0LTEuMTAzLTIuMzA1bDIuMzY1LTQuMTM4bDUuMzMzIDQuNjY3QTIuOTcgMi45NyAwIDAgMCAyNSAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYTMgMyAwIDAgMC0yLTIuODE2TTI4IDRhMS4wMDEgMS4wMDEgMCAwIDEgMCAyYTEgMSAwIDAgMSAwLTJtLTMuODIyIDUuNjczbC00LjQ0IDcuNzdsLTIuMjItMS45NDN6TTE0LjQ4MiAxNS41bC0yLjIyIDEuOTQybC00LjQ0LTcuNzd6TTQgNGExLjAwMSAxLjAwMSAwIDAgMSAwIDJhMSAxIDAgMCAxIDAtMm0wIDI0YTEuMDAxIDEuMDAxIDAgMCAxIDAtMmExLjAwMSAxLjAwMSAwIDAgMSAwIDJtMS00LjIwNFY4Ljc2Nmw1LjcyNiAxMC4wMnpNMTYgMjhhMS4wMDEgMS4wMDEgMCAwIDEgMC0yYTEuMDAxIDEuMDAxIDAgMCAxIDAgMm0wLTQuMDE1bC0yLjcyNi00Ljc3MUwxNiAxNi44MjlsMi43MjYgMi4zODV6bTExLTE1LjIydjE1LjAzMWwtNS43MjYtNS4wMXpNMjggMjhhMS4wMDEgMS4wMDEgMCAwIDEgMC0yYTEuMDAxIDEuMDAxIDAgMCAxIDAgMiIvPjwvc3ZnPg==',
+                width: 45,
+                height: 45,
+                x: 6,
+                y: 6
+              }
             }
           },
           true
@@ -1161,6 +1194,9 @@
           }
           if (this.currentCell.shape === 'sql') {
             this.sqlVisible = true
+          }
+          if (this.currentCell.shape === 'llm') {
+            this.llmVisible = true
           }
           if (this.currentCell.shape === 'custom-end-node') {
             this.toDsVisible = true

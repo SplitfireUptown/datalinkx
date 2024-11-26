@@ -83,6 +83,13 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Value("${data-transfer.query-time-out:10000}")
     Integer queryTimeOut;
 
+    @Value("${client.ollama.url}")
+    String ollamaUrl;
+
+    @Value("${llm.model:}")
+    String llmModel;
+
+
     @Override
     public DataTransJobDetail getJobExecInfo(String jobId) {
         JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
@@ -234,8 +241,13 @@ public class DtsJobServiceImpl implements DtsJobService {
             if (!ObjectUtils.isEmpty(transformDriver)) {
                 compute.setMeta(transformDriver.analysisTransferMeta(node));
                 compute.setType(transformType);
+                break;
             }
         }
+        compute.setCommonSettings(new HashMap<String, Object>() {{
+            put("openai.api_path", ollamaUrl);
+            put("model", llmModel);
+        }});
         return compute;
     }
 

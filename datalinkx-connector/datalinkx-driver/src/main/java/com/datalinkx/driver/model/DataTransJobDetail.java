@@ -1,6 +1,7 @@
 package com.datalinkx.driver.model;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,6 +52,8 @@ public class DataTransJobDetail {
         private String type;
         // 算子内容
         private String meta;
+        // 公共配置
+        private Map<String, Object> commonSettings;
     }
 
     @Data
