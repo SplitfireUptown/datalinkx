@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.result.WebResult;
 import com.datalinkx.common.utils.IdUtils;
 import com.datalinkx.common.utils.JsonUtils;
@@ -65,7 +66,7 @@ public class DataTransHandler {
         this.actionEngine.put(MetaConstants.JobType.JOB_TYPE_BATCH, dataTransferAction);
 
         if (!ObjectUtils.isEmpty(transformDataTransferAction)) {
-
+            // 配置了seatunnel client后加载计算引擎
             this.actionEngine.put(MetaConstants.JobType.JOB_TYPE_COMPUTE, transformDataTransferAction);
         }
     }
@@ -113,7 +114,11 @@ public class DataTransHandler {
         DataTransJobDetail jobDetail;
         try {
             jobDetail = this.getJobDetail(jobId);
-            this.actionEngine.get(jobDetail.getType()).doAction(jobDetail);
+            AbstractDataTransferAction engine = this.actionEngine.get(jobDetail.getType());
+            if (ObjectUtils.isEmpty(engine)) {
+                throw new DatalinkXJobException("引擎加载失败，检查配置!");
+            }
+            engine.doAction(jobDetail);
         } catch (InterruptedException e) {
             // cancel job
             throw e;

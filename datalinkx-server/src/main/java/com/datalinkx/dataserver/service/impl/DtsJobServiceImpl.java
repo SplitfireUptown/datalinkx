@@ -89,6 +89,9 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Value("${llm.model:}")
     String llmModel;
 
+    @Value("${llm.response_parse}")
+    String responseParse;
+
 
     @Override
     public DataTransJobDetail getJobExecInfo(String jobId) {
@@ -228,25 +231,38 @@ public class DtsJobServiceImpl implements DtsJobService {
         return syncCon;
     }
 
-    // 解析计算任务图 FIXME: 仅支持单SQL节点
+    // 解析计算任务图
     private DataTransJobDetail.Compute analysisComputeGraph(String graph) {
         DataTransJobDetail.Compute compute = new DataTransJobDetail.Compute();
         if (ObjectUtils.isEmpty(graph)) {
             return compute;
         }
+
+        List<DataTransJobDetail.Compute.Transform> transforms = new ArrayList<>();
         JsonNode jsonNode = JsonUtils.toJsonNode(graph);
         for (JsonNode node : jsonNode.get("cells")) {
+
             String transformType = node.get("shape").asText();
             ITransformDriver transformDriver = TRANSFORM_DRIVER_MAP.get(transformType);
+
             if (!ObjectUtils.isEmpty(transformDriver)) {
-                compute.setMeta(transformDriver.analysisTransferMeta(node));
-                compute.setType(transformType);
-                break;
+                transforms.add(
+                        DataTransJobDetail
+                                .Compute
+                                .Transform
+                                .builder()
+                                .meta(transformDriver.analysisTransferMeta(node))
+                                .type(transformType)
+                                .build()
+                );
             }
         }
+
+        compute.setTransforms(transforms);
         compute.setCommonSettings(new HashMap<String, Object>() {{
             put("openai.api_path", ollamaUrl);
             put("model", llmModel);
+            put("response_parse", responseParse);
         }});
         return compute;
     }

@@ -4,6 +4,7 @@ import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
+import com.datalinkx.compute.connector.model.TransformNode;
 import com.datalinkx.compute.transform.ITransformDriver;
 import com.datalinkx.dataclient.client.seatunnel.request.ComputeJobGraph;
 import com.datalinkx.compute.transform.ITransformFactory;
@@ -25,10 +26,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
 
@@ -119,7 +117,13 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
     protected SeatunnelActionMeta convertExecUnit(DataTransJobDetail info) throws Exception {
         IDsReader dsReader = DsDriverFactory.getDsReader(info.getSyncUnit().getReader().getConnectId());
         IDsWriter dsWriter = DsDriverFactory.getDsWriter(info.getSyncUnit().getWriter().getConnectId());
-        ITransformDriver computeDriver = ITransformFactory.getComputeDriver(info.getSyncUnit().getCompute().getType());
+
+        Map<String, Object> commonSettings = info.getSyncUnit().getCompute().getCommonSettings();
+        List<TransformNode> transformNodes = new ArrayList<>();
+        for (DataTransJobDetail.Compute.Transform transform : info.getSyncUnit().getCompute().getTransforms()) {
+            ITransformDriver computeDriver = ITransformFactory.getComputeDriver(transform.getType());
+            transformNodes.add(computeDriver.transferInfo(commonSettings, transform.getMeta()));
+        }
 
         return SeatunnelActionMeta.builder()
                 .writer(info.getSyncUnit().getWriter())
@@ -134,12 +138,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
                                 info.getSyncUnit().getWriter()
                         )
                 )
-                .transformInfo(
-                        computeDriver.transferInfo(
-                                info.getSyncUnit().getCompute().getCommonSettings(),
-                                info.getSyncUnit().getCompute().getMeta()
-                        )
-                )
+                .transformInfo(transformNodes)
                 .jobMode("batch")
                 .jobId(info.getJobId())
                 .cover(info.getCover())

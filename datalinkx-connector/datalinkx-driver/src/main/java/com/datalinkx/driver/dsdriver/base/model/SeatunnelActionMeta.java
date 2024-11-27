@@ -28,7 +28,7 @@ public class SeatunnelActionMeta extends EngineActionMeta {
     private PluginNode sourceInfo;
     private PluginNode sinkInfo;
     // 计算任务的中间节点
-    private TransformNode transformInfo;
+    private List<TransformNode> transformInfo;
     private String jobMode;
     private Integer parallelism;
     Integer cover;

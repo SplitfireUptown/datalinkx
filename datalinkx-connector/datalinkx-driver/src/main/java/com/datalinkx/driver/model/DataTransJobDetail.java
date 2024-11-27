@@ -49,11 +49,20 @@ public class DataTransJobDetail {
     @NoArgsConstructor
     @Builder
     public static class Compute {
-        private String type;
-        // 算子内容
-        private String meta;
+        // 算子列表
+        private List<Transform> transforms;
         // 公共配置
         private Map<String, Object> commonSettings;
+        @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
+        @Builder
+        public static class Transform {
+            // 算子类型
+            private String type;
+            // 算子内容
+            private String meta;
+        }
     }
 
     @Data

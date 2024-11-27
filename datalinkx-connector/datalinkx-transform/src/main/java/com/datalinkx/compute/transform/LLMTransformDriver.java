@@ -17,7 +17,18 @@ public class LLMTransformDriver extends ITransformDriver {
 
     @Override
     public TransformNode transferInfo(Map<String, Object> commonSettings, String meta) {
-        return LLMNode.builder().build();
+        return LLMNode.builder()
+                .modelProvider("CUSTOM")
+                .model((String) commonSettings.get("model"))
+                .prompt(meta)
+                .openaiApiPath((String) commonSettings.get("openai.api_path"))
+                .customConfig(
+                        LLMNode.CustomConfig.builder()
+                                .customResponseParse((String) commonSettings.get("response_parse"))
+                                .customRequestBody(LLMNode.customRequestBody.builder().build())
+                                .build()
+                )
+                .build();
     }
 
     @Override

@@ -1,10 +1,8 @@
 package com.datalinkx.compute.connector.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +14,7 @@ import java.util.Map;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@SuperBuilder(toBuilder = true)
 public class LLMNode extends TransformNode {
 
     @JsonProperty("model_provider")
@@ -30,6 +29,7 @@ public class LLMNode extends TransformNode {
     private CustomConfig customConfig;
 
     @Data
+    @Builder
     public static class CustomConfig {
         @JsonProperty("custom_response_parse")
         private String customResponseParse;
@@ -38,16 +38,22 @@ public class LLMNode extends TransformNode {
     }
 
     @Data
+    @Builder
     public static class customRequestBody {
-        private String model;
+        @Builder.Default
+        private String model = "${model}";
+        @Builder.Default
         private List<Message> message = new ArrayList<Message>() {{
-            add(new Message());
+            add(Message.builder().build());
         }};
     }
 
     @Data
+    @Builder
     public static class Message {
+        @Builder.Default
         private String role = "system";
+        @Builder.Default
         private String content = "${prompt}";
     }
 }
