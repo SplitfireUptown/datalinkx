@@ -66,30 +66,14 @@
       @close="onClose"
       width="500"
     >
-      <div>
-        <a-tag v-for="tag in tags" :key="tag" draggable @dragstart="handleDragStart(tag, $event)">{{ tag }}</a-tag>
-      </div>
-      <a-input
-        v-if="inputVisible"
-        ref="input"
-        type="text"
-        size="small"
-        :style="{ width: '78px' }"
-        :value="inputValue"
-        @change="handleInputChange"
-        @blur="handleInputConfirm"
-        @keyup.enter="handleInputConfirm"
-      />
-      <a-tag v-else style="background: #fff; borderStyle: dashed;" @click="showInput">
-        <a-icon type="plus" /> New Field
-      </a-tag>
-      <br>
-      <span class="">select</span>
-      <a-textarea @drop="handleDrop" @dragover.prevent v-model="this.sqlOperatorValue" placeholder="基于上游节点字段, 从上面的标签中拖拽至此处"/>
+      <span>select</span>
+      <a-textarea v-model="sqlOperatorValue" placeholder="基于前一个节点的节点信息构造SQL，from表基于前一个节点的结果集"/>
       <span>from</span>
-      <a-input v-model="this.selectedSourceTable" :disabled="disabledTrue"/>
+      <a-input v-model="previousNode" :disabled="disabledTrue"/>
       <span>where</span>
-      <a-textarea v-model="this.sqlOperatorWhereValue" placeholder="基于上游节点字段, 支持基本函数和条件操作, 不支持复杂的 SQL 操作，包括：多源表/行 JOIN 和聚合操作等"/>
+      <a-textarea v-model="sqlOperatorWhereValue" placeholder=""/>
+      <span>group</span>
+      <a-textarea v-model="sqlOperatorGroupValue" placeholder=""/>
     </a-drawer>
     <a-drawer
       title="大模型算子"
@@ -100,8 +84,8 @@
       @close="onClose"
       width="500"
     >
-      <span>大模型prompt:</span>
-      <a-textarea v-model="this.llmPrompt" style="height: 121px;" placeholder="所有字段都将用作模型输入，直接使用字段名称编写prompt，只支持英文，例：Determine whether someone is Chinese or American by their name(根据名字判断某人是中国人还是美国人)"/>
+      <span>大模型prompt</span>
+      <a-textarea v-model="llmPrompt" style="height: 121px;" placeholder="所有字段都将用作模型输入，直接使用字段名称编写prompt，只支持英文，例：Determine whether someone is Chinese or American by their name(根据名字判断某人是中国人还是美国人)"/>
     </a-drawer>
     <a-drawer
       title="目标数据源"
@@ -112,8 +96,8 @@
       @close="onClose"
       width="500"
     >
-      <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
       <div class="select-container">任务名称<a-input v-model="jobName"/></div>
+      <div class="select-container">定时配置（Spring crontab表达式）<a-input v-model="schedulerConf"/></div>
       <div class="select-container">
         目标数据源
         <a-select
@@ -194,22 +178,22 @@
       <a-layout>
         <a-layout-sider style="background: transparent">
           <div id="stencil">
-              <div class="dnd-rect" @mousedown="startDrag('start',$event)">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgOWgtMnY0aC0ydi00aC0ybDMtM3oiLz48L3N2Zz4=" alt="" width="50px" height="50px">
-                <span>来源数据源</span>
-              </div>
-              <div class="dnd-rect" @mousedown="startDrag('rect',$event)">
-                  <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgZD0iTTEyIDhhMiAyIDAgMCAxIDIgMnY0YTIgMiAwIDEgMS00IDB2LTRhMiAyIDAgMCAxIDItMm01IDB2OGg0bS04LTFsMSAxTTMgMTVhMSAxIDAgMCAwIDEgMWgyYTEgMSAwIDAgMCAxLTF2LTJhMSAxIDAgMCAwLTEtMUg0YTEgMSAwIDAgMS0xLTFWOWExIDEgMCAwIDEgMS0xaDJhMSAxIDAgMCAxIDEgMSIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
-                  <span>SQL算子</span>
-              </div>
-              <div class="dnd-rect" @mousedown="startDrag('polygon',$event)">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMzIgMzIiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTI5IDI0LjE4NFY3LjgxNkEzIDMgMCAwIDAgMzEgNWMwLTEuNjU0LTEuMzQ2LTMtMy0zcy0zIDEuMzQ2LTMgM2MwIC4zOTIuMDguNzYzLjIxNyAxLjEwNkwxNiAxNC4xNzFMNi43ODMgNi4xMDZBMyAzIDAgMCAwIDcgNWMwLTEuNjU0LTEuMzQ2LTMtMy0zUzEgMy4zNDYgMSA1YzAgMS4zMDIuODM4IDIuNDAxIDIgMi44MTV2MTYuMzdBMi45OTUgMi45OTUgMCAwIDAgMSAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYTIuOTcgMi45NyAwIDAgMC0uNTk1LTEuNzc1bDUuMzMzLTQuNjY4bDIuMzY1IDQuMTM4QTIuOTggMi45OCAwIDAgMCAxMyAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYzAtLjkzMS0uNDM1LTEuNzU0LTEuMTAzLTIuMzA1bDIuMzY1LTQuMTM4bDUuMzMzIDQuNjY3QTIuOTcgMi45NyAwIDAgMCAyNSAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYTMgMyAwIDAgMC0yLTIuODE2TTI4IDRhMS4wMDEgMS4wMDEgMCAwIDEgMCAyYTEgMSAwIDAgMSAwLTJtLTMuODIyIDUuNjczbC00LjQ0IDcuNzdsLTIuMjItMS45NDN6TTE0LjQ4MiAxNS41bC0yLjIyIDEuOTQybC00LjQ0LTcuNzd6TTQgNGExLjAwMSAxLjAwMSAwIDAgMSAwIDJhMSAxIDAgMCAxIDAtMm0wIDI0YTEuMDAxIDEuMDAxIDAgMCAxIDAtMmExLjAwMSAxLjAwMSAwIDAgMSAwIDJtMS00LjIwNFY4Ljc2Nmw1LjcyNiAxMC4wMnpNMTYgMjhhMS4wMDEgMS4wMDEgMCAwIDEgMC0yYTEuMDAxIDEuMDAxIDAgMCAxIDAgMm0wLTQuMDE1bC0yLjcyNi00Ljc3MUwxNiAxNi44MjlsMi43MjYgMi4zODV6bTExLTE1LjIydjE1LjAzMWwtNS43MjYtNS4wMXpNMjggMjhhMS4wMDEgMS4wMDEgMCAwIDEgMC0yYTEuMDAxIDEuMDAxIDAgMCAxIDAgMiIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
-                <span>大模型算子</span>
-              </div>
-              <div class="dnd-rect" @mousedown="startDrag('end',$event)">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgMTFsLTMgM2wtMy0zaDJ2LTRoMnY0eiIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
-                <span>目标数据源</span>
-              </div>
+            <div class="dnd-rect" @mousedown="startDrag('start',$event)">
+              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgOWgtMnY0aC0ydi00aC0ybDMtM3oiLz48L3N2Zz4=" alt="" width="50px" height="50px">
+              <span>来源数据源</span>
+            </div>
+            <div class="dnd-rect" @mousedown="startDrag('rect',$event)">
+              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgZD0iTTEyIDhhMiAyIDAgMCAxIDIgMnY0YTIgMiAwIDEgMS00IDB2LTRhMiAyIDAgMCAxIDItMm01IDB2OGg0bS04LTFsMSAxTTMgMTVhMSAxIDAgMCAwIDEgMWgyYTEgMSAwIDAgMCAxLTF2LTJhMSAxIDAgMCAwLTEtMUg0YTEgMSAwIDAgMS0xLTFWOWExIDEgMCAwIDEgMS0xaDJhMSAxIDAgMCAxIDEgMSIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
+              <span>SQL算子</span>
+            </div>
+            <div class="dnd-rect" @mousedown="startDrag('polygon',$event)">
+              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIyLjI4MiA5LjgyMWE2IDYgMCAwIDAtLjUxNi00LjkxYTYuMDUgNi4wNSAwIDAgMC02LjUxLTIuOUE2LjA2NSA2LjA2NSAwIDAgMCA0Ljk4MSA0LjE4YTYgNiAwIDAgMC0zLjk5OCAyLjlhNi4wNSA2LjA1IDAgMCAwIC43NDMgNy4wOTdhNS45OCA1Ljk4IDAgMCAwIC41MSA0LjkxMWE2LjA1IDYuMDUgMCAwIDAgNi41MTUgMi45QTYgNiAwIDAgMCAxMy4yNiAyNGE2LjA2IDYuMDYgMCAwIDAgNS43NzItNC4yMDZhNiA2IDAgMCAwIDMuOTk3LTIuOWE2LjA2IDYuMDYgMCAwIDAtLjc0Ny03LjA3M00xMy4yNiAyMi40M2E0LjQ4IDQuNDggMCAwIDEtMi44NzYtMS4wNGwuMTQxLS4wODFsNC43NzktMi43NThhLjguOCAwIDAgMCAuMzkyLS42ODF2LTYuNzM3bDIuMDIgMS4xNjhhLjA3LjA3IDAgMCAxIC4wMzguMDUydjUuNTgzYTQuNTA0IDQuNTA0IDAgMCAxLTQuNDk0IDQuNDk0TTMuNiAxOC4zMDRhNC40NyA0LjQ3IDAgMCAxLS41MzUtMy4wMTRsLjE0Mi4wODVsNC43ODMgMi43NTlhLjc3Ljc3IDAgMCAwIC43OCAwbDUuODQzLTMuMzY5djIuMzMyYS4wOC4wOCAwIDAgMS0uMDMzLjA2Mkw5Ljc0IDE5Ljk1YTQuNSA0LjUgMCAwIDEtNi4xNC0xLjY0Nk0yLjM0IDcuODk2YTQuNSA0LjUgMCAwIDEgMi4zNjYtMS45NzNWMTEuNmEuNzcuNzcgMCAwIDAgLjM4OC42NzdsNS44MTUgMy4zNTRsLTIuMDIgMS4xNjhhLjA4LjA4IDAgMCAxLS4wNzEgMGwtNC44My0yLjc4NkE0LjUwNCA0LjUwNCAwIDAgMSAyLjM0IDcuODcyem0xNi41OTcgMy44NTVsLTUuODMzLTMuMzg3TDE1LjExOSA3LjJhLjA4LjA4IDAgMCAxIC4wNzEgMGw0LjgzIDIuNzkxYTQuNDk0IDQuNDk0IDAgMCAxLS42NzYgOC4xMDV2LTUuNjc4YS43OS43OSAwIDAgMC0uNDA3LS42NjdtMi4wMS0zLjAyM2wtLjE0MS0uMDg1bC00Ljc3NC0yLjc4MmEuNzguNzggMCAwIDAtLjc4NSAwTDkuNDA5IDkuMjNWNi44OTdhLjA3LjA3IDAgMCAxIC4wMjgtLjA2MWw0LjgzLTIuNzg3YTQuNSA0LjUgMCAwIDEgNi42OCA0LjY2em0tMTIuNjQgNC4xMzVsLTIuMDItMS4xNjRhLjA4LjA4IDAgMCAxLS4wMzgtLjA1N1Y2LjA3NWE0LjUgNC41IDAgMCAxIDcuMzc1LTMuNDUzbC0uMTQyLjA4TDguNzA0IDUuNDZhLjguOCAwIDAgMC0uMzkzLjY4MXptMS4wOTctMi4zNjVsMi42MDItMS41bDIuNjA3IDEuNXYyLjk5OWwtMi41OTcgMS41bC0yLjYwNy0xLjVaIi8+PC9zdmc+" alt="" width="50px" height="50px">
+              <span>大模型算子</span>
+            </div>
+            <div class="dnd-rect" @mousedown="startDrag('end',$event)">
+              <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIwIDEzLjA5VjdjMC0yLjIxLTMuNTgtNC04LTRTNCA0Ljc5IDQgN3YxMGMwIDIuMjEgMy41OSA0IDggNGMuNDYgMCAuOSAwIDEuMzMtLjA2QTYgNiAwIDAgMSAxMyAxOXYtLjA1Yy0uMzIuMDUtLjY1LjA1LTEgLjA1Yy0zLjg3IDAtNi0xLjUtNi0ydi0yLjIzYzEuNjEuNzggMy43MiAxLjIzIDYgMS4yM2MuNjUgMCAxLjI3LS4wNCAxLjg4LS4xMUE1Ljk5IDUuOTkgMCAwIDEgMTkgMTNjLjM0IDAgLjY3LjA0IDEgLjA5bS0yLS42NGMtMS4zLjk1LTMuNTggMS41NS02IDEuNTVzLTQuNy0uNi02LTEuNTVWOS42NGMxLjQ3LjgzIDMuNjEgMS4zNiA2IDEuMzZzNC41My0uNTMgNi0xLjM2ek0xMiA5QzguMTMgOSA2IDcuNSA2IDdzMi4xMy0yIDYtMnM2IDEuNSA2IDJzLTIuMTMgMi02IDJtMTAgMTFsLTMgM2wtMy0zaDJ2LTRoMnY0eiIvPjwvc3ZnPg==" alt="" width="50px" height="50px">
+              <span>目标数据源</span>
+            </div>
           </div>
         </a-layout-sider>
         <a-layout-content style="height: calc(100vh - 64px)">
@@ -248,6 +232,7 @@
         sqlVisible: false,
         llmVisible: false,
         toDsVisible: false,
+        currentNodeId: '',
         jobName: '',
         jobId: '',
         dsImgObj,
@@ -259,27 +244,30 @@
         targetFields: [],
         selectloading: false,
         disabledTrue: true,
+        previousNode: '${previous_node}',
         selectedDataSourceName: '',
         selectedDataSource: '',
+        nodeName: '',
+        sqlOperatorValue: '',
+        sqlOperatorWhereValue: '',
+        sqlOperatorGroupValue: '',
         selectedSourceTable: '',
         selectedTargetSource: '',
         selectedTargetTable: '',
+        llmPrompt: '',
         mappings: [
           // { sourceField: '' }
         ],
         targetMappings: [
         ],
         tags: [],
-        sqlOperatorValue: '',
-        sqlOperatorWhereValue: '',
-        llmPrompt: '',
         sqlOperatorList: [],
         inputVisible: false,
         inputValue: '',
         syncMode: 'overwrite',
         cover: 0,
         incrementField: '',
-        schedulerConf: '0 0 18 28-31 * ?',
+        schedulerConf: '',
         tools: [
           {
             title: '保存',
@@ -401,6 +389,7 @@
       handleFromChange (value) {
         this.selectedDataSource = value
         this.selectloading = true
+        console.log(this.cacheCell)
         fetchTables(value).then(res => {
           this.selectloading = false
           this.sourceTables = res.result
@@ -412,28 +401,6 @@
         fetchTables(value).then(res => {
           this.selectloading = false
           this.targetTables = res.result
-        })
-      },
-      showInput () {
-        this.inputVisible = true
-        this.$nextTick(function () {
-          this.$refs.input.focus()
-        })
-      },
-      handleInputChange (e) {
-        this.inputValue = e.target.value
-      },
-      handleInputConfirm () {
-        const inputValue = this.inputValue
-        let tags = this.tags
-        if (inputValue && tags.indexOf(inputValue) === -1) {
-          tags = [...tags, inputValue]
-        }
-        console.log(tags)
-        Object.assign(this, {
-          tags,
-          inputVisible: false,
-          inputValue: ''
         })
       },
       addMapping () {
@@ -463,9 +430,6 @@
         this.sqlOperatorList.push(tag)
         this.targetMappings.push({ sourceField: tag, targetField: '' })
       },
-      handleDragStart (tag, event) {
-        event.dataTransfer.setData('text', tag)
-      },
       onClose () {
         this.visible = false
         this.sqlVisible = false
@@ -477,6 +441,26 @@
             this.tags.push(this.mappings[i].sourceField)
           }
         }
+
+        for (const node of this.graph.getNodes()) {
+          const nodeData = {}
+          if (node.id === this.currentNodeId) {
+            if (node.shape === 'sql') {
+              nodeData['sqlOperatorValue'] = this.sqlOperatorValue
+              nodeData['sqlOperatorWhereValue'] = this.sqlOperatorWhereValue
+              nodeData['sqlOperatorGroupValue'] = this.sqlOperatorGroupValue
+            }
+            if (node.shape === 'llm') {
+              nodeData['prompt'] = this.llmPrompt
+            }
+            nodeData['id'] = this.currentNodeId
+            node.setData(nodeData)
+            break
+          }
+        }
+        this.llmPrompt = ''
+        this.sqlOperatorValue = ''
+        this.currentNodeId = ''
       },
       edit (jobId) {
         this.selectloading = true
@@ -508,8 +492,6 @@
           for (const node of this.graph.getNodes()) {
             if (node.shape === 'sql') {
               this.sqlOperatorValue = node.data[0]
-              this.selectedSourceTable = node.data[1]
-              this.sqlOperatorWhereValue = node.data[2]
             }
           }
         })
@@ -557,8 +539,6 @@
         for (const node of this.graph.getNodes()) {
           if (node.shape === 'sql') {
             node.data.push(this.sqlOperatorValue)
-            node.data.push(this.selectedSourceTable)
-            node.data.push(this.sqlOperatorWhereValue)
           }
         }
         console.log(this.graph.getNodes())
@@ -580,7 +560,8 @@
             'mode': this.syncMode,
             'increate_field': this.incrementField
           },
-          'type': 2
+          'type': 2,
+          'run': false
         }
         if (this.jobId !== '') {
           modifyObj(formData).then(res => {
@@ -985,7 +966,7 @@
               },
               img: {
                 'xlink:href':
-                  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMzIgMzIiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTI5IDI0LjE4NFY3LjgxNkEzIDMgMCAwIDAgMzEgNWMwLTEuNjU0LTEuMzQ2LTMtMy0zcy0zIDEuMzQ2LTMgM2MwIC4zOTIuMDguNzYzLjIxNyAxLjEwNkwxNiAxNC4xNzFMNi43ODMgNi4xMDZBMyAzIDAgMCAwIDcgNWMwLTEuNjU0LTEuMzQ2LTMtMy0zUzEgMy4zNDYgMSA1YzAgMS4zMDIuODM4IDIuNDAxIDIgMi44MTV2MTYuMzdBMi45OTUgMi45OTUgMCAwIDAgMSAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYTIuOTcgMi45NyAwIDAgMC0uNTk1LTEuNzc1bDUuMzMzLTQuNjY4bDIuMzY1IDQuMTM4QTIuOTggMi45OCAwIDAgMCAxMyAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYzAtLjkzMS0uNDM1LTEuNzU0LTEuMTAzLTIuMzA1bDIuMzY1LTQuMTM4bDUuMzMzIDQuNjY3QTIuOTcgMi45NyAwIDAgMCAyNSAyN2MwIDEuNjU0IDEuMzQ2IDMgMyAzczMtMS4zNDYgMy0zYTMgMyAwIDAgMC0yLTIuODE2TTI4IDRhMS4wMDEgMS4wMDEgMCAwIDEgMCAyYTEgMSAwIDAgMSAwLTJtLTMuODIyIDUuNjczbC00LjQ0IDcuNzdsLTIuMjItMS45NDN6TTE0LjQ4MiAxNS41bC0yLjIyIDEuOTQybC00LjQ0LTcuNzd6TTQgNGExLjAwMSAxLjAwMSAwIDAgMSAwIDJhMSAxIDAgMCAxIDAtMm0wIDI0YTEuMDAxIDEuMDAxIDAgMCAxIDAtMmExLjAwMSAxLjAwMSAwIDAgMSAwIDJtMS00LjIwNFY4Ljc2Nmw1LjcyNiAxMC4wMnpNMTYgMjhhMS4wMDEgMS4wMDEgMCAwIDEgMC0yYTEuMDAxIDEuMDAxIDAgMCAxIDAgMm0wLTQuMDE1bC0yLjcyNi00Ljc3MUwxNiAxNi44MjlsMi43MjYgMi4zODV6bTExLTE1LjIydjE1LjAzMWwtNS43MjYtNS4wMXpNMjggMjhhMS4wMDEgMS4wMDEgMCAwIDEgMC0yYTEuMDAxIDEuMDAxIDAgMCAxIDAgMiIvPjwvc3ZnPg==',
+                  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIyLjI4MiA5LjgyMWE2IDYgMCAwIDAtLjUxNi00LjkxYTYuMDUgNi4wNSAwIDAgMC02LjUxLTIuOUE2LjA2NSA2LjA2NSAwIDAgMCA0Ljk4MSA0LjE4YTYgNiAwIDAgMC0zLjk5OCAyLjlhNi4wNSA2LjA1IDAgMCAwIC43NDMgNy4wOTdhNS45OCA1Ljk4IDAgMCAwIC41MSA0LjkxMWE2LjA1IDYuMDUgMCAwIDAgNi41MTUgMi45QTYgNiAwIDAgMCAxMy4yNiAyNGE2LjA2IDYuMDYgMCAwIDAgNS43NzItNC4yMDZhNiA2IDAgMCAwIDMuOTk3LTIuOWE2LjA2IDYuMDYgMCAwIDAtLjc0Ny03LjA3M00xMy4yNiAyMi40M2E0LjQ4IDQuNDggMCAwIDEtMi44NzYtMS4wNGwuMTQxLS4wODFsNC43NzktMi43NThhLjguOCAwIDAgMCAuMzkyLS42ODF2LTYuNzM3bDIuMDIgMS4xNjhhLjA3LjA3IDAgMCAxIC4wMzguMDUydjUuNTgzYTQuNTA0IDQuNTA0IDAgMCAxLTQuNDk0IDQuNDk0TTMuNiAxOC4zMDRhNC40NyA0LjQ3IDAgMCAxLS41MzUtMy4wMTRsLjE0Mi4wODVsNC43ODMgMi43NTlhLjc3Ljc3IDAgMCAwIC43OCAwbDUuODQzLTMuMzY5djIuMzMyYS4wOC4wOCAwIDAgMS0uMDMzLjA2Mkw5Ljc0IDE5Ljk1YTQuNSA0LjUgMCAwIDEtNi4xNC0xLjY0Nk0yLjM0IDcuODk2YTQuNSA0LjUgMCAwIDEgMi4zNjYtMS45NzNWMTEuNmEuNzcuNzcgMCAwIDAgLjM4OC42NzdsNS44MTUgMy4zNTRsLTIuMDIgMS4xNjhhLjA4LjA4IDAgMCAxLS4wNzEgMGwtNC44My0yLjc4NkE0LjUwNCA0LjUwNCAwIDAgMSAyLjM0IDcuODcyem0xNi41OTcgMy44NTVsLTUuODMzLTMuMzg3TDE1LjExOSA3LjJhLjA4LjA4IDAgMCAxIC4wNzEgMGw0LjgzIDIuNzkxYTQuNDk0IDQuNDk0IDAgMCAxLS42NzYgOC4xMDV2LTUuNjc4YS43OS43OSAwIDAgMC0uNDA3LS42NjdtMi4wMS0zLjAyM2wtLjE0MS0uMDg1bC00Ljc3NC0yLjc4MmEuNzguNzggMCAwIDAtLjc4NSAwTDkuNDA5IDkuMjNWNi44OTdhLjA3LjA3IDAgMCAxIC4wMjgtLjA2MWw0LjgzLTIuNzg3YTQuNSA0LjUgMCAwIDEgNi42OCA0LjY2em0tMTIuNjQgNC4xMzVsLTIuMDItMS4xNjRhLjA4LjA4IDAgMCAxLS4wMzgtLjA1N1Y2LjA3NWE0LjUgNC41IDAgMCAxIDcuMzc1LTMuNDUzbC0uMTQyLjA4TDguNzA0IDUuNDZhLjguOCAwIDAgMC0uMzkzLjY4MXptMS4wOTctMi4zNjVsMi42MDItMS41bDIuNjA3IDEuNXYyLjk5OWwtMi41OTcgMS41bC0yLjYwNy0xLjVaIi8+PC9zdmc+',
                 width: 45,
                 height: 45,
                 x: 6,
@@ -1185,20 +1166,25 @@
           }
         })
         this.graph.on('node:click', ({ x, y, node, cell }) => {
-          this.currentCell = cell
-          console.log('click this.currentCell', this.currentCell)
+
+          console.log('click this.currentCell', cell)
           console.log('node', node._model.outgoings)
-          if (this.currentCell.shape === 'custom-start-node') {
-            node.setData('123123123')
+          this.currentNodeId = node.id
+          const nodeData = node.getData()
+          if (cell.shape === 'custom-start-node') {
             this.visible = true
           }
-          if (this.currentCell.shape === 'sql') {
+          if (cell.shape === 'sql') {
             this.sqlVisible = true
+            this.sqlOperatorValue = nodeData['sqlOperatorValue']
+            this.sqlOperatorWhereValue = nodeData['sqlOperatorWhereValue']
+            this.sqlOperatorGroupValue = nodeData['sqlOperatorGroupValue']
           }
-          if (this.currentCell.shape === 'llm') {
+          if (cell.shape === 'llm') {
             this.llmVisible = true
+            this.llmPrompt = nodeData['prompt']
           }
-          if (this.currentCell.shape === 'custom-end-node') {
+          if (cell.shape === 'custom-end-node') {
             this.toDsVisible = true
           }
           if (cell.isNode() && !cell.attrs.typeName) {
@@ -1248,6 +1234,7 @@
   .select-container {
     margin-bottom: 10px; /* 添加底部间距 */
   }
+
   .input-full-width {
     width: 100%;
   }
@@ -1340,6 +1327,7 @@
         right: 30%;
       }
     }
+
     #stencil {
       width: 100%;
       height: 100%;
@@ -1358,15 +1346,15 @@
         width: 100%;
         border-radius: 10px;
         margin: 5px 0;
-     /*   width: 50px;
-        height: 30px;
-        line-height: 40px;
-        text-align: center;
-        border: 2px solid #000000;
-        border-radius: 6px;
-        cursor: move;
-        font-size: 12px;
-        margin-top: 30px;*/
+        /*   width: 50px;
+           height: 30px;
+           line-height: 40px;
+           text-align: center;
+           border: 2px solid #000000;
+           border-radius: 6px;
+           cursor: move;
+           font-size: 12px;
+           margin-top: 30px;*/
       }
 
       .dnd-polygon {

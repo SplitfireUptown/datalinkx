@@ -89,7 +89,7 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Value("${llm.model:}")
     String llmModel;
 
-    @Value("${llm.response_parse}")
+    @Value("${llm.response_parse:}")
     String responseParse;
 
 
