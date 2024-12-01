@@ -43,7 +43,7 @@ public class LLMNode extends TransformNode {
         @Builder.Default
         private String model = "${model}";
         @Builder.Default
-        private List<Message> message = new ArrayList<Message>() {{
+        private List<Message> messages = new ArrayList<Message>() {{
             add(Message.builder().build());
         }};
     }

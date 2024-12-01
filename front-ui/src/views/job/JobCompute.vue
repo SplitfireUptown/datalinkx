@@ -15,7 +15,7 @@
         <a-select
           class="input-full-width"
           @change="handleFromChange"
-          v-model="this.selectedDataSource">
+          v-model="selectedDataSource">
           <a-select-option v-for="table in fromDsList" :value="table.dsId" :key="table.name">
             <div>
               <span class="ds-icon">
@@ -29,7 +29,7 @@
 
       <div class="input-container">
         来源数据表
-        <a-select class="input-full-width" @change="handleFromTbChange" v-model="this.selectedSourceTable">
+        <a-select class="input-full-width" @change="handleFromTbChange" v-model="selectedSourceTable">
           <a-select-option v-for="table in sourceTables" :value="table" :key="table">
             {{ table }}
           </a-select-option>
@@ -66,10 +66,28 @@
       @close="onClose"
       width="500"
     >
-      <span>select</span>
-      <a-textarea v-model="sqlOperatorValue" placeholder="基于前一个节点的节点信息构造SQL，from表基于前一个节点的结果集"/>
+      <div>
+        <a-tag v-for="tag in tags" :key="tag" draggable @dragstart="handleDragStart(tag, $event)">{{ tag }}</a-tag>
+      </div>
+      <a-input
+        v-if="inputVisible"
+        ref="input"
+        type="text"
+        size="small"
+        :style="{ width: '120px' }"
+        :value="inputValue"
+        @change="handleInputChange"
+        @blur="handleInputConfirm"
+        @keyup.enter="handleInputConfirm"
+      />
+      <a-tag v-else style="background: #fff; borderStyle: dashed;" @click="showInput">
+        <a-icon type="plus" /> New Field
+      </a-tag>
+      <br>
+      <span class="">select</span>
+      <a-textarea @drop="handleDrop" @dragover.prevent v-model="sqlOperatorValue" :disabled="disabledTrue" placeholder="基于上游节点字段, 从上面的标签中拖拽至此处"/>
       <span>from</span>
-      <a-input v-model="previousNode" :disabled="disabledTrue"/>
+      <a-input v-model="selectedSourceTable" :disabled="disabledTrue"/>
       <span>where</span>
       <a-textarea v-model="sqlOperatorWhereValue" placeholder=""/>
       <span>group</span>
@@ -96,6 +114,7 @@
       @close="onClose"
       width="500"
     >
+      <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
       <div class="select-container">任务名称<a-input v-model="jobName"/></div>
       <div class="select-container">定时配置（Spring crontab表达式）<a-input v-model="schedulerConf"/></div>
       <div class="select-container">
@@ -103,7 +122,7 @@
         <a-select
           class="input-full-width"
           @change="handleToChange"
-          v-model="this.selectedTargetSource">
+          v-model="selectedTargetSource">
           <a-select-option v-for="table in toDsList" :value="table.dsId" :key="table.name">
             <div>
               <span class="ds-icon">
@@ -135,7 +154,7 @@
         <a-row :gutter="16" v-for="(mapping, index) in targetMappings" :key="index">
           <a-col :span="8">
             <a-select v-model="mapping.sourceField" placeholder="请选择来源字段" class="input-full-width">
-              <a-select-option v-for="field in sqlOperatorList" :value="field" :key="field">
+              <a-select-option v-for="field in toDsSourceFields" :value="field" :key="field">
                 {{ field }}
               </a-select-option>
             </a-select>
@@ -232,6 +251,7 @@
         sqlVisible: false,
         llmVisible: false,
         toDsVisible: false,
+        parentNodeBlood: {},
         currentNodeId: '',
         jobName: '',
         jobId: '',
@@ -241,6 +261,7 @@
         sourceTables: [],
         targetTables: [],
         sourceFields: [],
+        toDsSourceFields: [],
         targetFields: [],
         selectloading: false,
         disabledTrue: true,
@@ -327,6 +348,9 @@
     mounted () {
       this.initGraph()
       this.selectloading = true
+      this.sqlOperatorValue = ''
+      this.sqlOperatorWhereValue = ''
+      this.sqlOperatorGroupValue = ''
       listQuery().then(res => {
         const record = res.result
         for (var a of record) {
@@ -356,7 +380,6 @@
             this.selectedDataSourceName = this.fromDsList[i].catalog
           }
         }
-        console.log(this.selectedDataSourceName)
         this.selectedSourceTable = value
         this.selectloading = true
         this.queryParam = {
@@ -370,6 +393,9 @@
           this.sourceFields = res.result
         })
         this.sqlOperatorValue = ''
+        this.sqlOperatorWhereValue = ''
+        this.sqlOperatorGroupValue = ''
+        this.sqlOperatorList = []
       },
       handleToTbChange (value) {
         this.selectloading = true
@@ -403,6 +429,28 @@
           this.targetTables = res.result
         })
       },
+      showInput () {
+        this.inputVisible = true
+        this.$nextTick(function () {
+          this.$refs.input.focus()
+        })
+      },
+      handleInputChange (e) {
+        this.inputValue = e.target.value
+      },
+      handleInputConfirm () {
+        const inputValue = this.inputValue
+        let tags = this.tags
+        if (inputValue && tags.indexOf(inputValue) === -1) {
+          tags = [...tags, inputValue]
+        }
+        console.log(tags)
+        Object.assign(this, {
+          tags,
+          inputVisible: false,
+          inputValue: ''
+        })
+      },
       addMapping () {
         this.mappings.push({ sourceField: '' })
       },
@@ -421,14 +469,18 @@
       handleDrop (event) {
         event.preventDefault()
         const tag = event.dataTransfer.getData('text')
+        console.log('drag', this.sqlOperatorValue)
         if (this.sqlOperatorValue === '') {
           this.sqlOperatorValue += tag
         } else {
           this.sqlOperatorValue += ', '
           this.sqlOperatorValue += tag
         }
-        this.sqlOperatorList.push(tag)
+        this.toDsSourceFields.push(tag)
         this.targetMappings.push({ sourceField: tag, targetField: '' })
+      },
+      handleDragStart (tag, event) {
+        event.dataTransfer.setData('text', tag)
       },
       onClose () {
         this.visible = false
@@ -449,18 +501,25 @@
               nodeData['sqlOperatorValue'] = this.sqlOperatorValue
               nodeData['sqlOperatorWhereValue'] = this.sqlOperatorWhereValue
               nodeData['sqlOperatorGroupValue'] = this.sqlOperatorGroupValue
+              nodeData['sqlOperatorFrom'] = this.selectedSourceTable
             }
             if (node.shape === 'llm') {
               nodeData['prompt'] = this.llmPrompt
+              this.toDsSourceFields.push('llm_output')
+              console.log(this.toDsSourceFields)
             }
             nodeData['id'] = this.currentNodeId
             node.setData(nodeData)
+            console.log(node)
             break
           }
         }
-        this.llmPrompt = ''
-        this.sqlOperatorValue = ''
-        this.currentNodeId = ''
+        setTimeout(() => {
+          this.llmPrompt = ''
+          this.sqlOperatorValue = ''
+          this.currentNodeId = ''
+          this.sqlOperatorList = []
+        }, 100)
       },
       edit (jobId) {
         this.selectloading = true
@@ -487,11 +546,15 @@
             this.sourceTables = res.result
           })
           this.handleToTbChange(this.selectedTargetTable)
-
+          const graphData = JSON.parse(record.graph)
           this.graph.fromJSON(JSON.parse(record.graph))
-          for (const node of this.graph.getNodes()) {
+
+          console.log('graphData', graphData)
+          for (const node of graphData.cells) {
             if (node.shape === 'sql') {
-              this.sqlOperatorValue = node.data[0]
+              this.sqlOperatorValue = node.data.sqlOperatorValue
+              this.sqlOperatorWhereValue = node.data.sqlOperatorWhereValue
+              this.sqlOperatorGroupValue = node.data.sqlOperatorGroupValue
             }
           }
         })
@@ -536,14 +599,7 @@
       },
       // 保存的方法 根据业务需要达到数据处理成想要的
       handleSave () {
-        for (const node of this.graph.getNodes()) {
-          if (node.shape === 'sql') {
-            node.data.push(this.sqlOperatorValue)
-          }
-        }
-        console.log(this.graph.getNodes())
         const data = this.graph.toJSON() // 可以拿到画完图的数s据
-        console.log(data)
         const formData = {
           'job_id': this.jobId,
           // 提交表单数据
@@ -1166,19 +1222,18 @@
           }
         })
         this.graph.on('node:click', ({ x, y, node, cell }) => {
-
-          console.log('click this.currentCell', cell)
-          console.log('node', node._model.outgoings)
           this.currentNodeId = node.id
+          console.log('click node', node)
           const nodeData = node.getData()
           if (cell.shape === 'custom-start-node') {
             this.visible = true
           }
           if (cell.shape === 'sql') {
             this.sqlVisible = true
-            this.sqlOperatorValue = nodeData['sqlOperatorValue']
-            this.sqlOperatorWhereValue = nodeData['sqlOperatorWhereValue']
-            this.sqlOperatorGroupValue = nodeData['sqlOperatorGroupValue']
+            // this.sqlOperatorValue = nodeData['sqlOperatorValue']
+            // this.sqlOperatorWhereValue = nodeData['sqlOperatorWhereValue']
+            // this.sqlOperatorGroupValue = nodeData['sqlOperatorGroupValue']
+            // this.sqlOperatorList = nodeData['this.sqlOperatorList']
           }
           if (cell.shape === 'llm') {
             this.llmVisible = true
@@ -1186,11 +1241,29 @@
           }
           if (cell.shape === 'custom-end-node') {
             this.toDsVisible = true
+            console.log(this.graph)
+            // 父节点 Object.keys(this.graph.model.outgoings)[0]
+            // 当前节点 Object.keys(this.graph.model.incomings)[0]
+            const parentId = Object.keys(this.graph.model.outgoings)[0]
+            // this.parentNodeBlood[Object.keys(this.graph.model.incomings)[0]] = Object.keys(this.graph.model.outgoings)[0]
+            // for (const node of this.graph.getNodes()) {
+            //   if (node.id === parentId) {
+            //     console.log('node.id', node.id)
+            //     if (node.shape === 'sql') {
+            //       console.log(node)
+            //       this.toDsSourceFields = node['sqlOperatorList']
+            //     }
+            //     if (node.shape === 'llm') {
+            //       this.toDsSourceFields = node['sqlOperatorList']
+            //     }
+            //     break
+            //   }
+            // }
+            console.log('this.toDsSourceFields', this.toDsSourceFields)
           }
           if (cell.isNode() && !cell.attrs.typeName) {
             // 这可以写一些点击节点时和右侧表单交互的效果
             const selectedCell = this.graph.getSelectedCells()
-            console.log(selectedCell)
           }
           if (cell.hasTool('button')) {
             cell.removeTool('button')
@@ -1210,11 +1283,12 @@
             ]
           }
         })
+        this.graph.on('cell:delete', ({ cell, index, options }) => {
+          console.log(cell)
+        })
         this.graph.on('cell:added', ({ cell, index, options }) => {
           if (!cell.isNode()) {
-            console.log('11111111111111111')
           }
-          console.log('add cell', cell)
         })
         this.graph.on('blank:click', () => {
           // this.currentCell && this.currentCell.removeTools();
