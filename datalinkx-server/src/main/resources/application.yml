@@ -96,4 +96,4 @@ retrofit:
 #  embedding: "shaw/dmeta-embedding-zh"
 #  model: "qwen:7b"
 #  vector: "elasticsearch"
-#  response_parse: "$.choices[*].message.content"
+#  response_parse: "$.message.content"

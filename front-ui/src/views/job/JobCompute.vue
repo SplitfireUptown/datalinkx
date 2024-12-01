@@ -216,9 +216,9 @@
           </div>
         </a-layout-sider>
         <a-layout-content style="height: calc(100vh - 64px)">
+          <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
           <div id="container">
             <div id="graph-container">
-              <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
             </div>
           </div>
         </a-layout-content>
@@ -455,6 +455,17 @@
         this.mappings.push({ sourceField: '' })
       },
       removeMapping (index) {
+        const removeField = this.mappings[index].sourceField
+        const sourceFieldIndex = this.toDsSourceFields.indexOf(removeField)
+        if (sourceFieldIndex > -1) {
+          this.toDsSourceFields.splice(sourceFieldIndex, 1)
+        }
+        for (const i in this.targetMappings) {
+          if (this.targetMappings[i].sourceField === removeField) {
+            this.targetMappings.splice(i, 1)
+            break
+          }
+        }
         this.mappings.splice(index, 1)
       },
       addTargetMapping () {
@@ -476,7 +487,7 @@
           this.sqlOperatorValue += ', '
           this.sqlOperatorValue += tag
         }
-        this.toDsSourceFields.push(tag)
+        this.sourceFields.push(tag)
         this.targetMappings.push({ sourceField: tag, targetField: '' })
       },
       handleDragStart (tag, event) {
@@ -505,21 +516,19 @@
             }
             if (node.shape === 'llm') {
               nodeData['prompt'] = this.llmPrompt
-              this.toDsSourceFields.push('llm_output')
-              console.log(this.toDsSourceFields)
             }
             nodeData['id'] = this.currentNodeId
             node.setData(nodeData)
-            console.log(node)
             break
           }
         }
-        setTimeout(() => {
-          this.llmPrompt = ''
-          this.sqlOperatorValue = ''
-          this.currentNodeId = ''
-          this.sqlOperatorList = []
-        }, 100)
+        console.log('this.sqlOperatorValue', this.sqlOperatorValue)
+        // setTimeout(() => {
+        //   this.llmPrompt = ''
+        //   this.sqlOperatorValue = ''
+        //   this.currentNodeId = ''
+        //   this.sqlOperatorList = []
+        // }, 100)
       },
       edit (jobId) {
         this.selectloading = true
@@ -529,13 +538,14 @@
           this.selectedDataSource = record.from_ds_id
           this.selectedSourceTable = record.from_tb_name
           this.selectedTargetTable = record.to_tb_name
-
+          this.schedulerConf = record.scheduler_conf
           this.targetMappings = record.field_mappings
           this.jobId = record.job_id
           this.jobName = record.job_name
 
           for (const i in record.field_mappings) {
             this.mappings.push({ sourceField: record.field_mappings[i].sourceField })
+            this.tags.push(this.mappings[i].sourceField)
           }
 
           fetchTables(this.selectedTargetSource).then(res => {
@@ -555,6 +565,9 @@
               this.sqlOperatorValue = node.data.sqlOperatorValue
               this.sqlOperatorWhereValue = node.data.sqlOperatorWhereValue
               this.sqlOperatorGroupValue = node.data.sqlOperatorGroupValue
+            }
+            if (node.shape === 'llm') {
+              this.llmPrompt = node.data.prompt
             }
           }
         })
@@ -1230,10 +1243,15 @@
           }
           if (cell.shape === 'sql') {
             this.sqlVisible = true
-            // this.sqlOperatorValue = nodeData['sqlOperatorValue']
-            // this.sqlOperatorWhereValue = nodeData['sqlOperatorWhereValue']
-            // this.sqlOperatorGroupValue = nodeData['sqlOperatorGroupValue']
-            // this.sqlOperatorList = nodeData['this.sqlOperatorList']
+            // if (nodeData['sqlOperatorValue']) {
+            //   this.sqlOperatorValue = nodeData['sqlOperatorValue']
+            // }
+            // if (nodeData['sqlOperatorWhereValue']) {
+            //   this.sqlOperatorWhereValue = nodeData['sqlOperatorWhereValue']
+            // }
+            // if (nodeData['sqlOperatorGroupValue']) {
+            //   this.sqlOperatorGroupValue = nodeData['sqlOperatorGroupValue']
+            // }
           }
           if (cell.shape === 'llm') {
             this.llmVisible = true
@@ -1241,25 +1259,33 @@
           }
           if (cell.shape === 'custom-end-node') {
             this.toDsVisible = true
-            console.log(this.graph)
             // 父节点 Object.keys(this.graph.model.outgoings)[0]
             // 当前节点 Object.keys(this.graph.model.incomings)[0]
             const parentId = Object.keys(this.graph.model.outgoings)[0]
+            for (const i in this.mappings) {
+              if (!this.toDsSourceFields.includes(this.mappings[i].sourceField)) {
+                this.toDsSourceFields.push(this.mappings[i].sourceField)
+              }
+            }
+
             // this.parentNodeBlood[Object.keys(this.graph.model.incomings)[0]] = Object.keys(this.graph.model.outgoings)[0]
-            // for (const node of this.graph.getNodes()) {
-            //   if (node.id === parentId) {
-            //     console.log('node.id', node.id)
-            //     if (node.shape === 'sql') {
-            //       console.log(node)
-            //       this.toDsSourceFields = node['sqlOperatorList']
-            //     }
-            //     if (node.shape === 'llm') {
-            //       this.toDsSourceFields = node['sqlOperatorList']
-            //     }
-            //     break
-            //   }
-            // }
-            console.log('this.toDsSourceFields', this.toDsSourceFields)
+            console.log(this.graph.getNodes())
+            var hasLlm = 0
+            for (const node of this.graph.getNodes()) {
+              if (node.shape === 'llm') {
+                hasLlm = 1
+              }
+            }
+            if (hasLlm === 1) {
+              if (!this.toDsSourceFields.includes('llm_output')) {
+                this.toDsSourceFields.push('llm_output')
+              }
+            } else {
+              const sourceFieldIndex = this.toDsSourceFields.indexOf('llm_output')
+              if (sourceFieldIndex > -1) {
+                this.toDsSourceFields.splice(sourceFieldIndex, 1)
+              }
+            }
           }
           if (cell.isNode() && !cell.attrs.typeName) {
             // 这可以写一些点击节点时和右侧表单交互的效果
