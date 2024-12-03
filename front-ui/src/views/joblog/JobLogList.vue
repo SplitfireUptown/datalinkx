@@ -22,10 +22,10 @@
       :rowKey="record => record.id"
       @change="handleTableChange"
     >
-    <span slot="status" slot-scope="text, record" style="display: flex;align-items: center;">
-      <div :style=getTableCss(record.status)></div>
-      <span>{{ record.status ? '失败' : '成功'}}</span>
-    </span>
+      <span slot="status" slot-scope="text, record" style="display: flex;align-items: center;">
+        <div :style="getTableCss(record.status)"></div>
+        <span>{{ record.status ? '失败' : '成功' }}</span>
+      </span>
     </a-table>
   </a-card>
 </template>

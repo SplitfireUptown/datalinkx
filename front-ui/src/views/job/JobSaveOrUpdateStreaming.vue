@@ -66,12 +66,12 @@
             <div class="redis-type-lable">
               <label>目标数据源表</label>
             </div>
-            <a-select mode="tags" :show-search=true style="width: 100%" placeholder="目标topic" @change="handleToTbChange">
+            <a-select mode="tags" :show-search="true" style="width: 100%" placeholder="目标topic" @change="handleToTbChange">
               <a-select-option v-for="table in targetTables" :value="table" :key="table">
                 {{ table }}
               </a-select-option>
             </a-select>
-<!--            <a-input v-model="selectedTargetTable" placeholder="目标topic"/>-->
+            <!--            <a-input v-model="selectedTargetTable" placeholder="目标topic"/>-->
           </a-col>
         </a-row>
       </a-form-item>
@@ -109,7 +109,7 @@
 
     <template slot="footer">
       <a-button key="cancel" @click="handleCancel">取消</a-button>
-      <a-button key="forward" v-show='onlyRead' :loading="confirmLoading" type="primary" @click="handleSubmit">保存</a-button>
+      <a-button key="forward" v-show="onlyRead" :loading="confirmLoading" type="primary" @click="handleSubmit">保存</a-button>
     </template>
   </a-modal>
 </template>
@@ -161,7 +161,7 @@ export default {
         if (!err) {
           this.confirmLoading = true
           if (this.selectedTargetTable.length > 1) {
-            this.$message.error("仅支持单表流转")
+            this.$message.error('仅支持单表流转')
             this.confirmLoading = false
             return
           }
@@ -192,8 +192,7 @@ export default {
                 // 清楚表单数据
                 this.handleCancel()
                 this.$message.success('新增成功')
-              }
-              else{
+              } else {
                 this.confirmLoading = false
                 this.$message.error(res.errstr)
               }

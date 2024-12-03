@@ -26,7 +26,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
         >
-          <span>{{currentDs.label}}</span>
+          <span>{{ currentDs.label }}</span>
         </a-form-item>
 
         <a-form-item
@@ -256,8 +256,7 @@ export default {
                 // 清楚表单数据
                 this.handleCancel()
                 this.$message.success('新增成功')
-              }
-              else{
+              } else {
                 this.confirmLoading = false
                 this.$message.error(res.errstr)
               }
@@ -274,8 +273,7 @@ export default {
                 // 清楚表单数据
                 this.handleCancel()
                 this.$message.success('修改成功')
-              }
-              else{
+              } else {
                 this.confirmLoading = false
                 this.$message.error(res.errstr)
               }

@@ -23,7 +23,6 @@ import './global.less' // global style
 import Chat from 'vue-beautiful-chat'
 // 调用自定义指令
 
-
 Vue.config.productionTip = false
 
 // mount axios to `Vue.$http` and `this.$http`

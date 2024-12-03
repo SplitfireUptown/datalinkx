@@ -1,12 +1,16 @@
 <template>
-    <transition>
-        <div ref="floatBall" class="floatBall" @touchstart.stop="handleStart"
-            @touchmove.prevent.stop="handleMove($event)" @touchend.stop="handleEnd"
-            :style="{ left: left + 'px', top: top + 'px', width: itemWidth + 'px', height: itemHeight + 'px' }"
-            v-if="isShow">
-            {{ text }}
-        </div>
-    </transition>
+  <transition>
+    <div
+      ref="floatBall"
+      class="floatBall"
+      @touchstart.stop="handleStart"
+      @touchmove.prevent.stop="handleMove($event)"
+      @touchend.stop="handleEnd"
+      :style="{ left: left + 'px', top: top + 'px', width: itemWidth + 'px', height: itemHeight + 'px' }"
+      v-if="isShow">
+      {{ text }}
+    </div>
+  </transition>
 </template>
 
 <script>
