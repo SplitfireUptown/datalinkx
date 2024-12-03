@@ -4,7 +4,7 @@ package com.datalinkx.driver.dsdriver;
 import java.util.List;
 
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.compute.connector.jdbc.PluginNode;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
@@ -56,7 +56,7 @@ public interface IDsReader extends IDsDriver {
 
     // ============= Seatunnel引擎
     // 构造seatunnel引擎读信息
-    default PluginNode getSourceInfo(DataTransJobDetail.Reader reader) {
+    default TransformNode getSourceInfo(DataTransJobDetail.Reader reader) {
         return null;
     }
 

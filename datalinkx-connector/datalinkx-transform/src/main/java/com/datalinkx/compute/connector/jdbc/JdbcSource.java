@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class JdbcSource extends PluginNode {
+public class JdbcSource extends TransformNode {
     private String url;
     private String driver;
     @Builder.Default

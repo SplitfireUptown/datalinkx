@@ -1,8 +1,7 @@
 package com.datalinkx.compute.transform;
 
 
-import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.compute.connector.model.TransformNode;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Map;

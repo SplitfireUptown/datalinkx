@@ -1,10 +1,8 @@
-package com.datalinkx.compute.connector.model;
+package com.datalinkx.compute.connector.jdbc;
 
-import com.datalinkx.compute.connector.jdbc.PluginNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -13,11 +11,12 @@ import lombok.experimental.SuperBuilder;
  * @date: 2024/10/27 19:33
  */
 @SuperBuilder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransformNode extends PluginNode {
+public class TransformNode {
+    @JsonProperty("plugin_name")
+    private String pluginName;
     @JsonProperty("source_table_name")
     private String sourceTableName;
     @JsonProperty("result_table_name")

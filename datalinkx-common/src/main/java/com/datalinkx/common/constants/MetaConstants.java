@@ -67,6 +67,8 @@ public final class MetaConstants {
         public static final String TRACE_ID = "trace_id";
         public static final String SOURCE_TABLE = "source_table";
         public static final String RESULT_TABLE = "result_table";
+        public static final String LLM_OUTPUT_TABLE = "llm_output";
+        public static final String SQL_OUTPUT_TABLE = "sql_output";
         public static final String TRANSFORM_SQL = "sql";
         public static final String TRANSFORM_LLM = "llm";
     }

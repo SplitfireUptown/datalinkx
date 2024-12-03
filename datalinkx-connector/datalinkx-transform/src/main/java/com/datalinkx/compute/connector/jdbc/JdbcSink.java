@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class JdbcSink extends PluginNode {
+public class JdbcSink extends TransformNode {
     private String url;
     private String driver;
     private String user;

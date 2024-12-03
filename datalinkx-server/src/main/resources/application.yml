@@ -92,8 +92,8 @@ retrofit:
     # 全局日志打印策略
     global-log-strategy: body
 
-#llm:
+llm:
 #  embedding: "shaw/dmeta-embedding-zh"
 #  model: "qwen:7b"
 #  vector: "elasticsearch"
-#  response_parse: "$.message.content"
+  response_parse: "$.message.content"

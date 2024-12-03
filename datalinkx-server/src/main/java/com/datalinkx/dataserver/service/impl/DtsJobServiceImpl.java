@@ -183,7 +183,10 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .fetchSize(fetchSize)
                 .build();
 
-        String selectField = jobConf.stream().map(JobForm.FieldMappingForm::getSourceField).collect(Collectors.joining(", "));
+        String selectField = jobConf.stream()
+                .map(JobForm.FieldMappingForm::getSourceField)
+                .filter(typeMappings::containsKey)
+                .collect(Collectors.joining(", "));
 
         return DataTransJobDetail.Reader
                 .builder()

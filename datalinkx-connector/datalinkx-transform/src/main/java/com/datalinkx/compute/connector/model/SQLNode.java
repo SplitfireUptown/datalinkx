@@ -1,7 +1,6 @@
 package com.datalinkx.compute.connector.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;

@@ -23,7 +23,7 @@ import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.compute.connector.jdbc.JdbcSink;
 import com.datalinkx.compute.connector.jdbc.JdbcSource;
-import com.datalinkx.compute.connector.jdbc.PluginNode;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -389,7 +389,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
     @Override
-    public PluginNode getSourceInfo(DataTransJobDetail.Reader reader) {
+    public TransformNode getSourceInfo(DataTransJobDetail.Reader reader) {
 
         return JdbcSource.builder()
                 .url(this.jdbcUrl())
@@ -407,7 +407,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
     @Override
-    public PluginNode getSinkInfo(DataTransJobDetail.Writer writer) {
+    public TransformNode getSinkInfo(DataTransJobDetail.Writer writer) {
 
 
         return JdbcSink.builder()

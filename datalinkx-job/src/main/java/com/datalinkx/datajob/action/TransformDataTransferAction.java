@@ -2,9 +2,8 @@ package com.datalinkx.datajob.action;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
-import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.compute.connector.model.TransformNode;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.compute.transform.ITransformDriver;
 import com.datalinkx.dataclient.client.seatunnel.request.ComputeJobGraph;
 import com.datalinkx.compute.transform.ITransformFactory;
@@ -19,16 +18,13 @@ import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
 import com.datalinkx.driver.model.DataTransJobDetail;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
-
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -79,7 +75,9 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
             put("job.mode", unit.getJobMode());
         }});
         computeJobGraph.setSource(Collections.singletonList(unit.getSourceInfo()));
-        computeJobGraph.setTransform(Collections.singletonList(unit.getTransformInfo()));
+        computeJobGraph.setTransform(unit.getTransformInfo().stream()
+                .map(node -> (Object) node) // 使用 map 将 TransformNode 转换为 Object
+                .collect(Collectors.toList()));
         computeJobGraph.setSink(Collections.singletonList(unit.getSinkInfo()));
         JobCommitResp jobCommitResp = seaTunnelClient.jobSubmit(computeJobGraph);
         String taskId = jobCommitResp.getJobId();

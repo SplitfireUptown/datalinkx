@@ -3,13 +3,10 @@ package com.datalinkx.compute.transform;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.compute.connector.model.SQLNode;
-import com.datalinkx.compute.connector.model.TransformNode;
-import com.datalinkx.compute.transform.ITransformDriver;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author: uptown
@@ -23,7 +20,7 @@ public class SQLTransformDriver extends ITransformDriver {
         return SQLNode.builder()
                 .query(transferSQLMeta)
                 .sourceTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
-                .resultTableName(MetaConstants.CommonConstant.RESULT_TABLE)
+                .resultTableName(MetaConstants.CommonConstant.SQL_OUTPUT_TABLE)
                 .pluginName("sql")
                 .build();
     }

@@ -1,7 +1,8 @@
 package com.datalinkx.compute.transform;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.compute.connector.model.LLMNode;
-import com.datalinkx.compute.connector.model.TransformNode;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +20,7 @@ public class LLMTransformDriver extends ITransformDriver {
     public TransformNode transferInfo(Map<String, Object> commonSettings, String meta) {
         return LLMNode.builder()
                 .modelProvider("CUSTOM")
+                .pluginName(MetaConstants.CommonConstant.TRANSFORM_LLM)
                 .model((String) commonSettings.get("model"))
                 .prompt(meta)
                 .openaiApiPath((String) commonSettings.get("openai.api_path"))
@@ -28,11 +30,14 @@ public class LLMTransformDriver extends ITransformDriver {
                                 .customRequestBody(LLMNode.customRequestBody.builder().build())
                                 .build()
                 )
+                .sourceTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
+                .resultTableName(MetaConstants.CommonConstant.LLM_OUTPUT_TABLE)
                 .build();
     }
 
     @Override
     public String analysisTransferMeta(JsonNode nodeMeta) {
-        return null;
+        JsonNode dataMeta = nodeMeta.get("data");
+        return dataMeta.get("prompt").asText();
     }
 }

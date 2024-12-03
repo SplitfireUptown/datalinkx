@@ -1,10 +1,12 @@
 package com.datalinkx.compute.connector.model;
 
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,11 @@ public class LLMNode extends TransformNode {
     public static class CustomConfig {
         @JsonProperty("custom_response_parse")
         private String customResponseParse;
+        @JsonProperty("custom_request_headers")
+        @Builder.Default
+        private Map<String, String> customRequestHeaders = new HashMap<String, String>() {{
+            put("Content-Type", "application/json");
+        }};
         @JsonProperty("custom_request_body")
         private customRequestBody customRequestBody;
     }
@@ -52,7 +59,7 @@ public class LLMNode extends TransformNode {
     @Builder
     public static class Message {
         @Builder.Default
-        private String role = "system";
+        private String role = "user";
         @Builder.Default
         private String content = "${prompt}";
     }
