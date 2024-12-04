@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 
 public interface IDsReader extends IDsDriver {
-    // ============= Flink引擎
+    // ============= Flinkx 引擎
     String retrieveMax(FlinkActionMeta param, String field) throws Exception;
     Object getReaderInfo(FlinkActionMeta param) throws Exception;
     List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception;

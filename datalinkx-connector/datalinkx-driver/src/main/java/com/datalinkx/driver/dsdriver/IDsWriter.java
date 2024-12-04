@@ -6,7 +6,7 @@ import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.model.DataTransJobDetail;
 
 public interface IDsWriter extends IDsDriver {
-    // ============= Flink引擎
+    // ============= Flinkx 引擎
     void truncateData(FlinkActionMeta param) throws Exception;
     Object getWriterInfo(FlinkActionMeta param) throws Exception;
 
