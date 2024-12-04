@@ -118,11 +118,17 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
 
         Map<String, Object> commonSettings = info.getSyncUnit().getCompute().getCommonSettings();
         List<TransformNode> transformNodes = new ArrayList<>();
+        String lastTransformNodeName = "";
+
         for (DataTransJobDetail.Compute.Transform transform : info.getSyncUnit().getCompute().getTransforms()) {
             ITransformDriver computeDriver = ITransformFactory.getComputeDriver(transform.getType());
-            transformNodes.add(computeDriver.transferInfo(commonSettings, transform.getMeta()));
+            TransformNode transformNode = computeDriver.transferInfo(commonSettings, transform.getMeta());
+            lastTransformNodeName = transformNode.getResultTableName();
+            transformNodes.add(transformNode);
         }
 
+        TransformNode sinkInfo = dsWriter.getSinkInfo(info.getSyncUnit().getWriter());
+        sinkInfo.setSourceTableName(lastTransformNodeName);
         return SeatunnelActionMeta.builder()
                 .writer(info.getSyncUnit().getWriter())
                 .writerDsDriver(dsWriter)
@@ -131,11 +137,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
                                 info.getSyncUnit().getReader()
                         )
                 )
-                .sinkInfo(
-                        dsWriter.getSinkInfo(
-                                info.getSyncUnit().getWriter()
-                        )
-                )
+                .sinkInfo(sinkInfo)
                 .transformInfo(transformNodes)
                 .jobMode("batch")
                 .jobId(info.getJobId())

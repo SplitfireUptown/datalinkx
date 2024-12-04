@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
@@ -398,6 +399,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .password(this.jdbcSetupInfo.getPwd())
                 .query(this.transferSourceSQL(reader))
                 .pluginName(PLUGIN_NAME)
+                .resultTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
                 .build();
     }
 

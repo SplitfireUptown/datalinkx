@@ -451,7 +451,7 @@ export default {
       console.log(val)
     },
     changeCover (checked) {
-      this.cover = checked
+      this.cover = checked ? 1 : 0
     },
     changeSyncConfig (value) {
       if (value.target.value === 'increment') {

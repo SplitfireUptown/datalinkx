@@ -286,7 +286,7 @@
         inputVisible: false,
         inputValue: '',
         syncMode: 'overwrite',
-        cover: 0,
+        cover: 1,
         incrementField: '',
         schedulerConf: '',
         tools: [
@@ -567,6 +567,7 @@
               this.sqlOperatorGroupValue = node.data.sqlOperatorGroupValue
             }
             if (node.shape === 'llm') {
+              console.log('node.data.prompt', node.data.prompt)
               this.llmPrompt = node.data.prompt
             }
           }
@@ -1255,7 +1256,6 @@
           }
           if (cell.shape === 'llm') {
             this.llmVisible = true
-            this.llmPrompt = nodeData['prompt']
           }
           if (cell.shape === 'custom-end-node') {
             this.toDsVisible = true

@@ -263,7 +263,7 @@ public class DtsJobServiceImpl implements DtsJobService {
 
         compute.setTransforms(transforms);
         compute.setCommonSettings(new HashMap<String, Object>() {{
-            put("openai.api_path", ollamaUrl);
+            put("openai.api_path", ollamaUrl + "/api/chat");
             put("model", llmModel);
             put("response_parse", responseParse);
         }});
