@@ -99,8 +99,12 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
         }
 
         if (MetaConstants.JobStatus.SEATUNNEL_JOB_FAILED.equalsIgnoreCase(jobOverviewResp.getJobStatus())) {
-            log.error(jobOverviewResp.getErrorMsg());
-            throw new DatalinkXJobException(jobOverviewResp.getErrorMsg());
+            String errorMsg = "请检查Seatunnel日志";
+            if (!ObjectUtils.isEmpty(jobOverviewResp.getErrorMsg())) {
+                errorMsg = jobOverviewResp.getErrorMsg();
+            }
+            log.error(errorMsg);
+            throw new DatalinkXJobException(errorMsg);
         }
 
         return false;

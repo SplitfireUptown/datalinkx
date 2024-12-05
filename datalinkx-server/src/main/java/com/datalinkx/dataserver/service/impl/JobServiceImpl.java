@@ -105,6 +105,7 @@ public class JobServiceImpl implements JobService {
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 		jobBean.setName(form.getJobName());
 		jobBean.setCover(form.getCover());
+		jobBean.setGraph(form.getGraph());
 		jobRepository.save(jobBean);
 		return form.getJobId();
 	}
@@ -256,6 +257,7 @@ public class JobServiceImpl implements JobService {
 		return result;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public void jobStop(String jobId) {
 		jobRepository.updateJobStatus(jobId, JOB_STATUS_STOP);
 		jobClientApi.stop(jobId);

@@ -14,7 +14,7 @@ public interface SeaTunnelClient {
     @POST("/hazelcast/rest/maps/submit-job")
     JobCommitResp jobSubmit(@Body ComputeJobGraph computeJobGraph);
 
-    @GET("/hazelcast/rest/maps/running-job/{jobId}")
+    @GET("/hazelcast/rest/maps/job-info/{jobId}")
     JobOverviewResp jobOverview(@Path("jobId") String jobId);
 
     @POST("/hazelcast/rest/maps/stop-job")

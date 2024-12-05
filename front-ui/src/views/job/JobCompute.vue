@@ -84,7 +84,10 @@
         <a-icon type="plus" /> New Field
       </a-tag>
       <br>
-      <span class="">select</span>
+      <span class="">
+        select
+        <a-icon type="sync"  @click="cleanSelect"/>
+      </span>
       <a-textarea @drop="handleDrop" @dragover.prevent v-model="sqlOperatorValue" :disabled="disabledTrue" placeholder="基于上游节点字段, 从上面的标签中拖拽至此处"/>
       <span>from</span>
       <a-input v-model="selectedSourceTable" :disabled="disabledTrue"/>
@@ -345,12 +348,17 @@
         ]
       }
     },
-    mounted () {
-      this.initGraph()
-      this.selectloading = true
+    created () {
       this.sqlOperatorValue = ''
       this.sqlOperatorWhereValue = ''
       this.sqlOperatorGroupValue = ''
+      this.llmPrompt = ''
+      this.inputValue = ''
+      this.mappings = []
+    },
+    mounted () {
+      this.initGraph()
+      this.selectloading = true
       listQuery().then(res => {
         const record = res.result
         for (var a of record) {
@@ -428,6 +436,15 @@
           this.selectloading = false
           this.targetTables = res.result
         })
+      },
+      cleanSelect () {
+        this.sqlOperatorValue = ''
+        this.toDsSourceFields = []
+        for (const i in this.mappings) {
+          if (!this.toDsSourceFields.includes(this.mappings[i].sourceField)) {
+            this.toDsSourceFields.push(this.mappings[i].sourceField)
+          }
+        }
       },
       showInput () {
         this.inputVisible = true
@@ -1187,6 +1204,7 @@
           const cells = this.graph.getSelectedCells()
           if (cells.length) {
             this.graph.removeCells(cells)
+            console.log("remove cell####################")
           }
         })
 

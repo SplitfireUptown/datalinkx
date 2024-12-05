@@ -29,9 +29,13 @@ public class SQLTransformDriver extends ITransformDriver {
     @Override
     public String analysisTransferMeta(JsonNode nodeMeta) {
         JsonNode dataMeta = nodeMeta.get("data");
-        String sql = String.format("select %s from %s", dataMeta.get(0).asText(), dataMeta.get(1).asText());
-        if (ObjectUtils.isEmpty(dataMeta.get(2))) {
-            sql += String.format(" where %s", dataMeta.get(2).asText());
+        String sql = String.format("select %s from %s", dataMeta.get("sqlOperatorValue").asText(), dataMeta.get("sqlOperatorFrom").asText());
+        if (ObjectUtils.isEmpty(dataMeta.get("sqlOperatorWhereValue"))) {
+            sql += String.format(" where %s", dataMeta.get("sqlOperatorWhereValue").asText());
+        }
+
+        if (ObjectUtils.isEmpty(dataMeta.get("sqlOperatorGroupValue"))) {
+            sql += String.format(" group by %s", dataMeta.get("sqlOperatorGroupValue").asText());
         }
         return sql;
     }
