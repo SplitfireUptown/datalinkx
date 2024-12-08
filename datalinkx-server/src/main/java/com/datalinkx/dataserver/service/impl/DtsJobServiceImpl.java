@@ -102,9 +102,10 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .builder()
                 .reader(this.getReader(jobBean, fieldMappingForms))
                 .writer(this.getWriter(jobBean, fieldMappingForms))
-                .compute(this.analysisComputeGraph(jobBean.getGraph()))
                 .build();
 
+        // 解析计算任务图
+        this.analysisComputeGraph(syncUnit, jobBean.getGraph());
         return DataTransJobDetail.builder().jobId(jobId).type(jobBean.getType()).cover(jobBean.getCover()).syncUnit(syncUnit).build();
     }
 
@@ -183,10 +184,10 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .fetchSize(fetchSize)
                 .build();
 
-//        String selectField = jobConf.stream()
-//                .map(JobForm.FieldMappingForm::getSourceField)
-//                .filter(typeMappings::containsKey)
-//                .collect(Collectors.joining(", "));
+        String selectField = jobConf.stream()
+                .map(JobForm.FieldMappingForm::getSourceField)
+                .filter(typeMappings::containsKey)
+                .collect(Collectors.joining(", "));
 
         return DataTransJobDetail.Reader
                 .builder()
@@ -197,7 +198,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .maxValue(syncModeForm.getIncreateValue())
                 .tableName(jobBean.getFromTbId())
                 .columns(fromCols)
-                .queryFields("*")
+                .queryFields(selectField)
                 .build();
     }
 
@@ -235,17 +236,23 @@ public class DtsJobServiceImpl implements DtsJobService {
     }
 
     // 解析计算任务图
-    private DataTransJobDetail.Compute analysisComputeGraph(String graph) {
+    private void analysisComputeGraph(DataTransJobDetail.SyncUnit syncUnit,
+                                      String graph) {
         DataTransJobDetail.Compute compute = new DataTransJobDetail.Compute();
         if (ObjectUtils.isEmpty(graph)) {
-            return compute;
+            return;
         }
 
+        boolean containSQLNode = false;
         List<DataTransJobDetail.Compute.Transform> transforms = new ArrayList<>();
         JsonNode jsonNode = JsonUtils.toJsonNode(graph);
         for (JsonNode node : jsonNode.get("cells")) {
 
             String transformType = node.get("shape").asText();
+            if (MetaConstants.CommonConstant.TRANSFORM_SQL.equals(transformType)) {
+                containSQLNode = true;
+            }
+
             ITransformDriver transformDriver = TRANSFORM_DRIVER_MAP.get(transformType);
 
             if (!ObjectUtils.isEmpty(transformDriver)) {
@@ -267,7 +274,13 @@ public class DtsJobServiceImpl implements DtsJobService {
             put("model", llmModel);
             put("response_parse", responseParse);
         }});
-        return compute;
+
+        // 如果计算过程中存在SQL节点，把reader中的queryFields改成*防止SQL中引用了未映射字段导致报错
+        if (containSQLNode) {
+            syncUnit.getReader().setQueryFields("*");
+        }
+
+        syncUnit.setCompute(compute);
     }
 
     @SneakyThrows

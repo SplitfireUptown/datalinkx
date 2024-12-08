@@ -6,11 +6,13 @@ import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
@@ -30,6 +32,7 @@ import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.JobService;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -66,6 +69,7 @@ public class JobServiceImpl implements JobService {
 	@Transactional(rollbackFor = Exception.class)
 	public String jobCreate(JobForm.JobCreateForm form) {
 		this.validJobForm(form);
+        this.validTransformGraph(form);
 		String jobId = genKey("job");
 		JobBean jobBean = new JobBean();
 		jobBean.setJobId(jobId);
@@ -95,6 +99,7 @@ public class JobServiceImpl implements JobService {
 
 	public String jobModify(JobForm.JobModifyForm form) {
 		this.validJobForm(form);
+		this.validTransformGraph(form);
 		JobBean jobBean = jobRepository.findByJobId(form.getJobId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
 		jobBean.setReaderDsId(form.getFromDsId());
 		jobBean.setWriterDsId(form.getToDsId());
@@ -108,6 +113,35 @@ public class JobServiceImpl implements JobService {
 		jobBean.setGraph(form.getGraph());
 		jobRepository.save(jobBean);
 		return form.getJobId();
+	}
+
+	// 校验计算任务transform graph是否合法
+	private void validTransformGraph(JobForm.JobCreateForm form) {
+		if (ObjectUtils.isEmpty(form.getGraph())) {
+			return;
+		}
+
+		Map<String, Integer> nodeBook = new HashMap<>();
+		JsonNode jsonNode = JsonUtils.toJsonNode(form.getGraph());
+		for (JsonNode node : jsonNode.get("cells")) {
+			String nodeType = node.get("shape").asText();
+			if ("edge".equals(nodeType)) {
+				continue;
+			}
+
+			nodeBook.put(nodeType, nodeBook.getOrDefault(nodeType, 0) + 1);
+		}
+
+		// 目前只支持画布中三个节点, 前端太难写了，GPT都救不了，实在写不下去了。。。。
+		if (nodeBook.keySet().size() > 3) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "仅支持单source输入节点、单输出sink节点、单transform节点");
+		}
+
+		// 目前只支持单source输入节点、单输出sink节点、单transform节点
+		List<Integer> normalNodeNum = nodeBook.values().stream().filter(v -> v > 1).collect(Collectors.toList());
+		if (!ObjectUtils.isEmpty(normalNodeNum)) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "仅支持单source输入节点、单输出sink节点、单transform节点");
+		}
 	}
 
 	// 校验流转任务配置合法
@@ -264,6 +298,6 @@ public class JobServiceImpl implements JobService {
 	}
 
 	public List<JobVo.JobId2NameVo> list() {
-		return jobRepository.findAll().stream().map(v -> JobVo.JobId2NameVo.builder().JobId(v.getJobId()).jobName(v.getName()).build()).collect(Collectors.toList());
+		return jobRepository.findAll().stream().map(v -> JobVo.JobId2NameVo.builder().JobId(v.getJobId()).jobName(v.getName()).type(v.getType()).build()).collect(Collectors.toList());
 	}
 }
