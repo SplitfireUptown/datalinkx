@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EngineActionMeta {
     // 流转任务id
-    String jobId;
+    public String jobId;
     // 底层引擎侧任务id
-    String taskId;
+    public String taskId;
 }

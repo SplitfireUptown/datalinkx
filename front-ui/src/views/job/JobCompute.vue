@@ -315,7 +315,7 @@
         inputVisible: false,
         inputValue: '',
         syncMode: 'overwrite',
-        cover: 1,
+        cover: 0,
         isIncrement: false,
         incrementField: '',
         schedulerConf: '',
@@ -618,7 +618,12 @@
           this.targetMappings = record.field_mappings
           this.jobId = record.job_id
           this.jobName = record.job_name
-
+          this.syncMode = record.sync_mode.mode
+          this.cover = record.cover
+          this.incrementField = record.sync_mode.increate_field
+          if (this.syncMode === 'increment') {
+            this.isIncrement = true
+          }
           for (const i in record.field_mappings) {
             this.mappings.push({ sourceField: record.field_mappings[i].sourceField })
             this.tags.push(this.mappings[i].sourceField)

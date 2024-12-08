@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
@@ -36,6 +37,7 @@ import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
+import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import com.datalinkx.driver.model.DataTransJobDetail;
@@ -390,26 +392,41 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
     @Override
-    public TransformNode getSourceInfo(DataTransJobDetail.Reader reader) {
+    public TransformNode getSourceInfo(FlinkActionMeta unit) {
 
         return JdbcSource.builder()
                 .url(this.jdbcUrl())
                 .driver(this.driverClass())
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
-                .query(this.transferSourceSQL(reader))
+                .query(this.transferSourceSQL(unit))
                 .pluginName(PLUGIN_NAME)
                 .resultTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
                 .build();
     }
 
     @Override
-    public String transferSourceSQL(DataTransJobDetail.Reader reader) {
-        return String.format("select %s from %s.%s", reader.getQueryFields(), reader.getSchema(), reader.getTableName());
+    public String transferSourceSQL(FlinkActionMeta unit) {
+        DataTransJobDetail.Reader reader = unit.getReader();
+
+        String sourceSQL = String.format("select %s from %s.%s", reader.getQueryFields(), reader.getSchema(), reader.getTableName());
+        try {
+
+            String increaseSQL = this.genWhere(unit);
+            if (!ObjectUtils.isEmpty(increaseSQL)) {
+                sourceSQL += String.format(" where %s", increaseSQL);
+            }
+        } catch (Exception e) {
+
+            log.error("gen increase sql error: " + e.getMessage(), e);
+            throw new DatalinkXJobException("生成增量条件SQL失败");
+        }
+
+        return sourceSQL;
     }
 
     @Override
-    public TransformNode getSinkInfo(DataTransJobDetail.Writer writer) {
+    public TransformNode getSinkInfo(SeatunnelActionMeta param) {
 
 
         return JdbcSink.builder()
@@ -418,12 +435,13 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
                 .pluginName(PLUGIN_NAME)
-                .query(this.transferSinkSQL(writer))
+                .query(this.transferSinkSQL(param))
                 .build();
     }
 
     @Override
-    public String transferSinkSQL(DataTransJobDetail.Writer writer) {
+    public String transferSinkSQL(SeatunnelActionMeta param) {
+        DataTransJobDetail.Writer writer = param.getWriter();
         StringBuilder abstractQuery = new StringBuilder();
         for (int i = 0; i < writer.getInsertFields().split(",").length; i++) {
             if (i == 0) {

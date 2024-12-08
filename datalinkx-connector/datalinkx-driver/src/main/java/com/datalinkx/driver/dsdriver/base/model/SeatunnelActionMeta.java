@@ -20,9 +20,7 @@ import java.util.List;
 @SuperBuilder
 @FieldNameConstants
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeatunnelActionMeta extends EngineActionMeta {
-    IDsWriter writerDsDriver;
-    DataTransJobDetail.Writer writer;
+public class SeatunnelActionMeta extends FlinkActionMeta {
     private TransformNode sourceInfo;
     private TransformNode sinkInfo;
     // 计算任务的中间节点
