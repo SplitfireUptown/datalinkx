@@ -25,6 +25,7 @@ export default {
 
 <style lang="less">
 .base-loading-layer {
+  background: raba(255,255,255,.5);
   position: absolute;
   z-index: 999999;
   top: 0;
@@ -37,6 +38,7 @@ export default {
 }
 
 .base-loading-layer .loader-outer{
+  transform: translate(-50%, -50%);
   position: absolute;
   z-index: 999999;
   top: 50%;

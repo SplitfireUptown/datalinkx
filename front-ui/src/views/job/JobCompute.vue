@@ -219,7 +219,6 @@
           </div>
         </a-layout-sider>
         <a-layout-content style="height: calc(100vh - 64px)">
-          <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
           <div id="container">
             <div id="graph-container">
             </div>
@@ -227,6 +226,7 @@
         </a-layout-content>
       </a-layout>
     </a-layout>
+    <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
   </div>
 </template>
 
