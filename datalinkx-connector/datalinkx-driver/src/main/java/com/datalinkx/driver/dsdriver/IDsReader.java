@@ -56,12 +56,12 @@ public interface IDsReader extends IDsDriver {
 
     // ============= Seatunnel引擎
     // 构造seatunnel引擎读信息
-    default TransformNode getSourceInfo(DataTransJobDetail.Reader reader) {
+    default TransformNode getSourceInfo(FlinkActionMeta unit) {
         return null;
     }
 
     // 构造seatunnel引擎source中sql
-    default String transferSourceSQL(DataTransJobDetail.Reader reader) {
+    default String transferSourceSQL(FlinkActionMeta unit) {
         return "";
     }
 }

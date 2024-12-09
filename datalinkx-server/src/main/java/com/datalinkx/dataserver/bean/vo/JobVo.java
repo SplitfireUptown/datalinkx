@@ -156,6 +156,8 @@ public class JobVo {
 		@ApiModelProperty(value = "任务名称")
 		@JsonProperty("job_name")
 		private String jobName;
+		@ApiModelProperty(value = "任务类型")
+		private Integer type;
 	}
 
 	@Data

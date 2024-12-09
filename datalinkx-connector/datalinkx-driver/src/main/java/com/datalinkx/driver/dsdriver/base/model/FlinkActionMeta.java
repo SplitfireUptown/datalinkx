@@ -27,23 +27,23 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FlinkActionMeta extends EngineActionMeta {
     // datalinkx-server业务来源库信息
-    DataTransJobDetail.Reader reader;
+    public DataTransJobDetail.Reader reader;
     // datalinkx-server业务目标库信息
-    DataTransJobDetail.Writer writer;
+    public DataTransJobDetail.Writer writer;
     // 来源库driver驱动
-    IDsReader dsReader;
+    public IDsReader dsReader;
     // 目标库driver驱动
-    IDsWriter dsWriter;
+    public IDsWriter dsWriter;
     // 是否覆盖 0 - 否 1 - 是
-    Integer cover;
+    public Integer cover;
     // 数据总读行数
-    int readRecords = 0;
+    public int readRecords = 0;
     // 数据总写行数 = readRecords - errorRecords
-    int writeRecords = 0;
+    public int writeRecords = 0;
     // 数据失败行数
-    int errorRecords = 0;
+    public int errorRecords = 0;
     // 写字节数
-    long writeBytes;
+    public long writeBytes;
 
     public String getReaderFieldType(String fieldName) {
         Map<String, DataTransJobDetail.Column> columnTypeMap = this.getReader().getColumns().stream()

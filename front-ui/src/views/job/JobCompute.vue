@@ -7,7 +7,7 @@
       :visible="visible"
       :after-visible-change="afterVisibleChange"
       @close="onClose"
-      width="500"
+      width="700"
     >
       <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
       <div class="select-container">
@@ -35,6 +35,32 @@
           </a-select-option>
         </a-select>
       </div>
+      <a-form-item
+        label="同步配置"
+        v-show="!isRedisTo && !isStreaming"
+      >
+        <a-row :gutter="16">
+          <a-col :span="6">
+            <a-radio-group v-model="syncMode" button-style="solid" @change="changeSyncConfig">
+              <a-radio-button value="overwrite">
+                全量
+              </a-radio-button>
+              <a-radio-button value="increment">
+                增量
+              </a-radio-button>
+            </a-radio-group>
+          </a-col>
+          <a-col :span="6" v-show="!isIncrement">开启数据覆盖: <a-switch v-model="trans_cover" @change="changeCover" /></a-col>
+          <a-col :span="6"><p v-show="isIncrement">请选择增量字段: </p></a-col>
+          <div class="input-container">
+            <a-select v-show="isIncrement" v-model="incrementField" placeholder="请选择增量字段">
+              <a-select-option v-for="field in sourceFields" :value="field.name" :key="field.name">
+                {{ field.name }}
+              </a-select-option>
+            </a-select>
+          </div>
+        </a-row>
+      </a-form-item>
       <a-form-item label="选择流转字段">
         <a-row :gutter="16" v-for="(mapping, index) in mappings" :key="index">
           <a-col :span="8">
@@ -119,7 +145,7 @@
     >
       <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
       <div class="select-container">任务名称<a-input v-model="jobName"/></div>
-      <div class="select-container">定时配置（Spring crontab表达式）<a-input v-model="schedulerConf"/></div>
+      <div class="select-container"><a href="https://tool.lu/crontab" target="_blank">定时配置（Spring crontab表达式）</a><a-input v-model="schedulerConf"/></div>
       <div class="select-container">
         目标数据源
         <a-select
@@ -220,6 +246,7 @@
         </a-layout-sider>
         <a-layout-content style="height: calc(100vh - 64px)">
           <div id="container">
+            <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
             <div id="graph-container">
             </div>
           </div>
@@ -289,7 +316,8 @@
         inputVisible: false,
         inputValue: '',
         syncMode: 'overwrite',
-        cover: 1,
+        cover: 0,
+        isIncrement: false,
         incrementField: '',
         schedulerConf: '',
         tools: [
@@ -381,6 +409,22 @@
       })
     },
     inject: ['closeDraw'],
+    computed: {
+      isRedisTo () {
+        let temp = false
+        if (this.selectedTargetSource) {
+          temp = this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 4
+        }
+        return temp
+      },
+      isStreaming () {
+        return this.jobType === 'streaming'
+      },
+      // 是否覆盖
+      trans_cover () {
+        return Boolean(this.cover)
+      }
+    },
     methods: {
       handleFromTbChange (value) {
         for (const i in this.fromDsList) {
@@ -419,6 +463,19 @@
           this.selectloading = false
           this.targetFields = res.result
         })
+      },
+      changeCover (checked) {
+        this.cover = checked ? 1 : 0
+      },
+      changeSyncConfig (value) {
+        if (value.target.value === 'increment') {
+          this.isIncrement = true
+          this.syncMode = 'increment'
+        } else {
+          this.isIncrement = false
+          this.incrementField = ''
+          this.syncMode = 'overwrite'
+        }
       },
       handleFromChange (value) {
         this.selectedDataSource = value
@@ -534,6 +591,9 @@
             if (node.shape === 'llm') {
               nodeData['prompt'] = this.llmPrompt
             }
+            if (node.shape === 'custom-start-node') {
+              nodeData['mappings'] = this.mappings
+            }
             nodeData['id'] = this.currentNodeId
             node.setData(nodeData)
             break
@@ -559,7 +619,12 @@
           this.targetMappings = record.field_mappings
           this.jobId = record.job_id
           this.jobName = record.job_name
-
+          this.syncMode = record.sync_mode.mode
+          this.cover = record.cover
+          this.incrementField = record.sync_mode.increate_field
+          if (this.syncMode === 'increment') {
+            this.isIncrement = true
+          }
           for (const i in record.field_mappings) {
             this.mappings.push({ sourceField: record.field_mappings[i].sourceField })
             this.tags.push(this.mappings[i].sourceField)
@@ -586,6 +651,9 @@
             if (node.shape === 'llm') {
               console.log('node.data.prompt', node.data.prompt)
               this.llmPrompt = node.data.prompt
+            }
+            if (node.shape === 'custom-start-node') {
+              this.mappings = node.data.mappings
             }
           }
         })

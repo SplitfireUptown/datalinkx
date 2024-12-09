@@ -155,11 +155,12 @@ export default {
     init () {
       listQuery().then(res => {
         for (const i of res.result) {
-          this.selectJobs.push({
-            'label': i.job_name,
-            'value': i.job_id
-          })
-          this.loading = false
+          if (i.type !== 1) {
+            this.selectJobs.push({
+              'label': i.job_name,
+              'value': i.job_id
+            })
+          }
         }
         console.log(this.selectJobs)
       }).finally(() => {
