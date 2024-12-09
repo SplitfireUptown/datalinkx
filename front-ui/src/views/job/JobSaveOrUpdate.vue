@@ -122,9 +122,9 @@
         </a-row>
       </a-form-item>
       <a-form-item
-        label="定时配置（Spring crontab表达式）"
         v-show="!isStreaming"
       >
+        <a href="https://tool.lu/crontab" target="_blank">定时配置（Spring crontab表达式）</a>
         <a-input
           type="text"
           v-decorator="['schedulerConf', {rules: [{required: true, message: '请输入crontab表达式', trigger: 'blur'}],initialValue: schedulerConf}]"/>

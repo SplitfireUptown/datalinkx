@@ -246,7 +246,6 @@
         </a-layout-sider>
         <a-layout-content style="height: calc(100vh - 64px)">
           <div id="container">
-            <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
             <div id="graph-container">
             </div>
           </div>
