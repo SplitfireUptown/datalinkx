@@ -25,7 +25,7 @@ export default {
 
 <style lang="less">
 .base-loading-layer {
-  background: raba(255,255,255,.5);
+  background: rgba(255,255,255,.5);
   position: absolute;
   z-index: 999999;
   top: 0;
