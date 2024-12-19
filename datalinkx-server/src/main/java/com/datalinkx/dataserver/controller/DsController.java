@@ -53,7 +53,7 @@ public class DsController {
 		);
 	}
 
-	@GetMapping("/http/test")
+	@PostMapping("/http/test")
 	public WebResult httpTest(JobForm.HttpTestForm httpTestForm) {
 		return WebResult.of(HttpConstructor.go(httpTestForm));
 	}

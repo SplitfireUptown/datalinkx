@@ -10,6 +10,7 @@ import okhttp3.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,6 +20,13 @@ import java.util.Map;
 @Slf4j
 public class HttpConstructor {
 
+    public static Map<String, String> contentTypeMapping = new HashMap<>();
+    static {
+        contentTypeMapping.put("raw", "application/json");
+        contentTypeMapping.put("x-www-form-urlencoded", "application/x-www-form-urlencoded");
+        contentTypeMapping.put("form-data", "multipart/form-data");
+
+    }
 
     private static OkHttpClient client = new OkHttpClient();
 

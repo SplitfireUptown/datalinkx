@@ -1,9 +1,9 @@
 import { axios } from '@/utils/request'
 
-export function httpGo (params) {
+export function httpGo (obj) {
   return axios({
-    url: '/monitor/http/test',
-    method: 'GET',
-    params: params
+    url: '/api/ds/http/test',
+    method: 'POST',
+    data: obj
   })
 }

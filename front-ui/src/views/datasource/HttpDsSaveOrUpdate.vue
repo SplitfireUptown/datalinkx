@@ -163,7 +163,8 @@
         <br />
         <a-row>
           <a-card title="Response" style="width: 100%">
-            <p>{{ rev_data }}</p>
+<!--            <p>{{ rev_data }}</p>-->
+            <vue-json-pretty :data="largeJsonData" :collapsedNodeLength="10" />
           </a-card>
         </a-row>
       </a-card>
@@ -179,6 +180,8 @@
 <script>
   import { httpGo } from '@/api/postman'
   import { addObj, putObj } from '@/api/datasource/datasource'
+  import VueJsonPretty from 'vue-json-pretty'
+  import 'vue-json-pretty/lib/styles.css'
 
   // 表头数据,title 为表头的标题 dataIndex为列数据在数据项中对应的 key
   const columns = [
@@ -207,7 +210,7 @@
     data () {
       return {
         api_url: '',
-        rev_data: '',
+        rev_data: {},
         activeKey: '1', // 控制标签页params、headers、body
         data: [],
         headerData: [],
@@ -245,8 +248,16 @@
     methods: {
       onSubmit () {
         this.loading = true
-        // TODO url,method,body,header等都需要传给后端
-        httpGo(this.api_url)
+        const httpConfig = {
+          'method': this.method,
+          'url': this.api_url,
+          'header': this.headerData,
+          'param': this.paramData,
+          'body': this.data,
+          'content_type': this.body_type,
+          'raw': this.rawValue
+        }
+        httpGo(httpConfig)
           .then((result) => {
             this.loading = false
             this.rev_data = result
@@ -262,6 +273,7 @@
           'header': this.headerData,
           'param': this.paramData,
           'body': this.data,
+          'content_type': this.body_type,
           'raw': this.rawValue
         }
 
@@ -472,7 +484,7 @@
       }
     },
     components: {
-
+      VueJsonPretty
     }
   }
 

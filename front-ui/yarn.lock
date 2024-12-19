@@ -11339,6 +11339,11 @@ vue-i18n@^8.27.1:
   resolved "https://registry.npmjs.org/vue-i18n/-/vue-i18n-8.28.2.tgz"
   integrity sha512-C5GZjs1tYlAqjwymaaCPDjCyGo10ajUphiwA922jKt9n7KPpqR7oM1PCwYzhB/E7+nT3wfdG3oRre5raIT1rKA==
 
+vue-json-pretty@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.npmmirror.com/vue-json-pretty/-/vue-json-pretty-2.4.0.tgz#6c5a00ef9c2eb3d24466b861ec5a085c84367e4e"
+  integrity sha512-e9bP41DYYIc2tWaB6KuwqFJq5odZ8/GkE6vHQuGcbPn37kGk4a3n1RNw3ZYeDrl66NWXgTlOfS+M6NKkowmkWw==
+
 vue-loader@^17.0.0:
   version "17.2.2"
   resolved "https://registry.npmjs.org/vue-loader/-/vue-loader-17.2.2.tgz"
