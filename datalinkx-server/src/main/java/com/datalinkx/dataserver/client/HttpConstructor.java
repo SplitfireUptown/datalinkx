@@ -1,9 +1,9 @@
 package com.datalinkx.dataserver.client;
 
 import cn.hutool.core.lang.Pair;
-import cn.hutool.core.lang.Tuple;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -32,36 +32,48 @@ public class HttpConstructor {
 
     public static Object go(JobForm.HttpTestForm httpTestForm) {
 
-        // 1、解析param参数
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(httpTestForm.getApiUrl()).newBuilder();
-        for (Map.Entry<String, String> entry : httpTestForm.getParams().entrySet()) {
-            urlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
+        String apiUrl = httpTestForm.getApiUrl();
+        if (!apiUrl.contains("http") && !apiUrl.contains("https")) {
+            apiUrl = "http://" + apiUrl;
         }
-        // 2、解析body
-        RequestBody requestBody = RequestBody.create(MediaType.parse(httpTestForm.getContentType()), JsonUtils.toJson(httpTestForm.getBody()));
+
+        // 1、解析param参数
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(apiUrl).newBuilder();
+        for (JobForm.ItemConfig itemConfig : httpTestForm.getParam()) {
+            urlBuilder.addQueryParameter(itemConfig.getKey(), itemConfig.getValue());
+        }
+
 
         Request.Builder requestBuilder = new Request.Builder()
-                .url(urlBuilder.build())
-                .method(httpTestForm.getMethod(), requestBody);
+                .url(urlBuilder.build());
+//                .method(httpTestForm.getMethod().toLowerCase(), requestBody);
+
+        if (!"GET".equalsIgnoreCase(httpTestForm.getMethod().toLowerCase())) {
+            // 2、解析body
+            RequestBody requestBody = RequestBody.create(MediaType.parse(httpTestForm.getContentType()), JsonUtils.toJson(httpTestForm.getBody()));
+            requestBuilder.method(httpTestForm.getMethod().toLowerCase(), requestBody);
+        }
 
         // 3、解析header
-        httpTestForm.getHeaders().forEach(requestBuilder::addHeader);
+        for (JobForm.ItemConfig itemConfig : httpTestForm.getHeader()) {
+            requestBuilder.addHeader(itemConfig.getKey(), itemConfig.getValue());
+        }
+
 
         Request request = requestBuilder.build();
         try {
             Response response = client.newCall(request).execute();
-            ResponseBody responseBody = response.body();
-
-            if (responseBody != null) {
-                System.out.println(responseBody.string());
+            if (response.isSuccessful()) {
+                ResponseBody responseBody = response.body();
+                return responseBody.string();
+            } else {
+                throw new DatalinkXServerException(response.message());
             }
-
-            return responseBody;
-        } catch (IOException e) {
+        } catch (Exception e) {
 
             log.error(e.getMessage(), e);
+            throw new DatalinkXServerException("接口请求失败: " + e.getMessage());
         }
-        throw new DatalinkXServerException("HTTP构造失败");
     }
 
     public static Pair<String, Integer> checkUrlFormat(String url) {

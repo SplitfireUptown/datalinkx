@@ -54,7 +54,7 @@ public class DsController {
 	}
 
 	@PostMapping("/http/test")
-	public WebResult httpTest(JobForm.HttpTestForm httpTestForm) {
+	public WebResult httpTest(@RequestBody JobForm.HttpTestForm httpTestForm) {
 		return WebResult.of(HttpConstructor.go(httpTestForm));
 	}
 

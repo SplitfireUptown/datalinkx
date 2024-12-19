@@ -163,8 +163,7 @@
         <br />
         <a-row>
           <a-card title="Response" style="width: 100%">
-<!--            <p>{{ rev_data }}</p>-->
-            <vue-json-pretty :data="largeJsonData" :collapsedNodeLength="10" />
+            <p>{{ rev_data }}</p>
           </a-card>
         </a-row>
       </a-card>
@@ -180,8 +179,6 @@
 <script>
   import { httpGo } from '@/api/postman'
   import { addObj, putObj } from '@/api/datasource/datasource'
-  import VueJsonPretty from 'vue-json-pretty'
-  import 'vue-json-pretty/lib/styles.css'
 
   // 表头数据,title 为表头的标题 dataIndex为列数据在数据项中对应的 key
   const columns = [
@@ -216,7 +213,7 @@
         headerData: [],
         paramData: [],
         dataSource: [],
-        method: '',
+        method: 'GET',
         columns: columns,
         body_type: 'none',
         rawValue: '',
@@ -247,10 +244,9 @@
     },
     methods: {
       onSubmit () {
-        this.loading = true
         const httpConfig = {
           'method': this.method,
-          'url': this.api_url,
+          'api_url': this.api_url,
           'header': this.headerData,
           'param': this.paramData,
           'body': this.data,
@@ -259,11 +255,12 @@
         }
         httpGo(httpConfig)
           .then((result) => {
-            this.loading = false
-            this.rev_data = result
-          })
-          .catch((err) => {
-            this.rev_data = err
+            if (result.status === '0') {
+              this.rev_data = JSON.parse(result.result)
+              console.log(this.rev_data)
+            } else {
+              this.$message.error(result.errstr)
+            }
           })
       },
       handleSubmit () {
@@ -320,6 +317,7 @@
         console.log(key)
       },
       handleChange (key) {
+        console.log(key)
         this.method = key
       },
       onChange (e) {
@@ -423,6 +421,7 @@
             this.cacheData = newData.map(item => ({ ...item }))
           }
         }
+        this.handleCancel()
       },
       cancel (type, key, index) {
         if (type === 'param') {
@@ -476,6 +475,16 @@
       },
       handleCancel () {
         this.visible = false
+        this.api_url = ''
+        this.rev_data = {}
+        this.data = []
+        this.headerData = []
+        this.paramData = []
+        this.dataSource = []
+        this.method = 'GET'
+        this.body_type = 'none'
+        this.rawValue = ''
+        this.dsId = ''
         setTimeout(() => {
           this.addable = false
           this.showable = false
@@ -484,7 +493,6 @@
       }
     },
     components: {
-      VueJsonPretty
     }
   }
 

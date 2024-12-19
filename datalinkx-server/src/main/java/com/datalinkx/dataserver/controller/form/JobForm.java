@@ -146,10 +146,16 @@ public class JobForm {
 		private String apiUrl;
 		@JsonProperty("content_type")
 		private String contentType;
-		private Map<String, String> headers;
-		private Map<String, String> params;
-		private Map<String, String> body;
+		private List<ItemConfig> header;
+		private List<ItemConfig> param;
+		private List<ItemConfig> body;
 		private String raw;
 		private String method;
+	}
+
+	@Data
+	public static final class ItemConfig {
+		private String key;
+		private String value;
 	}
 }
