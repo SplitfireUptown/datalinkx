@@ -1427,7 +1427,7 @@
 <style lang="less" scoped>
   .g6-wrap {
     width: 100%;
-    height: 1500px;
+    height: 100vh;
 
     .el-dialog {
       display: flex;
