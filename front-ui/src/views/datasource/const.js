@@ -42,7 +42,7 @@ const dsTypeList = [
   },
   {
     value: 'es',
-    label: 'ES',
+    label: 'ElasticSearch',
     dsTypeKey: 2,
     img: ESPng
   },

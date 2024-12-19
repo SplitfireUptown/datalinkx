@@ -8,7 +8,9 @@ import java.util.stream.Collectors;
 import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
+import com.datalinkx.dataserver.client.HttpConstructor;
 import com.datalinkx.dataserver.controller.form.DsForm;
+import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.service.impl.DsServiceImpl;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import io.swagger.annotations.Api;
@@ -49,6 +51,11 @@ public class DsController {
 		return WebResult.of(
 				dsServiceImpl.list().stream().collect(Collectors.groupingBy(DsBean::getType,  Collectors.counting()))
 		);
+	}
+
+	@GetMapping("/http/test")
+	public WebResult httpTest(JobForm.HttpTestForm httpTestForm) {
+		return WebResult.of(HttpConstructor.go(httpTestForm));
 	}
 
 

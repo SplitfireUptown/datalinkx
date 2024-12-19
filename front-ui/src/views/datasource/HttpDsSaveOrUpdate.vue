@@ -1,245 +1,481 @@
 <template>
   <a-modal
     title="添加数据源"
-    :width="640"
+    :width="840"
     :visible="visible"
-    :confirmLoading="confirmLoading"
     :maskClosable="false"
     @cancel="handleCancel"
   >
-    <a-spin :spinning="confirmLoading">
-      <a-form :form="form">
-        <a-form-item
-          v-show="false"
-          label="ds_id"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-input
-            v-decorator="['dsId']"
-            :disabled="editable || showable"
-          />
-        </a-form-item>
 
-        <a-form-item
-          label="数据源类型"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-select
-            :disabled="showable"
-            v-decorator="['type', {rules: [{required: true, message: '选择数据源'}]}]"
-            :options="DataSourceType"
-          >
-          </a-select>
-        </a-form-item>
+    <div>
+      <a-card style="width: 100%">
+        <a-row>
+          <a-col :span="4">
+            <a-space>
+              <a-select
+                ref="select"
+                defaultValue="get"
+                style="width: 150px"
+                @focus="focus"
+                @change="handleChange"
+              >
+                <a-select-option value="get">GET</a-select-option>
+                <a-select-option value="post">POST</a-select-option>
+                <a-select-option value="put" >PUT</a-select-option>
+                <a-select-option value="delete">DELETE</a-select-option>
+              </a-select>
+            </a-space>
+          </a-col>
+          <a-col :span="20">
+            <a-input v-model="api_url" style="width: calc(100% - 250px)" />
+            <a-space>
+              <a-button type="primary" @click="onSubmit" >请求此API</a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+        <br />
+        <a-row>
+          <a-col :span="24">
+            <!--       activeKey属性通过“v-model”实现表单与data数据的双向绑定, 需在data中定义该属性-->
+            <a-tabs v-model="activeKey">
+              <a-tab-pane key="1" tab="Params">
+                <a-table :columns="columns" :dataSource="paramData" :pagination="false" bordered>
+                  <template v-for="col in ['key', 'value']" :slot="col" slot-scope="text, record, index">
+                    <div :key="col">
+                      <a-input
+                        v-if="record.editable"
+                        style="margin: -5px 0"
+                        :value="text"
+                        @change="e => handleChanged('param', e.target.value, record.key, col,index)"
+                      />
+                      <template v-else>{{ text }}</template>
+                    </div>
+                  </template>
+                  <template slot="operation" slot-scope="text, record, index">
+                    <div class="editable-row-operations">
+                      <span v-if="record.editable">
+                        <a-space>
+                          <a @click="() => save('param', record.key,index)">Save</a>
+                          <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('param', record.key,index)">
+                            <a>Cancel</a>
+                          </a-popconfirm>
+                        </a-space>
+                      </span>
+                      <span v-else>
+                        <a @click="() => edit('param', record.key,index)">Edit</a>
+                      </span>
+                      <a-divider type="vertical" />
+                      <a @click="() => onParamDelete('param', record.key)">Delete</a>
+                    </div>
+                  </template>
+                </a-table>
+                <a-button class="editable-add-btn" style="width: 100%" @click="handleAdd('param')">+ 添加一行数据</a-button>
+              </a-tab-pane>
+              <a-tab-pane key="2" tab="Headers" force-render>
+                <a-table :columns="columns" :dataSource="headerData" :pagination="false" bordered>
+                  <template v-for="col in ['key', 'value']" :slot="col" slot-scope="text, record, index">
+                    <div :key="col">
+                      <a-input
+                        v-if="record.editable"
+                        style="margin: -5px 0"
+                        :value="text"
+                        @change="e => handleChanged('header', e.target.value, record.key, col,index)"
+                      />
+                      <template v-else>{{ text }}</template>
+                    </div>
+                  </template>
+                  <template slot="operation" slot-scope="text, record, index">
+                    <div class="editable-row-operations">
+                      <span v-if="record.editable">
+                        <a-space>
+                          <a @click="() => save('header', record.key,index)">Save</a>
+                          <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('header', record.key,index)">
+                            <a>Cancel</a>
+                          </a-popconfirm>
+                        </a-space>
+                      </span>
+                      <span v-else>
+                        <a @click="() => edit('header', record.key,index)">Edit</a>
+                      </span>
+                      <a-divider type="vertical" />
+                      <a @click="() => onParamDelete('header', record.key)">Delete</a>
+                    </div>
+                  </template>
+                </a-table>
+                <a-button class="editable-add-btn" style="width: 100%" @click="handleAdd('header')">+ 添加一行数据</a-button>
+              </a-tab-pane>
+              <a-tab-pane key="3" tab="Body">
+                <a-col :span="24">
+                  <a-radio-group defaultValue="none" :select="body_type" name="radioGroup" @change="onChange" style="width: 100%" >
+                    <a-radio value="none">none</a-radio>
+                    <a-radio value="form-data">form-data</a-radio>
+                    <a-radio value="x-www-form-urlencoded">x-www-form-urlencoded</a-radio>
+                    <a-radio value="raw">raw</a-radio>
+                    <a-card style="width: 100%" >
+                      <p v-if="body_type=='none'">This request does not have a body</p>
+                      <div v-else-if="body_type=='form-data' || body_type=='x-www-form-urlencoded'">
+                        <a-table :columns="columns" :dataSource="data" :pagination="false" bordered>
+                          <template v-for="col in ['key', 'value']" :slot="col" slot-scope="text, record, index">
+                            <div :key="col">
+                              <a-input
+                                v-if="record.editable"
+                                style="margin: -5px 0"
+                                :value="text"
+                                @change="e => handleChanged('body', e.target.value, record.key, col,index)"
+                              />
+                              <template v-else>{{ text }}</template>
+                            </div>
+                          </template>
+                          <template slot="operation" slot-scope="text, record, index">
+                            <div class="editable-row-operations">
+                              <span v-if="record.editable">
+                                <a-space>
+                                  <a @click="() => save('body', record.key,index)">Save</a>
+                                  <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('body', record.key,index)">
+                                    <a>Cancel</a>
+                                  </a-popconfirm>
+                                </a-space>
+                              </span>
+                              <span v-else>
+                                <a @click="() => edit('body', record.key,index)">Edit</a>
+                              </span>
+                              <a-divider type="vertical" />
+                              <a @click="() => onParamDelete('body', record.key)">Delete</a>
+                            </div>
+                          </template>
+                        </a-table>
+                        <a-button class="editable-add-btn" style="width: 100%" @click="handleAdd('body')">+ 添加一行数据</a-button>
+                      </div>
+                      <div v-else-if="body_type=='raw'">
+                        <a-textarea
+                          v-model="rawValue"
+                          placeholder="application/json"
+                          :auto-size="{ minRows: 3, maxRows: 5 }"
+                        />
+                      </div>
+                    </a-card>
+                  </a-radio-group>
+                </a-col>
+              </a-tab-pane>
+            </a-tabs>
+          </a-col>
+        </a-row>
+        <br />
+        <a-row>
+          <a-card title="Response" style="width: 100%">
+            <p>{{ rev_data }}</p>
+          </a-card>
+        </a-row>
+      </a-card>
 
-        <a-form-item
-          label="数据源名称"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-input
-            type="text"
-            :disabled="showable"
-            v-decorator="['name', {rules: [{required: true, message: '请输入数据源名称'}]}]" />
-        </a-form-item>
-
-        <a-form-item
-          label="请求方式"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-<!--          <a-input-->
-<!--            type="text"-->
-<!--            :disabled="showable"-->
-<!--            v-decorator="['host', {rules: [{required: true, message: '请输入接口url'}]}]" />-->
-          <a-input-group compact :disabled="showable">
-            <a-select default-value="GET">
-              <a-select-option value="GET">
-                GET
-              </a-select-option>
-              <a-select-option value="POST">
-                POST
-              </a-select-option>
-            </a-select>
-          </a-input-group>
-        </a-form-item>
-
-        <a-form-item
-          label="port"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-input
-            type="number"
-            :disabled="showable"
-            v-decorator="['port', {rules: [{required: true, message: '请输入port'}]}]" />
-        </a-form-item>
-        <a-form-item
-          label="username"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-input
-            type="text"
-            :disabled="showable"
-            v-decorator="['username', {rules: [{required: false, message: '请输入username'}]}]" />
-        </a-form-item>
-        <a-form-item
-          label="password"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-input
-            type="password"
-            :disabled="showable"
-            v-decorator="['password', {rules: [{required: false, message: '请输入password'}]}]" />
-        </a-form-item>
-        <a-form-item
-          label="database"
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-        >
-          <a-input
-            type="text"
-            :disabled="showable"
-            v-decorator="['database', {rules: [{required: false, message: '请输入database'}]}]" />
-        </a-form-item>
-        <a-form-item
-          label="附加配置"
-          :labelCol="labelCol"
-          :wrapperCol="longWrapperCol"
-        >
-          <a-textarea
-            type="text"
-            :disabled="showable"
-            v-decorator="['config', {rules: [{required: false, message: '附加配置'}]}]" />
-        </a-form-item>
-      </a-form>
-    </a-spin>
-    <template slot="footer" >
-      <div
-        v-show="editable || addable"
-      >
-        <a-button key="cancel" @click="handleCancel">取消</a-button>
-        <a-button key="forward" :loading="confirmLoading" type="primary" @click="handleOk">保存</a-button>
-      </div>
+    </div>
+    <template slot="footer">
+      <a-button key="cancel" @click="handleCancel">取消</a-button>
+      <a-button key="forward" v-show="onlyRead" :loading="confirmLoading" type="primary" @click="handleSubmit">保存</a-button>
     </template>
   </a-modal>
-
 </template>
 
 <script>
-import pick from 'lodash.pick'
-import { getObj, addObj, putObj } from '@/api/datasource/datasource'
-import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
-let selectTables = []
+  import { httpGo } from '@/api/postman'
+  import { addObj, putObj } from '@/api/datasource/datasource'
 
-export default {
-  name: 'DsSaveOrUpdate',
-  data () {
-    return {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 7 }
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 13 }
-      },
-      longWrapperCol: {
-        xs: { span: 44 },
-        sm: { span: 13 }
-      },
-      visible: false,
-      confirmLoading: false,
-      form: this.$form.createForm(this),
-      editable: false,
-      addable: false,
-      showable: false,
-      DataSourceType: DATA_SOURCE_TYPE,
-      type: 'add'
+  // 表头数据,title 为表头的标题 dataIndex为列数据在数据项中对应的 key
+  const columns = [
+    {
+      title: 'key',
+      dataIndex: 'key',
+      scopedSlots: { customRender: 'key' },
+      width: '25%'
+    },
+    {
+      title: 'value',
+      dataIndex: 'value',
+      scopedSlots: { customRender: 'value' },
+      width: '25%'
+    },
+    {
+      title: 'operation',
+      dataIndex: 'operation',
+      scopedSlots: { customRender: 'operation' }, // 值跟dataIndex对应，支持操作列插槽
+      width: '25%'
     }
-  },
-  created () {
-    this.init()
-  },
-  methods: {
-    // 获取用户信息
-    edit (id, type) {
-      this.visible = true
-      if (type && type === 'add') {
-        this.addable = true
-        this.type = type
-      }
-      if (type === 'edit') {
-        this.editable = true
-        this.type = type
-      }
-      if (type === 'show') {
-        this.showable = true
-        this.type = type
-      }
+  ]
 
-      const { form: { setFieldsValue, resetFields } } = this
-      if (['edit', 'show'].includes(type)) {
-        this.confirmLoading = true
-        getObj(id).then(res => {
-          const record = res.result
-          this.confirmLoading = false
-          this.$nextTick(() => {
-            setFieldsValue(pick(record, ['dsId', 'type', 'name', 'host', 'port', 'username', 'database', 'password', 'config', 'tb_name_list']))
-          })
-        })
-      } else {
-        resetFields()
+  export default {
+    name: 'Postman',
+    data () {
+      return {
+        api_url: '',
+        rev_data: '',
+        activeKey: '1', // 控制标签页params、headers、body
+        data: [],
+        headerData: [],
+        paramData: [],
+        dataSource: [],
+        method: '',
+        columns: columns,
+        body_type: 'none',
+        rawValue: '',
+        editableData: {},
+        code: '', // 编辑器绑定的值,对应v-model
+        visible: false,
+        confirmLoading: false,
+        onlyRead: true,
+        dsId: '',
+        // 默认配置
+        options: {
+          tabSize: 4, // 缩进格式
+          theme: 'material', // 主题，对应主题库 JS 需要提前引入
+          lineNumbers: true, // 显示行号
+          line: true, // 检查格式
+          autocorrect: true, // 自动更正
+          spellcheck: true, // 拼写检查
+          mode: { // 模式, 可查看 /mode 中的所有模式,运行代码类型
+            name: 'python',
+            json: true
+          },
+          styleActiveLine: true, // 高亮选中行
+          hintOptions: {
+            completeSingle: true // 当匹配只有一项的时候是否自动补全
+          }
+        }
       }
     },
-    handleChange (value) {
-      selectTables.push(value)
-      console.log(`Selected: ${value}`)
-      console.log(selectTables)
-    },
-    // 结束保存用户信息
-    handleOk () {
-      this.form.validateFields(async (err, values) => {
-        if (!err) {
-          this.confirmLoading = true
-          if (this.type === 'add') {
-            console.log(values)
-            await addObj(values).then(res => {
-              if (res.status !== '0') {
+    methods: {
+      onSubmit () {
+        this.loading = true
+        // TODO url,method,body,header等都需要传给后端
+        httpGo(this.api_url)
+          .then((result) => {
+            this.loading = false
+            this.rev_data = result
+          })
+          .catch((err) => {
+            this.rev_data = err
+          })
+      },
+      handleSubmit () {
+        const httpConfig = {
+          'method': this.method,
+          'url': this.api_url,
+          'header': this.headerData,
+          'param': this.paramData,
+          'body': this.data,
+          'raw': this.rawValue
+        }
+
+        const formData = {
+          'ds_id': this.dsId,
+          'name': 'test',
+          'type': 5,
+          'config': JSON.stringify(httpConfig)
+        }
+
+        if (this.dsId === '') {
+          addObj(formData).then(res => {
+              if (res.status === '0') {
+                this.$emit('ok')
+                this.confirmLoading = false
+                // 清楚表单数据
+                this.$message.success('保存成功')
+              } else {
+                this.confirmLoading = false
                 this.$message.error(res.errstr)
               }
-            })
-          } else if (this.type === 'edit') {
-            await putObj(values)
-          }
-          setTimeout(() => {
+            }).catch(err => {
+              this.confirmLoading = false
+              this.$message.error(err.errstr)
+          })
+        } else {
+          putObj(formData).then(res => {
+            if (res.status === '0') {
+              this.$emit('ok')
+              this.confirmLoading = false
+              // 清楚表单数据
+              this.$message.success('修改成功')
+            } else {
+              this.confirmLoading = false
+              this.$message.error(res.errstr)
+            }
+          }).catch(err => {
             this.confirmLoading = false
-            this.$emit('ok')
-            this.visible = false
-          }, 1500)
+            this.$message.error(err.errstr)
+          })
         }
-      })
-      selectTables = []
+      },
+      focus (key) {
+        console.log(key)
+      },
+      handleChange (key) {
+        this.method = key
+      },
+      onChange (e) {
+        // TODO json需要单独处理
+        if (e.target.value === 'none') {
+          this.body_type = 'none'
+          console.log('radio-----', e)
+        } else if (e.target.value === 'form-data') {
+          this.body_type = 'form-data'
+        } else if (e.target.value === 'x-www-form-urlencoded') {
+          this.body_type = 'x-www-form-urlencoded'
+        } else if (e.target.value === 'raw') {
+          this.body_type = 'raw'
+        }
+      },
+      confirm () {},
+      handleChanged (type, value, key, column, index) {
+        if (type === 'param') {
+          const newData = [...this.paramData]
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            target[column] = value
+            this.paramData = newData
+          }
+        } else if (type === 'header') {
+          const newData = [...this.headerData]
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            target[column] = value
+            this.headerData = newData
+          }
+        } else {
+          const newData = [...this.data]
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            target[column] = value
+            this.data = newData
+          }
+        }
+      },
+      edit (type, key, index) {
+        if (type === 'param') {
+          const newData = [...this.paramData]
+          console.log('newData----', newData)
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            target.editable = true
+            this.paramData = newData
+          }
+        } else if (type === 'header') {
+          const newData = [...this.headerData]
+          console.log('newData----', newData)
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            target.editable = true
+            this.headerData = newData
+          }
+        } else {
+          const newData = [...this.data]
+          console.log('newData----', newData)
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            target.editable = true
+            this.data = newData
+          }
+        }
+      },
+      onParamDelete (type, key) {
+        if (type === 'param') {
+          this.paramData = this.paramData.filter(item => item.key !== key)
+        } else if (type === 'header') {
+          this.headerData = this.headerData.filter(item => item.key !== key)
+        } else {
+          this.data = this.data.filter(item => item.key !== key)
+        }
+      },
+      save (type, key, index) {
+        if (type === 'param') {
+          const newData = [...this.paramData]
+          console.log(newData)
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            delete target.editable
+            this.paramData = newData
+            this.cacheData = newData.map(item => ({ ...item }))
+          }
+        } else if (type === 'header') {
+          const newData = [...this.headerData]
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            delete target.editable
+            this.headerData = newData
+            this.cacheData = newData.map(item => ({ ...item }))
+          }
+        } else {
+          const newData = [...this.data]
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            delete target.editable
+            this.data = newData
+            this.cacheData = newData.map(item => ({ ...item }))
+          }
+        }
+      },
+      cancel (type, key, index) {
+        if (type === 'param') {
+          const newData = [...this.paramData]
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            Object.assign(target, this.cacheData.filter(item => key === item.key)[index])
+            delete target.editable
+            this.paramData = newData
+          }
+        } else if (type === 'header') {
+          const newData = [...this.headerData]
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            Object.assign(target, this.cacheData.filter(item => key === item.key)[index])
+            delete target.editable
+            this.headerData = newData
+          }
+        } else {
+          const newData = [...this.data]
+          const target = newData.filter(item => key === item.key)[index]
+          if (target) {
+            Object.assign(target, this.cacheData.filter(item => key === item.key)[index])
+            delete target.editable
+            this.data = newData
+          }
+        }
+      },
+      handleAdd (key) {
+        const { count } = this
+        if (key === 'param') {
+          this.paramData.push({
+            key: '',
+            value: ''
+          })
+        } else if (key === 'header') {
+          this.headerData.push({
+            key: '',
+            value: ''
+          })
+        } else {
+          this.data.push({
+            key: '',
+            value: ''
+          })
+        }
+        this.count = count + 1
+      },
+      show () {
+        this.visible = true
+      },
+      handleCancel () {
+        this.visible = false
+        setTimeout(() => {
+          this.addable = false
+          this.showable = false
+          this.editable = false
+        }, 200)
+      }
     },
-    handleCancel () {
-      this.visible = false
-      setTimeout(() => {
-        this.addable = false
-        this.showable = false
-        this.editable = false
-      }, 200)
-    },
-    init () {
-    },
-    handleSearch (value) {
+    components: {
 
     }
   }
-}
+
 </script>
 
 <style scoped>

@@ -1,6 +1,7 @@
 package com.datalinkx.dataserver.controller.form;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -137,5 +138,18 @@ public class JobForm {
 		@JsonProperty("sub_job_id")
 		private String subJobId;
 		private Integer priority;
+	}
+
+	@Data
+	public static class HttpTestForm {
+		@JsonProperty("api_url")
+		private String apiUrl;
+		@JsonProperty("content_type")
+		private String contentType;
+		private Map<String, String> headers;
+		private Map<String, String> params;
+		private Map<String, String> body;
+		private String raw;
+		private String method;
 	}
 }

@@ -39,7 +39,8 @@
       </div>
       <div class="table-operator">
         <!--      v-action="'upms:user:add'"-->
-        <a-button @click="$refs.refDsConfig.show('','add')" icon="plus" type="primary">新建</a-button>
+<!--        <a-button @click="$refs.refDsConfig.show('','add')" icon="plus" type="primary">新建</a-button>-->
+        <a-button @click="createDS" icon="plus" type="primary">新建</a-button>
       </div>
       <a-table
         :columns="columns"
@@ -55,13 +56,17 @@
         :currentDs="currentDs"
         ref="refDsConfig"
       />
+      <http-ds-save-or-update
+        @ok="handleOk"
+        ref="httpDsSaveOrUpdate"
+      />
     </a-card>
   </div>
 </template>
 
 <script>
 import { pageQuery, delObj, getDsGroup } from '@/api/datasource/datasource'
-// import DsSaveOrUpdate from './DsSaveOrUpdate.vue'
+import HttpDsSaveOrUpdate from './HttpDsSaveOrUpdate.vue'
 import DsConfig from './DsConfig.vue'
 import { dsTypeList } from './const'
 import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
@@ -69,7 +74,7 @@ import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
 export default {
   name: 'ContainerBottom',
   components: {
-    // DsSaveOrUpdate,
+    HttpDsSaveOrUpdate,
     DsConfig
   },
   data () {
@@ -170,6 +175,13 @@ export default {
       }).catch(reason => {
         this.loading = false
       })
+    },
+    createDS () {
+      if (this.currentDs.dsTypeKey === 5) {
+        this.$refs.httpDsSaveOrUpdate.show('', 'add')
+      } else {
+        this.$refs.refDsConfig.show('', 'add')
+      }
     },
     getAllDsNumber () {
       getDsGroup().then(res => {
