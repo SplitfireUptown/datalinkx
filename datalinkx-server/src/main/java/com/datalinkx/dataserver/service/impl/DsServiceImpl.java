@@ -249,6 +249,7 @@ public class DsServiceImpl implements DsService {
 		dsBean.setPort(form.getPort());
 		dsBean.setName(form.getName());
 		dsBean.setDatabase(form.getDatabase());
+		dsBean.setConfig(form.getConfig());
 		dsRepository.save(dsBean);
 	}
 

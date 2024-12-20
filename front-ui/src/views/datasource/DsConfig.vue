@@ -240,7 +240,7 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           values.type = this.currentDs.dsTypeKey
-          values.dsId = this.dsId
+          values.ds_id = this.dsId
           if (this.currentDs.dsTypeKey === 3) {
             const temp = {}
             temp[values.servertype] = values[values.servertype]

@@ -23,8 +23,8 @@ spring:
   redis:
     database: 0       # Redis数据库索引（默认为0）,如果设置为1，那么存入的key-value都存放在select 1中
     host: ${REDIS_HOST:127.0.0.1}
-    port: ${REDIS_PORT:123456}
-    password:
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:123456}
     timeout: 10000
 #  elasticsearch:  # 开启大模型时打开注解
 #    rest:

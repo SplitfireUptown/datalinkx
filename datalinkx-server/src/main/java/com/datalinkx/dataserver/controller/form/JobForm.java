@@ -151,6 +151,8 @@ public class JobForm {
 		private List<ItemConfig> body;
 		private String raw;
 		private String method;
+		@JsonProperty("json_path")
+		private String jsonPath;
 	}
 
 	@Data

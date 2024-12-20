@@ -2,6 +2,7 @@ package com.datalinkx.driver.dsdriver.httpdriver;
 
 import com.datalinkx.driver.dsdriver.base.connect.SetupInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -24,6 +25,10 @@ public class HttpSetupInfo extends SetupInfo {
     private List<ItemConfig> param;
     private List<ItemConfig> body;
     private String raw;
+    @JsonProperty("json_path")
+    private String jsonPath;
+    @JsonProperty("rev_data")
+    private String revData;
 
 
     @Data

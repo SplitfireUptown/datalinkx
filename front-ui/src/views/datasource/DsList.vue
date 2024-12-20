@@ -210,7 +210,11 @@ export default {
     },
 
     edit (record) {
-      this.$refs.refDsConfig.show(record.dsId, 'edit', record)
+      if (this.currentDs.dsTypeKey === 5) {
+        this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'show')
+      } else {
+        this.$refs.refDsConfig.show(record.dsId, 'edit', record)
+      }
       // this.init()
     },
     delete (record) {
@@ -233,7 +237,11 @@ export default {
       })
     },
     show (record) {
-      this.$refs.refDsConfig.show(record.dsId, 'show', record)
+      if (this.currentDs.dsTypeKey === 5) {
+        this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'show')
+      } else {
+        this.$refs.refDsConfig.show(record.dsId, 'show', record)
+      }
     },
     handleOk (data) {
       this.init()

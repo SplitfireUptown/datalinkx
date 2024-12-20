@@ -46,7 +46,6 @@ public class HttpConstructor {
 
         Request.Builder requestBuilder = new Request.Builder()
                 .url(urlBuilder.build());
-//                .method(httpTestForm.getMethod().toLowerCase(), requestBody);
 
         if (!"GET".equalsIgnoreCase(httpTestForm.getMethod().toLowerCase())) {
             // 2、解析body
@@ -65,7 +64,8 @@ public class HttpConstructor {
             Response response = client.newCall(request).execute();
             if (response.isSuccessful()) {
                 ResponseBody responseBody = response.body();
-                return responseBody.string();
+                // 4、解析配置json_path
+                return JsonUtils.touchJsonPath(responseBody.string(), httpTestForm.getJsonPath());
             } else {
                 throw new DatalinkXServerException(response.message());
             }

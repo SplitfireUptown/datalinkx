@@ -162,6 +162,22 @@
         </a-row>
         <br />
         <a-row>
+          <a-col :span="4">
+            <a-space>
+              <a-select
+                ref="select"
+                defaultValue="aaa"
+                style="width: 150px"
+              >
+                <a-select-option value="aaa">配置Json_Path</a-select-option>
+              </a-select>
+            </a-space>
+          </a-col>
+          <a-col :span="20">
+            <a-input v-model="json_path" placeholder="接口结果会根据json_path解析，结果中第一个元素的key作为HTTP数据源的默认表字段"/>
+          </a-col>
+        </a-row>
+        <a-row>
           <a-card title="Response" style="width: 100%">
             <p>{{ rev_data }}</p>
           </a-card>
@@ -178,7 +194,7 @@
 
 <script>
   import { httpGo } from '@/api/postman'
-  import { addObj, putObj } from '@/api/datasource/datasource'
+  import { addObj, getObj, putObj } from '@/api/datasource/datasource'
 
   // 表头数据,title 为表头的标题 dataIndex为列数据在数据项中对应的 key
   const columns = [
@@ -208,6 +224,7 @@
       return {
         api_url: '',
         rev_data: {},
+        json_path: '',
         activeKey: '1', // 控制标签页params、headers、body
         data: [],
         headerData: [],
@@ -217,6 +234,7 @@
         columns: columns,
         body_type: 'none',
         rawValue: '',
+        type: '',
         editableData: {},
         code: '', // 编辑器绑定的值,对应v-model
         visible: false,
@@ -251,12 +269,13 @@
           'param': this.paramData,
           'body': this.data,
           'content_type': this.body_type,
+          'json_path': this.json_path,
           'raw': this.rawValue
         }
         httpGo(httpConfig)
           .then((result) => {
             if (result.status === '0') {
-              this.rev_data = JSON.parse(result.result)
+              this.rev_data = result.result
               console.log(this.rev_data)
             } else {
               this.$message.error(result.errstr)
@@ -271,7 +290,9 @@
           'param': this.paramData,
           'body': this.data,
           'content_type': this.body_type,
-          'raw': this.rawValue
+          'raw': this.rawValue,
+          'json_path': this.json_path,
+          'rev_data': JSON.stringify(this.rev_data)
         }
 
         const formData = {
@@ -280,7 +301,14 @@
           'type': 5,
           'config': JSON.stringify(httpConfig)
         }
-
+        if (this.api_url === '') {
+          this.$message.error('接口数据不能为空')
+          return
+        }
+        if (this.json_path === '') {
+          this.$message.error('json_path不能为空')
+          return
+        }
         if (this.dsId === '') {
           addObj(formData).then(res => {
               if (res.status === '0') {
@@ -312,6 +340,7 @@
             this.$message.error(err.errstr)
           })
         }
+        this.visible = false
       },
       focus (key) {
         console.log(key)
@@ -450,6 +479,9 @@
           }
         }
       },
+      itemClick (node) {
+        console.log(node.model.text + ' clicked !')
+      },
       handleAdd (key) {
         const { count } = this
         if (key === 'param') {
@@ -470,8 +502,40 @@
         }
         this.count = count + 1
       },
-      show () {
+      show (dsId, type, info) {
+        this.type = type
+        this.dsId = dsId
+        switch (type) {
+          case 'add':
+            this.showable = false
+            this.addable = true
+            break
+          case 'edit':
+            this.showable = false
+            this.editable = true
+            break
+          default:
+            this.showable = true
+            break
+        }
         this.visible = true
+        if (['edit', 'show'].includes(type)) {
+          getObj(dsId).then(res => {
+            const record = res.result
+            const dsConfig = JSON.parse(record.config)
+            this.api_url = dsConfig.url
+            this.method = dsConfig.method
+            this.headerData = dsConfig.header
+            this.paramData = dsConfig.param
+            this.data = dsConfig.body
+            this.body_type = dsConfig.content_type
+            this.rawValue = dsConfig.raw
+            this.json_path = dsConfig.json_path
+            this.rev_data = JSON.parse(dsConfig.rev_data)
+          })
+
+          this.confirmLoading = false
+        }
       },
       handleCancel () {
         this.visible = false

@@ -3,6 +3,7 @@ package com.datalinkx.common.utils;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang3.StringUtils;
 
 public final class JsonUtils {
@@ -33,32 +35,6 @@ public final class JsonUtils {
 	 */
 	private JsonUtils() {
 		throw new AssertionError();
-	}
-
-	/**
-	 * 自定义日期反序列化处理类
-	 * LocalDate
-	 * jdk8 support
-	 */
-	public static class JsonLocalDateDeserializer extends JsonDeserializer<LocalDate> {
-		@Override
-		public LocalDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-			String str = jsonParser.getText().trim();
-			return LocalDate.parse(str, DateTimeFormatter.ISO_DATE);
-		}
-	}
-
-	/**
-	 * 自定义日期序列化类
-	 * LocalDate
-	 * jdk8 support
-	 */
-	public static class JsonLocalDateSerializer extends JsonSerializer<LocalDate> {
-		@Override
-		public void serialize(LocalDate localDate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-			String localdateStr = localDate.format(DateTimeFormatter.ISO_DATE);
-			jsonGenerator.writeString(localdateStr);
-		}
 	}
 
 	/**
@@ -142,23 +118,6 @@ public final class JsonUtils {
 	 * @param json json字符串
 	 * @return map对象
 	 */
-	public static Map<Integer, Map<String, Object>> toInnerMap(String json) {
-		Map<Integer, Map<String, Object>> convertedMap = null;
-		try {
-			convertedMap = OBJECT_MAPPER.readValue(json, new TypeReference<Map<Integer, Map<String, Object>>>() {
-			});
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return convertedMap;
-	}
-
-	/**
-	 * json转map
-	 *
-	 * @param json json字符串
-	 * @return map对象
-	 */
 	public static Map<String, Object> json2Map(String json) {
 		Map<String, Object> convertedMap = null;
 		try {
@@ -168,40 +127,6 @@ public final class JsonUtils {
 			e.printStackTrace();
 		}
 		return convertedMap;
-	}
-
-	/**
-	 * json转map
-	 *
-	 * @param json json字符串
-	 * @return map对象
-	 */
-	public static Map<Integer, Map<String, Object>> json2MapMap(String json) {
-		Map<Integer, Map<String, Object>> convertedMap = null;
-		try {
-			convertedMap = OBJECT_MAPPER.readValue(json, new TypeReference<Map<Integer, Map<String, Object>>>() {
-			});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return convertedMap;
-	}
-
-
-	/**
-	 * listMap转json
-	 *
-	 * @param listMap listMap
-	 * @return
-	 */
-	public static String listMap2JsonArray(List<Map<String, Object>> listMap) {
-		String jsonStr = "";
-		try {
-			jsonStr = OBJECT_MAPPER.writeValueAsString(listMap);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-		return jsonStr;
 	}
 
 	/**
@@ -220,21 +145,6 @@ public final class JsonUtils {
 		return jsonNode;
 	}
 
-	/**
-	 * 获取 ObjectNode
-	 * @return
-	 */
-	public static ObjectNode getObjectNode() {
-		return OBJECT_MAPPER.createObjectNode();
-	}
-
-	/**
-	 * 获取 ArrayNode
-	 * @return
-	 */
-	public static ArrayNode getArrayNode() {
-		return OBJECT_MAPPER.createArrayNode();
-	}
 
 	public static String map2Json(Map<String, Object> map) {
 		String jsonStr = "";
@@ -246,24 +156,16 @@ public final class JsonUtils {
 		return jsonStr;
 	}
 
-	public static String list2Json(List<?> list) {
-		String jsonStr = "";
-		try {
-			jsonStr = OBJECT_MAPPER.writeValueAsString(list);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		return jsonStr;
-	}
 
-	public static <T> List<T> json2List(String json) {
-		List<T> convertedList = null;
-		try {
-			convertedList = OBJECT_MAPPER.readValue(json, new TypeReference<List<T>>() {
-			});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return convertedList;
+
+	public static Object touchJsonPath(String data, String jsonPath) {
+		ObjectMapper mapper = new ObjectMapper();
+        HashMap responseJson;
+        try {
+            responseJson = mapper.readValue (data, HashMap.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return JsonPath.read(responseJson, jsonPath);
 	}
 }

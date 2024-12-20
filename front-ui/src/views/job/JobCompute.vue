@@ -1425,6 +1425,21 @@
   }
 </style>
 <style lang="less" scoped>
+  ::v-deep .ds-icon {
+    float: left;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-right: 4px;
+    img {
+      width: 24px;
+      height: 24px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+  }
   .g6-wrap {
     width: 100%;
     height: 100vh;

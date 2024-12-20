@@ -13,7 +13,12 @@ import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
 import com.datalinkx.driver.dsdriver.esdriver.OpenEsService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -54,12 +59,34 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
 
     @Override
     public List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception {
-        return null;
+        DbTree.DbTreeTable dbTreeTable = new DbTree.DbTreeTable();
+        dbTreeTable.setName("json_path返回解析表");
+        dbTreeTable.setLevel("table");
+        return Collections.singletonList(dbTreeTable);
     }
 
     @Override
     public List<DbTableField> getFields(String catalog, String schema, String tableName) throws Exception {
-        return null;
+        String revData = this.httpSetupInfo.getRevData();
+        JsonNode responseJsonNode = JsonUtils.toJsonNode(revData);
+        List<DbTableField> result = new ArrayList<>();
+
+        // 如果json_path解析结果是数组，取数组的第一个元素里的所有key作为HTTP数据源下对应的表
+        if (responseJsonNode.isArray()) {
+            JsonNode firstElement = responseJsonNode.get(0);
+            Iterator<String> fieldNames = firstElement.fieldNames();
+            while (fieldNames.hasNext()) {
+                String key = fieldNames.next();
+                result.add(DbTableField.builder().name(key).build());
+            }
+        } else {
+            Iterator<String> fieldNames = responseJsonNode.fieldNames();
+            while (fieldNames.hasNext()) {
+                String key = fieldNames.next();
+                result.add(DbTableField.builder().name(key).build());
+            }
+        }
+        return result;
     }
 
     @Override
