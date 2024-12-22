@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -34,7 +35,8 @@ public class HttpSource extends TransformNode {
 
     @Data
     public static final class Schema {
-        private Map<String, String> fields;
+        // 为什么用LinkedHashMap？ 因为要保证写入顺序与页面上配置的字段映射顺序一致
+        private LinkedHashMap<String, String> fields;
     }
 
     @Data

@@ -6,7 +6,7 @@
     :maskClosable="false"
     @cancel="handleCancel"
   >
-
+    <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
     <div>
       <a-card style="width: 100%">
         <a-row>
@@ -162,17 +162,21 @@
         <a-row>
           <a-col :span="4">
             <a-space>
-              <a-select
-                ref="select"
-                defaultValue="aaa"
-                style="width: 150px"
-              >
-                <a-select-option value="aaa">配置Json_Path</a-select-option>
-              </a-select>
+              <a-button style="width: 150px; text-align: left">配置Json_Path</a-button>
             </a-space>
           </a-col>
           <a-col :span="20">
             <a-input v-model="json_path" placeholder="根据json_path解析接口结果，配置到结果集的上一层即可"/>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col :span="4">
+            <a-space>
+              <a-button style="width: 150px; text-align: left">数据源名称</a-button>
+            </a-space>
+          </a-col>
+          <a-col :span="20">
+            <a-input v-model="ds_name"/>
           </a-col>
         </a-row>
         <a-row>
@@ -232,6 +236,7 @@
         api_url: '',
         rev_data: {},
         json_path: '',
+        ds_name: '',
         activeKey: '1', // 控制标签页params、headers、body
         data: [],
         headerData: [],
@@ -245,6 +250,7 @@
         editableData: {},
         code: '', // 编辑器绑定的值,对应v-model
         visible: false,
+        selectloading: false,
         confirmLoading: false,
         onlyRead: true,
         editable: false,
@@ -305,7 +311,7 @@
 
         const formData = {
           'ds_id': this.dsId,
-          'name': 'test',
+          'name': this.ds_name,
           'type': 5,
           'config': JSON.stringify(httpConfig)
         }
@@ -317,6 +323,11 @@
           this.$message.error('json_path不能为空')
           return
         }
+        if (this.ds_name === '') {
+          this.$message.error('数据源名称不能为空')
+          return
+        }
+        this.selectloading = true
         if (this.dsId === '') {
           addObj(formData).then(res => {
               if (res.status === '0') {
@@ -350,6 +361,7 @@
             this.$message.error(err.errstr)
           })
         }
+        this.selectloading = false
       },
       focus (key) {
         console.log(key)
@@ -551,6 +563,8 @@
       handleCancel () {
         this.visible = false
         this.api_url = ''
+        this.json_path = ''
+        this.ds_name = ''
         this.rev_data = {}
         this.data = []
         this.headerData = []

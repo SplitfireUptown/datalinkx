@@ -697,6 +697,7 @@
       },
       // 保存的方法 根据业务需要达到数据处理成想要的
       handleSave () {
+        this.selectloading = true
         const data = this.graph.toJSON() // 可以拿到画完图的数s据
         const formData = {
           'job_id': this.jobId,
@@ -742,7 +743,7 @@
           })
           this.selectloading = false
         }
-
+        this.selectloading = false
         // const nodeArr = data.cells
         // const filterCell = nodeArr.filter(item => item.shape !== 'edge')// 这里过滤我们需要的数据，可以根据自己的业务需要来做
         // const rulesNodeDTOList = []

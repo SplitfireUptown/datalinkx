@@ -115,7 +115,11 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
 
         // 接口字段配置
         HttpSource.Schema schema = new HttpSource.Schema();
-        Map<String, String> fields = unit.getReader().getColumns().stream().collect(Collectors.toMap(DataTransJobDetail.Column::getName, v -> "string"));
+        // 为什么用LinkedHashMap？ 因为要保证写入顺序与页面上配置的字段映射顺序一致
+        LinkedHashMap<String, String> fields = new LinkedHashMap<>();
+        for (DataTransJobDetail.Column column : unit.getReader().getColumns()) {
+            fields.put(column.getName(), "string");
+        }
         schema.setFields(fields);
 
         String revData = this.httpSetupInfo.getRevData();

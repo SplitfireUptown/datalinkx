@@ -47,10 +47,19 @@ public class HttpConstructor {
         Request.Builder requestBuilder = new Request.Builder()
                 .url(urlBuilder.build());
 
-        if (!"GET".equalsIgnoreCase(httpTestForm.getMethod().toLowerCase())) {
+        if ("POST".equalsIgnoreCase(httpTestForm.getMethod().toLowerCase())) {
             // 2、解析body
-            RequestBody requestBody = RequestBody.create(MediaType.parse(httpTestForm.getContentType()), JsonUtils.toJson(httpTestForm.getBody()));
-            requestBuilder.method(httpTestForm.getMethod().toLowerCase(), requestBody);
+            if (httpTestForm.getContentType().equalsIgnoreCase("raw")) {
+                RequestBody requestBody = RequestBody.create(MediaType.parse(contentTypeMapping.get(httpTestForm.getContentType())), JsonUtils.toJson(httpTestForm.getBody()));
+                requestBuilder.method(httpTestForm.getMethod().toLowerCase(), requestBody);
+            }
+            else {
+                FormBody.Builder formBody = new FormBody.Builder();
+                for (JobForm.ItemConfig itemConfig : httpTestForm.getBody()) {
+                    formBody.add(itemConfig.getKey(), itemConfig.getValue());
+                }
+                requestBuilder.post(formBody.build());
+            }
         }
 
         // 3、解析header

@@ -4,11 +4,7 @@ import static com.datalinkx.common.utils.IdUtils.genKey;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import cn.hutool.core.lang.Pair;
@@ -271,7 +267,8 @@ public class DsServiceImpl implements DsService {
 	}
 
 	public List<DsBean> list() {
-		return dsRepository.findAllByIsDel(0);
+		return dsRepository.findAllByIsDel(0).stream()
+				.sorted(Comparator.comparing(DsBean::getType)).collect(Collectors.toList());
 	}
 
 
