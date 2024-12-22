@@ -88,7 +88,7 @@ public abstract class AbstractDataTransferAction<T extends DataTransJobDetail, U
                 DataTransferAction.COUNT_RES.remove();
             }, healthCheck);
 
-            // 4、执行flink任务
+            // 4、向引擎提交任务
             try {
                 // 4.1、是否用户取消任务
                 if (isStop()) {

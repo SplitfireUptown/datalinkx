@@ -49,6 +49,8 @@ set "SEATUNNEL_CONFIG=%CONF_DIR%\seatunnel.yaml"
 set "JAVA_OPTS=%JAVA_OPTS% -Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector"
 set "JAVA_OPTS=%JAVA_OPTS% -Dlog4j2.isThreadContextMapInheritable=true"
 
+set "JAVA_OPTS=%JAVA_OPTS% -Dfile.encoding=utf-8"
+
 REM Server Debug Config
 REM Usage instructions:
 REM If you need to debug your code in cluster mode, please enable this configuration option and listen to the specified

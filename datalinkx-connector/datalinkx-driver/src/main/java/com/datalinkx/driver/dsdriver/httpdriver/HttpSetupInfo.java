@@ -21,6 +21,8 @@ public class HttpSetupInfo extends SetupInfo {
     private String method;
     private String host;
     private Integer port;
+    @JsonProperty("content_type")
+    private String contentType;
     private List<ItemConfig> header;
     private List<ItemConfig> param;
     private List<ItemConfig> body;

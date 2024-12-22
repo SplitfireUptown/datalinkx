@@ -211,7 +211,7 @@ export default {
 
     edit (record) {
       if (this.currentDs.dsTypeKey === 5) {
-        this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'show')
+        this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'edit')
       } else {
         this.$refs.refDsConfig.show(record.dsId, 'edit', record)
       }

@@ -1,8 +1,11 @@
 package com.datalinkx.driver.dsdriver.httpdriver;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.common.utils.TelnetUtil;
+import com.datalinkx.compute.connector.http.HttpSource;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -13,13 +16,12 @@ import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
 import com.datalinkx.driver.dsdriver.esdriver.OpenEsService;
+import com.datalinkx.driver.model.DataTransJobDetail;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author: uptown
@@ -29,6 +31,7 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
 
     private final String connectId;
     private final HttpSetupInfo httpSetupInfo;
+    protected String PLUGIN_NAME = "Http";
 
     public HttpDriver(String connectId) {
         this.connectId = connectId;
@@ -37,13 +40,13 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
 
     @Override
     public Object connect(boolean check) throws Exception {
-        TelnetUtil.telnet(this.httpSetupInfo.getUrl(), this.httpSetupInfo.getPort());
+        TelnetUtil.telnet(this.httpSetupInfo.getHost(), this.httpSetupInfo.getPort());
         return this.httpSetupInfo;
     }
 
     @Override
     public String getConnectId() {
-        return null;
+        return this.connectId;
     }
 
 
@@ -60,7 +63,7 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
     @Override
     public List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception {
         DbTree.DbTreeTable dbTreeTable = new DbTree.DbTreeTable();
-        dbTreeTable.setName("json_path返回解析表");
+        dbTreeTable.setName("json_path解析内置表");
         dbTreeTable.setLevel("table");
         return Collections.singletonList(dbTreeTable);
     }
@@ -77,13 +80,14 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
             Iterator<String> fieldNames = firstElement.fieldNames();
             while (fieldNames.hasNext()) {
                 String key = fieldNames.next();
-                result.add(DbTableField.builder().name(key).build());
+                // 接口返回默认数据类型为string
+                result.add(DbTableField.builder().name(key).type("string").build());
             }
         } else {
             Iterator<String> fieldNames = responseJsonNode.fieldNames();
             while (fieldNames.hasNext()) {
                 String key = fieldNames.next();
-                result.add(DbTableField.builder().name(key).build());
+                result.add(DbTableField.builder().name(key).type("string").build());
             }
         }
         return result;
@@ -91,11 +95,54 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
 
     @Override
     public TransformNode getSourceInfo(FlinkActionMeta unit) {
-        return IDsReader.super.getSourceInfo(unit);
-    }
+        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> headerMap = new HashMap<>();
+        Map<String, Object> bodyMap = new HashMap<>();
 
-    @Override
-    public String transferSourceSQL(FlinkActionMeta unit) {
-        return IDsReader.super.transferSourceSQL(unit);
+        this.httpSetupInfo.getParam().forEach(item -> paramMap.put(item.getKey(), item.getValue()));
+        this.httpSetupInfo.getHeader().forEach(item -> headerMap.put(item.getKey(), item.getValue()));
+        this.httpSetupInfo.getBody().forEach(item -> bodyMap.put(item.getKey(), item.getValue()));
+        String baseUrl = this.httpSetupInfo.getUrl();
+
+        if ("GET".equalsIgnoreCase(this.httpSetupInfo.getMethod()) && !ObjectUtils.isEmpty(paramMap)) {
+            List<String> paramList = new ArrayList<>();
+            for (Map.Entry<String, Object> paramItem : paramMap.entrySet()) {
+                paramList.add(paramItem.getKey() + "=" + paramItem.getValue());
+            }
+            String paramUrl = String.join(",", paramList);
+            baseUrl = String.format("%s?%s", baseUrl, paramUrl);
+        }
+
+        // 接口字段配置
+        HttpSource.Schema schema = new HttpSource.Schema();
+        Map<String, String> fields = unit.getReader().getColumns().stream().collect(Collectors.toMap(DataTransJobDetail.Column::getName, v -> "string"));
+        schema.setFields(fields);
+
+        String revData = this.httpSetupInfo.getRevData();
+        JsonNode responseJsonNode = JsonUtils.toJsonNode(revData);
+        Map<String, String> jsonField = new HashMap<>();
+        for (DataTransJobDetail.Column column : unit.getReader().getColumns()) {
+            String fieldJsonPath;
+            if (responseJsonNode.isArray()) {
+                fieldJsonPath = this.httpSetupInfo.getJsonPath() + "[*]." + column.getName();
+            } else {
+                fieldJsonPath = this.httpSetupInfo.getJsonPath() + "." + column.getName();
+            }
+            jsonField.put(column.getName(), fieldJsonPath);
+        }
+
+
+        return HttpSource.builder()
+                .url(baseUrl)
+                .method(this.httpSetupInfo.getMethod())
+//                .contentField(this.httpSetupInfo.getJsonPath())
+                .jsonField(jsonField)
+                .params(bodyMap)
+                .headers(headerMap)
+                .body(this.httpSetupInfo.getRaw())
+                .schema(schema)
+                .pluginName(PLUGIN_NAME)
+                .resultTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
+                .build();
     }
 }

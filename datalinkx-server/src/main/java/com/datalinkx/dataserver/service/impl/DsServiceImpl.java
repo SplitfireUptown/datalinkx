@@ -183,7 +183,7 @@ public class DsServiceImpl implements DsService {
 			case "http":
 				HttpSetupInfo httpSetupInfo = JsonUtils.toObject(dsBean.getConfig(), HttpSetupInfo.class);
 				Pair<String, Integer> host = HttpConstructor.checkUrlFormat(httpSetupInfo.getUrl());
-				httpSetupInfo.setUrl(host.getKey());
+				httpSetupInfo.setHost(host.getKey());
 				httpSetupInfo.setPort(host.getValue());
 				httpSetupInfo.setType(toType);
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(httpSetupInfo));

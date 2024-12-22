@@ -21,13 +21,11 @@
               >
                 <a-select-option value="get">GET</a-select-option>
                 <a-select-option value="post">POST</a-select-option>
-                <a-select-option value="put" >PUT</a-select-option>
-                <a-select-option value="delete">DELETE</a-select-option>
               </a-select>
             </a-space>
           </a-col>
           <a-col :span="20">
-            <a-input v-model="api_url" style="width: calc(100% - 250px)" />
+            <a-input v-model="api_url" style="width: calc(100% - 250px)" :disabled="editable"/>
             <a-space>
               <a-button type="primary" @click="onSubmit" >请求此API</a-button>
             </a-space>
@@ -40,13 +38,13 @@
             <a-tabs v-model="activeKey">
               <a-tab-pane key="1" tab="Params">
                 <a-table :columns="columns" :dataSource="paramData" :pagination="false" bordered>
-                  <template v-for="col in ['key', 'value']" :slot="col" slot-scope="text, record, index">
+                  <template v-for="col in ['index', 'key', 'value']" :slot="col" slot-scope="text, record, index">
                     <div :key="col">
                       <a-input
                         v-if="record.editable"
                         style="margin: -5px 0"
                         :value="text"
-                        @change="e => handleChanged('param', e.target.value, record.key, col,index)"
+                        @change="e => handleChanged('param', e.target.value, record.index, col,0)"
                       />
                       <template v-else>{{ text }}</template>
                     </div>
@@ -55,17 +53,17 @@
                     <div class="editable-row-operations">
                       <span v-if="record.editable">
                         <a-space>
-                          <a @click="() => save('param', record.key,index)">Save</a>
-                          <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('param', record.key,index)">
+                          <a @click="() => save('param', record.index,index)">Save</a>
+                          <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('param', record.index,index)">
                             <a>Cancel</a>
                           </a-popconfirm>
                         </a-space>
                       </span>
                       <span v-else>
-                        <a @click="() => edit('param', record.key,index)">Edit</a>
+                        <a @click="() => edit('param', record.index,index)">Edit</a>
                       </span>
                       <a-divider type="vertical" />
-                      <a @click="() => onParamDelete('param', record.key)">Delete</a>
+                      <a @click="() => onParamDelete('param', record.index)">Delete</a>
                     </div>
                   </template>
                 </a-table>
@@ -73,13 +71,13 @@
               </a-tab-pane>
               <a-tab-pane key="2" tab="Headers" force-render>
                 <a-table :columns="columns" :dataSource="headerData" :pagination="false" bordered>
-                  <template v-for="col in ['key', 'value']" :slot="col" slot-scope="text, record, index">
+                  <template v-for="col in ['index', 'key', 'value']" :slot="col" slot-scope="text, record, index">
                     <div :key="col">
                       <a-input
                         v-if="record.editable"
                         style="margin: -5px 0"
                         :value="text"
-                        @change="e => handleChanged('header', e.target.value, record.key, col,index)"
+                        @change="e => handleChanged('header', e.target.value, record.index, col,0)"
                       />
                       <template v-else>{{ text }}</template>
                     </div>
@@ -88,17 +86,17 @@
                     <div class="editable-row-operations">
                       <span v-if="record.editable">
                         <a-space>
-                          <a @click="() => save('header', record.key,index)">Save</a>
-                          <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('header', record.key,index)">
+                          <a @click="() => save('header', record.index,index)">Save</a>
+                          <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('header', record.index,index)">
                             <a>Cancel</a>
                           </a-popconfirm>
                         </a-space>
                       </span>
                       <span v-else>
-                        <a @click="() => edit('header', record.key,index)">Edit</a>
+                        <a @click="() => edit('header', record.index,index)">Edit</a>
                       </span>
                       <a-divider type="vertical" />
-                      <a @click="() => onParamDelete('header', record.key)">Delete</a>
+                      <a @click="() => onParamDelete('header', record.index)">Delete</a>
                     </div>
                   </template>
                 </a-table>
@@ -115,13 +113,13 @@
                       <p v-if="body_type=='none'">This request does not have a body</p>
                       <div v-else-if="body_type=='form-data' || body_type=='x-www-form-urlencoded'">
                         <a-table :columns="columns" :dataSource="data" :pagination="false" bordered>
-                          <template v-for="col in ['key', 'value']" :slot="col" slot-scope="text, record, index">
+                          <template v-for="col in ['index', 'key', 'value']" :slot="col" slot-scope="text, record, index">
                             <div :key="col">
                               <a-input
                                 v-if="record.editable"
                                 style="margin: -5px 0"
                                 :value="text"
-                                @change="e => handleChanged('body', e.target.value, record.key, col,index)"
+                                @change="e => handleChanged('body', e.target.value, record.index, col,0)"
                               />
                               <template v-else>{{ text }}</template>
                             </div>
@@ -130,17 +128,17 @@
                             <div class="editable-row-operations">
                               <span v-if="record.editable">
                                 <a-space>
-                                  <a @click="() => save('body', record.key,index)">Save</a>
-                                  <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('body', record.key,index)">
+                                  <a @click="() => save('body', record.index,index)">Save</a>
+                                  <a-popconfirm title="Sure to cancel?" @confirm="() => cancel('body', record.index,index)">
                                     <a>Cancel</a>
                                   </a-popconfirm>
                                 </a-space>
                               </span>
                               <span v-else>
-                                <a @click="() => edit('body', record.key,index)">Edit</a>
+                                <a @click="() => edit('body', record.index,index)">Edit</a>
                               </span>
                               <a-divider type="vertical" />
-                              <a @click="() => onParamDelete('body', record.key)">Delete</a>
+                              <a @click="() => onParamDelete('body', record.index)">Delete</a>
                             </div>
                           </template>
                         </a-table>
@@ -174,7 +172,7 @@
             </a-space>
           </a-col>
           <a-col :span="20">
-            <a-input v-model="json_path" placeholder="接口结果会根据json_path解析，结果中第一个元素的key作为HTTP数据源的默认表字段"/>
+            <a-input v-model="json_path" placeholder="根据json_path解析接口结果，配置到结果集的上一层即可"/>
           </a-col>
         </a-row>
         <a-row>
@@ -187,7 +185,7 @@
     </div>
     <template slot="footer">
       <a-button key="cancel" @click="handleCancel">取消</a-button>
-      <a-button key="forward" v-show="onlyRead" :loading="confirmLoading" type="primary" @click="handleSubmit">保存</a-button>
+      <a-button key="forward" v-show="onlyRead" :disabled=editable :loading="confirmLoading" type="primary" @click="handleSubmit">保存</a-button>
     </template>
   </a-modal>
 </template>
@@ -198,6 +196,12 @@
 
   // 表头数据,title 为表头的标题 dataIndex为列数据在数据项中对应的 key
   const columns = [
+    // {
+    //   title: 'index',
+    //   dataIndex: 'index',
+    //   scopedSlots: { customRender: 'index' },
+    //   width: '25%'
+    // },
     {
       title: 'key',
       dataIndex: 'key',
@@ -222,6 +226,9 @@
     name: 'Postman',
     data () {
       return {
+        paramCount: 0,
+        headerCount: 0,
+        bodyCount: 0,
         api_url: '',
         rev_data: {},
         json_path: '',
@@ -240,6 +247,7 @@
         visible: false,
         confirmLoading: false,
         onlyRead: true,
+        editable: false,
         dsId: '',
         // 默认配置
         options: {
@@ -316,6 +324,7 @@
                 this.confirmLoading = false
                 // 清楚表单数据
                 this.$message.success('保存成功')
+                this.visible = false
               } else {
                 this.confirmLoading = false
                 this.$message.error(res.errstr)
@@ -331,6 +340,7 @@
               this.confirmLoading = false
               // 清楚表单数据
               this.$message.success('修改成功')
+              this.visible = false
             } else {
               this.confirmLoading = false
               this.$message.error(res.errstr)
@@ -340,7 +350,6 @@
             this.$message.error(err.errstr)
           })
         }
-        this.visible = false
       },
       focus (key) {
         console.log(key)
@@ -366,21 +375,21 @@
       handleChanged (type, value, key, column, index) {
         if (type === 'param') {
           const newData = [...this.paramData]
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[index]
           if (target) {
             target[column] = value
             this.paramData = newData
           }
         } else if (type === 'header') {
           const newData = [...this.headerData]
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[index]
           if (target) {
             target[column] = value
             this.headerData = newData
           }
         } else {
           const newData = [...this.data]
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[index]
           if (target) {
             target[column] = value
             this.data = newData
@@ -391,7 +400,8 @@
         if (type === 'param') {
           const newData = [...this.paramData]
           console.log('newData----', newData)
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
+          console.log(target)
           if (target) {
             target.editable = true
             this.paramData = newData
@@ -399,7 +409,7 @@
         } else if (type === 'header') {
           const newData = [...this.headerData]
           console.log('newData----', newData)
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
           if (target) {
             target.editable = true
             this.headerData = newData
@@ -407,7 +417,7 @@
         } else {
           const newData = [...this.data]
           console.log('newData----', newData)
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
           if (target) {
             target.editable = true
             this.data = newData
@@ -416,18 +426,18 @@
       },
       onParamDelete (type, key) {
         if (type === 'param') {
-          this.paramData = this.paramData.filter(item => item.key !== key)
+          this.paramData = this.paramData.filter(item => item.index !== key)
         } else if (type === 'header') {
-          this.headerData = this.headerData.filter(item => item.key !== key)
+          this.headerData = this.headerData.filter(item => item.index !== key)
         } else {
-          this.data = this.data.filter(item => item.key !== key)
+          this.data = this.data.filter(item => item.index !== key)
         }
       },
       save (type, key, index) {
         if (type === 'param') {
           const newData = [...this.paramData]
           console.log(newData)
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
           if (target) {
             delete target.editable
             this.paramData = newData
@@ -435,7 +445,7 @@
           }
         } else if (type === 'header') {
           const newData = [...this.headerData]
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
           if (target) {
             delete target.editable
             this.headerData = newData
@@ -443,37 +453,36 @@
           }
         } else {
           const newData = [...this.data]
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
           if (target) {
             delete target.editable
             this.data = newData
             this.cacheData = newData.map(item => ({ ...item }))
           }
         }
-        this.handleCancel()
       },
       cancel (type, key, index) {
         if (type === 'param') {
           const newData = [...this.paramData]
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
           if (target) {
-            Object.assign(target, this.cacheData.filter(item => key === item.key)[index])
+            Object.assign(target, this.cacheData.filter(item => key === item.index)[0])
             delete target.editable
             this.paramData = newData
           }
         } else if (type === 'header') {
           const newData = [...this.headerData]
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
           if (target) {
-            Object.assign(target, this.cacheData.filter(item => key === item.key)[index])
+            Object.assign(target, this.cacheData.filter(item => key === item.index)[0])
             delete target.editable
             this.headerData = newData
           }
         } else {
           const newData = [...this.data]
-          const target = newData.filter(item => key === item.key)[index]
+          const target = newData.filter(item => key === item.index)[0]
           if (target) {
-            Object.assign(target, this.cacheData.filter(item => key === item.key)[index])
+            Object.assign(target, this.cacheData.filter(item => key === item.index)[0])
             delete target.editable
             this.data = newData
           }
@@ -483,39 +492,41 @@
         console.log(node.model.text + ' clicked !')
       },
       handleAdd (key) {
-        const { count } = this
         if (key === 'param') {
           this.paramData.push({
+            index: this.paramCount,
             key: '',
             value: ''
           })
+          this.paramCount++
         } else if (key === 'header') {
           this.headerData.push({
+            index: this.headerCount,
             key: '',
             value: ''
           })
+          this.headerCount++
         } else {
           this.data.push({
+            index: this.bodyCount,
             key: '',
             value: ''
           })
+          this.bodyCount++
         }
-        this.count = count + 1
       },
-      show (dsId, type, info) {
+      show (dsId, type) {
         this.type = type
         this.dsId = dsId
         switch (type) {
           case 'add':
-            this.showable = false
-            this.addable = true
+            this.editable = false
             break
           case 'edit':
-            this.showable = false
-            this.editable = true
+            this.editable = false
             break
           default:
-            this.showable = true
+            this.editable = true
             break
         }
         this.visible = true
