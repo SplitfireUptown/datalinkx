@@ -94,7 +94,7 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
     }
 
     @Override
-    public TransformNode getSourceInfo(FlinkActionMeta unit) {
+    public TransformNode getSourceInfo(FlinkActionMeta unit) throws Exception {
         Map<String, Object> paramMap = new HashMap<>();
         Map<String, Object> headerMap = new HashMap<>();
         Map<String, Object> bodyMap = new HashMap<>();
@@ -113,11 +113,19 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
             baseUrl = String.format("%s?%s", baseUrl, paramUrl);
         }
 
+        List<String> responseFields = this.getFields("This", "is", "easter egg")
+                .stream().map(DbTableField::getName)
+                .collect(Collectors.toList());
+
         // 接口字段配置
         HttpSource.Schema schema = new HttpSource.Schema();
         // 为什么用LinkedHashMap？ 因为要保证写入顺序与页面上配置的字段映射顺序一致
         LinkedHashMap<String, String> fields = new LinkedHashMap<>();
         for (DataTransJobDetail.Column column : unit.getReader().getColumns()) {
+            if (!responseFields.contains(column.getName())) {
+                // 如果不是接口返回的字段，跳过处理
+                continue;
+            }
             fields.put(column.getName(), "string");
         }
         schema.setFields(fields);
@@ -125,7 +133,13 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
         String revData = this.httpSetupInfo.getRevData();
         JsonNode responseJsonNode = JsonUtils.toJsonNode(revData);
         Map<String, String> jsonField = new HashMap<>();
+
         for (DataTransJobDetail.Column column : unit.getReader().getColumns()) {
+            if (!responseFields.contains(column.getName())) {
+                // 如果不是接口返回的字段，跳过处理
+                continue;
+            }
+
             String fieldJsonPath;
             if (responseJsonNode.isArray()) {
                 fieldJsonPath = this.httpSetupInfo.getJsonPath() + "[*]." + column.getName();

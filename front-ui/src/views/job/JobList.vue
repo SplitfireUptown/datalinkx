@@ -112,7 +112,7 @@ export default {
                 <a-divider type="vertical" />
                 <a href="javascript:;"onClick={(e) => this.execJob(record)}>手动触发</a>
                 <a-divider type="vertical" />
-                <a href="javascript:;"onClick={(e) => this.stopJob(record)}>暂停流转</a>
+                <a href="javascript:;"onClick={(e) => this.stopJob(record)}>停止流转</a>
               </div>
             )
           }

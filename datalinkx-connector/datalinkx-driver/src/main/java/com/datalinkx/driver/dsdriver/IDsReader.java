@@ -56,7 +56,7 @@ public interface IDsReader extends IDsDriver {
 
     // ============= Seatunnel引擎
     // 构造seatunnel引擎读信息
-    default TransformNode getSourceInfo(FlinkActionMeta unit) {
+    default TransformNode getSourceInfo(FlinkActionMeta unit) throws Exception {
         return null;
     }
 

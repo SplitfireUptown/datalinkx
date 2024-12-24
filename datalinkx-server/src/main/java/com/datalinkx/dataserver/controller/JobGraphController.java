@@ -48,7 +48,7 @@ public class JobGraphController {
     }
 
 
-    @ApiOperation("绑定业务JOB id与Flink task_id关联")
+    @ApiOperation("绑定业务JOB id与执行任务task_id关联")
     @PostMapping("/update_job_task_rel")
     public WebResult<String> updateJobTaskRel(String jobId, String taskId) {
         return WebResult.of(this.dtsJobService.updateJobTaskRel(jobId, taskId));
