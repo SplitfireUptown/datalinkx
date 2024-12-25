@@ -69,7 +69,6 @@ public class JobServiceImpl implements JobService {
 	@Transactional(rollbackFor = Exception.class)
 	public String jobCreate(JobForm.JobCreateForm form) {
 		this.validJobForm(form);
-        this.validTransformGraph(form);
 		String jobId = genKey("job");
 		JobBean jobBean = new JobBean();
 		jobBean.setJobId(jobId);
@@ -99,7 +98,6 @@ public class JobServiceImpl implements JobService {
 
 	public String jobModify(JobForm.JobModifyForm form) {
 		this.validJobForm(form);
-		this.validTransformGraph(form);
 		JobBean jobBean = jobRepository.findByJobId(form.getJobId()).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
 		jobBean.setReaderDsId(form.getFromDsId());
 		jobBean.setWriterDsId(form.getToDsId());
@@ -116,7 +114,7 @@ public class JobServiceImpl implements JobService {
 	}
 
 	// 校验计算任务transform graph是否合法
-	private void validTransformGraph(JobForm.JobCreateForm form) {
+	private void validTransformGraph(DsBean fromDsBean, JobForm.JobCreateForm form) {
 		if (ObjectUtils.isEmpty(form.getGraph())) {
 			return;
 		}
@@ -141,6 +139,11 @@ public class JobServiceImpl implements JobService {
 		List<Integer> normalNodeNum = nodeBook.values().stream().filter(v -> v > 1).collect(Collectors.toList());
 		if (!ObjectUtils.isEmpty(normalNodeNum)) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "仅支持单source输入节点、单输出sink节点、单transform节点");
+		}
+
+		// 如果来源数据源是http数据源，SQL算子无意义
+		if (MetaConstants.DsType.HTTP.equals(fromDsBean.getType()) && nodeBook.containsKey("llm")) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "HTTP数据源不支持大模型算子");
 		}
 	}
 
@@ -181,6 +184,8 @@ public class JobServiceImpl implements JobService {
 		if (ObjectUtils.isEmpty(form.getSchedulerConf()) && !ObjectUtils.nullSafeEquals(form.getType(), MetaConstants.JobType.JOB_TYPE_STREAM)) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "批式流转任务需要配置crontab表达式");
 		}
+		// 6、校验计算任务transform graph是否合法
+		this.validTransformGraph(fromDsBean, form);
 	}
 
 
