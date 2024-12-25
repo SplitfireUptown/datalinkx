@@ -62,7 +62,12 @@ public class DsController {
 
 	@GetMapping("/info/{dsId}")
 	public WebResult<DsBean> info(@PathVariable String dsId) {
-		return WebResult.of(dsServiceImpl.info(dsId));
+		try {
+			return WebResult.of(dsServiceImpl.info(dsId));
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			throw new DatalinkXServerException(e);
+		}
 	}
 
 	@PostMapping("/modify")

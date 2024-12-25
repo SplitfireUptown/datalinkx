@@ -50,6 +50,10 @@ public class LLMNode extends TransformNode {
         @Builder.Default
         private String model = "${model}";
         @Builder.Default
+        private Double temperature = 0.1;
+        @Builder.Default
+        private Boolean stream = false;
+        @Builder.Default
         private List<Message> messages = new ArrayList<Message>() {{
             add(Message.builder().build());
         }};

@@ -142,8 +142,8 @@ public class JobServiceImpl implements JobService {
 		}
 
 		// 如果来源数据源是http数据源，SQL算子无意义
-		if (MetaConstants.DsType.HTTP.equals(fromDsBean.getType()) && nodeBook.containsKey("llm")) {
-			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "HTTP数据源不支持大模型算子");
+		if (MetaConstants.DsType.HTTP.equals(fromDsBean.getType()) && nodeBook.containsKey("sql")) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "HTTP数据源不支持SQL算子");
 		}
 	}
 

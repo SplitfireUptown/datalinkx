@@ -132,7 +132,7 @@
       width="500"
     >
       <span>大模型prompt</span>
-      <a-textarea v-model="llmPrompt" style="height: 121px;" placeholder="所有字段都将用作模型输入，直接使用字段名称编写prompt，只支持英文，例：Determine whether someone is Chinese or American by their name(根据名字判断某人是中国人还是美国人)"/>
+      <a-textarea v-model="llmPrompt" style="height: 121px;" placeholder="所有字段都将可以用作模型输入，直接使用字段名称编写prompt，只支持英文，例：Determine whether someone is Chinese or American by their name(根据名字判断某人是中国人还是美国人)"/>
     </a-drawer>
     <a-drawer
       title="目标数据源"
