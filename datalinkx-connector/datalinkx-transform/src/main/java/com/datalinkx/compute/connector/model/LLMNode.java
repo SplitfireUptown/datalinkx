@@ -53,10 +53,7 @@ public class LLMNode extends TransformNode {
         private Double temperature = 0.1;
         @Builder.Default
         private Boolean stream = false;
-        @Builder.Default
-        private List<Message> messages = new ArrayList<Message>() {{
-            add(Message.builder().build());
-        }};
+        private List<Message> messages;
     }
 
     @Data
@@ -64,7 +61,6 @@ public class LLMNode extends TransformNode {
     public static class Message {
         @Builder.Default
         private String role = "user";
-        @Builder.Default
-        private String content = "${prompt}";
+        private String content;
     }
 }

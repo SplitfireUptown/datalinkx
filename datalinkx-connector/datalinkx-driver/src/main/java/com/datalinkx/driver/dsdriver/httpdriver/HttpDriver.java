@@ -8,17 +8,13 @@ import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.compute.connector.http.HttpSource;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
-import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
-import com.datalinkx.driver.dsdriver.esdriver.OpenEsService;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 
 import java.util.*;
 import java.util.stream.Collectors;

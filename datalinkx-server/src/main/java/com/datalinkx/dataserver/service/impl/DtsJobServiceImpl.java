@@ -92,6 +92,9 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Value("${llm.response_parse:}")
     String responseParse;
 
+    @Value("${llm.temperature:0.1}")
+    String temperature;
+
 
     @Override
     public DataTransJobDetail getJobExecInfo(String jobId) {
@@ -274,6 +277,7 @@ public class DtsJobServiceImpl implements DtsJobService {
             put("openai.api_path", ollamaUrl + "/api/chat");
             put("model", llmModel);
             put("response_parse", responseParse);
+            put("temperature", temperature);
         }});
 
         // 如果计算过程中存在SQL节点，把reader中的queryFields改成*防止SQL中引用了未映射字段导致报错

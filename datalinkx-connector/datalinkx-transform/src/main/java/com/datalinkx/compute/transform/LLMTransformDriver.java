@@ -6,6 +6,7 @@ import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -18,6 +19,8 @@ public class LLMTransformDriver extends ITransformDriver {
 
     @Override
     public TransformNode transferInfo(Map<String, Object> commonSettings, String meta) {
+        LLMNode.Message promptMessage = LLMNode.Message.builder().content(meta).build();
+
         return LLMNode.builder()
                 .modelProvider("CUSTOM")
                 .pluginName(MetaConstants.CommonConstant.TRANSFORM_LLM)
@@ -27,7 +30,13 @@ public class LLMTransformDriver extends ITransformDriver {
                 .customConfig(
                         LLMNode.CustomConfig.builder()
                                 .customResponseParse((String) commonSettings.get("response_parse"))
-                                .customRequestBody(LLMNode.customRequestBody.builder().build())
+                                .customRequestBody(
+                                        LLMNode.customRequestBody
+                                                .builder()
+                                                .temperature((Double) commonSettings.getOrDefault("temperature", 0.1))
+                                                .messages(Collections.singletonList(promptMessage))
+                                                .build()
+                                )
                                 .build()
                 )
                 .sourceTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
