@@ -49,7 +49,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
 
     @Override
     protected void end(SeatunnelActionMeta unit, int status, String errmsg) {
-        log.info(String.format("stream job jobid: %s, end to transfer", unit.getJobId()));
+        log.info(String.format("transform job jobid: %s, end to transfer", unit.getJobId()));
         // 修改任务状态，存储checkpoint
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(unit.getJobId())
                 .jobStatus(status).endTime(new Date().getTime()).startTime(START_TIME.get())
@@ -80,6 +80,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
                 .map(node -> (Object) node) // 使用 map 将 TransformNode 转换为 Object
                 .collect(Collectors.toList()));
         computeJobGraph.setSink(Collections.singletonList(unit.getSinkInfo()));
+        log.info("job_graph ==> {}", computeJobGraph);
         JobCommitResp jobCommitResp = seaTunnelClient.jobSubmit(computeJobGraph);
         String taskId = jobCommitResp.getJobId();
         unit.setTaskId(taskId);

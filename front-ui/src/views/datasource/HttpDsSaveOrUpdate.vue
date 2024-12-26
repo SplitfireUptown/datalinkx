@@ -555,6 +555,7 @@
             this.rawValue = dsConfig.raw
             this.json_path = dsConfig.json_path
             this.rev_data = JSON.parse(dsConfig.rev_data)
+            this.ds_name = record.name
           })
 
           this.confirmLoading = false
