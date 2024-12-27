@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OracleSetupInfo extends JdbcSetupInfo {
-    private String alias;
+    private String connectType;
     private String sid;
-    private String subtype;
 }

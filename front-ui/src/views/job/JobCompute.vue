@@ -719,7 +719,6 @@
           'run': false
         }
         if (this.jobId !== '') {
-          this.selectloading = true
           modifyObj(formData).then(res => {
             if (res.status === '0') {
               this.$message.success('修改成功')
@@ -741,7 +740,6 @@
           }).catch(err => {
             this.$message.error(err.errstr)
           })
-          this.selectloading = false
         }
         this.selectloading = false
         // const nodeArr = data.cells

@@ -163,6 +163,10 @@ const OracleServerTypes = [
   {
     label: 'SID',
     value: 'sid'
+  },
+  {
+    label: '服务名',
+    value: 'servername'
   }
 ]
 

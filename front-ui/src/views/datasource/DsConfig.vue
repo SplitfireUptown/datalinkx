@@ -243,7 +243,7 @@ export default {
           values.ds_id = this.dsId
           if (this.currentDs.dsTypeKey === 3) {
             const temp = {}
-            temp[values.servertype] = values[values.servertype]
+            temp[values.servertype] = values['sid']
             values.config = JSON.stringify(temp)
           }
           this.confirmLoading = true

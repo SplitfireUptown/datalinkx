@@ -454,6 +454,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         }
 
 
-        return String.format("insert into %s.%s(%s) value(%s)", writer.getSchema(), writer.getTableName(), writer.getInsertFields(), abstractQuery);
+        return String.format("insert into %s.%s(%s) values(%s)", writer.getSchema(), writer.getTableName(), writer.getInsertFields(), abstractQuery);
     }
 }

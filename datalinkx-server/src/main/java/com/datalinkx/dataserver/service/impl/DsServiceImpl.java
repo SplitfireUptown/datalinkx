@@ -163,9 +163,13 @@ public class DsServiceImpl implements DsService {
 				oracleSetupInfo.setUid(dsBean.getUsername());
 
 				Map configMap = JsonUtils.toObject(dsBean.getConfig(), Map.class);
-				oracleSetupInfo.setSid((String) configMap.get("sid"));
-				oracleSetupInfo.setSubtype((String) configMap.getOrDefault("subtype", "BASIC"));
-				oracleSetupInfo.setAlias((String) configMap.getOrDefault("alias", "SID"));
+				if (configMap.containsKey("sid")) {
+					oracleSetupInfo.setConnectType("SID");
+					oracleSetupInfo.setSid((String) configMap.get("sid"));
+				} else {
+					oracleSetupInfo.setConnectType("SERVERNAME");
+					oracleSetupInfo.setSid((String) configMap.get("servername"));
+				}
 
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(oracleSetupInfo));
 			case "redis":
