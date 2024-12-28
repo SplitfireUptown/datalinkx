@@ -97,3 +97,4 @@ llm:
   model: "qwen:7b"
   vector: "elasticsearch"
   response_parse: "$.message.content"
+  inner_prompt: "不要回答任何多余的说辞和思考过程!只回答我问题的答案答案，不要一句话，越简洁越好"

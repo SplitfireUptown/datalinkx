@@ -95,6 +95,8 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Value("${llm.temperature:0.1}")
     String temperature;
 
+    @Value("${llm.inner_prompt:}")
+    String innerPrompt;
 
     @Override
     public DataTransJobDetail getJobExecInfo(String jobId) {
@@ -278,6 +280,7 @@ public class DtsJobServiceImpl implements DtsJobService {
             put("model", llmModel);
             put("response_parse", responseParse);
             put("temperature", temperature);
+            put("inner_prompt", innerPrompt);
         }});
 
         // 如果计算过程中存在SQL节点，把reader中的queryFields改成*防止SQL中引用了未映射字段导致报错

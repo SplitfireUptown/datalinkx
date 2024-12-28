@@ -19,8 +19,11 @@ public class LLMTransformDriver extends ITransformDriver {
 
     @Override
     public TransformNode transferInfo(Map<String, Object> commonSettings, String meta) {
-        LLMNode.Message promptMessage = LLMNode.Message.builder().content(meta).build();
+        // 内置prompt，有些模型理解不了。。。
+        String innerPrompt = (String) commonSettings.getOrDefault("inner_prompt", "");
+        String prompt = String.format("%s \n %s", innerPrompt, meta);
 
+        LLMNode.Message promptMessage = LLMNode.Message.builder().content(prompt).build();
         return LLMNode.builder()
                 .modelProvider("CUSTOM")
                 .pluginName(MetaConstants.CommonConstant.TRANSFORM_LLM)
@@ -33,7 +36,7 @@ public class LLMTransformDriver extends ITransformDriver {
                                 .customRequestBody(
                                         LLMNode.customRequestBody
                                                 .builder()
-                                                .temperature((Double) commonSettings.getOrDefault("temperature", 0.1))
+                                                .temperature(Double.valueOf((String) commonSettings.getOrDefault("temperature", 0.1)))
                                                 .messages(Collections.singletonList(promptMessage))
                                                 .build()
                                 )
