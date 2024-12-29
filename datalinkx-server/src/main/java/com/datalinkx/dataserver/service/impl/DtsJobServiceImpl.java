@@ -1,13 +1,10 @@
 package com.datalinkx.dataserver.service.impl;
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNCING;
+import static com.datalinkx.compute.transform.ITransformFactory.TRANSFORM_DRIVER_MAP;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -17,6 +14,7 @@ import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.compute.transform.ITransformDriver;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.domain.JobLogBean;
@@ -37,6 +35,7 @@ import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +83,21 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Value("${data-transfer.query-time-out:10000}")
     Integer queryTimeOut;
 
+    @Value("${client.ollama.url}")
+    String ollamaUrl;
+
+    @Value("${llm.model:}")
+    String llmModel;
+
+    @Value("${llm.response_parse:}")
+    String responseParse;
+
+    @Value("${llm.temperature:0.1}")
+    String temperature;
+
+    @Value("${llm.inner_prompt:}")
+    String innerPrompt;
+
     @Override
     public DataTransJobDetail getJobExecInfo(String jobId) {
         JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
@@ -94,7 +108,10 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .reader(this.getReader(jobBean, fieldMappingForms))
                 .writer(this.getWriter(jobBean, fieldMappingForms))
                 .build();
-        return DataTransJobDetail.builder().jobId(jobId).cover(jobBean.getCover()).syncUnit(syncUnit).build();
+
+        // 解析计算任务图
+        this.analysisComputeGraph(syncUnit, jobBean.getGraph());
+        return DataTransJobDetail.builder().jobId(jobId).type(jobBean.getType()).cover(jobBean.getCover()).syncUnit(syncUnit).build();
     }
 
     @Override
@@ -162,7 +179,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .stream().collect(Collectors.toMap(DbTableField::getName, DbTableField::getType));
         JobForm.SyncModeForm syncModeForm = JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class);
 
-        DataTransJobDetail.Sync.SyncCondition syncCond = this.getSyncCond(syncModeForm, fromCols, typeMappings);
+        DataTransJobDetail.Sync.SyncCondition syncCond = this.getSyncCond(syncModeForm, typeMappings);
 
         DataTransJobDetail.Sync sync = DataTransJobDetail.Sync
                 .builder()
@@ -171,6 +188,11 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .queryTimeOut(queryTimeOut)
                 .fetchSize(fetchSize)
                 .build();
+
+        String selectField = jobConf.stream()
+                .map(JobForm.FieldMappingForm::getSourceField)
+                .filter(typeMappings::containsKey)
+                .collect(Collectors.joining(", "));
 
         return DataTransJobDetail.Reader
                 .builder()
@@ -181,21 +203,25 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .maxValue(syncModeForm.getIncreateValue())
                 .tableName(jobBean.getFromTbId())
                 .columns(fromCols)
+                .queryFields(selectField)
                 .build();
     }
 
     private DataTransJobDetail.Sync.SyncCondition getSyncCond(JobForm.SyncModeForm exportMode,
-                                                              List<DataTransJobDetail.Column> syncFields, Map<String, String> typeMappings) {
+                                                              Map<String, String> typeMappings) {
         DataTransJobDetail.Sync.SyncCondition syncCon = null;
+        if (ObjectUtils.isEmpty(exportMode) || ObjectUtils.isEmpty(exportMode.getMode())) {
+            return syncCon;
+        }
         if ("increment".equalsIgnoreCase(exportMode.getMode())) {
-            for (DataTransJobDetail.Column field : syncFields) {
-                if (!ObjectUtils.nullSafeEquals(field.getName(), exportMode.getIncreateField())) {
+            for (String field : typeMappings.keySet()) {
+                if (!ObjectUtils.nullSafeEquals(field, exportMode.getIncreateField())) {
                     continue;
                 }
 
-                String synFieldType = typeMappings.getOrDefault(field.getName(), "string");
+                String synFieldType = typeMappings.getOrDefault(field, "string");
                 syncCon = DataTransJobDetail.Sync.SyncCondition.builder()
-                        .field(field.getName())
+                        .field(field)
                         .fieldType(synFieldType)
                         .start(DataTransJobDetail.Sync.SyncCondition.Conditon
                                 .builder()
@@ -208,10 +234,61 @@ public class DtsJobServiceImpl implements DtsJobService {
                                 .enable(0)
                                 .build())
                         .build();
+                break;
             }
         }
 
         return syncCon;
+    }
+
+    // 解析计算任务图
+    private void analysisComputeGraph(DataTransJobDetail.SyncUnit syncUnit,
+                                      String graph) {
+        DataTransJobDetail.Compute compute = new DataTransJobDetail.Compute();
+        if (ObjectUtils.isEmpty(graph)) {
+            return;
+        }
+
+        boolean containSQLNode = false;
+        List<DataTransJobDetail.Compute.Transform> transforms = new ArrayList<>();
+        JsonNode jsonNode = JsonUtils.toJsonNode(graph);
+        for (JsonNode node : jsonNode.get("cells")) {
+
+            String transformType = node.get("shape").asText();
+            if (MetaConstants.CommonConstant.TRANSFORM_SQL.equals(transformType)) {
+                containSQLNode = true;
+            }
+
+            ITransformDriver transformDriver = TRANSFORM_DRIVER_MAP.get(transformType);
+
+            if (!ObjectUtils.isEmpty(transformDriver)) {
+                transforms.add(
+                        DataTransJobDetail
+                                .Compute
+                                .Transform
+                                .builder()
+                                .meta(transformDriver.analysisTransferMeta(node))
+                                .type(transformType)
+                                .build()
+                );
+            }
+        }
+
+        compute.setTransforms(transforms);
+        compute.setCommonSettings(new HashMap<String, Object>() {{
+            put("openai.api_path", ollamaUrl + "/api/chat");
+            put("model", llmModel);
+            put("response_parse", responseParse);
+            put("temperature", temperature);
+            put("inner_prompt", innerPrompt);
+        }});
+
+        // 如果计算过程中存在SQL节点，把reader中的queryFields改成*防止SQL中引用了未映射字段导致报错
+        if (containSQLNode) {
+            syncUnit.getReader().setQueryFields("*");
+        }
+
+        syncUnit.setCompute(compute);
     }
 
     @SneakyThrows
@@ -234,9 +311,15 @@ public class DtsJobServiceImpl implements DtsJobService {
                 )
                 .collect(Collectors.toList());
 
+        String insertFields = jobConf.stream()
+                .map(JobForm.FieldMappingForm::getTargetField)
+                .filter(targetField -> !ObjectUtils.isEmpty(targetField))
+                .collect(Collectors.joining(", "));
+
         return DataTransJobDetail.Writer.builder()
                 .schema(toDs.getDatabase()).connectId(dsServiceImpl.getConnectId(toDs))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
+                .insertFields(insertFields)
                 .tableName(jobBean.getToTbId()).columns(toCols).build();
     }
 
@@ -250,7 +333,7 @@ public class DtsJobServiceImpl implements DtsJobService {
         int status = jobStateForm.getJobStatus();
 
         // 1、实时推送流转进度
-        if (!MetaConstants.JobType.JOB_TYPE_STREAM.equals(jobBean.getType())) {
+        if (MetaConstants.JobType.JOB_TYPE_BATCH.equals(jobBean.getType())) {
             ProducerAdapterForm producerAdapterForm = new ProducerAdapterForm();
             producerAdapterForm.setType(MessageHubConstants.REDIS_STREAM_TYPE);
             producerAdapterForm.setTopic(MessageHubConstants.JOB_PROGRESS_TOPIC);

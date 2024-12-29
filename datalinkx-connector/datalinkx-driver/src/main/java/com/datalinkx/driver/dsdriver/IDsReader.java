@@ -4,23 +4,24 @@ package com.datalinkx.driver.dsdriver;
 import java.util.List;
 
 import com.datalinkx.common.utils.ObjectUtils;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
+import com.datalinkx.driver.model.DataTransJobDetail;
 import org.apache.commons.lang3.StringUtils;
 
 
 public interface IDsReader extends IDsDriver {
+    // ============= Flinkx 引擎
     String retrieveMax(FlinkActionMeta param, String field) throws Exception;
     Object getReaderInfo(FlinkActionMeta param) throws Exception;
-    List<DbTree> tree(Boolean fetchTable) throws Exception;
     List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception;
     List<DbTableField> getFields(String catalog, String schema, String tableName) throws Exception;
 
     default Boolean judgeIncrementalField(String catalog, String schema, String tableName, String field) throws Exception {
         return false;
     }
-
     default String genWhere(FlinkActionMeta unit) throws Exception {
 
         if (unit.getReader().getSync().getSyncCondition() != null) {
@@ -53,4 +54,14 @@ public interface IDsReader extends IDsDriver {
         return " (1=1) ";
     }
 
+    // ============= Seatunnel引擎
+    // 构造seatunnel引擎读信息
+    default TransformNode getSourceInfo(FlinkActionMeta unit) throws Exception {
+        return null;
+    }
+
+    // 构造seatunnel引擎source中sql
+    default String transferSourceSQL(FlinkActionMeta unit) {
+        return "";
+    }
 }

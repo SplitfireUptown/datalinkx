@@ -4,13 +4,10 @@ import static com.datalinkx.common.utils.IdUtils.genKey;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.lang.Pair;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
@@ -20,6 +17,7 @@ import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
+import com.datalinkx.dataserver.client.HttpConstructor;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
@@ -30,6 +28,7 @@ import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
+import com.datalinkx.driver.dsdriver.httpdriver.HttpSetupInfo;
 import com.datalinkx.driver.dsdriver.kafkadriver.KafkaSetupInfo;
 import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
 import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
@@ -105,6 +104,18 @@ public class DsServiceImpl implements DsService {
 		if (!ObjectUtils.isEmpty(dsBean.getConfig())) {
 			try {
 				Map map = JsonUtils.toObject(dsBean.getConfig(), Map.class);
+
+				// HTTP数据源校验url是否合法
+				if (MetaConstants.DsType.HTTP.equals(dsBean.getType())) {
+					String url = (String) map.get("url");
+					if (ObjectUtils.isEmpty(url)) {
+						throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "接口地址未配置");
+					}
+
+					if (!url.contains("http") && !url.contains("https")) {
+						throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "接口地址格式不正确，请包含协议");
+					}
+				}
 			} catch (Exception e) {
 				log.error("dsbean config json format error", e);
 				throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "数据源附加信息转化Json格式异常");
@@ -152,9 +163,13 @@ public class DsServiceImpl implements DsService {
 				oracleSetupInfo.setUid(dsBean.getUsername());
 
 				Map configMap = JsonUtils.toObject(dsBean.getConfig(), Map.class);
-				oracleSetupInfo.setSid((String) configMap.get("sid"));
-				oracleSetupInfo.setSubtype((String) configMap.getOrDefault("subtype", "BASIC"));
-				oracleSetupInfo.setAlias((String) configMap.getOrDefault("alias", "SID"));
+				if (configMap.containsKey("sid")) {
+					oracleSetupInfo.setConnectType("SID");
+					oracleSetupInfo.setSid((String) configMap.get("sid"));
+				} else {
+					oracleSetupInfo.setConnectType("SERVERNAME");
+					oracleSetupInfo.setSid((String) configMap.get("servername"));
+				}
 
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(oracleSetupInfo));
 			case "redis":
@@ -165,6 +180,13 @@ public class DsServiceImpl implements DsService {
 				redisSetupInfo.setPwd(dsBean.getPassword());
 				redisSetupInfo.setType(toType);
 				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(redisSetupInfo));
+			case "http":
+				HttpSetupInfo httpSetupInfo = JsonUtils.toObject(dsBean.getConfig(), HttpSetupInfo.class);
+				Pair<String, Integer> host = HttpConstructor.checkUrlFormat(httpSetupInfo.getUrl());
+				httpSetupInfo.setHost(host.getKey());
+				httpSetupInfo.setPort(host.getValue());
+				httpSetupInfo.setType(toType);
+				return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(httpSetupInfo));
 			case "kafka":
 				KafkaSetupInfo kafkaSetupInfo = new KafkaSetupInfo();
 				kafkaSetupInfo.setServer(dsBean.getHost());
@@ -227,6 +249,7 @@ public class DsServiceImpl implements DsService {
 		dsBean.setPort(form.getPort());
 		dsBean.setName(form.getName());
 		dsBean.setDatabase(form.getDatabase());
+		dsBean.setConfig(form.getConfig());
 		dsRepository.save(dsBean);
 	}
 
@@ -248,7 +271,8 @@ public class DsServiceImpl implements DsService {
 	}
 
 	public List<DsBean> list() {
-		return dsRepository.findAllByIsDel(0);
+		return dsRepository.findAllByIsDel(0).stream()
+				.sorted(Comparator.comparing(DsBean::getType)).collect(Collectors.toList());
 	}
 
 

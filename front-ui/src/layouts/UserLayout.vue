@@ -9,7 +9,7 @@
         <div class="top">
           <div class="header">
             <a href="/">
-<!--              <img src="~@/assets/logo.svg" class="logo" alt="logo">-->
+              <!--              <img src="~@/assets/logo.svg" class="logo" alt="logo">-->
               <span class="title">DatalinkX</span>
             </a>
           </div>
@@ -20,16 +20,16 @@
 
         <router-view />
 
-<!--        <div class="footer">-->
-<!--          <div class="links">-->
-<!--            <a href="_self">帮助</a>-->
-<!--            <a href="_self">隐私</a>-->
-<!--            <a href="_self">条款</a>-->
-<!--          </div>-->
-<!--          <div class="copyright">-->
-<!--            Copyright &copy; 2018 vueComponent-->
-<!--          </div>-->
-<!--        </div>-->
+        <!--        <div class="footer">-->
+        <!--          <div class="links">-->
+        <!--            <a href="_self">帮助</a>-->
+        <!--            <a href="_self">隐私</a>-->
+        <!--            <a href="_self">条款</a>-->
+        <!--          </div>-->
+        <!--          <div class="copyright">-->
+        <!--            Copyright &copy; 2018 vueComponent-->
+        <!--          </div>-->
+        <!--        </div>-->
       </div>
     </div>
   </div>

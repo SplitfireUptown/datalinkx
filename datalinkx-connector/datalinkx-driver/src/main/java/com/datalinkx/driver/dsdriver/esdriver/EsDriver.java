@@ -154,28 +154,6 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
         return readerInfo;
     }
 
-    @Override
-    public List<DbTree> tree(Boolean fetchTable) throws Exception {
-        List<String> indexes = esService.getIndexes();
-        DbTree dbTree = new DbTree();
-        dbTree.setRef(RefUtils.encode(Lists.newArrayList("", null, null)));
-        dbTree.setName("");
-        dbTree.setLevel("catalog");
-        dbTree.setTable(new ArrayList<>());
-        if (fetchTable) {
-            indexes.forEach(idx -> {
-                DbTree.DbTreeTable dbTreeTable = new DbTree.DbTreeTable();
-                dbTreeTable.setName(idx);
-                dbTreeTable.setRemark("");
-                dbTreeTable.setType("table");
-                dbTreeTable.setLevel("table");
-                dbTreeTable.setRef(RefUtils.encode(Lists.newArrayList("", null, idx)));
-                dbTree.getTable().add(dbTreeTable);
-            });
-        }
-
-        return Lists.newArrayList(dbTree);
-    }
 
     @Override
     public List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception {

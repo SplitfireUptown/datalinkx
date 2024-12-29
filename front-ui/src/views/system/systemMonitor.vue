@@ -17,14 +17,14 @@
   </a-card>
 </template>
 <script>
-import { Card, Table } from 'ant-design-vue';
+import { Card, Table } from 'ant-design-vue'
 import { getSystemMonitor } from '@/api/system/monitor'
 
 export default {
   components: {
-    'a-card': Card,
+    'a-card': Card
   },
-  data() {
+  data () {
     return {
       systemStatus: {
         totalDisk: '',
@@ -38,14 +38,14 @@ export default {
         jvmMemorySize: '',
         jvmMemoryUsed: '',
         memoryRate: '',
-        machineMemorySize: '',
-      },
-    };
+        machineMemorySize: ''
+      }
+    }
   },
   created () {
     getSystemMonitor().then(res => {
       this.systemStatus = res.result
     })
   }
-};
+}
 </script>

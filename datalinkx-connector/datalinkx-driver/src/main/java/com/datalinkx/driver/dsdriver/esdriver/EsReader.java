@@ -26,8 +26,6 @@ public class EsReader extends AbstractReader {
     private Long batchSize;
     private String username;
     private String password;
-    private String kerberosKrb5Path;
-    private String kerberosJaasPath;
     private Long timeout;
     List<MetaColumn> column;
 }

@@ -6,11 +6,13 @@ import static com.datalinkx.common.utils.IdUtils.genKey;
 import static com.datalinkx.common.utils.JsonUtils.toJson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
@@ -30,6 +32,7 @@ import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.JobService;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -81,6 +84,8 @@ public class JobServiceImpl implements JobService {
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 		jobBean.setName(form.getJobName());
 		jobBean.setCover(form.getCover());
+		jobBean.setGraph(form.getGraph());
+		jobBean.setType(form.getType());
 
 		// 创建 xxljob
 		String xxlJobId = jobClientApi.add(form.getSchedulerConf(), XxlJobParam.builder().jobId(jobId).build());
@@ -103,8 +108,43 @@ public class JobServiceImpl implements JobService {
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 		jobBean.setName(form.getJobName());
 		jobBean.setCover(form.getCover());
+		jobBean.setGraph(form.getGraph());
 		jobRepository.save(jobBean);
 		return form.getJobId();
+	}
+
+	// 校验计算任务transform graph是否合法
+	private void validTransformGraph(DsBean fromDsBean, JobForm.JobCreateForm form) {
+		if (ObjectUtils.isEmpty(form.getGraph())) {
+			return;
+		}
+
+		Map<String, Integer> nodeBook = new HashMap<>();
+		JsonNode jsonNode = JsonUtils.toJsonNode(form.getGraph());
+		for (JsonNode node : jsonNode.get("cells")) {
+			String nodeType = node.get("shape").asText();
+			if ("edge".equals(nodeType)) {
+				continue;
+			}
+
+			nodeBook.put(nodeType, nodeBook.getOrDefault(nodeType, 0) + 1);
+		}
+
+		// 目前只支持画布中三个节点, 前端太难写了，GPT都救不了，实在写不下去了。。。。
+		if (nodeBook.keySet().size() > 3) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "仅支持单source输入节点、单输出sink节点、单transform节点");
+		}
+
+		// 目前只支持单source输入节点、单输出sink节点、单transform节点
+		List<Integer> normalNodeNum = nodeBook.values().stream().filter(v -> v > 1).collect(Collectors.toList());
+		if (!ObjectUtils.isEmpty(normalNodeNum)) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "仅支持单source输入节点、单输出sink节点、单transform节点");
+		}
+
+		// 如果来源数据源是http数据源，SQL算子无意义
+		if (MetaConstants.DsType.HTTP.equals(fromDsBean.getType()) && nodeBook.containsKey("sql")) {
+			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "HTTP数据源不支持SQL算子");
+		}
 	}
 
 	// 校验流转任务配置合法
@@ -144,6 +184,8 @@ public class JobServiceImpl implements JobService {
 		if (ObjectUtils.isEmpty(form.getSchedulerConf()) && !ObjectUtils.nullSafeEquals(form.getType(), MetaConstants.JobType.JOB_TYPE_STREAM)) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "批式流转任务需要配置crontab表达式");
 		}
+		// 6、校验计算任务transform graph是否合法
+		this.validTransformGraph(fromDsBean, form);
 	}
 
 
@@ -172,6 +214,7 @@ public class JobServiceImpl implements JobService {
 				.toTbName(jobBean.getToTbId())
 				.schedulerConf(jobBean.getCrontab())
 				.cover(jobBean.getCover())
+				.graph(jobBean.getGraph())
 				.syncMode(JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class))
 				.build();
 
@@ -253,12 +296,13 @@ public class JobServiceImpl implements JobService {
 		return result;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public void jobStop(String jobId) {
 		jobRepository.updateJobStatus(jobId, JOB_STATUS_STOP);
 		jobClientApi.stop(jobId);
 	}
 
 	public List<JobVo.JobId2NameVo> list() {
-		return jobRepository.findAll().stream().map(v -> JobVo.JobId2NameVo.builder().JobId(v.getJobId()).jobName(v.getName()).build()).collect(Collectors.toList());
+		return jobRepository.findAll().stream().map(v -> JobVo.JobId2NameVo.builder().JobId(v.getJobId()).jobName(v.getName()).type(v.getType()).build()).collect(Collectors.toList());
 	}
 }

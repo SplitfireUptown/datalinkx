@@ -26,7 +26,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
         >
-          <span>{{currentDs.label}}</span>
+          <span>{{ currentDs.label }}</span>
         </a-form-item>
 
         <a-form-item
@@ -240,10 +240,10 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           values.type = this.currentDs.dsTypeKey
-          values.dsId = this.dsId
+          values.ds_id = this.dsId
           if (this.currentDs.dsTypeKey === 3) {
             const temp = {}
-            temp[values.servertype] = values[values.servertype]
+            temp[values.servertype] = values['sid']
             values.config = JSON.stringify(temp)
           }
           this.confirmLoading = true
@@ -256,8 +256,7 @@ export default {
                 // 清楚表单数据
                 this.handleCancel()
                 this.$message.success('新增成功')
-              }
-              else{
+              } else {
                 this.confirmLoading = false
                 this.$message.error(res.errstr)
               }
@@ -274,8 +273,7 @@ export default {
                 // 清楚表单数据
                 this.handleCancel()
                 this.$message.success('修改成功')
-              }
-              else{
+              } else {
                 this.confirmLoading = false
                 this.$message.error(res.errstr)
               }

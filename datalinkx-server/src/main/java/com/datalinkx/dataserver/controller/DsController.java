@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
+import com.datalinkx.dataserver.client.HttpConstructor;
 import com.datalinkx.dataserver.controller.form.DsForm;
+import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.service.impl.DsServiceImpl;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import io.swagger.annotations.Api;
@@ -51,10 +54,20 @@ public class DsController {
 		);
 	}
 
+	@PostMapping("/http/test")
+	public WebResult httpTest(@RequestBody JobForm.HttpTestForm httpTestForm) {
+		return WebResult.of(HttpConstructor.go(httpTestForm));
+	}
+
 
 	@GetMapping("/info/{dsId}")
 	public WebResult<DsBean> info(@PathVariable String dsId) {
-		return WebResult.of(dsServiceImpl.info(dsId));
+		try {
+			return WebResult.of(dsServiceImpl.info(dsId));
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			throw new DatalinkXServerException(e);
+		}
 	}
 
 	@PostMapping("/modify")

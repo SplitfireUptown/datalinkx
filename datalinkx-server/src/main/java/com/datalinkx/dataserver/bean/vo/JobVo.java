@@ -121,6 +121,7 @@ public class JobVo {
 		private List<JobForm.FieldMappingForm> fieldMappings;
 		@JsonProperty("sync_mode")
 		private JobForm.SyncModeForm syncMode;
+		private String graph;
 	}
 
 
@@ -155,6 +156,8 @@ public class JobVo {
 		@ApiModelProperty(value = "任务名称")
 		@JsonProperty("job_name")
 		private String jobName;
+		@ApiModelProperty(value = "任务类型")
+		private Integer type;
 	}
 
 	@Data

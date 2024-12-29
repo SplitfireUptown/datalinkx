@@ -22,10 +22,6 @@ import lombok.experimental.SuperBuilder;
 @FieldNameConstants
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamFlinkActionMeta extends EngineActionMeta {
-    // 来源库driver驱动
-    IDsReader dsReader;
-    // 目标库driver驱动
-    IDsWriter dsWriter;
     String readerDsInfo;
     String writerDsInfo;
     String checkpoint;

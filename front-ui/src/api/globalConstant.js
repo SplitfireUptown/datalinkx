@@ -16,6 +16,10 @@ export const DATA_SOURCE_TYPE = [
     value: 4
   },
   {
+    label: 'HTTP',
+    value: 5
+  },
+  {
     label: 'KAFKA',
     value: 100
   }

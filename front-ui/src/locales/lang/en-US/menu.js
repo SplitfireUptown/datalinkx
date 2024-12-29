@@ -9,6 +9,8 @@ export default {
   'menu.streamingTransferTask': 'StreamingTransferTask',
   'menu.tasklist': 'TaskList',
   'menu.tasklistlog': 'TaskExecutionLog',
+  'menu.computeTransferTask': 'JobCompute',
+  'menu.computeTaskList': 'TaskList',
   'menu.taskrelationlist': 'TaskRelationList',
   // 'menu.dashboard': 'Dashboard',
   // 'menu.dashboard.analysis': 'Analysis',

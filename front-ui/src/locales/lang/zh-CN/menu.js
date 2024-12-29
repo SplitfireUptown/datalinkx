@@ -9,6 +9,8 @@ export default {
   'menu.streamingTransferTask': '实时任务',
   'menu.taskList': '任务列表',
   'menu.streamingTaskList': '任务列表',
+  'menu.computeTransferTask': '计算任务',
+  'menu.computeTaskList': '任务列表',
   'menu.tasklistlog': '任务执行日志',
   'menu.taskrelationlist': '任务级联配置',
   'menu.taskrelationmap': '任务血缘',

@@ -1,7 +1,8 @@
 <template>
   <div>
     <div class="sssss">
-      <div class="callback float"
+      <div
+        class="callback float"
         @click="clickDB()"
         @mousedown="down"
         @touchstart="down"
@@ -12,8 +13,8 @@
         @mouseup="end"
         @touchend="end"
         ref="refDB"
-        >
-        <span>{{name}}</span>
+      >
+        <span>{{ name }}</span>
       </div>
     </div>
   </div>
@@ -106,9 +107,9 @@ export default {
         this.xPum = this.dx + this.nx
         this.yPum = this.dy + this.ny
         // 屏幕宽度减去自身控件宽度
-        let width = window.innerWidth - this.$refs.refDB.offsetWidth
+        const width = window.innerWidth - this.$refs.refDB.offsetWidth
         // 屏幕高度减去自身控件高度
-        let height = window.innerHeight - this.$refs.refDB.offsetHeight
+        const height = window.innerHeight - this.$refs.refDB.offsetHeight
         this.xPum < 0 && (this.xPum = 0)
         this.yPum < 0 && (this.yPum = 0)
         this.xPum > width && (this.xPum = width)

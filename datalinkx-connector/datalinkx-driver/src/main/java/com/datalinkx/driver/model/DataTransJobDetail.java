@@ -1,6 +1,7 @@
 package com.datalinkx.driver.model;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,6 +24,7 @@ import lombok.experimental.FieldNameConstants;
 public class DataTransJobDetail {
     @JsonProperty("job_id")
     String jobId;
+    Integer type;
     @JsonProperty("lock_id")
     String lockId;
     @JsonProperty("sync_unit")
@@ -37,9 +39,31 @@ public class DataTransJobDetail {
     public static class SyncUnit {
         Reader reader;
         Writer writer;
+        Compute compute;
         String checkpoint;
     }
 
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Compute {
+        // 算子列表
+        private List<Transform> transforms;
+        // 公共配置
+        private Map<String, Object> commonSettings;
+        @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
+        @Builder
+        public static class Transform {
+            // 算子类型
+            private String type;
+            // 算子内容
+            private String meta;
+        }
+    }
 
     @Data
     @AllArgsConstructor
@@ -54,6 +78,7 @@ public class DataTransJobDetail {
         String connectId;
         String type;
         String maxValue;
+        String queryFields;
     }
 
     @Data
@@ -68,6 +93,7 @@ public class DataTransJobDetail {
         String connectId;
         Integer batchSize;
         String type;
+        String insertFields;
     }
 
     @Data

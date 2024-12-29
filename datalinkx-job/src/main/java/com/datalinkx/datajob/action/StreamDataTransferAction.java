@@ -13,7 +13,7 @@ import com.datalinkx.dataclient.client.flink.FlinkClient;
 import com.datalinkx.dataclient.client.flink.response.FlinkJobStatus;
 import com.datalinkx.datajob.bean.JobStateForm;
 import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.datajob.job.StreamExecutorJobHandler;
+import com.datalinkx.datajob.job.ExecutorStreamJobHandler;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.StreamFlinkActionMeta;
@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,7 +40,7 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
     DatalinkXServerClient datalinkXServerClient;
 
     @Autowired
-    StreamExecutorJobHandler streamExecutorJobHandler;
+    ExecutorStreamJobHandler streamExecutorJobHandler;
 
     @Autowired
     DistributedLock distributedLock;

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface JobRepository extends CRUDRepository<JobBean, String> {
 
+	@Query(value = "select * from JOB where job_id = :jobId", nativeQuery = true)
 	Optional<JobBean> findByJobId(String jobId);
 
 	Optional<JobBean> findByName(String name);

@@ -1,11 +1,11 @@
 <template>
-<div class="ds-list-root">
-  <a-card :bordered="false" class="list-acard">
-    <div class="table-page-search-wrapper">
-      <div style="text-align: center;">敬请期待……</div>
-    </div>
-  </a-card>
-</div>
+  <div class="ds-list-root">
+    <a-card :bordered="false" class="list-acard">
+      <div class="table-page-search-wrapper">
+        <div style="text-align: center;">敬请期待……</div>
+      </div>
+    </a-card>
+  </div>
 </template>
 
 <script>

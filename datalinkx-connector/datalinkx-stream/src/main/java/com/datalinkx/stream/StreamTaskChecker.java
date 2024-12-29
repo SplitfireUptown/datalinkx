@@ -61,7 +61,7 @@ public class StreamTaskChecker extends TimerTask {
 
     @Override
     public void run() {
-        String querySQL = "SELECT job_id, status FROM JOB where type in (1, 3) and is_del = 0";
+        String querySQL = "SELECT job_id, status FROM JOB where type = 1 and status in (1, 3) and is_del = 0";
         List<StreamTaskBean> streamTaskBeans = jdbcTemplate.queryForList(querySQL).stream().map(item ->
                 StreamTaskBean
                 .builder()
@@ -69,6 +69,9 @@ public class StreamTaskChecker extends TimerTask {
                 .status((Integer) item.get("status"))
                 .taskId((String) item.get("task_id"))
                 .build()).collect(Collectors.toList());
+        if (ObjectUtils.isEmpty(streamTaskBeans)) {
+            return;
+        }
 
         try {
             JsonNode jsonNode = flinkClient.jobOverview();
