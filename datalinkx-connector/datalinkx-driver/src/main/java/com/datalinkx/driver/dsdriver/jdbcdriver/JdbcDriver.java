@@ -17,10 +17,15 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.common.utils.TelnetUtil;
+import com.datalinkx.compute.connector.jdbc.JdbcSink;
+import com.datalinkx.compute.connector.jdbc.JdbcSource;
+import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -32,6 +37,7 @@ import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
+import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import com.datalinkx.driver.model.DataTransJobDetail;
@@ -41,11 +47,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
-public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> implements AbstractDriver<T, P, Q>, IDsDriver, IDsReader, IDsWriter {
+public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> implements
+        AbstractDriver<T, P, Q>, IDsDriver, IDsReader, IDsWriter {
 
     protected T jdbcSetupInfo;
     protected String connectId;
-
+    protected String PLUGIN_NAME = "Jdbc";
 
     private static final Set<String> INCREMENTAL_TYPE_SET = new HashSet<>();
     static {
@@ -124,45 +131,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return this.connectId;
     }
 
-    public List<DbTree> tree(Boolean fetchTable) throws Exception {
-        Connection connection = ConnectPool.getConnection(this, Connection.class);
-        try {
-            List<String> catalogs = fetchCatalog(connection);
-            List<DbTree> result = new ArrayList<>();
-
-            if (!ObjectUtils.isEmpty(catalogs)) {
-                List<DbTree> catalogList = catalogs.stream().map(catalog -> {
-                    DbTree catalogItem = new DbTree();
-                    catalogItem.setName(catalog);
-                    catalogItem.setLevel("catalog");
-                    catalogItem.setRef(refEncode(Lists.newArrayList(catalog, null, null)));
-                    List<? extends DbTree> dbTrees = generateTree(catalog, fetchTable, connection);
-                    if (dbTrees.size() > 0) {
-                        if (dbTrees.get(0) instanceof DbTree.DbTreeTable) {
-                            catalogItem.setTable(dbTrees.stream()
-                                    .map(dbTree -> (DbTree.DbTreeTable) dbTree).collect(Collectors.toList()));
-                        } else {
-                            catalogItem.setFolder(dbTrees.stream()
-                                    .map(dbTree -> (DbTree) dbTree).collect(Collectors.toList()));
-                        }
-                    }
-                    return catalogItem;
-                }).collect(Collectors.toList());
-
-                List<DbTree> schemaList = new ArrayList<>();
-                catalogList.forEach(catalog -> schemaList.addAll(catalog.getFolder()));
-                result.addAll(schemaList);
-                return result;
-            } else {
-                List<? extends DbTree> tree = generateTree(null, fetchTable, connection);
-                result.addAll(tree);
-            }
-
-            return result;
-        } finally {
-            ConnectPool.releaseConnection(this.connectId, connection);
-        }
-    }
 
     public List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception {
         Connection connection = ConnectPool.getConnection(this, Connection.class);
@@ -194,25 +162,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
 
-    public List<? extends DbTree> generateTree(String catalog, boolean fetchTable, Connection connection) {
-        List<String> schemas = fetchSchema(catalog, connection);
-        Map<String, List<Map<String, Object>>> result = new HashMap<>();
-        if (schemas == null) {
-            if (fetchTable) {
-                return generateTree(catalog, null, connection);
-            }
-            return new ArrayList<>();
-        }
-
-        return schemas.stream().map(schema -> {
-            DbTree schemaItem = new DbTree();
-            schemaItem.setName(schema);
-            schemaItem.setLevel("schema");
-            schemaItem.setRef(refEncode(Lists.newArrayList(catalog, schema, null)));
-            schemaItem.setTable(fetchTable ? generateTree(catalog, schema, connection) : new ArrayList<>());
-            return schemaItem;
-        }).collect(Collectors.toList());
-    }
 
     public List<DbTree.DbTreeTable> generateTree(String catalog, String schema, Connection connection) {
         List<String> tableList = fetchTable(catalog, schema, connection);
@@ -274,34 +223,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         }
     }
 
-
-    public List<String> fetchCatalog(Connection connection) {
-        ResultSet resultSet = null;
-        List<String> catalogs = new ArrayList<>();
-        try {
-            resultSet = connection.getMetaData().getCatalogs();
-            while (resultSet.next()) {
-                catalogs.add(resultSet.getString("TABLE_CAT"));
-            }
-        } catch (SQLException e) {
-            log.error("fetch catalog error", e);
-        }
-        return catalogs;
-    }
-
-    public List<String> fetchSchema(String catalog, Connection connection) {
-        ResultSet resultSet = null;
-        List<String> schemas = new ArrayList<>();
-        try {
-            resultSet = connection.getMetaData().getSchemas(catalog, null);
-            while (resultSet.next()) {
-                schemas.add(resultSet.getString("TABLE_SCHEM"));
-            }
-        } catch (SQLException e) {
-            log.error("fetch schema error", e);
-        }
-        return schemas;
-    }
 
     public List<String> fetchTable(String catalog, String schema, Connection connection) {
         List<String> tables = new ArrayList<>();
@@ -454,7 +375,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return "'";
     }
 
-
     public String wrapTableName(String catalog, String schema, String tableName) {
         List<String> fullName = new ArrayList<>();
         if (StringUtils.isNotEmpty(catalog)) {
@@ -469,5 +389,71 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
             fullName.add(String.format("%s%s%s", columnQuota(), tableName, columnQuota()));
         }
         return String.join(".", fullName);
+    }
+
+    @Override
+    public TransformNode getSourceInfo(FlinkActionMeta unit) {
+
+        return JdbcSource.builder()
+                .url(this.jdbcUrl())
+                .driver(this.driverClass())
+                .user(this.jdbcSetupInfo.getUid())
+                .password(this.jdbcSetupInfo.getPwd())
+                .query(this.transferSourceSQL(unit))
+                .pluginName(PLUGIN_NAME)
+                .resultTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
+                .build();
+    }
+
+    @Override
+    public String transferSourceSQL(FlinkActionMeta unit) {
+        DataTransJobDetail.Reader reader = unit.getReader();
+
+        String sourceSQL = String.format("select %s from %s.%s", reader.getQueryFields(), reader.getSchema(), reader.getTableName());
+        try {
+
+            String increaseSQL = this.genWhere(unit);
+            if (!ObjectUtils.isEmpty(increaseSQL)) {
+                sourceSQL += String.format(" where %s", increaseSQL);
+            }
+        } catch (Exception e) {
+
+            log.error("gen increase sql error: " + e.getMessage(), e);
+            throw new DatalinkXJobException("生成增量条件SQL失败");
+        }
+
+        return sourceSQL;
+    }
+
+    @Override
+    public TransformNode getSinkInfo(SeatunnelActionMeta param) {
+
+
+        return JdbcSink.builder()
+                .url(this.jdbcUrl())
+                .driver(this.driverClass())
+                .user(this.jdbcSetupInfo.getUid())
+                .password(this.jdbcSetupInfo.getPwd())
+                .pluginName(PLUGIN_NAME)
+                .query(this.transferSinkSQL(param))
+                .build();
+    }
+
+    @Override
+    public String transferSinkSQL(SeatunnelActionMeta param) {
+        DataTransJobDetail.Writer writer = param.getWriter();
+        StringBuilder abstractQuery = new StringBuilder();
+        for (int i = 0; i < writer.getInsertFields().split(",").length; i++) {
+            if (i == 0) {
+
+                abstractQuery.append("?");
+            } else {
+
+                abstractQuery.append(",?");
+            }
+        }
+
+
+        return String.format("insert into %s.%s(%s) values(%s)", writer.getSchema(), writer.getTableName(), writer.getInsertFields(), abstractQuery);
     }
 }

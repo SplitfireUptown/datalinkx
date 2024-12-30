@@ -157,8 +157,8 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     @Override
     protected boolean checkResult(FlinkActionMeta unitParam) throws DatalinkXJobException {
         String taskId = unitParam.getTaskId();
-        if (StringUtils.isEmpty(taskId)) {
-            throw new DatalinkXJobException("flink task id is empty.");
+        if (ObjectUtils.isEmpty(taskId)) {
+            throw new DatalinkXJobException("task id is empty.");
         }
 
 
@@ -173,16 +173,13 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         if ("failed".equalsIgnoreCase(state)) {
             String errorMsg = "data-transfer task failed.";
 
-            if (flinkClient != null) {
-                JsonNode jsonNode = flinkClient.jobExceptions(taskId);
-                if (jsonNode.has("all-exceptions")) {
-                    Iterator<JsonNode> exceptions = jsonNode.get("all-exceptions").elements();
-                    if (exceptions.hasNext()) {
-                        errorMsg = exceptions.next().get("exception").asText();
-                    }
+            JsonNode jsonNode = flinkClient.jobExceptions(taskId);
+            if (jsonNode.has("all-exceptions")) {
+                Iterator<JsonNode> exceptions = jsonNode.get("all-exceptions").elements();
+                if (exceptions.hasNext()) {
+                    errorMsg = exceptions.next().get("exception").asText();
                 }
             }
-
             log.error(errorMsg);
             throw new DatalinkXJobException(errorMsg);
         }

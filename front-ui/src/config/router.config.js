@@ -48,18 +48,6 @@ export const asyncRouterMap = [
             name: 'job',
             component: () => import('@/views/job/JobList.vue'),
             meta: { title: 'menu.taskList', keepAlive: false, icon: taskList }
-          },
-          {
-            path: '/job_relation',
-            name: 'job_relation',
-            component: () => import('@/views/jobrelation/JobRelationList.vue'),
-            meta: { title: 'menu.taskrelationlist', keepAlive: false, icon: taskLog }
-          },
-          {
-            path: '/job_relation_map',
-            name: 'job_map',
-            component: () => import('@/views/jobrelation/JobRelationBloodMap.vue'),
-            meta: { title: 'menu.taskrelationmap', keepAlive: false, icon: taskLog }
           }
         ]
       },
@@ -77,6 +65,33 @@ export const asyncRouterMap = [
             meta: { title: 'menu.streamingTaskList', keepAlive: false, icon: taskList }
           }
         ]
+      },
+      {
+        path: '/compute/transferTask',
+        name: 'computeTransferTask',
+        redirect: '/computeTransferTask/workplace',
+        component: RouteView,
+        meta: { title: 'menu.computeTransferTask', keepAlive: true, icon: task },
+        children: [
+          {
+            path: '/compute/job',
+            name: 'ComputeJob',
+            component: () => import('@/views/job/JobListOfCompute.vue'),
+            meta: { title: 'menu.computeTaskList', keepAlive: false, icon: taskList }
+          }
+        ]
+      },
+      {
+        path: '/job_relation',
+        name: 'job_relation',
+        component: () => import('@/views/jobrelation/JobRelationList.vue'),
+        meta: { title: 'menu.taskrelationlist', keepAlive: false, icon: taskLog }
+      },
+      {
+        path: '/job_relation_map',
+        name: 'job_map',
+        component: () => import('@/views/jobrelation/JobRelationBloodMap.vue'),
+        meta: { title: 'menu.taskrelationmap', keepAlive: false, icon: taskLog }
       },
       {
         path: '/job_log',

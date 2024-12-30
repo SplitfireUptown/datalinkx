@@ -1,6 +1,7 @@
 package com.datalinkx.dataserver.controller.form;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -59,8 +60,10 @@ public class JobForm {
 		private List<FieldMappingForm> fieldMappings;
 		@ApiModelProperty("是否覆盖数据")
 		private Integer cover = 0;
-		@ApiModelProperty("任务类型，1 - 流式 0 - 批式")
+		@ApiModelProperty("任务类型， 2 - 计算, 1 - 流式, 0 - 批式")
 		private Integer type = 0;
+		@JsonProperty("graph")
+		private String graph;
 	}
 
 	@Data
@@ -77,7 +80,6 @@ public class JobForm {
 		private String sourceField;
 		@ApiModelProperty(value = "to表字段名称")
 		private String targetField;
-		private String mappingValue = "string";
 	}
 
 	@Data
@@ -136,5 +138,26 @@ public class JobForm {
 		@JsonProperty("sub_job_id")
 		private String subJobId;
 		private Integer priority;
+	}
+
+	@Data
+	public static class HttpTestForm {
+		@JsonProperty("api_url")
+		private String apiUrl;
+		@JsonProperty("content_type")
+		private String contentType;
+		private List<ItemConfig> header;
+		private List<ItemConfig> param;
+		private List<ItemConfig> body;
+		private String raw;
+		private String method;
+		@JsonProperty("json_path")
+		private String jsonPath;
+	}
+
+	@Data
+	public static final class ItemConfig {
+		private String key;
+		private String value;
 	}
 }

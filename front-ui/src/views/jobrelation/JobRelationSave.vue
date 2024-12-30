@@ -17,11 +17,11 @@
           <a-select
             v-decorator="['job_id', {rules: [{required: true, message: '选择流转任务'}]}]"
             :options="selectJobs"
-            v-model='job_id'
+            v-model="job_id"
             style="display: inline-block; width: 70%"
           >
           </a-select>
-          <a-button type="link" icon='arrows-alt' @click="edit(job_id)">详情</a-button>
+          <a-button type="link" icon="arrows-alt" @click="edit(job_id)">详情</a-button>
         </a-form-item>
 
         <a-form-item
@@ -32,11 +32,11 @@
           <a-select
             v-decorator="['sub_job_id', {rules: [{required: true, message: '选择级联触发流转子任务'}]}]"
             :options="selectJobs"
-            v-model='sub_job_id'
+            v-model="sub_job_id"
             style="display: inline-block; width: 70%"
           >
           </a-select>
-          <a-button type="link" icon='arrows-alt' @click="edit(sub_job_id)">详情</a-button>
+          <a-button type="link" icon="arrows-alt" @click="edit(sub_job_id)">详情</a-button>
         </a-form-item>
         <a-form-item
           label="级联权重"
@@ -133,8 +133,7 @@ export default {
               // 清楚表单数据
               this.handleCancel()
               this.$message.success('新增成功')
-            }
-            else{
+            } else {
               this.confirmLoading = false
               this.$message.error(res.errstr)
             }
@@ -156,11 +155,12 @@ export default {
     init () {
       listQuery().then(res => {
         for (const i of res.result) {
-          this.selectJobs.push({
-            'label': i.job_name,
-            'value': i.job_id
-          })
-          this.loading = false
+          if (i.type !== 1) {
+            this.selectJobs.push({
+              'label': i.job_name,
+              'value': i.job_id
+            })
+          }
         }
         console.log(this.selectJobs)
       }).finally(() => {

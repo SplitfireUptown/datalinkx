@@ -34,6 +34,12 @@ export function streamExec (jobId) {
 }
 export function stop (jobId) {
   return axios({
+    url: `/api/job/stop/${jobId}`,
+    method: 'POST'
+  })
+}
+export function streamStop (jobId) {
+  return axios({
     url: `/api/stream/job/stop/${jobId}`,
     method: 'POST'
   })

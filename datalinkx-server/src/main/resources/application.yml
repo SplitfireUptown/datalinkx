@@ -6,9 +6,9 @@ spring:
     name: datalinkx-server
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 2022nixi00_JK
-    url: jdbc:mysql://60.204.201.0:3306/datalinkx?characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:123456}
+    url: jdbc:mysql://${MYSQL_URL:127.0.0.1}:3306/datalinkx?characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
@@ -22,19 +22,22 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
   redis:
     database: 0       # Redis数据库索引（默认为0）,如果设置为1，那么存入的key-value都存放在select 1中
-    host: 10.0.0.1
-    port: 6600
-    password:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:123456}
     timeout: 10000
+#  elasticsearch:  # 开启大模型时打开注解
+#    rest:
+#      uris:
 
 xxl-job:
-  username:
-  password:
+  username: admin
+  password: 123456
   job-group: 1
   exec-handler: dataTransJobHandler
   executor-route-strategy: FIRST
   client:
-    url: http://127.0.0.1
+    url: http://127.0.0.1:8080
     connect_timeout_ms: 20000
     call_timeout_ms: 600000
     read_timeout_ms: 600000
@@ -90,6 +93,8 @@ retrofit:
     global-log-strategy: body
 
 llm:
-  embedding: "shaw/dmeta-embedding-zh"
+#  embedding: "shaw/dmeta-embedding-zh"
   model: "qwen:7b"
   vector: "elasticsearch"
+  response_parse: "$.message.content"
+  inner_prompt: "不要回答任何多余的说辞和思考过程!只回答我问题的答案，不要长篇大论一句话，越简洁越好"

@@ -13,4 +13,5 @@ public class ClientProperties {
     private ClientConfig.ServicePropertieBean dataserver;
     private ClientConfig.ServicePropertieBean flinkx;
     private ClientConfig.ServicePropertieBean flink;
+    private ClientConfig.ServicePropertieBean seatunnel;
 }

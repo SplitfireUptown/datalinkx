@@ -11,6 +11,7 @@ public class DsForm {
 	@Data
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static final class DsCreateForm {
+		@JsonProperty("ds_id")
 		private String dsId;
 		@ApiModelProperty(value = "数据源创建")
 		@JsonProperty("name")

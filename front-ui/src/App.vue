@@ -150,7 +150,7 @@ export default {
       m.isEdited = true
       m.data.text = message.data.text
     },
-    getTimestamp() {
+    getTimestamp () {
       return new Date().getTime() + Math.random()
     }
   },

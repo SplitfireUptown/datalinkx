@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { pageQuery, delObj, stop, streamExec } from '@/api/job/job'
+import { pageQuery, delObj, streamStop, streamExec } from '@/api/job/job'
 import JobSaveOrUpdateStreaming from '@/views/job/JobSaveOrUpdateStreaming.vue'
 // 0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING
 const StatusType = [
@@ -177,7 +177,7 @@ export default {
       this.$refs.JobSaveOrUpdateStreaming.edit(record.job_id, 'show')
     },
     stopJob (record) {
-      stop(record.job_id).then(res => {
+      streamStop(record.job_id).then(res => {
         this.loading = false
         if (res.status === '0') {
           this.$message.info('停止成功')

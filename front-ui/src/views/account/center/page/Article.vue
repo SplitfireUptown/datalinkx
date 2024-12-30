@@ -17,8 +17,8 @@
         <template slot="description">
           <span>
             <a-tag>DatalinkX</a-tag>
-<!--            <a-tag>设计语言</a-tag>-->
-<!--            <a-tag>蚂蚁金服</a-tag>-->
+            <!--            <a-tag>设计语言</a-tag>-->
+            <!--            <a-tag>蚂蚁金服</a-tag>-->
           </span>
         </template>
       </a-list-item-meta>

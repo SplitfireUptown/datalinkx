@@ -88,7 +88,7 @@ public abstract class AbstractDataTransferAction<T extends DataTransJobDetail, U
                 DataTransferAction.COUNT_RES.remove();
             }, healthCheck);
 
-            // 4、执行flink任务
+            // 4、向引擎提交任务
             try {
                 // 4.1、是否用户取消任务
                 if (isStop()) {
@@ -105,7 +105,7 @@ public abstract class AbstractDataTransferAction<T extends DataTransJobDetail, U
                 // 用户手动取消任务
                 throw e;
             } catch (Throwable e) {
-                log.error("execute flink task error.", e);
+                log.error("execute task error.", e);
                 afterExec(execUnit, false);
                 error.append(e.getMessage()).append("\r\n");
                 this.end(execUnit,  JOB_STATUS_ERROR, error.toString());
