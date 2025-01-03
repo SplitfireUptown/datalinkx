@@ -10,6 +10,7 @@ import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.dataserver.bean.domain.JobBean;
+import com.datalinkx.dataserver.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.client.xxljob.request.LogQueryParam;
 import com.datalinkx.dataserver.client.xxljob.request.PageQueryParam;
 import com.datalinkx.dataserver.client.xxljob.request.XxlJobInfo;

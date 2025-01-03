@@ -120,9 +120,5 @@ seatunnel:
 7. 任务执行
 ![img.png](datalinkx-server/src/main/resources/readme/flink.png)
 
-## datalinkx交流群
-私聊进群我会拉到项目交流群中
-![输入图片说明](datalinkx-server/src/main/resources/readme/author.png)
-
 ## 项目文档
 [细致文档带你吃透DatalinkX](https://note.youdao.com/s/a9ltzlc1)
