@@ -9,6 +9,7 @@ import java.util.Map;
 public final class MetaConstants {
     private MetaConstants() {
     }
+
     /**
      * 数据源类型管理
      */
@@ -73,6 +74,51 @@ public final class MetaConstants {
         public static final String SQL_OUTPUT_TABLE = "sql_output";
         public static final String TRANSFORM_SQL = "sql";
         public static final String TRANSFORM_LLM = "llm";
+
+        /**
+         * 令牌
+         */
+        public static final String TOKEN = "token";
+        /**
+         * 令牌前缀
+         */
+        public static final String LOGIN_USER_KEY = "login_user_key";
+        /**
+         * 令牌前缀
+         */
+        public static final String TOKEN_PREFIX = "Bearer ";
+        /**
+         * www主域
+         */
+        public static final String WWW = "www.";
+
+        /**
+         * http请求
+         */
+        public static final String HTTP = "http://";
+
+        /**
+         * https请求
+         */
+        public static final String HTTPS = "https://";
+
+        /**
+         * 所有权限标识
+         */
+        public static final String ALL_PERMISSION = "*:*:*";
+
+        /**
+         * 管理员角色权限标识
+         */
+        public static final String SUPER_ADMIN = "admin";
+        /**
+         * 角色权限分隔符
+         */
+        public static final String ROLE_DELIMETER = ",";
+        /**
+         * 权限标识分隔符
+         */
+        public static final String PERMISSION_DELIMETER = ",";
     }
 
     public static class CopilotConstant {

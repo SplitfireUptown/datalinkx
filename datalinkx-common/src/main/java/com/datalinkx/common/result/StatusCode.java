@@ -18,8 +18,11 @@ public enum StatusCode {
     JOB_CONFIG_ERROR(1003),
     JOB_IS_STOP(1004),
 
-
-    XTB_NOT_EXISTS(2000);
+    XTB_NOT_EXISTS(2000),
+    /**
+     * 未授权
+     */
+    UNAUTHORIZED(401);
 
     private final int value;
 
