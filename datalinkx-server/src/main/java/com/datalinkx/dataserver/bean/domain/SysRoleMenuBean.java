@@ -24,7 +24,7 @@ import java.util.Objects;
 @DynamicUpdate
 @Entity
 @IdClass(SysRoleMenuId.class)
-@Table(name = "sys_role_menu", schema = "datalinkx", catalog = "")
+@Table(name = "sys_role_menu")
 public class SysRoleMenuBean {
     @Id
     @Column(name = "role_id")

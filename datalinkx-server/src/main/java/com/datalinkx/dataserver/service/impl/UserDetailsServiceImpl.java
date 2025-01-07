@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -27,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Autowired
-    private ISysUserService userService;
+    private ISysUserService sysUserService;
 
     @Autowired
     private SysPasswordService passwordService;
@@ -36,8 +35,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private SysPermissionService permissionService;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        SysUserBean user = userService.selectUserByUserName(username);
+    public UserDetails loadUserByUsername(String username) throws DatalinkXServerException {
+        SysUserBean user = sysUserService.selectUserByUserName(username);
         if (Objects.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
             throw new DatalinkXServerException("user.not.exists");

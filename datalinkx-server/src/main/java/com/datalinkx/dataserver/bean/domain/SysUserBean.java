@@ -25,7 +25,7 @@ import java.util.Objects;
 @DynamicInsert
 @DynamicUpdate
 @Entity
-@Table(name = "sys_user", schema = "datalinkx", catalog = "")
+@Table(name = "sys_user")
 public class SysUserBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -62,7 +62,7 @@ public class SysUserBean {
     @Column(name = "status")
     private String status;
     @Basic
-    @Column(name = "del_flag")
+    @Column(name = "is_del")
     private String delFlag;
     @Basic
     @Column(name = "login_ip")
@@ -90,6 +90,10 @@ public class SysUserBean {
      */
     @Transient
     private List<SysRoleBean> roles;
+
+    public static boolean isAdmin(Long userId) {
+        return userId != null && 1L == userId;
+    }
 
     public long getUserId() {
         return userId;
@@ -243,14 +247,10 @@ public class SysUserBean {
         this.remark = remark;
     }
 
+
     public boolean isAdmin() {
         return isAdmin(this.userId);
     }
-
-    public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -263,5 +263,15 @@ public class SysUserBean {
     @Override
     public int hashCode() {
         return Objects.hash(userId, deptId, userName, nickName, userType, email, phonenumber, sex, avatar, password, status, delFlag, loginIp, loginDate, createBy, createTime, updateBy, updateTime, remark);
+    }
+
+
+    public List<SysRoleBean> getRoles() {
+        return roles;
+    }
+
+
+    public void setRoles(List<SysRoleBean> roles) {
+        this.roles = roles;
     }
 }

@@ -25,7 +25,7 @@ import java.util.Set;
 @DynamicInsert
 @DynamicUpdate
 @Entity
-@Table(name = "sys_role", schema = "datalinkx", catalog = "")
+@Table(name = "sys_role")
 public class SysRoleBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -53,7 +53,7 @@ public class SysRoleBean {
     @Column(name = "status")
     private String status;
     @Basic
-    @Column(name = "del_flag")
+    @Column(name = "is_del")
     private String delFlag;
     @Basic
     @Column(name = "create_by")
@@ -76,17 +76,16 @@ public class SysRoleBean {
     @Transient
     private Set<String> permissions;
 
+    public static boolean isAdmin(Long roleId) {
+        return roleId != null && 1L == roleId;
+    }
+
     public void setPermissions(Set<String> permissions) {
         this.permissions = permissions;
     }
 
-
     public boolean isAdmin() {
         return isAdmin(this.roleId);
-    }
-
-    public static boolean isAdmin(Long roleId) {
-        return roleId != null && 1L == roleId;
     }
 
     public long getRoleId() {

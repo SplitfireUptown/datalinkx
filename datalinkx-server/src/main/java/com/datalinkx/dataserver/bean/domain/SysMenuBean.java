@@ -26,12 +26,12 @@ import java.util.Objects;
 @DynamicInsert
 @DynamicUpdate
 @Entity
-@Table(name = "sys_menu", schema = "datalinkx", catalog = "")
+@Table(name = "sys_menu")
 public class SysMenuBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "menu_id")
-    private long menuId;
+    private Long menuId;
     @Basic
     @Column(name = "menu_name")
     private String menuName;
@@ -92,7 +92,7 @@ public class SysMenuBean {
     @Transient
     private List<SysMenuBean> children = new ArrayList<>();
 
-    public long getMenuId() {
+    public Long getMenuId() {
         return menuId;
     }
 

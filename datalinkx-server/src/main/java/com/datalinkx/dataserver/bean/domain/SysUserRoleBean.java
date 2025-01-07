@@ -24,7 +24,7 @@ import java.util.Objects;
 @DynamicUpdate
 @Entity
 @IdClass(SysUserRoleId.class)
-@Table(name = "sys_user_role", schema = "datalinkx", catalog = "")
+@Table(name = "sys_user_role")
 public class SysUserRoleBean {
     @Id
     @Column(name = "user_id")

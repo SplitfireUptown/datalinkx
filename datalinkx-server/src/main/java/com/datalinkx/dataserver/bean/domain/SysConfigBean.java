@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-@Table(name = "sys_config", schema = "datalinkx", catalog = "")
+@Table(name = "sys_config")
 public class SysConfigBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

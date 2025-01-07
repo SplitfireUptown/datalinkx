@@ -58,9 +58,9 @@ public class SysLoginService {
             // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
             authentication = authenticationManager.authenticate(authenticationToken);
         } catch (Exception e) {
-            if (e instanceof BadCredentialsException) {
+            if (e.getCause() instanceof BadCredentialsException) {
 //                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.password.not.match")));
-                throw new DatalinkXServerException("user.password.not.match");
+                throw new DatalinkXServerException(e.getCause().getMessage());
             } else {
 //                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, e.getMessage()));
                 throw new ServiceException(e.getMessage());

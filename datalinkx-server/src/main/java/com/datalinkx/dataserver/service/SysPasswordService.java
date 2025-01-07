@@ -2,13 +2,13 @@ package com.datalinkx.dataserver.service;
 
 
 import com.datalinkx.common.constants.CacheConstants;
-import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.dataserver.bean.domain.SysUserBean;
 import com.datalinkx.dataserver.security.context.AuthenticationContextHolder;
 import com.datalinkx.dataserver.utils.RedisCache;
 import com.datalinkx.dataserver.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -52,13 +52,13 @@ public class SysPasswordService {
         }
 
         if (retryCount >= Integer.valueOf(maxRetryCount).intValue()) {
-            throw new DatalinkXServerException("密码错误次数超过限制");
+            throw new BadCredentialsException("user.password.retry.limit.exceed");
         }
 
         if (!matches(user, password)) {
             retryCount = retryCount + 1;
             redisCache.setCacheObject(getCacheKey(username), retryCount, lockTime, TimeUnit.MINUTES);
-            throw new DatalinkXServerException("密码错误");
+            throw new BadCredentialsException("user.password.not.match");
         } else {
             clearLoginRecordCache(username);
         }
