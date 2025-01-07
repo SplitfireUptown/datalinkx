@@ -4,6 +4,7 @@ import static com.datalinkx.common.constants.MetaConstants.CommonConstant.TRACE_
 
 import java.util.Optional;
 
+import com.datalinkx.common.exception.DatalinkXServerException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,9 @@ public class WebResult<T> {
 	}
 
 	public static <T> WebResult<T> fail(Throwable throwable) {
-		log.error(throwable.getMessage(), throwable);
+		if (!(throwable instanceof DatalinkXServerException)) {
+			log.error(throwable.getMessage(), throwable);
+		}
 		WebResult<T> r = newInstance();
 		r.setStatus("500");
 		r.setErrstr(throwable.getMessage());
@@ -63,7 +66,9 @@ public class WebResult<T> {
 	}
 
 	public static <T> WebResult<T> fail(Throwable throwable, T o) {
-		log.error(throwable.getMessage(), throwable);
+		if (!(throwable instanceof DatalinkXServerException)) {
+			log.error(throwable.getMessage(), throwable);
+		}
 		String msg = Optional.ofNullable(throwable.getCause())
 				.map(s -> s.getMessage() + ",")
 				.orElse("") + throwable.getMessage();

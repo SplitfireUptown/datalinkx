@@ -51,14 +51,14 @@ public class SysPasswordService {
             retryCount = 0;
         }
 
-        if (retryCount >= Integer.valueOf(maxRetryCount).intValue()) {
-            throw new BadCredentialsException("user.password.retry.limit.exceed");
+        if (retryCount >= maxRetryCount) {
+            throw new BadCredentialsException("user.login.message-retry-limit-exceed");
         }
 
         if (!matches(user, password)) {
             retryCount = retryCount + 1;
             redisCache.setCacheObject(getCacheKey(username), retryCount, lockTime, TimeUnit.MINUTES);
-            throw new BadCredentialsException("user.password.not.match");
+            throw new BadCredentialsException("user.login.message-invalid-credentials");
         } else {
             clearLoginRecordCache(username);
         }

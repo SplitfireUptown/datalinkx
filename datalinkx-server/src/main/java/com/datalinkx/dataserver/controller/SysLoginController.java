@@ -11,6 +11,7 @@ import com.datalinkx.dataserver.service.ISysMenuService;
 import com.datalinkx.dataserver.service.SysLoginService;
 import com.datalinkx.dataserver.service.SysPermissionService;
 import com.datalinkx.dataserver.service.TokenService;
+import com.datalinkx.dataserver.utils.RSAEncrypt;
 import com.datalinkx.dataserver.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,8 +49,8 @@ public class SysLoginController {
      * @return 结果
      */
     @PostMapping("/login")
-    public WebResult<HashMap<String, String>> login(@RequestBody LoginBody loginBody) {
-
+    public WebResult<HashMap<String, String>> login(@RequestBody LoginBody loginBody) throws Exception {
+        loginBody.setPassword(RSAEncrypt.decrypt(loginBody.getPassword()));
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
                 loginBody.getUuid());
@@ -63,7 +64,7 @@ public class SysLoginController {
      *
      * @return 用户信息
      */
-    @GetMapping("getInfo")
+    @GetMapping("/user/info")
     public WebResult<HashMap<String, Object>> getInfo() {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         SysUserBean user = loginUser.getUser();
@@ -93,5 +94,13 @@ public class SysLoginController {
         List<SysMenuBean> menus = menuService.selectMenuTreeByUserId(userId);
 
         return WebResult.of(menuService.buildMenus(menus));
+    }
+
+    /**
+     * 获取公钥
+     */
+    @GetMapping("getPubKey")
+    public WebResult<String> getPubKey() {
+        return WebResult.of(RSAEncrypt.getPubKey());
     }
 }

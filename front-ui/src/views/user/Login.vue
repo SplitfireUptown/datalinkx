@@ -13,7 +13,7 @@
         @change="handleTabClick"
       >
         <a-tab-pane key="tab1" :tab="$t('user.login.tab-login-credentials')">
-          <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" :message="$t('user.login.message-invalid-credentials')" />
+          <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" :message="message" />
           <a-form-item>
             <a-input
               size="large"
@@ -88,11 +88,11 @@
 </template>
 
 <script>
-import md5 from 'md5'
 import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
 import { mapActions } from 'vuex'
 import { timeFix } from '@/utils/util'
 import { getSmsCaptcha, get2step } from '@/api/login'
+import { encrypt } from '@/utils/encrypt'
 
 export default {
   components: {
@@ -105,6 +105,7 @@ export default {
       // login type: 0 email, 1 username, 2 telephone
       loginType: 0,
       isLoginError: false,
+      message: '',
       requiredTwoStepCaptcha: false,
       stepCaptchaVisible: false,
       form: this.$form.createForm(this),
@@ -163,20 +164,22 @@ export default {
           const loginParams = { ...values }
           delete loginParams.username
           loginParams[!state.loginType ? 'email' : 'username'] = values.username
-          loginParams.password = md5(values.password)
-          Login(loginParams)
-            .then((res) => {
-              console.log(res)
-              if (res.status !== 200) {
-                this.requestFailed(res)
-              } else {
-                this.loginSuccess(res)
-              }
-            })
-            .catch(err => this.requestFailed(err))
-            .finally(() => {
-              state.loginBtn = false
-            })
+          encrypt(values.password).then(res => {
+            loginParams.password = res
+            Login(loginParams)
+              .then((res) => {
+                console.log(res)
+                if (res.status !== '0') {
+                  this.requestFailed(res)
+                } else {
+                  this.loginSuccess(res)
+                }
+              })
+              .catch(err => this.requestFailed(err))
+              .finally(() => {
+                state.loginBtn = false
+              })
+          })
         } else {
           setTimeout(() => {
             state.loginBtn = false
@@ -252,12 +255,7 @@ export default {
     },
     requestFailed (err) {
       this.isLoginError = true
-      var errstr = ((err || {}).errstr || {}) || '请求出现错误，请稍后再试'
-      this.$notification['error']({
-        message: '错误',
-        description: this.$t(errstr),
-        duration: 4
-      })
+      this.message = this.$t(((err || {}).errstr || {}) || '请求出现错误，请稍后再试')
     }
   }
 }

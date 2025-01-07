@@ -102,7 +102,7 @@ llm:
 # token配置
 token:
   # 令牌自定义标识
-  header: Authorization
+  header: ACCESS-TOKEN
   # 令牌密钥
   secret: NBgkqhkiG9w0BAQEFAASCBKgwggSkA
   # 令牌有效期（默认30分钟）

@@ -42,11 +42,11 @@ function hasRole(roles, route) {
   }
 }
 
-function filterAsyncRouter (routerMap, role) {
+function filterAsyncRouter (routerMap, permissions) {
   const accessedRouters = routerMap.filter(route => {
-    if (hasPermission(role.permissionList, route)) {
+    if (hasPermission(permissions, route)) {
       if (route.children && route.children.length) {
-        route.children = filterAsyncRouter(route.children, role)
+        route.children = filterAsyncRouter(route.children, permissions)
       }
       return true
     }
@@ -69,11 +69,17 @@ const permission = {
   actions: {
     GenerateRoutes ({ commit }, data) {
       return new Promise(resolve => {
-        const { role } = data
+        const { permissions, roles } = data
         const routerMap = cloneDeep(asyncRouterMap)
-        const accessedRouters = filterAsyncRouter(routerMap, role)
-        commit('SET_ROUTERS', accessedRouters)
-        resolve()
+        // 如果是admin角色，直接返回所有菜单
+        if (roles && roles.includes('admin')) {
+          commit('SET_ROUTERS', routerMap)
+          resolve()
+        } else {
+          const accessedRouters = filterAsyncRouter(routerMap, permissions)
+          commit('SET_ROUTERS', accessedRouters)
+          resolve()
+        }
       })
     }
   }

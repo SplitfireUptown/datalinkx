@@ -10,6 +10,7 @@ import com.datalinkx.dataserver.service.SysPermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -39,13 +40,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         SysUserBean user = sysUserService.selectUserByUserName(username);
         if (Objects.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
-            throw new DatalinkXServerException("user.not.exists");
+            throw new BadCredentialsException("user.not.exists");
         } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
             log.info("登录用户：{} 已被删除.", username);
-            throw new DatalinkXServerException("user.password.delete");
+            throw new BadCredentialsException("user.password.delete");
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", username);
-            throw new DatalinkXServerException("user.blocked");
+            throw new BadCredentialsException("user.blocked");
         }
 
         passwordService.validate(user);

@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 const userApi = {
   Login: '/login',
-  Logout: '/auth/logout',
+  Logout: '/logout',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',
   twoStepCode: '/auth/2step-code',
@@ -10,7 +10,8 @@ const userApi = {
   SendSmsErr: '/account/sms_err',
   // get my info
   UserInfo: '/user/info',
-  UserMenu: '/user/nav'
+  UserMenu: '/user/nav',
+  GetPubKey: '/getPubKey'
 }
 
 /**
@@ -76,5 +77,14 @@ export function get2step (parameter) {
     url: userApi.twoStepCode,
     method: 'post',
     data: parameter
+  })
+}
+/**
+ * get public key
+ */
+export function getPubKey () {
+  return request({
+    url: userApi.GetPubKey,
+    method: 'get'
   })
 }
