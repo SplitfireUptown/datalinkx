@@ -70,6 +70,9 @@ import HttpDsSaveOrUpdate from './HttpDsSaveOrUpdate.vue'
 import DsConfig from './DsConfig.vue'
 import { dsTypeList } from './const'
 import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
+import { getCurrentUserNav } from '@/api/login'
+import router from '@/router'
+import { transformMenuToRoutes } from '@/router/generator-routers'
 
 export default {
   name: 'ContainerBottom',
@@ -255,6 +258,12 @@ export default {
     }
   },
   created () {
+    getCurrentUserNav().then(res => {
+      const routers = transformMenuToRoutes(res.result)
+      routers.forEach(item => {
+        router.addRoute(item)
+      })
+    })
     this.init()
     this.getAllDsNumber()
   }

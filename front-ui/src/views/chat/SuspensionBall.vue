@@ -147,7 +147,7 @@ export default {
   height: 90px;
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  background-image: url("../assets/db.png") !important;
+  background-image: url("../../assets/db.png") !important;
   top: 20%;
   right: 1%;
   z-index: 99999;

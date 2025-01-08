@@ -17,20 +17,21 @@ const constantRouterComponents = {
   // 你需要动态引入的页面组件
   Workplace: () => import('@/views/dashboard/Workplace'),
   Analysis: () => import('@/views/dashboard/Analysis'),
+  DsList: () => import('@/views/datasource/DsList'),
 
   // form
-  BasicForm: () => import('@/views/form/basicForm'),
-  StepForm: () => import('@/views/form/stepForm/StepForm'),
-  AdvanceForm: () => import('@/views/form/advancedForm/AdvancedForm'),
+  // BasicForm: () => import('@/views/form/basicForm'),
+  // StepForm: () => import('@/views/form/stepForm/StepForm'),
+  // AdvanceForm: () => import('@/views/form/advancedForm/AdvancedForm'),
 
   // list
-  TableList: () => import('@/views/list/TableList'),
-  StandardList: () => import('@/views/list/BasicList'),
-  CardList: () => import('@/views/list/CardList'),
-  SearchLayout: () => import('@/views/list/search/SearchLayout'),
-  SearchArticles: () => import('@/views/list/search/Article'),
-  SearchProjects: () => import('@/views/list/search/Projects'),
-  SearchApplications: () => import('@/views/list/search/Applications'),
+  // TableList: () => import('@/views/list/TableList'),
+  // StandardList: () => import('@/views/list/BasicList'),
+  // CardList: () => import('@/views/list/CardList'),
+  // SearchLayout: () => import('@/views/list/search/SearchLayout'),
+  // SearchArticles: () => import('@/views/list/search/Article'),
+  // SearchProjects: () => import('@/views/list/search/Projects'),
+  // SearchApplications: () => import('@/views/list/search/Applications'),
   ProfileBasic: () => import('@/views/profile/basic'),
   ProfileAdvanced: () => import('@/views/profile/advanced/Advanced'),
 
@@ -185,5 +186,33 @@ const listToTree = (list, tree, parentId) => {
       // 加入到树中
       tree.push(child)
     }
+  })
+}
+/**
+ * 将后端返回的菜单 JSON 转换为 Vue 路由对象
+ * @param {Array} menuList 后端返回的菜单列表
+ * @returns {Array} Vue 路由对象列表
+ */
+// eslint-disable-next-line no-unused-vars
+export const transformMenuToRoutes = (menuList) => {
+  return menuList.map(menu => {
+    // 转换单个菜单为路由
+    const route = {
+      path: menu.path || '/',
+      name: menu.name || null,
+      meta: {
+        title: menu.menuName,
+        icon: menu.icon || '',
+        perms: menu.perms || '',
+        isCache: menu.isCache === 1,
+        isFrame: menu.isFrame === 1
+      },
+      children: menu.children && menu.children.length > 0
+        ? transformMenuToRoutes(menu.children) // 递归处理子菜单
+        : null
+    }
+    // 动态设置组件，处理特殊情况如 null 或 Layout 类型
+    route.component = constantRouterComponents[menu.component || menu.routeName] || (() => import(`@/views/${menu.component}`))
+    return route
   })
 }

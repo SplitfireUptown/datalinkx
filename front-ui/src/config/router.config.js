@@ -18,7 +18,7 @@ export const asyncRouterMap = [
     path: '/',
     name: 'index',
     component: BasicLayout,
-    meta: { title: 'menu.home' },
+    meta: { title: 'menu.home', permission: ['index'] },
     redirect: '/dashboard',
     children: [
       {
@@ -26,13 +26,13 @@ export const asyncRouterMap = [
         name: 'datasource',
         redirect: '/datasource/workplace',
         component: RouteView,
-        meta: { title: 'menu.batchDataSource', keepAlive: true, icon: dataManage },
+        meta: { title: 'menu.batchDataSource', permission: ['datasource'], keepAlive: true, icon: dataManage },
         children: [
           {
             path: '/dashboard',
             name: 'dashboard',
             component: () => import('@/views/datasource/DsList.vue'),
-            meta: { title: 'menu.datasourceList', keepAlive: false, icon: dataList }
+            meta: { title: 'menu.datasourceList', permission: ['dashboard'], keepAlive: false, icon: dataList }
           }
         ]
       },
@@ -41,13 +41,13 @@ export const asyncRouterMap = [
         name: 'transferTask',
         redirect: '/transferTask/workplace',
         component: RouteView,
-        meta: { title: 'menu.transferTask', keepAlive: true, icon: task },
+        meta: { title: 'menu.transferTask', permission: ['transferTask'], keepAlive: true, icon: task },
         children: [
           {
             path: '/job',
             name: 'job',
             component: () => import('@/views/job/JobList.vue'),
-            meta: { title: 'menu.taskList', keepAlive: false, icon: taskList }
+            meta: { title: 'menu.taskList', permission: ['job'], keepAlive: false, icon: taskList }
           }
         ]
       },
@@ -56,13 +56,13 @@ export const asyncRouterMap = [
         name: 'streamingTransferTask',
         redirect: '/streamingTransferTask/workplace',
         component: RouteView,
-        meta: { title: 'menu.streamingTransferTask', keepAlive: true, icon: task },
+        meta: { title: 'menu.streamingTransferTask', permission: ['streamingTransferTask'], keepAlive: true, icon: task },
         children: [
           {
             path: '/streaming/job',
             name: 'StreamingJob',
             component: () => import('@/views/job/JobListOfStreaming.vue'),
-            meta: { title: 'menu.streamingTaskList', keepAlive: false, icon: taskList }
+            meta: { title: 'menu.streamingTaskList', permission: ['StreamingJob'], keepAlive: false, icon: taskList }
           }
         ]
       },
@@ -71,39 +71,39 @@ export const asyncRouterMap = [
         name: 'computeTransferTask',
         redirect: '/computeTransferTask/workplace',
         component: RouteView,
-        meta: { title: 'menu.computeTransferTask', keepAlive: true, icon: task },
+        meta: { title: 'menu.computeTransferTask', permission: ['computeTransferTask'], keepAlive: true, icon: task },
         children: [
           {
             path: '/compute/job',
             name: 'ComputeJob',
             component: () => import('@/views/job/JobListOfCompute.vue'),
-            meta: { title: 'menu.computeTaskList', keepAlive: false, icon: taskList }
+            meta: { title: 'menu.computeTaskList', permission: ['ComputeJob'], keepAlive: false, icon: taskList }
           }
         ]
       },
       {
         path: '/job_relation',
-        name: 'job_relation',
+        name: 'jobRelation',
         component: () => import('@/views/jobrelation/JobRelationList.vue'),
-        meta: { title: 'menu.taskrelationlist', keepAlive: false, icon: taskLog }
+        meta: { title: 'menu.taskrelationlist', permission: ['jobRelation'], keepAlive: false, icon: taskLog }
       },
       {
         path: '/job_relation_map',
-        name: 'job_map',
+        name: 'jobMap',
         component: () => import('@/views/jobrelation/JobRelationBloodMap.vue'),
-        meta: { title: 'menu.taskrelationmap', keepAlive: false, icon: taskLog }
+        meta: { title: 'menu.taskrelationmap', permission: ['jobMap'], keepAlive: false, icon: taskLog }
       },
       {
         path: '/job_log',
-        name: 'joblog',
+        name: 'jobLog',
         component: () => import('@/views/joblog/JobLogList.vue'),
-        meta: { title: 'menu.tasklistlog', keepAlive: false, icon: taskLog }
+        meta: { title: 'menu.tasklistlog', permission: ['jobLog'], keepAlive: false, icon: taskLog }
       },
       {
         path: '/system/monitor',
         name: 'systemMonitor',
         component: () => import('@/views/system/systemMonitor.vue'),
-        meta: { title: 'menu.systemMonitor', keepAlive: true, icon: task }
+        meta: { title: 'menu.systemMonitor', permission: ['systemMonitor'], keepAlive: true, icon: task }
       }
       // {
       //   path: '/datasource',
@@ -207,6 +207,7 @@ export const constantRouterMap = [
 
   {
     path: '/404',
+    name: '404',
     component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
   }
 ]

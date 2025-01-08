@@ -76,6 +76,7 @@ public class SysLoginController {
             loginUser.setPermissions(permissions);
             tokenService.refreshToken(loginUser);
         }
+        user.setPassword(null);
         HashMap<String, Object> resultMap = new HashMap<>();
         resultMap.put("user", user);
         resultMap.put("roles", roles);

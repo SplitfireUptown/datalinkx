@@ -15,7 +15,10 @@ public class RouterVo {
      * 路由名字
      */
     private String name;
-
+    /**
+     * 菜单名字
+     */
+    private String menuName;
     /**
      * 路由地址
      */
@@ -126,5 +129,13 @@ public class RouterVo {
 
     public void setChildren(List<RouterVo> children) {
         this.children = children;
+    }
+
+    public String getMenuName() {
+        return menuName;
+    }
+
+    public void setMenuName(String menuName) {
+        this.menuName = menuName;
     }
 }

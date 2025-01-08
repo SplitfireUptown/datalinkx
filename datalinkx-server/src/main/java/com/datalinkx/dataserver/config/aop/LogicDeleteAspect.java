@@ -64,7 +64,7 @@ public class LogicDeleteAspect {
     public Object createNativeQuery(ProceedingJoinPoint pjp) throws Throwable {
         Object[] args = pjp.getArgs();
         String nativeSQL = String.valueOf(args[0]);
-        if (nativeSQL.contains("is_del")) {
+        if (nativeSQL.contains("is_del") || nativeSQL.contains("sys_user") || nativeSQL.contains("sys_role") || nativeSQL.contains("sys_menu")) {
             return pjp.proceed();
         } else {
             if (nativeSQL.toUpperCase().contains("WHERE")) {
