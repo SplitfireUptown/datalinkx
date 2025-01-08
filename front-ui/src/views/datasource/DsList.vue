@@ -258,12 +258,6 @@ export default {
     }
   },
   created () {
-    getCurrentUserNav().then(res => {
-      const routers = transformMenuToRoutes(res.result)
-      routers.forEach(item => {
-        router.addRoute(item)
-      })
-    })
     this.init()
     this.getAllDsNumber()
   }

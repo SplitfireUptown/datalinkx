@@ -20,9 +20,9 @@ public class MetaVo {
     private String icon;
 
     /**
-     * 设置为true，则不会被 <keep-alive>缓存
+     * 设置为true，则会被 <keep-alive>缓存
      */
-    private boolean noCache;
+    private boolean isCache;
 
     /**
      * 内链地址（http(s)://开头）
@@ -37,10 +37,10 @@ public class MetaVo {
         this.icon = icon;
     }
 
-    public MetaVo(String title, String icon, boolean noCache) {
+    public MetaVo(String title, String icon, boolean isCache) {
         this.title = title;
         this.icon = icon;
-        this.noCache = noCache;
+        this.isCache = isCache;
     }
 
     public MetaVo(String title, String icon, String link) {
@@ -49,21 +49,21 @@ public class MetaVo {
         this.link = link;
     }
 
-    public MetaVo(String title, String icon, boolean noCache, String link) {
+    public MetaVo(String title, String icon, boolean isCache, String link) {
         this.title = title;
         this.icon = icon;
-        this.noCache = noCache;
+        this.isCache = isCache;
         if (StringUtils.startsWithAny(link, CommonConstant.HTTP, CommonConstant.HTTPS)) {
             this.link = link;
         }
     }
 
-    public boolean isNoCache() {
-        return noCache;
+    public boolean isCache() {
+        return isCache;
     }
 
-    public void setNoCache(boolean noCache) {
-        this.noCache = noCache;
+    public void setIsCache(boolean isCache) {
+        this.isCache = isCache;
     }
 
     public String getTitle() {

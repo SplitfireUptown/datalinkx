@@ -1,7 +1,7 @@
 import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
 import cloneDeep from 'lodash.clonedeep'
 import { getCurrentUserNav } from '@/api/login'
-import { transformMenuToRoutes } from '@/router/generator-routers'
+import { notFoundRouter, transformMenuToRoutes } from '@/router/generator-routers'
 
 /**
  * 过滤账户是否拥有某一个权限，并将菜单从加载列表移除
@@ -71,33 +71,28 @@ const permission = {
   actions: {
     GenerateRoutes ({ commit }, data) {
       return new Promise(resolve => {
-        const { permissions, roles } = data
+        const { permissions } = data
         const routerMap = cloneDeep(asyncRouterMap)
-        // 如果是admin角色，直接返回所有菜单
-        if (roles && roles.includes('admin')) {
-          commit('SET_ROUTERS', routerMap)
-          resolve()
-        } else {
-          const accessedRouters = filterAsyncRouter(routerMap, permissions)
-          getCurrentUserNav().then(res => {
-            const syncRouters = transformMenuToRoutes(res.result)
-            // 合并后端返回的菜单和前端配置的菜单
-            const routers = syncRouters.concat(accessedRouters)
-            // 去重
-            const newRouters = []
-            routers.forEach(item => {
-              const index = newRouters.findIndex(r => r.path === item.path)
-              if (index === -1) {
-                newRouters.push(item)
-              }
-            })
-            console.log('newRouters', newRouters)
-            commit('SET_ROUTERS', newRouters)
-            resolve()
-          }).catch(() => {
-            console.log('获取用户菜单失败')
+        const accessedRouters = filterAsyncRouter(routerMap, permissions)
+        getCurrentUserNav().then(res => {
+          const syncRouters = transformMenuToRoutes(res.result)
+          // 合并后端返回的菜单和前端配置的菜单
+          const routers = syncRouters.concat(accessedRouters)
+          // 去重
+          const newRouters = []
+          routers.forEach(item => {
+            const index = newRouters.findIndex(r => r.path === item.path)
+            if (index === -1) {
+              newRouters.push(item)
+            }
           })
-        }
+          newRouters.push(notFoundRouter)
+          console.log('newRouters', newRouters)
+          commit('SET_ROUTERS', newRouters)
+          resolve()
+        }).catch(() => {
+          console.log('获取用户菜单失败')
+        })
       })
     }
   }

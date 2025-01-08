@@ -2,6 +2,7 @@
 import * as loginService from '@/api/login'
 // eslint-disable-next-line
 import { BasicLayout, BlankLayout, PageView, RouteView } from '@/layouts'
+import { icons } from '@/core/icons'
 
 // 前端路由表 (基于动态)
 const constantRouterComponents = {
@@ -17,7 +18,6 @@ const constantRouterComponents = {
   // 你需要动态引入的页面组件
   Workplace: () => import('@/views/dashboard/Workplace'),
   Analysis: () => import('@/views/dashboard/Analysis'),
-  DsList: () => import('@/views/datasource/DsList'),
 
   // form
   // BasicForm: () => import('@/views/form/basicForm'),
@@ -57,7 +57,7 @@ const constantRouterComponents = {
 }
 
 // 前端未找到页面路由（固定不用改）
-const notFoundRouter = {
+export const notFoundRouter = {
   path: '*',
   redirect: '/404',
   hidden: true
@@ -197,15 +197,15 @@ const listToTree = (list, tree, parentId) => {
 export const transformMenuToRoutes = (menuList) => {
   return menuList.map(menu => {
     // 转换单个菜单为路由
+    const { title, icon, cache } = menu.meta || {}
     const route = {
-      path: menu.path || '/',
-      name: menu.name || null,
+      path: menu.path || '/notFound',
+      name: menu.name || 'notFound',
       meta: {
-        title: menu.menuName,
-        icon: menu.icon || '',
-        perms: menu.perms || '',
-        isCache: menu.isCache === 1,
-        isFrame: menu.isFrame === 1
+        title: title || '',
+        icon: icons[icon] || icons['logo'],
+        permission: menu.name || null,
+        keepAlive: cache
       },
       children: menu.children && menu.children.length > 0
         ? transformMenuToRoutes(menu.children) // 递归处理子菜单

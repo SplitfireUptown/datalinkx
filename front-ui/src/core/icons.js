@@ -18,6 +18,7 @@ import ESPng from '@/assets/icons/ELASTICSEARCH.png'
 import httpPng from '@/assets/icons/HTTP.png'
 import redisPng from '@/assets/icons/REDIS.png'
 import kafkaPng from '@/assets/icons/KAFKA.png'
+import logo from '@/assets/logo.svg?inline'
 
 export {
   bxAnaalyse,
@@ -31,5 +32,22 @@ export {
   ESPng,
   httpPng,
   redisPng,
-  kafkaPng
+  kafkaPng,
+  logo
+}
+
+export const icons = {
+  bxAnaalyse: bxAnaalyse,
+  dataManage: dataManage,
+  dataList: dataList,
+  task: task,
+  taskList: taskList,
+  taskLog: taskLog,
+  mysqlPng: mysqlPng,
+  oraclePng: oraclePng,
+  ESPng: ESPng,
+  httpPng: httpPng,
+  redisPng: redisPng,
+  kafkaPng: kafkaPng,
+  logo: logo
 }
