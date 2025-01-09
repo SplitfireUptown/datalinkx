@@ -12,7 +12,10 @@ public interface SysRoleRepository extends JpaRepository<SysRoleBean, String> {
             "FROM sys_role r " +
             "LEFT JOIN sys_user_role ur ON ur.role_id = r.role_id " +
             "LEFT JOIN sys_user u ON u.user_id = ur.user_id " +
-            "WHERE r.is_del = '0' AND ur.user_id = :userId",
+            "WHERE r.is_del = '0' AND r.status = '0' AND ur.user_id = :userId",
             nativeQuery = true)
-    List<SysRoleBean> selectRolePermissionByUserId(@Param("userId") Long userId);
+    List<SysRoleBean> selectRoleByUserId(@Param("userId") String userId);
+
+    @Query(value = "SELECT * FROM sys_role WHERE is_del = '0' AND status = '0'", nativeQuery = true)
+    List<SysRoleBean> selectRoleAll();
 }

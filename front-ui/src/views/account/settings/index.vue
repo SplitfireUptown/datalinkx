@@ -11,7 +11,7 @@
             @openChange="onOpenChange"
           >
             <a-menu-item key="/account/settings/basic">
-              <router-link :to="{ name: 'BasicSettings' }">
+              <router-link :to="{ name: 'BasicSetting' }">
                 {{ $t('account.settings.menuMap.basic') }}
               </router-link>
             </a-menu-item>

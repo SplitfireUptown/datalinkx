@@ -49,7 +49,9 @@ public interface ISysUserService {
      * @param userId 用户ID
      * @return 用户对象信息
      */
-    public SysUserBean selectUserById(Long userId);
+    public SysUserBean selectUserById(String userId);
+
+    SysUserBean selectUserById(Long userId);
 
     /**
      * 根据用户ID查询用户所属角色组
@@ -103,7 +105,7 @@ public interface ISysUserService {
      *
      * @param userId 用户id
      */
-    public void checkUserDataScope(Long userId);
+    public void checkUserDataScope(String userId);
 
     /**
      * 新增用户信息
@@ -127,7 +129,7 @@ public interface ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    public int updateUser(SysUserBean user);
+    public Integer updateUser(SysUserBean user);
 
     /**
      * 用户授权角色
@@ -135,7 +137,7 @@ public interface ISysUserService {
      * @param userId  用户ID
      * @param roleIds 角色组
      */
-    public void insertUserAuth(Long userId, Long[] roleIds);
+    public void insertUserAuth(String userId, Long[] roleIds);
 
     /**
      * 修改用户状态
@@ -185,7 +187,7 @@ public interface ISysUserService {
      * @param userId 用户ID
      * @return 结果
      */
-    public int deleteUserById(Long userId);
+    public int deleteUserById(String userId);
 
     /**
      * 批量删除用户信息

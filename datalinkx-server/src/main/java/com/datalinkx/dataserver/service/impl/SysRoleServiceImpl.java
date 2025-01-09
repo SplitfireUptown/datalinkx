@@ -29,13 +29,13 @@ public class SysRoleServiceImpl implements ISysRoleService {
     }
 
     @Override
-    public List<SysRoleBean> selectRolesByUserId(Long userId) {
+    public List<SysRoleBean> selectRolesByUserId(String userId) {
         return null;
     }
 
     @Override
-    public Set<String> selectRolePermissionByUserId(Long userId) {
-        List<SysRoleBean> perms = sysRoleRepository.selectRolePermissionByUserId(userId);
+    public Set<String> selectRolePermissionByUserId(String userId) {
+        List<SysRoleBean> perms = sysRoleRepository.selectRoleByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (SysRoleBean perm : perms) {
             if (ObjectUtils.isNotEmpty(perm)) {
@@ -47,16 +47,16 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
     @Override
     public List<SysRoleBean> selectRoleAll() {
+        return sysRoleRepository.selectRoleAll();
+    }
+
+    @Override
+    public List<Long> selectRoleListByUserId(String userId) {
         return null;
     }
 
     @Override
-    public List<Long> selectRoleListByUserId(Long userId) {
-        return null;
-    }
-
-    @Override
-    public SysRoleBean selectRoleById(Long roleId) {
+    public SysRoleBean selectRoleById(String roleId) {
         return null;
     }
 
@@ -81,7 +81,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     }
 
     @Override
-    public int countUserRoleByRoleId(Long roleId) {
+    public int countUserRoleByRoleId(String roleId) {
         return 0;
     }
 
@@ -106,7 +106,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     }
 
     @Override
-    public int deleteRoleById(Long roleId) {
+    public int deleteRoleById(String roleId) {
         return 0;
     }
 
@@ -121,12 +121,12 @@ public class SysRoleServiceImpl implements ISysRoleService {
     }
 
     @Override
-    public int deleteAuthUsers(Long roleId, Long[] userIds) {
+    public int deleteAuthUsers(String roleId, Long[] userIds) {
         return 0;
     }
 
     @Override
-    public int insertAuthUsers(Long roleId, Long[] userIds) {
+    public int insertAuthUsers(String roleId, Long[] userIds) {
         return 0;
     }
 }

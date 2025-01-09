@@ -25,7 +25,7 @@ public class SecurityUtils {
     /**
      * 用户ID
      **/
-    public static Long getUserId() {
+    public static String getUserId() {
         try {
             return getLoginUser().getUserId();
         } catch (Exception e) {
@@ -36,7 +36,7 @@ public class SecurityUtils {
     /**
      * 获取部门ID
      **/
-    public static Long getDeptId() {
+    public static String getDeptId() {
         try {
             return getLoginUser().getDeptId();
         } catch (Exception e) {
@@ -102,8 +102,8 @@ public class SecurityUtils {
      * @param userId 用户ID
      * @return 结果
      */
-    public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
+    public static boolean isAdmin(String userId) {
+        return userId != null && userId.equals("1");
     }
 
     /**

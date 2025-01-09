@@ -14,8 +14,8 @@ import java.util.Objects;
 @NoArgsConstructor
 public class SysUserRoleId implements Serializable {
 
-    private Long userId;
-    private Long roleId;
+    private String userId;
+    private String roleId;
 
     // 必须重写 equals 和 hashCode 方法
     @Override

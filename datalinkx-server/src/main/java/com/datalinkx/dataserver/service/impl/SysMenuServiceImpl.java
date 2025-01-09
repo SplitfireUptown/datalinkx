@@ -22,12 +22,12 @@ public class SysMenuServiceImpl implements ISysMenuService {
     private SysMenuRepository sysMenuRepository;
 
     @Override
-    public List<SysMenuBean> selectMenuList(Long userId) {
+    public List<SysMenuBean> selectMenuList(String userId) {
         return null;
     }
 
     @Override
-    public List<SysMenuBean> selectMenuList(SysMenuBean menu, Long userId) {
+    public List<SysMenuBean> selectMenuList(SysMenuBean menu, String userId) {
         return null;
     }
 
@@ -38,7 +38,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 权限列表
      */
     @Override
-    public Set<String> selectMenuPermsByUserId(Long userId) {
+    public Set<String> selectMenuPermsByUserId(String userId) {
         List<String> perms = sysMenuRepository.selectMenuPermsByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
@@ -56,7 +56,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 权限列表
      */
     @Override
-    public Set<String> selectMenuPermsByRoleId(Long roleId) {
+    public Set<String> selectMenuPermsByRoleId(String roleId) {
         List<String> perms = sysMenuRepository.selectMenuPermsByRoleId(roleId);
         Set<String> permsSet = new HashSet<>();
         for (String perm : perms) {
@@ -68,18 +68,18 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     @Override
-    public List<SysMenuBean> selectMenuTreeByUserId(Long userId) {
+    public List<SysMenuBean> selectMenuTreeByUserId(String userId) {
         List<SysMenuBean> menus = null;
         if (SecurityUtils.isAdmin(userId)) {
             menus = sysMenuRepository.selectMenuTreeAll();
         } else {
             menus = sysMenuRepository.selectMenuTreeByUserId(userId);
         }
-        return getChildPerms(menus, 0);
+        return getChildPerms(menus, "0");
     }
 
     @Override
-    public List<Long> selectMenuListByRoleId(Long roleId) {
+    public List<Long> selectMenuListByRoleId(String roleId) {
         return null;
     }
 
@@ -99,7 +99,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
             router.setPath(getRouterPath(menu));
             router.setComponent(getComponent(menu));
             router.setQuery(menu.getQuery());
-            router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals("1", menu.getIsCache().toString()), menu.getPath()));
+            router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), StringUtils.equals("0", menu.getIsCache().toString()), menu.getPath()));
             List<SysMenuBean> cMenus = menu.getChildren();
             if (ObjectUtils.isNotEmpty(cMenus) && UserConstants.TYPE_DIR.equals(menu.getMenuType())) {
                 router.setAlwaysShow(true);
@@ -116,7 +116,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 children.setQuery(menu.getQuery());
                 childrenList.add(children);
                 router.setChildren(childrenList);
-            } else if (menu.getParentId().intValue() == 0 && isInnerLink(menu)) {
+            } else if (menu.getParentId().equals("0") && isInnerLink(menu)) {
                 router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
                 router.setPath("/");
                 List<RouterVo> childrenList = new ArrayList<RouterVo>();
@@ -145,17 +145,17 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     @Override
-    public SysMenuBean selectMenuById(Long menuId) {
+    public SysMenuBean selectMenuById(String menuId) {
         return null;
     }
 
     @Override
-    public boolean hasChildByMenuId(Long menuId) {
+    public boolean hasChildByMenuId(String menuId) {
         return false;
     }
 
     @Override
-    public boolean checkMenuExistRole(Long menuId) {
+    public boolean checkMenuExistRole(String menuId) {
         return false;
     }
 
@@ -170,7 +170,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     @Override
-    public int deleteMenuById(Long menuId) {
+    public int deleteMenuById(String menuId) {
         return 0;
     }
 
@@ -186,12 +186,12 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @param parentId 传入的父节点ID
      * @return String
      */
-    public List<SysMenuBean> getChildPerms(List<SysMenuBean> list, int parentId) {
+    public List<SysMenuBean> getChildPerms(List<SysMenuBean> list, String parentId) {
         List<SysMenuBean> returnList = new ArrayList<SysMenuBean>();
         for (Iterator<SysMenuBean> iterator = list.iterator(); iterator.hasNext(); ) {
             SysMenuBean t = (SysMenuBean) iterator.next();
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
-            if (t.getParentId() == parentId) {
+            if (Objects.equals(t.getParentId(), parentId)) {
                 recursionFn(list, t);
                 returnList.add(t);
             }
@@ -224,7 +224,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Iterator<SysMenuBean> it = list.iterator();
         while (it.hasNext()) {
             SysMenuBean n = (SysMenuBean) it.next();
-            if (n.getParentId().longValue() == t.getMenuId().longValue()) {
+            if (Objects.equals(n.getParentId(), t.getMenuId())) {
                 tlist.add(n);
             }
         }
@@ -261,16 +261,16 @@ public class SysMenuServiceImpl implements ISysMenuService {
     public String getRouterPath(SysMenuBean menu) {
         String routerPath = menu.getPath();
         // 内链打开外网方式
-        if (menu.getParentId().intValue() != 0 && isInnerLink(menu)) {
+        if (!menu.getParentId().equals("0") && isInnerLink(menu)) {
             routerPath = innerLinkReplaceEach(routerPath);
         }
         // 非外链并且是一级目录（类型为目录）
-        if (0 == menu.getParentId().intValue() && UserConstants.TYPE_DIR.equals(menu.getMenuType())
-                && UserConstants.NO_FRAME.equals(menu.getIsFrame())) {
+        if (menu.getParentId().equals("0") && UserConstants.TYPE_DIR.equals(menu.getMenuType())
+                && UserConstants.NO_FRAME.equals(menu.getIsFrame()) && !routerPath.equals("/")) {
             routerPath = "/" + menu.getPath();
         }
         // 非外链并且是一级目录（类型为菜单）
-        else if (isMenuFrame(menu)) {
+        else if (isMenuFrame(menu) && !routerPath.equals("/")) {
             routerPath = "/";
         }
         return routerPath;
@@ -286,7 +286,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         String component = UserConstants.LAYOUT;
         if (StringUtils.isNotEmpty(menu.getComponent()) && !isMenuFrame(menu)) {
             component = menu.getComponent();
-        } else if (StringUtils.isEmpty(menu.getComponent()) && menu.getParentId().intValue() != 0 && isInnerLink(menu)) {
+        } else if (StringUtils.isEmpty(menu.getComponent()) && !menu.getParentId().equals("0") && isInnerLink(menu)) {
             component = UserConstants.INNER_LINK;
         } else if (StringUtils.isEmpty(menu.getComponent()) && isParentView(menu)) {
             component = UserConstants.PARENT_VIEW;
@@ -302,7 +302,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 结果
      */
     public boolean isMenuFrame(SysMenuBean menu) {
-        return menu.getParentId().intValue() == 0 && UserConstants.TYPE_MENU.equals(menu.getMenuType())
+        return menu.getParentId().equals("0") && UserConstants.TYPE_MENU.equals(menu.getMenuType())
                 && menu.getIsFrame().equals(UserConstants.NO_FRAME);
     }
 
@@ -335,7 +335,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 结果
      */
     public boolean isParentView(SysMenuBean menu) {
-        return menu.getParentId().intValue() != 0 && UserConstants.TYPE_DIR.equals(menu.getMenuType());
+        return !menu.getParentId().equals("0") && UserConstants.TYPE_DIR.equals(menu.getMenuType());
     }
 
     /**

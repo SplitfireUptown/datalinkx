@@ -28,24 +28,24 @@ import java.util.Objects;
 public class SysRoleMenuBean {
     @Id
     @Column(name = "role_id")
-    private long roleId;
+    private String roleId;
     @Id
     @Column(name = "menu_id")
-    private long menuId;
+    private String menuId;
 
-    public long getRoleId() {
+    public String getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(long roleId) {
+    public void setRoleId(String roleId) {
         this.roleId = roleId;
     }
 
-    public long getMenuId() {
+    public String getMenuId() {
         return menuId;
     }
 
-    public void setMenuId(long menuId) {
+    public void setMenuId(String menuId) {
         this.menuId = menuId;
     }
 
@@ -54,7 +54,7 @@ public class SysRoleMenuBean {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SysRoleMenuBean that = (SysRoleMenuBean) o;
-        return roleId == that.roleId && menuId == that.menuId;
+        return Objects.equals(roleId, that.roleId) && Objects.equals(menuId, that.menuId);
     }
 
     @Override

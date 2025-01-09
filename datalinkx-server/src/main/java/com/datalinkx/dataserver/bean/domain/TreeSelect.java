@@ -17,7 +17,7 @@ public class TreeSelect implements Serializable {
     /**
      * 节点ID
      */
-    private Long id;
+    private String id;
 
     /**
      * 节点名称
@@ -46,11 +46,11 @@ public class TreeSelect implements Serializable {
         this.children = menu.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

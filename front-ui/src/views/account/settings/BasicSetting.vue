@@ -2,28 +2,31 @@
   <div class="account-settings-info-view">
     <a-row :gutter="16" type="flex" justify="center">
       <a-col :order="isMobile ? 2 : 1" :md="24" :lg="16">
-
-        <a-form layout="vertical">
+        <a-form layout="vertical" :form="form">
           <a-form-item
             :label="$t('account.settings.basic.nickname')"
+            :required="true"
           >
-            <a-input :placeholder="$t('account.settings.basic.nickname-message')" />
+            <a-input
+              type="text"
+              :placeholder="$t('account.settings.basic.nickname-message')"
+              v-decorator="['nickName']" />
           </a-form-item>
           <a-form-item
             :label="$t('account.settings.basic.profile')"
           >
-            <a-textarea rows="4" :placeholder="$t('account.settings.basic.profile-message')"/>
+            <a-textarea rows="4" :placeholder="$t('account.settings.basic.profile-message')" v-decorator="['remark']" />
           </a-form-item>
 
           <a-form-item
             :label="$t('account.settings.basic.email')"
-            :required="false"
+            :required="true"
           >
-            <a-input placeholder="example@ant.design"/>
+            <a-input type="email" :placeholder="$t('account.settings.basic.email-message')" v-decorator="['email']" />
           </a-form-item>
 
           <a-form-item>
-            <a-button type="primary">{{ $t('account.settings.basic.update') }}</a-button>
+            <a-button type="primary" @click="submitUserInfo">{{ $t('account.settings.basic.update') }}</a-button>
           </a-form-item>
         </a-form>
 
@@ -48,6 +51,7 @@
 <script>
 import AvatarModal from './AvatarModal'
 import { baseMixin } from '@/store/app-mixin'
+import { getUserInfo, updateUserInfo } from '@/api/user'
 
 export default {
   mixins: [baseMixin],
@@ -56,7 +60,7 @@ export default {
   },
   data () {
     return {
-      // cropper
+      form: this.$form.createForm(this),
       preview: {},
       option: {
         img: '/avatar2.jpg',
@@ -78,7 +82,36 @@ export default {
   methods: {
     setavatar (url) {
       this.option.img = url
+    },
+    getUserInfo () {
+      getUserInfo().then(res => {
+        res = res.result
+        this.form.setFieldsValue({
+          nickName: res.user.nickName,
+          avatar: res.user.avatar,
+          email: res.user.email,
+          remark: res.remark
+        })
+      })
+    },
+    submitUserInfo () {
+      // 表单校验
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          values.userId = this.$store.getters.userInfo.userId
+          updateUserInfo(values).then(res => {
+            this.$message.success('更新成功')
+          }).catch(() => {
+            this.$message.error('更新失败')
+          })
+        }
+      })
     }
+  },
+  computed: {
+  },
+  mounted () {
+    this.getUserInfo()
   }
 }
 </script>

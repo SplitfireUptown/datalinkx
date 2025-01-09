@@ -30,10 +30,10 @@ public class SysUserBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "user_id")
-    private long userId;
+    private String userId;
     @Basic
     @Column(name = "dept_id")
-    private Long deptId;
+    private String deptId;
     @Basic
     @Column(name = "user_name")
     private String userName;
@@ -91,23 +91,23 @@ public class SysUserBean {
     @Transient
     private List<SysRoleBean> roles;
 
-    public static boolean isAdmin(Long userId) {
-        return userId != null && 1L == userId;
+    public static boolean isAdmin(String userId) {
+        return userId != null && userId.equals("1");
     }
 
-    public long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public Long getDeptId() {
+    public String getDeptId() {
         return deptId;
     }
 
-    public void setDeptId(Long deptId) {
+    public void setDeptId(String deptId) {
         this.deptId = deptId;
     }
 
@@ -257,7 +257,7 @@ public class SysUserBean {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SysUserBean that = (SysUserBean) o;
-        return userId == that.userId && Objects.equals(deptId, that.deptId) && Objects.equals(userName, that.userName) && Objects.equals(nickName, that.nickName) && Objects.equals(userType, that.userType) && Objects.equals(email, that.email) && Objects.equals(phonenumber, that.phonenumber) && Objects.equals(sex, that.sex) && Objects.equals(avatar, that.avatar) && Objects.equals(password, that.password) && Objects.equals(status, that.status) && Objects.equals(delFlag, that.delFlag) && Objects.equals(loginIp, that.loginIp) && Objects.equals(loginDate, that.loginDate) && Objects.equals(createBy, that.createBy) && Objects.equals(createTime, that.createTime) && Objects.equals(updateBy, that.updateBy) && Objects.equals(updateTime, that.updateTime) && Objects.equals(remark, that.remark);
+        return Objects.equals(userId,that.userId) && Objects.equals(deptId, that.deptId) && Objects.equals(userName, that.userName) && Objects.equals(nickName, that.nickName) && Objects.equals(userType, that.userType) && Objects.equals(email, that.email) && Objects.equals(phonenumber, that.phonenumber) && Objects.equals(sex, that.sex) && Objects.equals(avatar, that.avatar) && Objects.equals(password, that.password) && Objects.equals(status, that.status) && Objects.equals(delFlag, that.delFlag) && Objects.equals(loginIp, that.loginIp) && Objects.equals(loginDate, that.loginDate) && Objects.equals(createBy, that.createBy) && Objects.equals(createTime, that.createTime) && Objects.equals(updateBy, that.updateBy) && Objects.equals(updateTime, that.updateTime) && Objects.equals(remark, that.remark);
     }
 
     @Override

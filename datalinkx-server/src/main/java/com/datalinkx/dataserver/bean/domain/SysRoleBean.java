@@ -30,7 +30,7 @@ public class SysRoleBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "role_id")
-    private long roleId;
+    private String roleId;
     @Basic
     @Column(name = "role_name")
     private String roleName;
@@ -76,8 +76,8 @@ public class SysRoleBean {
     @Transient
     private Set<String> permissions;
 
-    public static boolean isAdmin(Long roleId) {
-        return roleId != null && 1L == roleId;
+    public static boolean isAdmin(String roleId) {
+        return roleId != null && roleId.equals("1");
     }
 
     public void setPermissions(Set<String> permissions) {
@@ -88,11 +88,11 @@ public class SysRoleBean {
         return isAdmin(this.roleId);
     }
 
-    public long getRoleId() {
+    public String getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(long roleId) {
+    public void setRoleId(String roleId) {
         this.roleId = roleId;
     }
 

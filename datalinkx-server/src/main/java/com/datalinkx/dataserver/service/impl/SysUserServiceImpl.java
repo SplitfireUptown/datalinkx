@@ -34,6 +34,11 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
+    public SysUserBean selectUserById(String userId) {
+        return sysUserRepository.selectUserById(userId);
+    }
+
+    @Override
     public SysUserBean selectUserById(Long userId) {
         return null;
     }
@@ -69,7 +74,7 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public void checkUserDataScope(Long userId) {
+    public void checkUserDataScope(String userId) {
 
     }
 
@@ -84,12 +89,12 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public int updateUser(SysUserBean user) {
-        return 0;
+    public Integer updateUser(SysUserBean user) {
+        return  sysUserRepository.saveByUserId(user);
     }
 
     @Override
-    public void insertUserAuth(Long userId, Long[] roleIds) {
+    public void insertUserAuth(String userId, Long[] roleIds) {
 
     }
 
@@ -119,7 +124,7 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public int deleteUserById(Long userId) {
+    public int deleteUserById(String userId) {
         return 0;
     }
 

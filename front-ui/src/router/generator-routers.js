@@ -46,7 +46,7 @@ const constantRouterComponents = {
 
   // account
   AccountCenter: () => import('@/views/account/center'),
-  AccountSettings: () => import('@/views/account/settings/Index'),
+  AccountSettings: () => import('@/views/account/settings'),
   BasicSetting: () => import('@/views/account/settings/BasicSetting'),
   SecuritySettings: () => import('@/views/account/settings/Security'),
   CustomSettings: () => import('@/views/account/settings/Custom'),
@@ -193,7 +193,6 @@ const listToTree = (list, tree, parentId) => {
  * @param {Array} menuList 后端返回的菜单列表
  * @returns {Array} Vue 路由对象列表
  */
-// eslint-disable-next-line no-unused-vars
 export const transformMenuToRoutes = (menuList) => {
   return menuList.map(menu => {
     // 转换单个菜单为路由
@@ -201,6 +200,7 @@ export const transformMenuToRoutes = (menuList) => {
     const route = {
       path: menu.path || '/notFound',
       name: menu.name || 'notFound',
+      hidden: menu.hidden,
       meta: {
         title: title || '',
         icon: icons[icon] || icons['logo'],

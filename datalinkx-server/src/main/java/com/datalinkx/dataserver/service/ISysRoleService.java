@@ -27,7 +27,7 @@ public interface ISysRoleService {
      * @param userId 用户ID
      * @return 角色列表
      */
-    public List<SysRoleBean> selectRolesByUserId(Long userId);
+    public List<SysRoleBean> selectRolesByUserId(String userId);
 
     /**
      * 根据用户ID查询角色权限
@@ -35,7 +35,7 @@ public interface ISysRoleService {
      * @param userId 用户ID
      * @return 权限列表
      */
-    public Set<String> selectRolePermissionByUserId(Long userId);
+    public Set<String> selectRolePermissionByUserId(String userId);
 
     /**
      * 查询所有角色
@@ -50,7 +50,7 @@ public interface ISysRoleService {
      * @param userId 用户ID
      * @return 选中角色ID列表
      */
-    public List<Long> selectRoleListByUserId(Long userId);
+    public List<Long> selectRoleListByUserId(String userId);
 
     /**
      * 通过角色ID查询角色
@@ -58,7 +58,7 @@ public interface ISysRoleService {
      * @param roleId 角色ID
      * @return 角色对象信息
      */
-    public SysRoleBean selectRoleById(Long roleId);
+    public SysRoleBean selectRoleById(String roleId);
 
     /**
      * 校验角色名称是否唯一
@@ -96,7 +96,7 @@ public interface ISysRoleService {
      * @param roleId 角色ID
      * @return 结果
      */
-    public int countUserRoleByRoleId(Long roleId);
+    public int countUserRoleByRoleId(String roleId);
 
     /**
      * 新增保存角色信息
@@ -136,7 +136,7 @@ public interface ISysRoleService {
      * @param roleId 角色ID
      * @return 结果
      */
-    public int deleteRoleById(Long roleId);
+    public int deleteRoleById(String roleId);
 
     /**
      * 批量删除角色信息
@@ -161,7 +161,7 @@ public interface ISysRoleService {
      * @param userIds 需要取消授权的用户数据ID
      * @return 结果
      */
-    public int deleteAuthUsers(Long roleId, Long[] userIds);
+    public int deleteAuthUsers(String roleId, Long[] userIds);
 
     /**
      * 批量选择授权用户角色
@@ -170,5 +170,5 @@ public interface ISysRoleService {
      * @param userIds 需要删除的用户数据ID
      * @return 结果
      */
-    public int insertAuthUsers(Long roleId, Long[] userIds);
+    public int insertAuthUsers(String roleId, Long[] userIds);
 }

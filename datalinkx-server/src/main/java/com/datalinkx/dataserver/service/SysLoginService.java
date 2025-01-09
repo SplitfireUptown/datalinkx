@@ -144,7 +144,7 @@ public class SysLoginService {
      *
      * @param userId 用户ID
      */
-    public void recordLoginInfo(Long userId) {
+    public void recordLoginInfo(String userId) {
 //        SysUserBean SysUserBean = new SysUserBean();
 //        SysUserBean.setUserId(userId);
 //        SysUserBean.setLoginIp(IpUtils.getIpAddr());

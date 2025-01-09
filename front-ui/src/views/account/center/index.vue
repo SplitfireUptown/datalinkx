@@ -5,9 +5,9 @@
         <a-card :bordered="false">
           <div class="account-center-avatarHolder">
             <div class="avatar">
-              <img :src="avatar">
+              <img :src="avatar || 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'">
             </div>
-            <div class="username">{{ nickname }}</div>
+            <div class="username">{{ nickName }}</div>
             <div class="bio">海纳百川，有容乃大</div>
           </div>
           <div class="account-center-detail">
@@ -99,7 +99,7 @@
 import { PageView, RouteView } from '@/layouts'
 import { AppPage, ArticlePage, ProjectPage } from './page'
 
-import { mapGetters } from 'vuex'
+import { getUserInfo } from '@/api/user'
 
 export default {
   components: {
@@ -111,6 +111,8 @@ export default {
   },
   data () {
     return {
+      nickName: '',
+      avatar: '',
       tags: ['很有想法的', '专注设计', '辣~', '大长腿', '川妹子', '海纳百川'],
 
       tagInputVisible: false,
@@ -137,12 +139,19 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['nickname', 'avatar'])
+
   },
   mounted () {
-    this.getTeams()
+    this.getUserInfo()
   },
   methods: {
+    getUserInfo () {
+      getUserInfo().then(res => {
+          res = res.result
+          this.nickName = res.user.nickName
+          this.avatar = res.user.avatar
+      })
+    },
     getTeams () {
       this.$http.get('/workplace/teams').then(res => {
         this.teams = res.result

@@ -71,7 +71,7 @@ const user = {
           if (result.roles.length > 0 && result.permissions.length > 0) {
             commit('SET_ROLES', result.roles)
             commit('SET_INFO', result.user)
-            commit('SET_NAME', { name: result.user.userName, welcome: welcome() })
+            commit('SET_NAME', { name: result.user.nickName, welcome: welcome() })
             commit('SET_AVATAR', result.user.avatar)
             // 下游
             resolve(result)

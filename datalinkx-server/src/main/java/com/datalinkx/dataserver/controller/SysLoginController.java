@@ -91,7 +91,7 @@ public class SysLoginController {
      */
     @GetMapping("getRouters")
     public WebResult<List<RouterVo>> getRouters() {
-        Long userId = SecurityUtils.getUserId();
+        String userId = SecurityUtils.getUserId();
         List<SysMenuBean> menus = menuService.selectMenuTreeByUserId(userId);
 
         return WebResult.of(menuService.buildMenus(menus));

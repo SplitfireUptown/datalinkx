@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class SysRoleMenuId implements Serializable {
-    private long roleId;
-    private long menuId;
+    private String roleId;
+    private String menuId;
 
     // 必须重写 equals 和 hashCode
     @Override
@@ -13,7 +13,7 @@ public class SysRoleMenuId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SysRoleMenuId that = (SysRoleMenuId) o;
-        return roleId == that.roleId && menuId == that.menuId;
+        return Objects.equals(roleId, that.roleId) && Objects.equals(menuId, that.menuId);
     }
 
     @Override

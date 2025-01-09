@@ -28,24 +28,24 @@ import java.util.Objects;
 public class SysUserRoleBean {
     @Id
     @Column(name = "user_id")
-    private long userId;
+    private String userId;
     @Id
     @Column(name = "role_id")
-    private long roleId;
+    private String roleId;
 
-    public long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public long getRoleId() {
+    public String getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(long roleId) {
+    public void setRoleId(String roleId) {
         this.roleId = roleId;
     }
 
@@ -54,7 +54,7 @@ public class SysUserRoleBean {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SysUserRoleBean that = (SysUserRoleBean) o;
-        return userId == that.userId && roleId == that.roleId;
+        return Objects.equals(userId, that.userId) && Objects.equals(roleId, that.roleId);
     }
 
     @Override

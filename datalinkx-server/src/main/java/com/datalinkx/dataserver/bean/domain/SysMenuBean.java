@@ -31,13 +31,13 @@ public class SysMenuBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "menu_id")
-    private Long menuId;
+    private String menuId;
     @Basic
     @Column(name = "menu_name")
     private String menuName;
     @Basic
     @Column(name = "parent_id")
-    private Long parentId;
+    private String parentId;
     @Basic
     @Column(name = "order_num")
     private Integer orderNum;
@@ -55,10 +55,10 @@ public class SysMenuBean {
     private String routeName;
     @Basic
     @Column(name = "is_frame")
-    private Integer isFrame;
+    private String isFrame;
     @Basic
     @Column(name = "is_cache")
-    private Integer isCache;
+    private String isCache;
     @Basic
     @Column(name = "menu_type")
     private String menuType;
@@ -92,11 +92,11 @@ public class SysMenuBean {
     @Transient
     private List<SysMenuBean> children = new ArrayList<>();
 
-    public Long getMenuId() {
+    public String getMenuId() {
         return menuId;
     }
 
-    public void setMenuId(long menuId) {
+    public void setMenuId(String menuId) {
         this.menuId = menuId;
     }
 
@@ -108,11 +108,11 @@ public class SysMenuBean {
         this.menuName = menuName;
     }
 
-    public Long getParentId() {
+    public String getParentId() {
         return parentId;
     }
 
-    public void setParentId(Long parentId) {
+    public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 
@@ -156,19 +156,19 @@ public class SysMenuBean {
         this.routeName = routeName;
     }
 
-    public Integer getIsFrame() {
+    public String getIsFrame() {
         return isFrame;
     }
 
-    public void setIsFrame(Integer isFrame) {
+    public void setIsFrame(String isFrame) {
         this.isFrame = isFrame;
     }
 
-    public Integer getIsCache() {
+    public String getIsCache() {
         return isCache;
     }
 
-    public void setIsCache(Integer isCache) {
+    public void setIsCache(String isCache) {
         this.isCache = isCache;
     }
 

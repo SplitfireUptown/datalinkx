@@ -37,7 +37,7 @@ public interface SysMenuRepository extends JpaRepository<SysMenuBean, String> {
             "WHERE u.user_id = :userId AND m.menu_type IN ('M', 'C') AND m.status = 0 AND ro.status = 0 " +
             "ORDER BY m.parent_id, m.order_num",
             nativeQuery = true)
-    List<SysMenuBean> selectMenuTreeByUserId(@Param("userId") Long userId);
+    List<SysMenuBean> selectMenuTreeByUserId(@Param("userId") String userId);
 
     /**
      * 根据用户ID查询权限
@@ -52,13 +52,12 @@ public interface SysMenuRepository extends JpaRepository<SysMenuBean, String> {
             "LEFT JOIN sys_role r ON r.role_id = ur.role_id " +
             "WHERE m.status = '0' AND r.status = '0' AND ur.user_id = :userId",
             nativeQuery = true)
-    List<String> selectMenuPermsByUserId(@Param("userId") Long userId);
+    List<String> selectMenuPermsByUserId(@Param("userId") String userId);
 
     @Query(value = "select distinct m.perms " +
             "from sys_menu m " +
             "LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id " +
             "WHERE m.status = '0' AND rm.role_id = :roleId",
             nativeQuery = true)
-    
-    List<String> selectMenuPermsByRoleId(Long roleId);
+    List<String> selectMenuPermsByRoleId(String roleId);
 }
