@@ -8,6 +8,8 @@
 <script>
 import AvatarDropdown from './AvatarDropdown'
 import SelectLang from '@/components/SelectLang'
+import storage from 'store'
+import { AVATAR, USER } from '@/store/mutation-types'
 
 export default {
   name: 'RightContent',
@@ -48,7 +50,7 @@ export default {
     }
   },
   mounted () {
-      this.currentUser = this.$store.getters.userInfo
+      this.currentUser = { ...storage.get(USER), avatar: storage.get(AVATAR) }
   }
 }
 </script>

@@ -1,4 +1,7 @@
 export const ACCESS_TOKEN = 'Access-Token'
+export const AVATAR = 'Avatar'
+export const USER = 'User'
+export const ROLES = 'Roles'
 
 export const SIDEBAR_TYPE = 'sidebar_type'
 export const TOGGLE_MOBILE_TYPE = 'is_mobile'

@@ -52,6 +52,8 @@
 import AvatarModal from './AvatarModal'
 import { baseMixin } from '@/store/app-mixin'
 import { getUserInfo, updateUserInfo } from '@/api/user'
+import storage from 'store'
+import { AVATAR } from '@/store/mutation-types'
 
 export default {
   mixins: [baseMixin],
@@ -63,32 +65,20 @@ export default {
       form: this.$form.createForm(this),
       preview: {},
       option: {
-        img: '/avatar2.jpg',
-        info: true,
-        size: 1,
-        outputType: 'jpeg',
-        canScale: false,
-        autoCrop: true,
-        // 只有自动截图开启 宽度高度才生效
-        autoCropWidth: 180,
-        autoCropHeight: 180,
-        fixedBox: true,
-        // 开启宽度和高度比例
-        fixed: true,
-        fixedNumber: [1, 1]
+        img: '/avatar2.jpg'
       }
     }
   },
   methods: {
-    setavatar (url) {
-      this.option.img = url
+    setavatar (data) {
+      this.option.img = URL.createObjectURL(data)
     },
     getUserInfo () {
       getUserInfo().then(res => {
         res = res.result
+        this.option.img = storage.get(AVATAR)
         this.form.setFieldsValue({
           nickName: res.user.nickName,
-          avatar: res.user.avatar,
           email: res.user.email,
           remark: res.remark
         })
@@ -128,6 +118,7 @@ export default {
     margin: 0 auto;
     width: 100%;
     max-width: 180px;
+    height: 180px;
     border-radius: 50%;
     box-shadow: 0 0 4px #ccc;
 

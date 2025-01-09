@@ -22,4 +22,10 @@ public interface SysUserRepository extends JpaRepository<SysUserBean, String> {
 
     @Query(value = "select * from SYS_USER where user_id = :userId AND status = 0", nativeQuery = true)
     SysUserBean selectUserById(String userId);
+
+    //修改用户头像
+    @Transactional
+    @Modifying
+    @Query(value = "update SYS_USER set avatar = :avatar where user_id = :userId", nativeQuery = true)
+    Integer updateAvatar(@Param("userId") String userId, @Param("avatar") String avatar);
 }

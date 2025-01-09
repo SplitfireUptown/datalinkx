@@ -100,6 +100,8 @@ import { PageView, RouteView } from '@/layouts'
 import { AppPage, ArticlePage, ProjectPage } from './page'
 
 import { getUserInfo } from '@/api/user'
+import { AVATAR } from '@/store/mutation-types'
+import storage from 'store'
 
 export default {
   components: {
@@ -149,7 +151,7 @@ export default {
       getUserInfo().then(res => {
           res = res.result
           this.nickName = res.user.nickName
-          this.avatar = res.user.avatar
+          this.avatar = storage.get(AVATAR)
       })
     },
     getTeams () {

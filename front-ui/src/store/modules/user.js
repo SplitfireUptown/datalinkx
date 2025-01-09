@@ -1,8 +1,9 @@
 import storage from 'store'
 import expirePlugin from 'store/plugins/expire'
 import { login, getInfo, logout } from '@/api/login'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { ACCESS_TOKEN, AVATAR, ROLES, USER } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
+import { getUserInfo } from '@/api/user'
 
 storage.addPlugin(expirePlugin)
 const user = {
@@ -41,6 +42,12 @@ const user = {
         login(userInfo).then(response => {
           const result = (response.result || {})
           storage.set(ACCESS_TOKEN, 'Bearer ' + result.token, new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
+          getUserInfo().then(response => {
+            const { result } = response
+            storage.set(AVATAR, `data:image/jpeg;base64,${result.avatar}`)
+            storage.set(USER, result.user)
+            storage.set(ROLES, result.roles)
+          })
           commit('SET_TOKEN', result.token)
           resolve(response)
         }).catch(error => {

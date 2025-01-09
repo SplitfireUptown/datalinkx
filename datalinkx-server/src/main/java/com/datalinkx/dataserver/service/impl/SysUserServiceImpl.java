@@ -109,8 +109,8 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public boolean updateUserAvatar(String userName, String avatar) {
-        return false;
+    public boolean updateUserAvatar(String userId, String avatar) {
+       return sysUserRepository.updateAvatar(userId, avatar) > 0;
     }
 
     @Override

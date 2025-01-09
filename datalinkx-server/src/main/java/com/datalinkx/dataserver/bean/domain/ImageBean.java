@@ -1,6 +1,8 @@
 package com.datalinkx.dataserver.bean.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -9,6 +11,8 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "images", schema = "datalinkx")
 public class ImageBean {
     @Id

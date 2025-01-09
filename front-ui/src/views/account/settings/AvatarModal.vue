@@ -55,16 +55,18 @@
 
 </template>
 <script>
+import storage from 'store'
+import { AVATAR } from '@/store/mutation-types'
+
 export default {
   data () {
     return {
       visible: false,
       id: null,
       confirmLoading: false,
-      fileList: [],
       uploading: false,
+      fileName: '',
       options: {
-        // img: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
         img: '',
         autoCrop: true,
         autoCropWidth: 200,
@@ -98,6 +100,7 @@ export default {
       this.$refs.cropper.rotateRight()
     },
     beforeUpload (file) {
+      this.fileName = file.name
       const reader = new FileReader()
       // 把Array Buffer转化为blob 如果是base64不需要
       // 转化为base64
@@ -119,25 +122,33 @@ export default {
       // 输出
       if (type === 'blob') {
         this.$refs.cropper.getCropBlob((data) => {
-          const img = window.URL.createObjectURL(data)
           this.model = true
-          this.modelSrc = img
-          formData.append('file', data, this.fileName)
-          this.$http.post('https://www.mocky.io/v2/5cc8019d300000980a055e76', formData, { contentType: false, processData: false, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
-            .then((response) => {
-              console.log('upload response:', response)
-              // var res = response.data
-              // if (response.status === 'done') {
-              //   _this.imgFile = ''
-              //   _this.headImg = res.realPathList[0] // 完整路径
-              //   _this.uploadImgRelaPath = res.relaPathList[0] // 非完整路径
-              //   _this.$message.success('上传成功')
-              //   this.visible = false
-              // }
-              _this.$message.success('上传成功')
-              _this.$emit('ok', response.url)
-              _this.visible = false
+          const reader = new FileReader()
+          reader.readAsDataURL(data)
+          reader.onload = () => {
+            const base64 = reader.result
+            formData.append('file', data, this.fileName)
+            this.$http.post('/system/user/avatar', formData, {
+              contentType: false,
+              processData: false,
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             })
+              .then((response) => {
+                console.log('upload response:', response)
+                // var res = response.data
+                // if (response.status === 'done') {
+                //   _this.imgFile = ''
+                //   _this.headImg = res.realPathList[0] // 完整路径
+                //   _this.uploadImgRelaPath = res.relaPathList[0] // 非完整路径
+                //   _this.$message.success('上传成功')
+                //   this.visible = false
+                // }
+                storage.set(AVATAR, base64)
+                _this.$message.success('上传成功')
+                _this.$emit('ok', data)
+                _this.visible = false
+              })
+          }
         })
       } else {
         this.$refs.cropper.getCropData((data) => {
