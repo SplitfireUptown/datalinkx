@@ -211,6 +211,9 @@ export const transformMenuToRoutes = (menuList) => {
         ? transformMenuToRoutes(menu.children) // 递归处理子菜单
         : null
     }
+    if (route.name === 'Index') {
+      route.redirect = '/dashboard'
+    }
     // 动态设置组件，处理特殊情况如 null 或 Layout 类型
     route.component = constantRouterComponents[menu.component || menu.routeName] || (() => import(`@/views/${menu.component}`))
     return route
