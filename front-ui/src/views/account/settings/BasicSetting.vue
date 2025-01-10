@@ -80,7 +80,7 @@ export default {
         this.form.setFieldsValue({
           nickName: res.user.nickName,
           email: res.user.email,
-          remark: res.remark
+          remark: res.user.remark
         })
       })
     },

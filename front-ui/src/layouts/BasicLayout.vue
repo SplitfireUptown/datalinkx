@@ -86,9 +86,9 @@ export default {
         // CONTENT_WIDTH_TYPE
         contentWidth: defaultSettings.layout === 'sidemenu' ? CONTENT_WIDTH_TYPE.Fluid : defaultSettings.contentWidth,
         // 主题 'dark' | 'light'
-        theme: defaultSettings.navTheme,
+        theme: this.$store.state.app.theme,
         // 主色调
-        primaryColor: defaultSettings.primaryColor,
+        primaryColor: this.$store.state.app.color,
         fixedHeader: defaultSettings.fixedHeader,
         fixSiderbar: defaultSettings.fixSiderbar,
         colorWeak: defaultSettings.colorWeak,

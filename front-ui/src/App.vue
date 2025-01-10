@@ -185,4 +185,10 @@ a {
   position: relative;
   z-index: 9999;
 }
+* {
+  box-sizing: border-box;
+}
+*::before,*::after{
+  box-sizing: border-box;
+}
 </style>

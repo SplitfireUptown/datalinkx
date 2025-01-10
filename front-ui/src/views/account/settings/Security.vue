@@ -3,7 +3,7 @@
     itemLayout="horizontal"
     :dataSource="data"
   >
-    <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+    <a-list-item v-for="(item,key) in data" :key="key">
       <a-list-item-meta>
         <a slot="title">{{ item.title }}</a>
         <span slot="description">

@@ -8,7 +8,7 @@
               <img :src="avatar || 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'">
             </div>
             <div class="username">{{ nickName }}</div>
-            <div class="bio">海纳百川，有容乃大</div>
+            <div class="bio">{{ remark }}</div>
           </div>
           <div class="account-center-detail">
             <p>
@@ -114,6 +114,7 @@ export default {
   data () {
     return {
       nickName: '',
+      remark: '',
       avatar: '',
       tags: ['很有想法的', '专注设计', '辣~', '大长腿', '川妹子', '海纳百川'],
 
@@ -145,6 +146,7 @@ export default {
   },
   mounted () {
     this.getUserInfo()
+    this.getTeams()
   },
   methods: {
     getUserInfo () {
@@ -152,13 +154,11 @@ export default {
           res = res.result
           this.nickName = res.user.nickName
           this.avatar = storage.get(AVATAR)
+          this.remark = res.user.remark
       })
     },
     getTeams () {
-      this.$http.get('/workplace/teams').then(res => {
-        this.teams = res.result
         this.teamSpinning = false
-      })
     },
 
     handleTabChange (key, type) {
