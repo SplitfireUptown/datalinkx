@@ -9,6 +9,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import static com.datalinkx.common.constants.MetaConstants.CommonConstant.KEY_CHECKPOINT_INTERVAL;
+
 @Slf4j
 @Service
 public class ExecutorStreamJobHandler extends ExecutorJobHandler {
@@ -36,7 +38,7 @@ public class ExecutorStreamJobHandler extends ExecutorJobHandler {
 
 
         if (!ObjectUtils.isEmpty(otherSetting.get("savePointPath"))) {
-            executeCmd += " -confProp \"{\"flink.checkpoint.interval\":60000}\" ";
+            executeCmd += String.format(" -confProp \"{\"flink.checkpoint.interval\":%s}\" ", otherSetting.getOrDefault(KEY_CHECKPOINT_INTERVAL, 6000));
             executeCmd = executeCmd + " -s " + otherSetting.get("savePointPath");
         }
 

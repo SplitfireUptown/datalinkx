@@ -47,10 +47,14 @@ xxl-job:
 data-transfer:
   # 批次提交行数，读fetch-size行后提交
   fetch-size: 1000
+  # 流式任务提交阈值，读stream-batch-size行后提交
+  stream-batch-size: 10
   # 读fetch-size行数据的查询超时时间
   query-time-out: 10000
   # 流式checkpoint地址
   checkpoint-path: file:///tmp
+  # 触发checkpoint时间间隔
+  checkpoint-interval: 6000
   # kafka读取规则
   kafka-read-mode: group-offsets
 

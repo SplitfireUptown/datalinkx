@@ -76,6 +76,7 @@ public final class MetaConstants {
 
         public static final String KEY_RESTORE_COLUMN_INDEX = "restoreColumnIndex";
         public static final String KEY_KAFKA_READ_INDEX = "kafkaReadMode";
+        public static final String KEY_CHECKPOINT_INTERVAL = "checkpoint_interval";
         public static final String KEY_RESTORE = "restore";
     }
 

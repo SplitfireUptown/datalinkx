@@ -20,6 +20,8 @@ public class CommonProperties {
     Integer fetchSize;
     @Value("${data-transfer.stream-batch-size:10}")
     Integer streamBatchSize;
+    @Value("${data-transfer.checkpoint-interval:6000}")
+    Integer checkpointInterval;
     @Value("${data-transfer.query-time-out:10000}")
     Integer queryTimeOut;
     @Value("${client.ollama.url}")
