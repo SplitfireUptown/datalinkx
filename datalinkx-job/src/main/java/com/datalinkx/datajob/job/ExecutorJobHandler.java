@@ -42,12 +42,12 @@ public class ExecutorJobHandler {
 	Boolean reserveJobGraph;
 
 
-	public String execute(String jobId, String reader, String writer, Map<String, String> otherSetting) throws Exception {
+	public String execute(String jobId, String reader, String writer, Map<String, Object> otherSetting) throws Exception {
 
 		StringBuffer errorRet = new StringBuffer();
 		StringBuffer successRet = new StringBuffer();
 
-		String jobSettings = this.generateJobSetting("classpath:job_setting.json");
+		String jobSettings = this.generateJobSetting("classpath:job_setting.json", otherSetting);
 		String jobJsonFile = this.generateJobJsonFile(jobId, reader, writer, jobSettings);
 
 		try {
@@ -99,7 +99,7 @@ public class ExecutorJobHandler {
 		return jobUrl.substring("/jobs/".length());
 	}
 
-	public String generateFlinkCmd(String jobId, String jobJsonFile, Map<String, String> otherSetting) {
+	public String generateFlinkCmd(String jobId, String jobJsonFile, Map<String, Object> otherSetting) {
 		String javaHome = System.getenv("JAVA_HOME");
 		String os = System.getProperty("os.name").toLowerCase();
 
@@ -139,7 +139,7 @@ public class ExecutorJobHandler {
 	}*/
 
     @SneakyThrows
-	public String generateJobSetting(String jobSettingPath) {
+	public String generateJobSetting(String jobSettingPath, Map<String, Object> commonSettings) {
         Resource resource = new DefaultResourceLoader().getResource(jobSettingPath);
 
         log.info(resource.toString());

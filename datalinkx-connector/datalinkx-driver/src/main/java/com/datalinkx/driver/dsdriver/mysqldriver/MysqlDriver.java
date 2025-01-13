@@ -17,8 +17,9 @@ public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWrit
         super(connectId);
     }
 
-    private static final String MYSQL_DATABASE_JDBC_PATTERN = "jdbc:mysql://%s:%s/%s?useCursorFetch=%s" +
-            "&useUnicode=%s&zeroDateTimeBehavior=%s&characterEncoding=%s&useInformationSchema=%s&serverTimezone=%s";
+    private static final String MYSQL_DATABASE_JDBC_PATTERN = "jdbc:mysql://%s:%s/%s?useCursorFetch=%s"
+            + "&useUnicode=%s&zeroDateTimeBehavior=%s&characterEncoding=%s&useInformationSchema=%s&serverTimezone=%s&socketTimeout=%s"
+            + "&useSSL=false";
 
     private static final String MYSQL_DRIVER_CLASS = "com.mysql.cj.jdbc.Driver";
 
@@ -45,7 +46,8 @@ public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWrit
                 this.jdbcSetupInfo.getZeroDateTimeBehavior(),
                 this.jdbcSetupInfo.getCharacterEncoding(),
                 this.jdbcSetupInfo.getUseInformationSchema(),
-                this.jdbcSetupInfo.getServerTimezone()
+                this.jdbcSetupInfo.getServerTimezone(),
+                this.jdbcSetupInfo.getSocketTimeout()
         );
     }
 

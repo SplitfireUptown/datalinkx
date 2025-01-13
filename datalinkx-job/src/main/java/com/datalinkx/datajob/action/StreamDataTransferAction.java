@@ -71,10 +71,9 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
 
     @Override
     protected void execute(StreamFlinkActionMeta unit) throws Exception {
-        Map<String, String> otherSetting = new HashMap<String, String>() {{
-           put("savePointPath", unit.getCheckpoint());
-        }};
-        String taskId = streamExecutorJobHandler.execute(unit.getJobId(), unit.getReaderDsInfo(), unit.getWriterDsInfo(), otherSetting);
+        Map<String, Object> commonSettings = unit.getCommonSettings();
+        commonSettings.put("savePointPath", unit.getCheckpoint());
+        String taskId = streamExecutorJobHandler.execute(unit.getJobId(), unit.getReaderDsInfo(), unit.getWriterDsInfo(), commonSettings);
         unit.setTaskId(taskId);
         // 更新task
         datalinkXServerClient.updateJobTaskRel(unit.getJobId(), taskId);
@@ -172,6 +171,7 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
                 .writerDsInfo(JsonUtils.toJson(writerDsInfo))
                 .readerDsInfo(JsonUtils.toJson(readerDsInfo))
                 .checkpoint(info.getSyncUnit().getCheckpoint())
+                .commonSettings(info.getSyncUnit().getCommonSettings())
                 .jobId(info.getJobId())
                 .lockId(info.getLockId())
                 .build();

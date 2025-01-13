@@ -17,6 +17,7 @@ public class MysqlSetupInfo extends JdbcSetupInfo {
     private String characterEncoding = "UTF8";
     private String useInformationSchema = "true";
     private String serverTimezone;
+    private String socketTimeout = "300000";
 
     public String getServerTimezone() {
         if (!ObjectUtils.isEmpty(serverTimezone)) {

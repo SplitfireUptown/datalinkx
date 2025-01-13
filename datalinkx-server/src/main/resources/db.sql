@@ -101,4 +101,6 @@ alter table JOB ADD COLUMN `checkpoint` longtext CHARACTER SET utf8 COLLATE utf8
 
 alter table JOB ADD COLUMN `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
+alter table JOB ADD COLUMN `retry_time` int NOT NULL DEFAULT '0' COMMENT '流式任务重试次数';
+
 alter table JOB ADD COLUMN `graph` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '计算画布';

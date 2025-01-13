@@ -39,7 +39,6 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
 
         readerInfo.setParameter(KafkaReader.builder()
                 .topic(reader.getTableName())
-                .mode(kafkaSetupInfo.getMode())
                 .codec("text")
                 .blankIgnore(false)
                 .consumerSettings(CommonSetting.builder().bootstrapServers(kafkaSetupInfo.getServer() + ":" + kafkaSetupInfo.getPort()).build())

@@ -41,6 +41,8 @@ public class DataTransJobDetail {
         Writer writer;
         Compute compute;
         String checkpoint;
+        // 公共配置
+        Map<String, Object> commonSettings;
     }
 
 
@@ -51,8 +53,6 @@ public class DataTransJobDetail {
     public static class Compute {
         // 算子列表
         private List<Transform> transforms;
-        // 公共配置
-        private Map<String, Object> commonSettings;
         @Data
         @AllArgsConstructor
         @NoArgsConstructor

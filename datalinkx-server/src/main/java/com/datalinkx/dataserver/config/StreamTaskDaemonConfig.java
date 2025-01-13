@@ -1,33 +1,36 @@
 package com.datalinkx.dataserver.config;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.IdUtils;
+import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.common.utils.ObjectUtils;
+import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
+import com.datalinkx.dataclient.client.flink.FlinkClient;
+import com.datalinkx.dataclient.client.flink.response.FlinkJobOverview;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.StreamJobService;
-import com.datalinkx.stream.StreamTaskChecker;
 import com.datalinkx.stream.lock.DistributedLock;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.lucene.util.packed.DirectMonotonicReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Configuration
 @Slf4j
 public class StreamTaskDaemonConfig implements InitializingBean {
 
-    @Resource
-    StreamTaskChecker streamTaskChecker;
 
     @Autowired
     StreamJobService streamJobService;
@@ -39,57 +42,114 @@ public class StreamTaskDaemonConfig implements InitializingBean {
     DistributedLock distributedLock;
 
     @Autowired
-    LinkedBlockingQueue<String> streamTaskQueue;
+    FlinkClient flinkClient;
 
     @Autowired
-    LinkedBlockingQueue<String> stopTaskQueue;
+    DatalinkXJobClient datalinkXJobClient;
 
-    @Bean
-    public void streamTaskCheck() {
-        Timer timer = new Timer();
-        log.info("topic daemon warden reload start");
-        timer.schedule(streamTaskChecker, 30000, 30000);
-    }
 
     @Override
     public void afterPropertiesSet() {
-        streamTaskChecker.run();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Scheduled(fixedDelay = 10000) // 每10秒检查
     public void processQueueItems() {
-        log.info("stream task daemon check");
-        // 先停止
-        while (!stopTaskQueue.isEmpty()) {
-            String jobId = stopTaskQueue.poll();
-            streamJobService.pause(jobId);
+        log.info("start to check stream task status");
+        List<JobBean> restartJob = jobRepository.findRestartJob(MetaConstants.JobType.JOB_TYPE_STREAM,
+                Arrays.asList(
+                        MetaConstants.JobStatus.JOB_STATUS_CREATE,
+                        MetaConstants.JobStatus.JOB_STATUS_SYNCING,
+                        MetaConstants.JobStatus.JOB_STATUS_ERROR
+                ));
+
+        if (ObjectUtils.isEmpty(restartJob)) {
+            return;
         }
 
-        // 再启动
-        while (!streamTaskQueue.isEmpty()) {
-            String lockId = IdUtils.generateShortUuid();
-            String jobId = streamTaskQueue.poll();
+        try {
+            JsonNode jsonNode = flinkClient.jobOverview();
+            Set<String> runningJobIds = JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
+                    .stream()
+                    .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
+                    .map(FlinkJobOverview::getName)
+                    .collect(Collectors.toSet());
 
-            boolean isLock = distributedLock.lock(jobId, lockId, DistributedLock.LOCK_TIME);
-            try {
-                // 拿到了流式任务的锁就提交任务，任务状态在datalinkx-job提交流程中更改
-                if (isLock) {
-                    // 双重检查
-                    Optional<JobBean> jobBeanOp = jobRepository.findByJobId(jobId);
-                    if (!jobBeanOp.isPresent()) {
-                        continue;
+            for (JobBean streamTaskBean : restartJob) {
+                String jobId = streamTaskBean.getJobId();
+
+                // 如果datalinkx任务同步中，检查flink任务是否存在
+                if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == streamTaskBean.getStatus()) {
+                    // 如果flink任务不存在，则重新提交任务
+                    if (!runningJobIds.contains(jobId)) {
+
+                        this.runStreamTask(jobId);
+                    } else {
+                        // 如果因为datalinkx挂掉后重启，flink任务正常，datalinkx任务状态正常，判断健康检查线程是否挂掉, 如果挂掉，先停止再重新提交
+                        String stringWebResult = datalinkXJobClient.streamJobHealth(jobId).getResult();
+                        if (ObjectUtils.isEmpty(stringWebResult)) {
+                            // 更新状态为失败，等待调度重新提交
+                            jobRepository.updateJobStatus(jobId, MetaConstants.JobStatus.JOB_STATUS_ERROR, "health check thread is dead, restart job");
+                            this.retryTime(jobId);
+                            streamJobService.pause(jobId);
+                        }
                     }
-                    if (!Arrays.asList(
-                            MetaConstants.JobStatus.JOB_STATUS_SYNCING,
-                            MetaConstants.JobStatus.JOB_STATUS_ERROR).contains(jobBeanOp.get().getStatus())) {
-                        continue;
-                    }
-                    streamJobService.streamJobExec(jobId, lockId);
                 }
-            } catch (Exception e){
-                // 成功一直持有锁，失败需要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来
-                distributedLock.unlock(jobId, lockId);
+
+                // 如果flink任务在运行，而datalinkx中的任务状态为停止，以datalinkx的状态为准，手动停掉flink任务
+                if (runningJobIds.contains(jobId) && MetaConstants.JobStatus.JOB_STATUS_STOP == streamTaskBean.getStatus()) {
+                    streamJobService.pause(jobId);
+                }
+
+                // 如果任务是失败，重新提交
+                if (MetaConstants.JobStatus.JOB_STATUS_ERROR == streamTaskBean.getStatus()) {
+                    this.retryTime(jobId);
+                    this.runStreamTask(jobId);
+                }
+
+                if (MetaConstants.JobStatus.JOB_STATUS_CREATE == streamTaskBean.getStatus()) {
+                    this.runStreamTask(jobId);
+                }
             }
+        } catch (Throwable t) {
+            log.error(t.getMessage(), t);
+        }
+    }
+
+    /**
+     *  增加重试次数
+     * @param jobId
+     */
+    public void retryTime(String jobId) {
+        // TODO webhook 通知
+        jobRepository.addRetryTime(jobId);
+    }
+
+    /**
+     * 提交流式任务
+     * @param jobId
+     */
+    public void runStreamTask(String jobId) {
+        boolean isLock = distributedLock.lock(jobId, jobId, DistributedLock.LOCK_TIME);
+        try {
+            // 拿到了流式任务的锁就提交任务，任务状态在datalinkx-job提交流程中更改
+            if (isLock) {
+                // 双重检查
+                Optional<JobBean> jobBeanOp = jobRepository.findByJobId(jobId);
+                if (!jobBeanOp.isPresent()) {
+                    return;
+                }
+                if (!Arrays.asList(
+                        MetaConstants.JobStatus.JOB_STATUS_CREATE,
+                        MetaConstants.JobStatus.JOB_STATUS_SYNCING,
+                        MetaConstants.JobStatus.JOB_STATUS_ERROR).contains(jobBeanOp.get().getStatus())) {
+                    return;
+                }
+                streamJobService.streamJobExec(jobId, jobId);
+            }
+        } catch (Exception e){
+            // 成功一直持有锁，失败需要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来
+            distributedLock.unlock(jobId, jobId);
         }
     }
 }

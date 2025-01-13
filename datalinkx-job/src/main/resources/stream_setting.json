@@ -2,7 +2,9 @@
   "restore": {
     "isRestore": true,
     "isStream": true,
-    "maxRowNumForCheckpoint": 5
+    "maxRowNumForCheckpoint": 5,
+    "restoreColumnName": "",
+    "restoreColumnIndex": 0
   },
   "speed": {
     "channel": 1

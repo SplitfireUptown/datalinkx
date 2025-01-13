@@ -51,6 +51,9 @@ data-transfer:
   query-time-out: 10000
   # 流式checkpoint地址
   checkpoint-path: file:///tmp
+  # kafka读取规则
+  kafka-read-mode: group-offsets
+
 
 client:
   datajob:
@@ -68,9 +71,6 @@ client:
   ollama:
     url: http://localhost:11434
 
-topic:
-  daemon: true
-
 logging:
   pattern:
     console: ${CONSOLE_LOG_PATTERN:%clr(%d{${LOG_DATEFORMAT_PATTERN:yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:%5p}) %clr(${PID:- }){magenta} [${spring.application.name}] %clr([%10.10t]){faint}[%36.36X{trace_id}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}}
@@ -79,6 +79,7 @@ logging:
   level:
     com.datalinkx: INFO
     org.hibernate.SQL: DEBUG
+    org.hibernate.hql: INFO
 
 retrofit:
   # 日志打印配置

@@ -347,20 +347,24 @@ export default {
       listQuery().then(res => {
         this.selectloading = false
         const record = res.result
+        const excludeFromDs = [4, 5]
+        const excludeToDs = [5]
         for (var a of record) {
           // redis数据源暂不支持读
-          if (a.type !== 4) {
+          if (!excludeFromDs.includes(a.type)) {
             this.fromDsList.push({
               dsId: a.dsId,
               name: a.name,
               type: a.type
             })
           }
-          this.toDsList.push({
-            dsId: a.dsId,
-            name: a.name,
-            type: a.type
-          })
+          if (!excludeToDs.includes(a.type)) {
+            this.toDsList.push({
+              dsId: a.dsId,
+              name: a.name,
+              type: a.type
+            })
+          }
         }
       })
       console.log(this.fromDsList)

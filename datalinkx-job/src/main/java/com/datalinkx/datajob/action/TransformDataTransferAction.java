@@ -130,7 +130,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
         IDsReader dsReader = DsDriverFactory.getDsReader(info.getSyncUnit().getReader().getConnectId());
         IDsWriter dsWriter = DsDriverFactory.getDsWriter(info.getSyncUnit().getWriter().getConnectId());
 
-        Map<String, Object> commonSettings = info.getSyncUnit().getCompute().getCommonSettings();
+        Map<String, Object> commonSettings = info.getSyncUnit().getCommonSettings();
         List<TransformNode> transformNodes = new ArrayList<>();
         String lastTransformNodeName = "";
 

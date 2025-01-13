@@ -95,9 +95,11 @@ export default {
           customRender: (record) => {
             return (
               <div>
-                <a href="javascript:;"onClick={(e) => this.stopJob(record)}>停止</a>
+                <a href="javascript:;" onClick={(e) => this.stopJob(record)}>停止</a>
                 <a-divider type="vertical" />
-                <a href="javascript:;"onClick={(e) => this.execJob(record)}>触发</a>
+                <a href="javascript:;" onClick={(e) => this.execJob(record)}>触发</a>
+                <a-divider type="vertical" />
+                <a href="javascript:;" onClick={(e) => this.edit(record)}>修改</a>
                 <a-divider type="vertical" />
                 <a-popconfirm title="是否删除" onConfirm={() => this.delete(record)} okText="是" cancelText="否">
                   <a-icon slot="icon" type="question-circle-o" style="color: red" />
@@ -145,9 +147,12 @@ export default {
       this.pages.current = pagination.current
       this.init()
     },
-
     edit (record) {
-      this.$refs.JobSaveOrUpdateStreaming.edit('edit', record.job_id)
+      if (record.status === 1) {
+        this.$refs.JobSaveOrUpdateStreaming.edit('show', record.job_id)
+      } else {
+        this.$refs.JobSaveOrUpdateStreaming.edit('edit', record.job_id)
+      }
     },
     delete (record) {
       delObj(record.job_id).then(res => {

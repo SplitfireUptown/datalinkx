@@ -66,7 +66,13 @@
             <div class="redis-type-lable">
               <label>目标数据源表</label>
             </div>
-            <a-select mode="tags" :show-search="true" style="width: 100%" placeholder="目标topic" @change="handleToTbChange">
+            <a-select
+              mode="combobox"
+              :show-search="true"
+              style="width: 100%"
+              placeholder="目标topic"
+              @change="handleToTbChange"
+              v-model="selectedTargetTable">
               <a-select-option v-for="table in targetTables" :value="table" :key="table">
                 {{ table }}
               </a-select-option>
@@ -75,7 +81,24 @@
           </a-col>
         </a-row>
       </a-form-item>
-
+      <a-form-item
+        label=""
+      >
+        <a-row :gutter="16">
+          <a-col :span="6">
+            开启断点续传: <a-switch @change="changeCheckpointConfig" />
+          </a-col>
+          <a-col :span="8"><p v-show="checkpoint">请选择断点续传字段下标: </p></a-col>
+          <a-col :span="8" v-show="checkpoint">
+            <!--            <a-input  />-->
+            <a-select v-model="restore_column_index"  placeholder="索引下标从0开始">
+              <a-select-option v-for="(mapping, index)  in mappings" :value="index" :key="index">
+                {{index}}
+              </a-select-option>
+            </a-select>
+          </a-col>
+        </a-row>
+      </a-form-item>
       <a-form-item label="字段映射关系">
         <a-row :gutter="16">
           <a-col :span="8">
@@ -131,9 +154,11 @@ export default {
       selectedDataSource: null,
       selectedTargetSource: null,
       selectedSourceTable: null,
-      selectedTargetTable: null,
+      selectedTargetTable: '',
       confirmLoading: false,
       jobName: '',
+      restore_column_index: '',
+      checkpoint: false,
       onlyRead: true,
       visible: false,
       type: '',
@@ -160,22 +185,23 @@ export default {
         this.confirmLoading = true
         if (!err) {
           this.confirmLoading = true
-          if (this.selectedTargetTable.length > 1) {
-            this.$message.error('仅支持单表流转')
-            this.confirmLoading = false
-            return
-          }
 
           const formData = {
             'job_id': this.jobId,
             'from_ds_id': this.selectedDataSource,
             'to_ds_id': this.selectedTargetSource,
             'from_tb_name': this.selectedSourceTable,
-            'to_tb_name': this.selectedTargetTable[0],
+            'to_tb_name': this.selectedTargetTable,
             'field_mappings': this.mappings,
-            'job_name': this.jobName
+            'type': 1,
+            'job_name': this.jobName,
+            'sync_mode': {
+              'checkpoint': this.checkpoint,
+              'restore_column_index': this.restore_column_index
+            }
           }
           console.log(this.jobId)
+          console.log(this.type)
           if (this.type === 'edit') {
             streamModifyObj(formData).then(res => {
               this.confirmLoading = false
@@ -204,16 +230,12 @@ export default {
         }
       })
     },
-    readOnly (id) {
-      this.onlyRead = false
-      console.log(this.onlyRead)
-      this.edit('edit', id)
-    },
     edit (type, id, jobType = 'default') {
       this.visible = true
       this.jobType = jobType
       this.type = type
       this.selectloading = true
+      const excludeToDs = [5]
       listQuery().then(res => {
         this.selectloading = false
         const record = res.result
@@ -225,15 +247,20 @@ export default {
               type: a.type
             })
           }
-          this.toDsList.push({
-            dsId: a.dsId,
-            name: a.name,
-            type: a.type
-          })
+          if (!excludeToDs.includes(a.type)) {
+            this.toDsList.push({
+              dsId: a.dsId,
+              name: a.name,
+              type: a.type
+            })
+          }
         }
       })
       console.log(this.fromDsList)
-      if (type === 'edit') {
+      if (type === 'show') {
+        this.onlyRead = false
+      }
+      if (type === 'edit' || type === 'show') {
         getObj(id).then(res => {
           const record = res.result
           this.selectedTargetSource = record.to_ds_id
@@ -243,20 +270,18 @@ export default {
           this.mappings = record.field_mappings
           this.jobId = record.job_id
           this.jobName = record.job_name
-          console.log(this.syncMode)
-
-          this.incrementField = record.sync_mode.increate_field
+          this.checkpoint = record.sync_mode.checkpoint
+          this.restore_column_index = record.sync_mode.restore_column_index
           fetchTables(this.selectedTargetSource).then(res => {
             this.targetTables = res.result
           })
-          this.handleFromTbChange(this.selectedSourceTable)
           fetchTables(this.selectedDataSource).then(res => {
             this.sourceTables = res.result
           })
         })
       }
     },
-    handleFromChange (value) {
+    handleFromChange(value) {
       this.selectedDataSource = value
       // this.selectloading = true
       // console.log('当前选中数据源类型', this.selectedDataSource)
@@ -265,10 +290,13 @@ export default {
       //   this.sourceTables = res.result
       // })
     },
-    handleToTbChange (value) {
+    changeCheckpointConfig(value) {
+      this.checkpoint = value
+    },
+    handleToTbChange(value) {
       this.selectedTargetTable = value
     },
-    handleToDsChange (value) {
+    handleToDsChange(value) {
       this.selectloading = true
       this.selectedTargetSource = value
       console.log('当前选中数据源类型', this.selectedTargetSource)
@@ -279,10 +307,10 @@ export default {
         this.selectloading = false
       })
     },
-    addMapping () {
+    addMapping() {
       this.mappings.push({ sourceField: '', targetField: '' })
     },
-    handleCancel () {
+    handleCancel() {
       this.visible = false
       this.selectedDataSource = null
       this.selectedTargetSource = null
@@ -295,7 +323,7 @@ export default {
       this.mappings = []
       this.jobName = ''
     },
-    removeMapping (index) {
+    removeMapping(index) {
       this.mappings.splice(index, 1)
     }
   }
@@ -307,6 +335,7 @@ export default {
   .job-save-col {
     .redis-type-lable {
       display: flex;
+
       .redis-lable {
         display: block;
         width: 48%;
@@ -314,6 +343,7 @@ export default {
     }
   }
 }
+
 ::v-deep .ds-icon {
   float: left;
   width: 24px;
@@ -321,6 +351,7 @@ export default {
   border-radius: 6px;
   overflow: hidden;
   margin-right: 4px;
+
   img {
     width: 24px;
     height: 24px;

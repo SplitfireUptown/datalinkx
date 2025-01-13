@@ -52,13 +52,15 @@
           </a-col>
           <a-col :span="6" v-show="!isIncrement">开启数据覆盖: <a-switch v-model="trans_cover" @change="changeCover" /></a-col>
           <a-col :span="6"><p v-show="isIncrement">请选择增量字段: </p></a-col>
-          <div class="input-container">
-            <a-select v-show="isIncrement" v-model="incrementField" placeholder="请选择增量字段">
-              <a-select-option v-for="field in sourceFields" :value="field.name" :key="field.name">
-                {{ field.name }}
-              </a-select-option>
-            </a-select>
-          </div>
+          <a-col :span="6">
+<!--            <div class="input-container">-->
+              <a-select v-show="isIncrement" v-model="incrementField" placeholder="请选择增量字段" style="width: 100%">
+                <a-select-option v-for="field in sourceFields" :value="field.name" :key="field.name">
+                  {{ field.name }}
+                </a-select-option>
+              </a-select>
+<!--            </div>-->
+          </a-col>
         </a-row>
       </a-form-item>
       <a-form-item label="选择流转字段">

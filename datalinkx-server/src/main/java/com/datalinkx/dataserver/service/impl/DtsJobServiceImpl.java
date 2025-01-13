@@ -22,6 +22,7 @@ import com.datalinkx.dataserver.bean.domain.JobRelationBean;
 import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.client.xxljob.JobClientApi;
 import com.datalinkx.dataserver.client.xxljob.request.XxlJobParam;
+import com.datalinkx.dataserver.config.CommonProperties;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
 import com.datalinkx.dataserver.repository.DsRepository;
@@ -74,29 +75,8 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Autowired
     JobClientApi jobClientApi;
 
-    @Value("${data-transfer.fetch-size:1000}")
-    Integer fetchSize;
-
-    @Value("${data-transfer.stream-batch-size:10}")
-    Integer streamBatchSize;
-
-    @Value("${data-transfer.query-time-out:10000}")
-    Integer queryTimeOut;
-
-    @Value("${client.ollama.url}")
-    String ollamaUrl;
-
-    @Value("${llm.model:}")
-    String llmModel;
-
-    @Value("${llm.response_parse:}")
-    String responseParse;
-
-    @Value("${llm.temperature:0.1}")
-    String temperature;
-
-    @Value("${llm.inner_prompt:}")
-    String innerPrompt;
+    @Autowired
+    CommonProperties commonProperties;
 
     @Override
     public DataTransJobDetail getJobExecInfo(String jobId) {
@@ -117,12 +97,24 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Override
     public DataTransJobDetail getStreamJobExecInfo(String jobId) {
         JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
-        List<DataTransJobDetail.Column> columns = JsonUtils.toList(jobBean.getConfig(), JobForm.FieldMappingForm.class).stream()
-                .filter(x -> StringUtils.isNotEmpty(x.getSourceField()) && StringUtils.isNotEmpty(x.getTargetField()))
-                .map(x -> DataTransJobDetail.Column.builder()
-                        .name(x.getSourceField())
-                        .build())
-                .collect(Collectors.toList());
+        List<DataTransJobDetail.Column> fromColumns = new ArrayList<>();
+        List<DataTransJobDetail.Column> toColumns = new ArrayList<>();
+
+        JsonUtils.toList(jobBean.getConfig(), JobForm.FieldMappingForm.class).stream()
+        .filter(x -> StringUtils.isNotEmpty(x.getSourceField()) && StringUtils.isNotEmpty(x.getTargetField()))
+        .forEach(x -> {
+            fromColumns.add(DataTransJobDetail.Column.builder()
+                    .name(x.getSourceField())
+                    .build());
+            toColumns.add(DataTransJobDetail.Column.builder()
+                    .name(x.getTargetField())
+                    .build());
+        });
+
+        JobForm.SyncModeForm syncModeForm = JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class);
+        Map<String, Object> commonSettings = new HashMap<>();
+        commonSettings.put(MetaConstants.CommonConstant.KEY_KAFKA_READ_INDEX, commonProperties.getKafkaReadMode());
+        commonSettings.put(MetaConstants.CommonConstant.KEY_RESTORE_COLUMN_INDEX, syncModeForm.getRestoreColumnIndex());
 
         List<String> dsIds = new ArrayList<>(Arrays.asList(jobBean.getReaderDsId(), jobBean.getWriterDsId()));
         Map<String, DsBean> dsId2Object = dsRepository.findAllByDsIdIn(dsIds)
@@ -131,16 +123,16 @@ public class DtsJobServiceImpl implements DtsJobService {
 
         DataTransJobDetail.Reader reader = DataTransJobDetail.Reader.builder()
                 .tableName(jobBean.getFromTbId())
-                .columns(columns)
+                .columns(fromColumns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getReaderDsId())))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsId2Object.get(jobBean.getReaderDsId()).getType()))
                 .build();
 
         DataTransJobDetail.Writer writer = DataTransJobDetail.Writer.builder()
                 .tableName(jobBean.getToTbId())
-                .columns(columns)
+                .columns(toColumns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getWriterDsId())))
-                .batchSize(streamBatchSize)
+                .batchSize(commonProperties.getStreamBatchSize())
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsId2Object.get(jobBean.getWriterDsId()).getType()))
                 .build();
 
@@ -148,6 +140,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .builder()
                 .reader(reader)
                 .writer(writer)
+                .commonSettings(commonSettings)
                 .checkpoint(jobBean.getCheckpoint())
                 .build();
         return DataTransJobDetail.builder().jobId(jobId).syncUnit(syncUnit).build();
@@ -185,8 +178,8 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .builder()
                 .type(syncModeForm.getMode())
                 .syncCondition(syncCond)
-                .queryTimeOut(queryTimeOut)
-                .fetchSize(fetchSize)
+                .queryTimeOut(commonProperties.getQueryTimeOut())
+                .fetchSize(commonProperties.getFetchSize())
                 .build();
 
         String selectField = jobConf.stream()
@@ -275,19 +268,19 @@ public class DtsJobServiceImpl implements DtsJobService {
         }
 
         compute.setTransforms(transforms);
-        compute.setCommonSettings(new HashMap<String, Object>() {{
-            put("openai.api_path", ollamaUrl + "/api/chat");
-            put("model", llmModel);
-            put("response_parse", responseParse);
-            put("temperature", temperature);
-            put("inner_prompt", innerPrompt);
-        }});
 
         // 如果计算过程中存在SQL节点，把reader中的queryFields改成*防止SQL中引用了未映射字段导致报错
         if (containSQLNode) {
             syncUnit.getReader().setQueryFields("*");
         }
 
+        syncUnit.setCommonSettings(new HashMap<String, Object>() {{
+            put("openai.api_path", commonProperties.getOllamaUrl() + "/api/chat");
+            put("model", commonProperties.getLlmModel());
+            put("response_parse", commonProperties.getResponseParse());
+            put("temperature", commonProperties.getTemperature());
+            put("inner_prompt", commonProperties.getInnerPrompt());
+        }});
         syncUnit.setCompute(compute);
     }
 

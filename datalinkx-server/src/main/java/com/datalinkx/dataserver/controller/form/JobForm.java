@@ -100,6 +100,9 @@ public class JobForm {
 		private String increateField;
 		@JsonProperty("increate_value")
 		private String increateValue = "";
+		private Boolean checkpoint;
+		@JsonProperty("restore_column_index")
+		private String restoreColumnIndex;
 	}
 
 	@Data

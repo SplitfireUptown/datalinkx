@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author: uptown
  * @date: 2024/4/27 17:15
@@ -26,4 +29,5 @@ public class StreamFlinkActionMeta extends EngineActionMeta {
     String writerDsInfo;
     String checkpoint;
     String lockId;
+    Map<String, Object> commonSettings;
 }

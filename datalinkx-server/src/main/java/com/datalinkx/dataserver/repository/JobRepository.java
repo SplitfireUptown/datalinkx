@@ -22,6 +22,9 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 
 	List<JobBean> findByJobIdIn(List<String> jobIds);
 
+	@Query(value = "select * from JOB where type = :type and status in :jobStatus and retry_time < 5 and is_del = 0", nativeQuery = true)
+	List<JobBean> findRestartJob(Integer type, List<Integer> jobStatus);
+
 	@Query(value = "select * from JOB where (reader_ds_id = :jobId or writer_ds_id = :jobId)", nativeQuery = true)
 	List<JobBean> findDependJobId(String jobId);
 
@@ -32,6 +35,16 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 	@Transactional
 	@Query(value = "update JOB set status = :status where job_id = :jobId", nativeQuery = true)
 	void updateJobStatus(String jobId, Integer status);
+
+	@Modifying
+	@Transactional
+	@Query(value = "update JOB set status = :status, error_msg = :errorMsg  where job_id = :jobId", nativeQuery = true)
+	void updateJobStatus(String jobId, Integer status, String errorMsg);
+
+	@Modifying
+	@Transactional
+	@Query(value = "update JOB set retry_time = retry_time + 1 where job_id = :jobId", nativeQuery = true)
+	void addRetryTime(String jobId);
 
 	@Modifying
 	@Transactional

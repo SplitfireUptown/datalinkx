@@ -64,9 +64,6 @@ public class StreamJobServiceImpl implements StreamJobService {
     @Autowired
     FlinkClient flinkClient;
 
-    @Autowired
-    LinkedBlockingQueue<String> streamTaskQueue;
-
     @Value("${data-transfer.checkpoint-path:file:///tmp}")
     String checkpointPath;
 
@@ -102,6 +99,7 @@ public class StreamJobServiceImpl implements StreamJobService {
         jobBean.setFromTbId(form.getFromTbName());
         jobBean.setToTbId(form.getToTbName());
         jobBean.setName(form.getJobName());
+        jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
         jobRepository.save(jobBean);
         return form.getJobId();
     }
