@@ -61,7 +61,7 @@ public class StreamTaskChecker extends TimerTask {
 
     @Override
     public void run() {
-        String querySQL = "SELECT job_id, status FROM JOB where type = 1 and status in (0, 1, 3) and is_del = 0";
+        String querySQL = "SELECT job_id, status FROM JOB where type = 1 and status in (1, 3) and is_del = 0";
         List<StreamTaskBean> streamTaskBeans = jdbcTemplate.queryForList(querySQL).stream().map(item ->
                 StreamTaskBean
                 .builder()
@@ -105,11 +105,7 @@ public class StreamTaskChecker extends TimerTask {
 
                 // 如果任务是失败，重新提交
                 if (MetaConstants.JobStatus.JOB_STATUS_ERROR == streamTaskBean.getStatus() && !streamTaskQueue.contains(streamTaskBean.getJobId())) {
-                    this.addStreamTaskQueue(streamTaskBean.getJobId());
-                }
-
-                if (MetaConstants.JobStatus.JOB_STATUS_CREATE == streamTaskBean.getStatus()) {
-                    this.addStreamTaskQueue(streamTaskBean.getJobId());
+                    streamTaskQueue.add(streamTaskBean.getJobId());
                 }
             }
         } catch (Throwable t) {
