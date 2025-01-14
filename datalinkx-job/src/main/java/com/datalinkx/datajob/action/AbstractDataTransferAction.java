@@ -76,6 +76,7 @@ public abstract class AbstractDataTransferAction<T extends DataTransJobDetail, U
                             this.afterExec(execUnit, true);
                             break;
                         }
+                        Thread.sleep(5000);
                     } catch (Exception e) {
                         log.error("data-transfer-job error ", e);
                         String errorMsg = e.getMessage();

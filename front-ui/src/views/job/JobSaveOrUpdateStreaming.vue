@@ -91,9 +91,9 @@
           <a-col :span="8"><p v-show="checkpoint">请选择断点续传字段下标: </p></a-col>
           <a-col :span="8" v-show="checkpoint">
             <!--            <a-input  />-->
-            <a-select v-model="restore_column_index"  placeholder="索引下标从0开始">
-              <a-select-option v-for="(mapping, index)  in mappings" :value="index" :key="index">
-                {{index}}
+            <a-select v-model="restore_column_index" placeholder="索引下标从0开始">
+              <a-select-option v-for="(mapping, index) in mappings" :value="index" :key="index">
+                {{ index }}
               </a-select-option>
             </a-select>
           </a-col>
@@ -281,7 +281,7 @@ export default {
         })
       }
     },
-    handleFromChange(value) {
+    handleFromChange (value) {
       this.selectedDataSource = value
       // this.selectloading = true
       // console.log('当前选中数据源类型', this.selectedDataSource)
@@ -290,14 +290,14 @@ export default {
       //   this.sourceTables = res.result
       // })
     },
-    changeCheckpointConfig(value) {
+    changeCheckpointConfig (value) {
       this.checkpoint = value
     },
-    handleToTbChange(value) {
+    handleToTbChange (value) {
       this.selectedTargetTable = value
     },
-    handleToDsChange(value) {
-      this.selectloading = true
+    handleToDsChange (value) {
+      this.seyarnlectloading = true
       this.selectedTargetSource = value
       console.log('当前选中数据源类型', this.selectedTargetSource)
       fetchTables(value).then(res => {
@@ -307,10 +307,10 @@ export default {
         this.selectloading = false
       })
     },
-    addMapping() {
+    addMapping () {
       this.mappings.push({ sourceField: '', targetField: '' })
     },
-    handleCancel() {
+    handleCancel () {
       this.visible = false
       this.selectedDataSource = null
       this.selectedTargetSource = null
@@ -323,7 +323,7 @@ export default {
       this.mappings = []
       this.jobName = ''
     },
-    removeMapping(index) {
+    removeMapping (index) {
       this.mappings.splice(index, 1)
     }
   }

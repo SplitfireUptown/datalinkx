@@ -126,7 +126,7 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           this.confirmLoading = true
-          await addObj(values).then(res => {
+          addObj(values).then(res => {
             if (res.status === '0') {
               this.$emit('ok')
               this.confirmLoading = false
@@ -140,6 +140,9 @@ export default {
           }).catch(err => {
             this.confirmLoading = false
             this.$message.error(err.errstr)
+          }).finally(res => {
+            this.job_id = ''
+            this.sub_job_id = ''
           })
         }
       })

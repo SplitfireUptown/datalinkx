@@ -347,8 +347,8 @@ export default {
       listQuery().then(res => {
         this.selectloading = false
         const record = res.result
-        const excludeFromDs = [4, 5]
-        const excludeToDs = [5]
+        const excludeFromDs = [4, 5, 100]
+        const excludeToDs = [5, 100]
         for (var a of record) {
           // redis数据源暂不支持读
           if (!excludeFromDs.includes(a.type)) {

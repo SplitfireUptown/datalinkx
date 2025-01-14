@@ -23,11 +23,6 @@ public class RedisQueueProcessor extends MessageHubServiceImpl {
         stringRedisTemplate.opsForList().leftPush(producerAdapterForm.getTopic(), producerAdapterForm.getMessage());
     }
 
-    /**
-     * 照搬python common逻辑
-     * @param messageForm
-     */
-    @Async
     @Override
     public void consume(ConsumerAdapterForm messageForm) {
         String topic = messageForm.getTopic();

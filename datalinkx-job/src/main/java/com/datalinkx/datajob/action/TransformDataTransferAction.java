@@ -27,6 +27,8 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
+
 
 @Slf4j
 @Component
@@ -50,11 +52,15 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
     @Override
     protected void end(SeatunnelActionMeta unit, int status, String errmsg) {
         log.info(String.format("transform job jobid: %s, end to transfer", unit.getJobId()));
-        // 修改任务状态，存储checkpoint
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(unit.getJobId())
                 .jobStatus(status).endTime(new Date().getTime()).startTime(START_TIME.get())
                 .errmsg(errmsg)
                 .build());
+
+        // 父任务执行成功后级联触发子任务
+        if (JOB_STATUS_SUCCESS == status) {
+            datalinkXServerClient.cascadeJob(unit.getJobId());
+        }
     }
 
     @Override

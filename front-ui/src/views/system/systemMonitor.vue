@@ -1,5 +1,6 @@
 <template>
   <a-card title="系统状态">
+    <LoadingDx size="'size-1x'" v-if="selectloading"></LoadingDx>
     <a-descriptions column="1">
       <a-descriptions-item label="磁盘总量">{{ systemStatus.totalDisk }}</a-descriptions-item>
       <a-descriptions-item label="磁盘空闲量">{{ systemStatus.freeDisk }}</a-descriptions-item>
@@ -19,13 +20,16 @@
 <script>
 import { Card, Table } from 'ant-design-vue'
 import { getSystemMonitor } from '@/api/system/monitor'
+import LoadingDx from '@/components/common/loading-dx.vue'
 
 export default {
   components: {
+    LoadingDx,
     'a-card': Card
   },
   data () {
     return {
+      selectloading: false,
       systemStatus: {
         totalDisk: '',
         freeDisk: '',
@@ -43,8 +47,11 @@ export default {
     }
   },
   created () {
+    this.selectloading = true
     getSystemMonitor().then(res => {
       this.systemStatus = res.result
+    }).finally(res => {
+      this.selectloading = false
     })
   }
 }
