@@ -8,8 +8,9 @@ import com.datalinkx.dataserver.bean.domain.SysUserBean;
 import com.datalinkx.dataserver.repository.ImageRepository;
 import com.datalinkx.dataserver.repository.SysRoleRepository;
 import com.datalinkx.dataserver.service.ISysUserService;
+import com.datalinkx.dataserver.utils.RSAEncrypt;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.Build;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static com.datalinkx.dataserver.utils.SecurityUtils.getUserId;
+import static com.datalinkx.dataserver.utils.SecurityUtils.*;
 
 
 /**
@@ -51,11 +52,12 @@ public class SysUserController
         HashMap<String, Object> resultMap = new HashMap<>();
         SysUserBean sysUserBean;
         if (Objects.isNull(userId)) {
-            userId=getUserId();
+            userId = getUserId();
         }
         sysUserBean = userService.selectUserById(userId);
         ArrayList<SysRoleBean> sysRoleBean = new ArrayList<>(sysRoleRepository.selectRoleByUserId(userId));
-        imageRepository.findById(Integer.valueOf(sysUserBean.getAvatar())).ifPresent(imageBean -> {
+        Integer i = StringUtils.isNotEmpty(sysUserBean.getAvatar()) ? Integer.parseInt(sysUserBean.getAvatar()) : -1;
+        imageRepository.findById(i).ifPresent(imageBean -> {
             byte[] imageData = imageBean.getData();
             // 将二进制数据转换为Base64编码
             String encodedImage = Base64.getEncoder().encodeToString(imageData);
@@ -65,9 +67,10 @@ public class SysUserController
         resultMap.put("roles", sysRoleBean);
         return WebResult.of(resultMap);
     }
-    
+
     /**
      * 修改用户
+     * @param user
      */
     @PutMapping
     public WebResult<Integer> edit(@Validated @RequestBody SysUserBean user)
@@ -88,7 +91,11 @@ public class SysUserController
         return WebResult.of(userService.updateUser(user));
     }
 
-
+    /**
+     * 修改用户头像
+     * @param file
+     * @return
+     */
     @PostMapping(value = "/avatar")
     public WebResult<HashMap<String, String>> avatar(@RequestParam("file") MultipartFile file) {
         try {
@@ -110,5 +117,19 @@ public class SysUserController
             e.printStackTrace();
             return WebResult.fail(new DatalinkXServerException("上传图片失败"));
         }
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param user
+     * @return
+     */
+    @PutMapping("/resetUserPwd")
+    public WebResult<Integer> resetUserPwd(@RequestBody SysUserBean user) throws Exception {
+        if (Objects.equals(user.getUserId(), getUserId()))
+            return WebResult.of(userService.resetUserPwd(getUsername(), encryptPassword(RSAEncrypt.decrypt(user.getPassword())), user.getPasswordLevel()));
+        else
+            return WebResult.fail(new DatalinkXServerException("只能重置自己的密码"));
     }
 }

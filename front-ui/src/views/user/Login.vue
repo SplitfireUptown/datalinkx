@@ -103,7 +103,7 @@ export default {
       customActiveKey: 'tab1',
       loginBtn: false,
       // login type: 0 email, 1 username, 2 telephone
-      loginType: 0,
+      loginType: 1,
       isLoginError: false,
       message: '',
       requiredTwoStepCaptcha: false,
@@ -113,7 +113,7 @@ export default {
         time: 60,
         loginBtn: false,
         // login type: 0 email, 1 username, 2 telephone
-        loginType: 0,
+        loginType: 1,
         smsSendBtn: false
       }
     }
@@ -160,7 +160,6 @@ export default {
 
       validateFields(validateFieldsKey, { force: true }, (err, values) => {
         if (!err) {
-          console.log('login form', values)
           const loginParams = { ...values }
           delete loginParams.username
           loginParams[!state.loginType ? 'email' : 'username'] = values.username
@@ -168,7 +167,6 @@ export default {
             loginParams.password = res
             Login(loginParams)
               .then((res) => {
-                console.log(res)
                 if (res.status !== '0') {
                   this.requestFailed(res)
                 } else {
@@ -231,7 +229,6 @@ export default {
       })
     },
     loginSuccess (res) {
-      console.log(res)
       // check res.homePage define, set $router.push name res.homePage
       // Why not enter onComplete
       /*

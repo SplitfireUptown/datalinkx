@@ -59,6 +59,9 @@ public class SysUserBean {
     @Column(name = "password")
     private String password;
     @Basic
+    @Column(name = "password_level")
+    private String passwordLevel;
+    @Basic
     @Column(name = "status")
     private String status;
     @Basic

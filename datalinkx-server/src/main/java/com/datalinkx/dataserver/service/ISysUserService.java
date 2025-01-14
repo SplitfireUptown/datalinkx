@@ -121,7 +121,7 @@ public interface ISysUserService {
      * @param user 用户信息
      * @return 结果
      */
-    public boolean registerUser(SysUserBean user);
+    public SysUserBean registerUser(SysUserBean user);
 
     /**
      * 修改用户信息
@@ -179,7 +179,7 @@ public interface ISysUserService {
      * @param password 密码
      * @return 结果
      */
-    public int resetUserPwd(String userName, String password);
+    public int resetUserPwd(String userName, String password, String passwordLevel);
 
     /**
      * 通过用户ID删除用户

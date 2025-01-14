@@ -87,7 +87,6 @@ const permission = {
             }
           })
           newRouters.push(notFoundRouter)
-          console.log('newRouters', newRouters)
           commit('SET_ROUTERS', newRouters)
           resolve()
         }).catch(() => {

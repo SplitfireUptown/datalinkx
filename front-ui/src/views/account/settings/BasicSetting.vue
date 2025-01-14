@@ -65,7 +65,7 @@ export default {
       form: this.$form.createForm(this),
       preview: {},
       option: {
-        img: '/avatar2.jpg'
+        img: ''
       }
     }
   },

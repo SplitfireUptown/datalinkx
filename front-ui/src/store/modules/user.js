@@ -41,14 +41,18 @@ const user = {
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
           const result = (response.result || {})
-          storage.set(ACCESS_TOKEN, 'Bearer ' + result.token, new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
+          if (response.status === '0') {
+            storage.set(ACCESS_TOKEN, 'Bearer ' + result.token, new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
+          }
           getUserInfo().then(response => {
-            const { result } = response
-            storage.set(AVATAR, `data:image/jpeg;base64,${result.avatar}`)
-            storage.set(USER, result.user)
-            storage.set(ROLES, result.roles)
+            if (response.status === '0') {
+              const { result } = response
+              result.avatar ? storage.set(AVATAR, `data:image/jpeg;base64,${result.avatar}`) : storage.set(AVATAR, '/avatar2.jpg')
+              storage.set(USER, result.user)
+              storage.set(ROLES, result.roles)
+              commit('SET_TOKEN', result.token)
+            }
           })
-          commit('SET_TOKEN', result.token)
           resolve(response)
         }).catch(error => {
           reject(error)

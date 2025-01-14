@@ -79,7 +79,7 @@ public class TokenService {
      * 设置用户身份信息
      */
     public void setLoginUser(LoginUser loginUser) {
-        if (!Objects.isNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
+        if (Objects.nonNull(loginUser) && StringUtils.isNotEmpty(loginUser.getToken())) {
             refreshToken(loginUser);
         }
     }

@@ -1,5 +1,6 @@
 package com.datalinkx.dataserver.service.impl;
 
+import com.datalinkx.common.constants.UserConstants;
 import com.datalinkx.dataserver.bean.domain.SysUserBean;
 import com.datalinkx.dataserver.repository.SysUserRepository;
 import com.datalinkx.dataserver.service.ISysUserService;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class SysUserServiceImpl implements ISysUserService {
@@ -55,7 +57,12 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public boolean checkUserNameUnique(SysUserBean user) {
-        return false;
+        String userId = Objects.isNull(user.getUserId()) ? "-1L" : user.getUserId();
+        SysUserBean info = sysUserRepository.selectUserByUserName(user.getUserName());
+        if (Objects.nonNull(info) && !info.getUserId().equals(userId)) {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
     }
 
     @Override
@@ -84,13 +91,13 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public boolean registerUser(SysUserBean user) {
-        return false;
+    public SysUserBean registerUser(SysUserBean user) {
+        return sysUserRepository.save(user);
     }
 
     @Override
     public Integer updateUser(SysUserBean user) {
-        return  sysUserRepository.saveByUserId(user);
+        return sysUserRepository.saveByUserId(user);
     }
 
     @Override
@@ -110,7 +117,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public boolean updateUserAvatar(String userId, String avatar) {
-       return sysUserRepository.updateAvatar(userId, avatar) > 0;
+        return sysUserRepository.updateAvatar(userId, avatar) > 0;
     }
 
     @Override
@@ -119,8 +126,8 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public int resetUserPwd(String userName, String password) {
-        return 0;
+    public int resetUserPwd(String userName, String password, String passwordLevel) {
+        return sysUserRepository.resetUserPwd(userName, password, passwordLevel);
     }
 
     @Override

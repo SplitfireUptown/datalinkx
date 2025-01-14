@@ -3,8 +3,8 @@ import request from '@/utils/request'
 const userApi = {
   Login: '/login',
   Logout: '/logout',
+  Register: '/register',
   ForgePassword: '/auth/forge-password',
-  Register: '/auth/register',
   twoStepCode: '/auth/2step-code',
   SendSms: '/account/sms',
   SendSmsErr: '/account/sms_err',
@@ -86,5 +86,18 @@ export function getPubKey () {
   return request({
     url: userApi.GetPubKey,
     method: 'get'
+  })
+}
+
+/**
+ * 用户注册
+ * @param parameter
+ * @returns {*}
+ */
+export function register (parameter) {
+  return request({
+    url: userApi.Register,
+    method: 'post',
+    data: parameter
   })
 }

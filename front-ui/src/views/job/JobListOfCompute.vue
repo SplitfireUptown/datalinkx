@@ -1,18 +1,23 @@
 <template>
   <a-card :bordered="false">
-    <div class="table-operator">
-      <a-button @click="newCompute" icon="plus" type="primary">新建</a-button>
-    </div>
-    <a-table
-      :columns="columns"
-      :dataSource="tableData"
-      :loading="loading"
-      :pagination="pagination"
-      :rowKey="record => record.job_id"
-      @change="handleTableChange"
-    >
-    </a-table>
+    <template v-if="!showJobCompute">
+      <div class="table-operator">
+        <a-button @click="newCompute" icon="plus" type="primary">新建</a-button>
+      </div>
+      <a-table
+        :columns="columns"
+        :dataSource="tableData"
+        :loading="loading"
+        :pagination="pagination"
+        :rowKey="record => record.job_id"
+        @change="handleTableChange"
+      >
+      </a-table>
+    </template>
     <div v-if="showJobCompute" class="job-compute-overlay">
+      <div class="table-operator">
+        <a-button @click="showJobCompute=!showJobCompute" icon="plus" type="primary">返回</a-button>
+      </div>
       <job-compute ref="JobCompute" :jobId="this.currentJobId"></job-compute>
     </div>
   </a-card>
@@ -224,12 +229,12 @@
 
 <style scoped>
   .job-compute-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 1);
-    z-index: 19;
+    //position: fixed;
+    //top: 0;
+    //left: 0;
+    //width: 100%;
+    //height: 100%;
+    //background: rgba(255, 255, 255, 1);
+    //z-index: 19;
   }
 </style>

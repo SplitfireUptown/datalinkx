@@ -172,7 +172,6 @@ export default {
         ...this.pages
       }).then(res => {
         this.tableData = res.result.data
-        console.log(res)
         this.pagination.total = +res.result.total
         this.loading = false
       }).catch(reason => {
