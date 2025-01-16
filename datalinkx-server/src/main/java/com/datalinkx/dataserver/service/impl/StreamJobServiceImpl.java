@@ -25,6 +25,7 @@ import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.client.xxljob.JobClientApi;
+import com.datalinkx.dataserver.config.CommonProperties;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
@@ -64,8 +65,9 @@ public class StreamJobServiceImpl implements StreamJobService {
     @Autowired
     FlinkClient flinkClient;
 
-    @Value("${data-transfer.checkpoint-path:file:///tmp}")
-    String checkpointPath;
+    @Autowired
+    CommonProperties commonProperties;
+
 
     @Override
     public String createStreamJob(JobForm.JobCreateForm form) {
@@ -192,7 +194,7 @@ public class StreamJobServiceImpl implements StreamJobService {
         if (!ObjectUtils.isEmpty(jobBean.getTaskId())) {
             FlinkJobStopReq flinkJobStopReq = new FlinkJobStopReq();
             flinkJobStopReq.setDrain(true);
-            String checkpoint = String.format("%s/%s", checkpointPath, jobBean.getJobId());
+            String checkpoint = String.format("%s/%s", commonProperties.getCheckpointPath(), jobBean.getJobId());
 
             // 如果之前记录的checkpoint目录存在，则删除
             File directory = new File(checkpoint);
