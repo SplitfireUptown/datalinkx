@@ -23,7 +23,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
 
     @Override
     public List<SysMenuBean> selectMenuList(String userId) {
-        return null;
+        return sysMenuRepository.selectMenuTreeByUserId(userId);
     }
 
     @Override
