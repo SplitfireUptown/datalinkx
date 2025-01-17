@@ -19,6 +19,8 @@ import httpPng from '@/assets/icons/HTTP.png'
 import redisPng from '@/assets/icons/REDIS.png'
 import kafkaPng from '@/assets/icons/KAFKA.png'
 import logo from '@/assets/logo.svg?inline'
+import systemManagement from '@/assets/icons/system-management.svg?inline'
+import menuManagement from '@/assets/icons/menu-management.svg?inline'
 
 export {
   bxAnaalyse,
@@ -33,7 +35,9 @@ export {
   httpPng,
   redisPng,
   kafkaPng,
-  logo
+  logo,
+  systemManagement,
+  menuManagement
 }
 
 export const icons = {
@@ -49,5 +53,7 @@ export const icons = {
   httpPng: httpPng,
   redisPng: redisPng,
   kafkaPng: kafkaPng,
-  logo: logo
+  logo: logo,
+  systemManagement: systemManagement,
+  menuManagement: menuManagement
 }

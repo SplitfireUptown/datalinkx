@@ -3,12 +3,13 @@
     title="编辑菜单"
     :width="800"
     :visible="visible"
+    :confirmLoading="confirmLoading"
     @cancel="handleCancel"
     @ok="handleOk"
   >
-    <a-form :form="form" layout="vertical">
+    <a-form :form="form" layout="vertical" style=".ant-form-item{margin-bottom: 5px}">
       <a-form-item label="菜单名称">
-        <a-input v-decorator="[ 'title', { initialValue: menu.title } ]" />
+        <a-input v-decorator="[ 'menuName', { initialValue: menu.menuName } ]" />
       </a-form-item>
       <a-form-item label="组件">
         <a-input v-decorator="[ 'component', { initialValue: menu.component } ]" />
@@ -19,38 +20,33 @@
       <a-form-item label="路径">
         <a-input v-decorator="[ 'path', { initialValue: menu.path } ]" />
       </a-form-item>
-      <a-form-item label="图标" v-if="!iconEdit">
-        <div style="display: flex">
-          <div style="flex: 1">
-            <a-input>
-              <img slot="prefix" v-if="currentIcon(menu.icon)" :src="menu.icon" alt="icon" style="width: 16px; margin-right: 8px;" />
-              <a-icon slot="prefix" v-else :component="menu.icon" style="margin-right: 8px;" />
-            </a-input>
-          </div>
-          <div style="align-content: center;width: 20%;text-align: end">
-            <a v-if="!iconEdit" @click="iconEdit = true">编辑图标</a>
-          </div>
-        </div>
+      <a-form-item label="父级菜单">
+        <a-tree-select
+          :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+          v-decorator="[ 'parentId', { initialValue: menu.parentId } ]"
+          :treeData="menuTree"
+          placeholder="请选择父级菜单"
+          @select="onSelect"
+          allowClear
+        />
       </a-form-item>
-      <a-form-item label="图标" v-else>
+      <a-form-item label="图标">
         <div style="display: flex">
           <div style="flex: 1">
             <a-select
-              v-decorator="[ 'icon' ]"
+              v-decorator="[ 'icon', { initialValue: menu.icon } ]"
               placeholder="请选择图标"
               allow-clear
             >
               <a-select-option
-                v-for="(icon, key) in Object.entries(icons)"
-                :key="key"
-                :value="key">
+                v-for="icon in Object.entries(icons)"
+                :key="icon[0]"
+                :value="icon[0]">
                 <img v-if="currentIcon(icon[1])" :src="icon[1]" alt="icon" style="width: 16px; margin-right: 8px;" />
                 <a-icon v-else :component="icon[1]" style="margin-right: 8px;" />
+                {{ icon[0] }}
               </a-select-option>
             </a-select>
-          </div>
-          <div style="align-content: center;width: 20%;text-align: end">
-            <a v-if="iconEdit" @click="iconEdit = false">取消</a>
           </div>
         </div>
       </a-form-item>
@@ -59,6 +55,13 @@
         <a-radio-group v-decorator="[ 'isCache', { initialValue: menu.isCache } ]">
           <a-radio value="1">是</a-radio>
           <a-radio value="0">否</a-radio>
+        </a-radio-group>
+      </a-form-item>
+      <a-form-item label="菜单类型">
+        <a-radio-group v-decorator="[ 'menuType', { initialValue: menu.menuType } ]">
+          <a-radio value="M">目录</a-radio>
+          <a-radio value="C">菜单</a-radio>
+          <a-radio value="F">按钮</a-radio>
         </a-radio-group>
       </a-form-item>
       <a-form-item label="排序">
@@ -70,6 +73,7 @@
 
 <script>
 import { icons } from '@/core/icons'
+import { updateMenu } from '@/api/system/menu'
 
 export default {
   name: 'EditMenu',
@@ -86,12 +90,16 @@ export default {
     menu: {
       type: Object,
       default: () => ({})
+    },
+    menuTree: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
     return {
       form: this.$form.createForm(this),
-      iconEdit: false
+      confirmLoading: false
     }
   },
   methods: {
@@ -102,10 +110,39 @@ export default {
       this.$emit('update:visible', false)
     },
     handleOk () {
-      this.$emit('update:visible', false)
+      this.confirmLoading = true
+      const { form: { validateFields } } = this
+      validateFields((err, values) => {
+        if (!err) {
+          values.menuId = this.menu.menuId
+          updateMenu(values).then((res) => {
+            this.confirmLoading = false
+            if (res.status === '0') {
+              if (values.menuId) { this.$message.success('编辑成功') } else { this.$message.success('新增成功') }
+              this.$emit('update:visible', false)
+            } else {
+              this.$message.error(res.errstr)
+            }
+          }).catch((err) => {
+            this.confirmLoading = false
+            this.$message.error(err)
+          })
+        } else {
+          this.confirmLoading = false
+        }
+      })
+    },
+    onSelect (value, node, extra) {
+      if (value === this.menu.menuId) {
+        this.$message.error('不能选择自己作为父级菜单')
+        this.$nextTick(() => {
+          this.form.setFieldsValue({ parentId: this.menu.parentId })
+        })
+      }
     }
   },
   mounted () {
+    this.form.getFieldDecorator('icon', { initialValue: this.menu.iconPath || 'logon' })
   }
 }
 </script>

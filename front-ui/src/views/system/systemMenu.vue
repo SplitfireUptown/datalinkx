@@ -1,6 +1,9 @@
 <template>
   <a-card title="系统菜单">
-    <a-input-search style="margin-bottom: 8px" placeholder="搜索" @change="onChange"/>
+    <div style="display: flex">
+      <a-input-search style="margin-right: 200px;margin-bottom: 8px" placeholder="搜索" @change="onChange"/>
+      <a-button type="primary" style="margin-bottom: 8px" @click="editMenu({})">新增</a-button>
+    </div>
     <div>
       <a-table
         v-if="menuTree.length > 0"
@@ -8,6 +11,7 @@
         :data-source="menuTree"
         :columns="columns"
         :pagination="false"
+        :expandable="expandable"
         :expanded-row-keys.sync="expandedKeys"
         :row-selection="rowSelection">
         <template v-slot:customTitle="customTitle">
@@ -19,11 +23,17 @@
           <span v-else>{{ customTitle }}</span>
         </template>
         <template v-slot:icon="icon">
-          <a-icon :component="icon" />
+          <img v-if="currentIcon(icon)" :src="icon" alt="icon" style="width: 16px; margin-right: 8px;" />
+          <a-icon v-else :component="icon" />
         </template>
         <template v-slot:isCache="isCache">
           <span v-if="isCache === '1'">是</span>
           <span v-else>否</span>
+        </template>
+        <template v-slot:menuType="menuType">
+          <span v-if="menuType === 'M'">目录</span>
+          <span v-else-if="menuType === 'C'">菜单</span>
+          <span v-else>按钮</span>
         </template>
         <template v-slot:action="record">
           <a-button type="primary" size="small" @click="editMenu(record)">编辑</a-button>
@@ -31,7 +41,7 @@
         </template>
       </a-table>
     </div>
-    <EditMenu v-if="visible" :visible.sync="visible" :menu="menu"/>
+    <EditMenu v-if="visible" :visible.sync="visible" :menu="menu" :menu-tree="menuTree"/>
   </a-card>
 </template>
 
@@ -87,6 +97,12 @@ export default {
           scopedSlots: { customRender: 'isCache' }
         },
         {
+          title: '类型',
+          dataIndex: 'menuType',
+          key: 'menuType',
+          scopedSlots: { customRender: 'menuType' }
+        },
+        {
           title: '排序',
           dataIndex: 'orderNum',
           key: 'orderNum'
@@ -129,7 +145,6 @@ export default {
     },
     // 将菜单数据转换为树形结构
     convertMenusToTreeData (menus) {
-      this.checkedKeys = menus.map(menu => menu.menuId)
       this.expandedKeys = ['1']
       const map = new Map()
       const treeData = []
@@ -139,14 +154,15 @@ export default {
           title: this.$t(menu.menuName), // 菜单名称
           value: menu.menuId, // 唯一标识
           key: menu.menuId, // 同样用 menuId 做 key
-          children: [], // 初始化子节点为空数组
+          children: null, // 初始化子节点
           component: menu.component,
           isCache: menu.isCache,
           routeName: menu.routeName,
           path: menu.path,
+          parentId: menu.parentId,
+          menuType: menu.menuType,
           icon: icons[menu.icon] || icons['logo'],
-          orderNum: menu.orderNum,
-          isParent: false
+          orderNum: menu.orderNum
         }
         map.set(menu.menuId, node)
 
@@ -158,6 +174,7 @@ export default {
           // 否则将其放入父节点的 children 中
           const parentNode = map.get(menu.parentId)
           if (parentNode) {
+            parentNode.children = parentNode.children || []
             parentNode.children.push(node)
           }
         }
@@ -178,12 +195,18 @@ export default {
       }
       return parentKey
     },
+    expandable (row) {
+      return row.children && row.children.length > 0
+    },
     editMenu (record) {
-      this.menu = record
+      this.menu = this.menuList.find(menu => menu.menuId === record.key) || {}
       this.visible = true
     },
     changeSelectedRowKeys (checkedKeys) {
       this.checkedKeys = checkedKeys
+    },
+    currentIcon (icon) {
+      return typeof icon === 'string'
     }
   },
   mounted () {

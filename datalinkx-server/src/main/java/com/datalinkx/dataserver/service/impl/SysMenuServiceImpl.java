@@ -159,16 +159,31 @@ public class SysMenuServiceImpl implements ISysMenuService {
         return false;
     }
 
+    /**
+     * 新增菜单信息
+     * @param menu 菜单信息
+     * @return
+     */
     @Override
     public int insertMenu(SysMenuBean menu) {
         return 0;
     }
 
+    /**
+     * 修改菜单信息
+     * @param menu 菜单信息
+     * @return
+     */
     @Override
     public int updateMenu(SysMenuBean menu) {
-        return 0;
+        return sysMenuRepository.save(menu) != null ? 1 : 0;
     }
 
+    /**
+     * 删除菜单信息
+     * @param menuId 菜单ID
+     * @return
+     */
     @Override
     public int deleteMenuById(String menuId) {
         return 0;

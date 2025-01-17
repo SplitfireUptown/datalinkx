@@ -6,3 +6,11 @@ export function getMenuList () {
     method: 'GET'
   })
 }
+
+export function updateMenu (data) {
+  return request({
+    url: '/system/menu/update',
+    method: 'POST',
+    data
+  })
+}
