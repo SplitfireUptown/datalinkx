@@ -37,16 +37,16 @@
         </template>
         <template v-slot:action="record">
           <a-button type="primary" size="small" @click="editMenu(record)">编辑</a-button>
-          <a-button type="danger" size="small">删除</a-button>
+          <a-button type="danger" size="small" @click="deleteMenu(record)">删除</a-button>
         </template>
       </a-table>
     </div>
-    <EditMenu v-if="visible" :visible.sync="visible" :menu="menu" :menu-tree="menuTree"/>
+    <EditMenu @editMenu="getSystemMenu()" v-if="visible" :visible.sync="visible" :menu="menu" :menu-tree="menuTree"/>
   </a-card>
 </template>
 
 <script>
-import { getMenuList } from '@/api/system/menu'
+import { deleteMenu, getMenuList } from '@/api/system/menu'
 import { icons } from '@/core/icons'
 import EditMenu from '@/views/system/menu/editMenu.vue'
 
@@ -201,6 +201,24 @@ export default {
     editMenu (record) {
       this.menu = this.menuList.find(menu => menu.menuId === record.key) || {}
       this.visible = true
+    },
+    deleteMenu (record) {
+      this.$confirm({
+        title: '提示',
+        content: '确定删除该菜单吗？',
+        onOk: () => {
+          deleteMenu(record.key).then(res => {
+            this.getSystemMenu()
+            if (res.status === '0') {
+              this.$message.success('删除成功')
+            } else {
+              this.$message.error('删除失败')
+            }
+          }).catch(() => {
+            this.$message.error('删除失败')
+          })
+        }
+      })
     },
     changeSelectedRowKeys (checkedKeys) {
       this.checkedKeys = checkedKeys

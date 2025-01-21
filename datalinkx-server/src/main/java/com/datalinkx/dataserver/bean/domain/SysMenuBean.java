@@ -9,6 +9,7 @@ import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -26,6 +27,7 @@ import java.util.Objects;
 @DynamicInsert
 @DynamicUpdate
 @Entity
+@SQLDelete(sql = "update sys_menu set status = 1 where menu_id = ?")
 @Table(name = "sys_menu")
 public class SysMenuBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)

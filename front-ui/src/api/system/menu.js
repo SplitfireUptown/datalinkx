@@ -14,3 +14,11 @@ export function updateMenu (data) {
     data
   })
 }
+
+export function deleteMenu (menuId) {
+  return request({
+    url: '/system/menu/delete', // 在这里插入 menuId
+    method: 'DELETE',
+    params: { menuId }
+  })
+}

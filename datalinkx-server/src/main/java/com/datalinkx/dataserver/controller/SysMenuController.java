@@ -67,4 +67,17 @@ public class SysMenuController {
         return WebResult.of(resultMap);
     }
 
+    /**
+     * 删除菜单
+     *
+     * @param menuId
+     */
+    @DeleteMapping("/delete")
+    public WebResult<HashMap<String, Integer>> deleteMenu(@RequestParam String menuId) {
+        int count = menuService.deleteMenuById(menuId);
+        HashMap<String, Integer> resultMap = new HashMap<>();
+        resultMap.put("count", count);
+        return WebResult.of(resultMap);
+    }
+
 }

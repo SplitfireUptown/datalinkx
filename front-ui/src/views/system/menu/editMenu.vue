@@ -118,7 +118,8 @@ export default {
           updateMenu(values).then((res) => {
             this.confirmLoading = false
             if (res.status === '0') {
-              if (values.menuId) { this.$message.success('编辑成功') } else { this.$message.success('新增成功') }
+              this.$message.success('编辑成功')
+              this.$emit('editMenu')
               this.$emit('update:visible', false)
             } else {
               this.$message.error(res.errstr)

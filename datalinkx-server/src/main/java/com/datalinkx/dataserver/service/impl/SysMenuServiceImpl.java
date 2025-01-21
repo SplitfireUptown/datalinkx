@@ -186,7 +186,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public int deleteMenuById(String menuId) {
-        return 0;
+        sysMenuRepository.deleteById(menuId);
+        return 1;
     }
 
     @Override
