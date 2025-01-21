@@ -27,7 +27,7 @@
           <a-icon v-else :component="icon" />
         </template>
         <template v-slot:isCache="isCache">
-          <span v-if="isCache === '1'">是</span>
+          <span v-if="isCache === '0'">是</span>
           <span v-else>否</span>
         </template>
         <template v-slot:menuType="menuType">
@@ -250,8 +250,8 @@ export default {
 }
 </script>
 
-<style scoped>
-.ant-btn{
+<style scoped lang="less">
+.ant-btn {
   margin-right: 10px;
 }
 </style>
