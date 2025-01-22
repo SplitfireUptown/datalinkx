@@ -14,6 +14,14 @@ export function getUserInfo () {
     method: 'get'
   })
 }
+// 获取用户详细列表
+export function getUserList (parameter) {
+  return request({
+    url: '/system/user/list',
+    method: 'get',
+    params: parameter
+  })
+}
 // 获取指定用户信息
 export function getUserInfoById (userId) {
   return request({

@@ -4,20 +4,22 @@ import com.datalinkx.common.constants.UserConstants;
 import com.datalinkx.dataserver.bean.domain.SysUserBean;
 import com.datalinkx.dataserver.repository.SysUserRepository;
 import com.datalinkx.dataserver.service.ISysUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class SysUserServiceImpl implements ISysUserService {
     @Autowired
     private SysUserRepository sysUserRepository;
 
     @Override
-    public List<SysUserBean> selectUserList(SysUserBean user) {
-        return null;
+    public List<SysUserBean> selectUserList() {
+        return sysUserRepository.findAll();
     }
 
     @Override

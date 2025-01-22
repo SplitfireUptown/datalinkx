@@ -1,8 +1,7 @@
 <template>
   <a-card title="系统菜单">
     <div style="display: flex">
-      <a-input-search style="margin-right: 200px;margin-bottom: 8px" placeholder="搜索" @change="onChange"/>
-      <a-button type="primary" style="margin-bottom: 8px" @click="editMenu({})">新增</a-button>
+      <a-input-search style="margin-right: 200px;margin-bottom: 8px" placeholder="搜索" @change="onChange" />
     </div>
     <div>
       <a-table
@@ -35,33 +34,29 @@
           <span v-else-if="menuType === 'C'">菜单</span>
           <span v-else>按钮</span>
         </template>
-        <template v-slot:action="record">
-          <a-button type="primary" size="small" @click="editMenu(record)">编辑</a-button>
-          <a-button type="danger" size="small" @click="deleteMenu(record)">删除</a-button>
-        </template>
       </a-table>
     </div>
-    <EditMenu @editMenuSuccess="getSystemMenu()" v-if="visible" :visible.sync="visible" :menu="menu" :menu-tree="menuTree"/>
   </a-card>
 </template>
 
 <script>
-import { deleteMenu, getMenuList } from '@/api/system/menu'
+import { getMenuList } from '@/api/system/menu'
 import { icons } from '@/core/icons'
-import EditMenu from '@/views/system/menu/editMenu.vue'
 
 export default {
-  name: 'SystemMenu',
-  components: { EditMenu },
+  name: 'MenuTable',
+  props: {
+    menuSelection: {
+      type: Array,
+      default: () => []
+    }
+  },
   data () {
     return {
       menuList: [],
       menuTree: [],
-      checkedKeys: [],
       searchValue: '',
       expandedKeys: [],
-      visible: false,
-      menu: {},
       columns: [
         {
           title: '菜单名称',
@@ -106,12 +101,6 @@ export default {
           title: '排序',
           dataIndex: 'orderNum',
           key: 'orderNum'
-        },
-        {
-          title: '操作', // 编辑列
-          key: 'action',
-          width: '10%',
-          scopedSlots: { customRender: 'action' }
         }
       ]
     }
@@ -198,31 +187,6 @@ export default {
     expandable (row) {
       return row.children && row.children.length > 0
     },
-    editMenu (record) {
-      this.menu = this.menuList.find(menu => menu.menuId === record.key) || {}
-      this.visible = true
-    },
-    deleteMenu (record) {
-      this.$confirm({
-        title: '提示',
-        content: '确定删除该菜单吗？',
-        onOk: () => {
-          deleteMenu(record.key).then(res => {
-            this.getSystemMenu()
-            if (res.status === '0') {
-              this.$message.success('删除成功')
-            } else {
-              this.$message.error('删除失败')
-            }
-          }).catch(() => {
-            this.$message.error('删除失败')
-          })
-        }
-      })
-    },
-    changeSelectedRowKeys (checkedKeys) {
-      this.checkedKeys = checkedKeys
-    },
     currentIcon (icon) {
       return typeof icon === 'string'
     }
@@ -233,9 +197,9 @@ export default {
   computed: {
     rowSelection () {
       return {
-        selectedRowKeys: this.checkedKeys,
+        selectedRowKeys: this.menuSelection,
         onChange: (selectedRowKeys) => {
-          this.changeSelectedRowKeys(selectedRowKeys)
+          this.$emit('update:menuSelection', selectedRowKeys)
         }
       }
     }

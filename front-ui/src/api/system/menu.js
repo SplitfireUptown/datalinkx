@@ -10,6 +10,14 @@ export function getMenuList () {
 export function updateMenu (data) {
   return request({
     url: '/system/menu/update',
+    method: 'PUT',
+    data
+  })
+}
+
+export function createMenu (data) {
+  return request({
+    url: '/system/menu/insert',
     method: 'POST',
     data
   })
@@ -17,7 +25,7 @@ export function updateMenu (data) {
 
 export function deleteMenu (menuId) {
   return request({
-    url: '/system/menu/delete', // 在这里插入 menuId
+    url: '/system/menu/delete',
     method: 'DELETE',
     params: { menuId }
   })

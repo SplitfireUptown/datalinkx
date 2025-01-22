@@ -41,7 +41,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (Objects.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
             throw new BadCredentialsException("user.not.exists");
-        } else if (UserStatus.DELETED.getCode().equals(user.getDelFlag())) {
+        } else if (UserStatus.DELETED.getCode().equals(user.getIsDel())) {
             log.info("登录用户：{} 已被删除.", username);
             throw new BadCredentialsException("user.password.delete");
         } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {

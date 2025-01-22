@@ -17,24 +17,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 import static com.datalinkx.dataserver.utils.SecurityUtils.*;
 
 
 /**
  * 用户信息
- * 
+ *
  * @author ruoyi
  */
 @Slf4j
 @RestController
 @RequestMapping("/system/user")
-public class SysUserController
-{
+public class SysUserController {
     @Autowired
     private ISysUserService userService;
 
@@ -69,12 +65,23 @@ public class SysUserController
     }
 
     /**
+     * 获取用户列表
+     *
+     * @param user
+     * @return
+     */
+    @GetMapping("/list")
+    public WebResult<List<SysUserBean>> list() {
+        return WebResult.of(userService.selectUserList());
+    }
+
+    /**
      * 修改用户
+     *
      * @param user
      */
     @PutMapping
-    public WebResult<Integer> edit(@Validated @RequestBody SysUserBean user)
-    {
+    public WebResult<Integer> edit(@Validated @RequestBody SysUserBean user) {
 //        if (!userService.checkUserNameUnique(user))
 //        {
 //            return WebResult.fail(new DatalinkXServerException("修改用户'" + user.getNickName() + "'失败，登录账号已存在"));
@@ -93,6 +100,7 @@ public class SysUserController
 
     /**
      * 修改用户头像
+     *
      * @param file
      * @return
      */

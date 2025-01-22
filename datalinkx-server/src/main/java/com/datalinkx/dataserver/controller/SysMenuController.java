@@ -48,20 +48,28 @@ public class SysMenuController {
     }
 
     /**
-     * 新增|更新菜单
+     * 更新菜单
      *
      * @param menu
      */
-    @PostMapping("/update")
+    @PutMapping("/update")
     public WebResult<HashMap<String, Integer>> updateMenu(@RequestBody SysMenuBean menu) {
-        int count = 0;
-        if (menu.getMenuId() != null) {
-            SysMenuBean sysMenuBean = sysMenuRepository.findById(menu.getMenuId()).orElse(new SysMenuBean());
-            BeanUtils.copyProperties(menu, sysMenuBean, getNullPropertyNames(menu));
-            count = menuService.updateMenu(sysMenuBean);
-        } else {
-            count = menuService.updateMenu(menu);
-        }
+        SysMenuBean sysMenuBean = sysMenuRepository.findById(menu.getMenuId()).orElse(new SysMenuBean());
+        BeanUtils.copyProperties(menu, sysMenuBean, getNullPropertyNames(menu));
+        int count = menuService.updateMenu(sysMenuBean);
+        HashMap<String, Integer> resultMap = new HashMap<>();
+        resultMap.put("count", count);
+        return WebResult.of(resultMap);
+    }
+
+    /**
+     * 新增菜单
+     *
+     * @param menu
+     */
+    @PostMapping("/insert")
+    public WebResult<HashMap<String, Integer>> insertMenu(@RequestBody SysMenuBean menu) {
+        int count = menuService.insertMenu(menu);
         HashMap<String, Integer> resultMap = new HashMap<>();
         resultMap.put("count", count);
         return WebResult.of(resultMap);

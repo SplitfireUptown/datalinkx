@@ -9,6 +9,7 @@ import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -25,6 +26,7 @@ import java.util.Set;
 @DynamicInsert
 @DynamicUpdate
 @Entity
+@SQLDelete(sql = "update sys_role set status = 1 where role_id = ?")
 @Table(name = "sys_role")
 public class SysRoleBean {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,7 +56,7 @@ public class SysRoleBean {
     private String status;
     @Basic
     @Column(name = "is_del")
-    private String delFlag;
+    private String isDel;
     @Basic
     @Column(name = "create_by")
     private String createBy;
@@ -152,12 +154,12 @@ public class SysRoleBean {
         this.status = status;
     }
 
-    public String getDelFlag() {
-        return delFlag;
+    public String getIsDel() {
+        return isDel;
     }
 
-    public void setDelFlag(String delFlag) {
-        this.delFlag = delFlag;
+    public void setIsDel(String isDel) {
+        this.isDel = isDel;
     }
 
     public String getCreateBy() {
@@ -205,11 +207,11 @@ public class SysRoleBean {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SysRoleBean that = (SysRoleBean) o;
-        return roleId == that.roleId && roleSort == that.roleSort && Objects.equals(roleName, that.roleName) && Objects.equals(roleKey, that.roleKey) && Objects.equals(dataScope, that.dataScope) && Objects.equals(menuCheckStrictly, that.menuCheckStrictly) && Objects.equals(deptCheckStrictly, that.deptCheckStrictly) && Objects.equals(status, that.status) && Objects.equals(delFlag, that.delFlag) && Objects.equals(createBy, that.createBy) && Objects.equals(createTime, that.createTime) && Objects.equals(updateBy, that.updateBy) && Objects.equals(updateTime, that.updateTime) && Objects.equals(remark, that.remark);
+        return roleId == that.roleId && roleSort == that.roleSort && Objects.equals(roleName, that.roleName) && Objects.equals(roleKey, that.roleKey) && Objects.equals(dataScope, that.dataScope) && Objects.equals(menuCheckStrictly, that.menuCheckStrictly) && Objects.equals(deptCheckStrictly, that.deptCheckStrictly) && Objects.equals(status, that.status) && Objects.equals(isDel, that.isDel) && Objects.equals(createBy, that.createBy) && Objects.equals(createTime, that.createTime) && Objects.equals(updateBy, that.updateBy) && Objects.equals(updateTime, that.updateTime) && Objects.equals(remark, that.remark);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(roleId, roleName, roleKey, roleSort, dataScope, menuCheckStrictly, deptCheckStrictly, status, delFlag, createBy, createTime, updateBy, updateTime, remark);
+        return Objects.hash(roleId, roleName, roleKey, roleSort, dataScope, menuCheckStrictly, deptCheckStrictly, status, isDel, createBy, createTime, updateBy, updateTime, remark);
     }
 }

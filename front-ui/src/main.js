@@ -34,15 +34,6 @@ Vue.component('page-container', PageHeaderWrapper)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
 
 window.umi_plugin_ant_themeVar = themePluginConfig.theme
-// 自定义指令解决避免在焦点元素或其祖先元素上使用aria-hidden。考虑使用惰性属性，这也会阻止焦点。有关更多详细信息，请参见 WAI-ARIA规范 的aria隐藏部分。
-Vue.directive('removeAriaHidden', {
-  bind (el, binding) {
-    const ariaEls = el.querySelectorAll('.el-radio__original')
-    ariaEls.forEach((item) => {
-      item.removeAttribute('aria-hidden')
-    })
-  }
-})
 // 解决ERROR ResizeObserver loop completed with undelivered notifications.
 // 重写ResizeObserver的构造函数，并在其中定义并调用防抖函数
 window.ResizeObserver = class ResizeObserver extends window.ResizeObserver {

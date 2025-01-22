@@ -1,30 +1,73 @@
 <template>
-  <a-card>
-    <a-table :columns="columns" :dataSource="roleList" rowKey="roleId" :row-selection="roleSelection">
-      <template v-slot:status="status">
-        <a-badge :status="status === '0' ? 'success' : 'error'" :text="status === '0' ? '正常' : '停用'"/>
-      </template>
-      <template v-slot:action>
-        <a-button type="primary" size="small" @click="editRole(text)">编辑</a-button>
-        <a-button type="danger" size="small" @click="deleteRole(text)">删除</a-button>
-      </template>
-    </a-table>
+  <a-card title="角色管理">
+    <div style="display: flex">
+      <a-input-search
+        style="margin-right: 200px;margin-bottom: 8px"
+        placeholder="搜索"
+        @change="onChange"
+        :allowClear="true" />
+      <a-button type="primary" style="margin-bottom: 8px" @click="editRole({})">新增</a-button>
+    </div>
+    <div>
+      <a-table :columns="columns" :dataSource="showRoleList" rowKey="roleId">
+        <template v-slot:status="status">
+          <a-badge :status="status === '0' ? 'success' : 'error'" :text="status === '0' ? '正常' : '停用'" />
+        </template>
+        <template v-slot:action="record">
+          <a-button type="primary" size="small" @click="editRole(record)">编辑</a-button>
+          <a-button type="danger" size="small" @click="deleteRole(record)">删除</a-button>
+          <a @click="assignUsers(record)">分配用户</a>
+          <a @click="assignMenus(record)">分配菜单</a>
+        </template>
+      </a-table>
+    </div>
+    <EditRole @editRoleSuccess="getRoleList()" :role="role" v-if="visible" :visible.sync="visible" />
+    <a-modal
+      title="分配用户"
+      :visible="assignUsersVisible"
+      @cancel="assignUsersVisible = false"
+      width="65vw"
+      @ok="createAuthRoleUserList">
+      <UserTable
+        :userSelection.sync="selectedUserRowKeys"
+      />
+    </a-modal>
+    <a-modal
+      title="分配菜单"
+      :visible="assignMenusVisible"
+      @cancel="assignMenusVisible = false"
+      width="65vw"
+      @ok="createAuthRoleMenuList">
+      <menuTable :menuSelection.sync="selectedMenuRowKeys" />
+    </a-modal>
   </a-card>
 </template>
 <script>
-import { getRoleList } from '@/api/system/role'
+import {
+  createAuthRoleMenuList,
+  createAuthRoleUserList,
+  deleteRole,
+  getAuthUserList,
+  getRoleList
+} from '@/api/system/role'
+import EditRole from '@/views/system/role/editRole.vue'
+import UserTable from '@/views/user/UserTable.vue'
+import MenuTable from '@/views/system/menu/menuTable.vue'
 
 export default {
   name: 'SystemRole',
+  components: { MenuTable, UserTable, EditRole },
   data () {
     return {
       roleList: [],
-      selectedRowKeys: [],
-      roleSelection: {
-        onChange: (selectedRowKeys, selectedRows) => {
-          console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-        }
-      },
+      showRoleList: [],
+      userList: [],
+      selectedMenuRowKeys: [],
+      selectedUserRowKeys: [],
+      role: {},
+      visible: false,
+      assignUsersVisible: false,
+      assignMenusVisible: false,
       columns: [
         {
           title: '角色ID',
@@ -58,9 +101,9 @@ export default {
           scopedSlots: { customRender: 'status' }
         },
         {
-          title: '创建时间',
-          dataIndex: 'createTime',
-          key: 'createTime'
+          title: '备注',
+          dataIndex: 'remark',
+          key: 'remark'
         },
         {
           title: '操作',
@@ -73,8 +116,90 @@ export default {
   methods: {
     getRoleList () {
       getRoleList().then(res => {
-        this.roleList = res.result
+        if (res.status === '0') {
+          this.roleList = res.result
+          this.showRoleList = res.result
+        } else {
+          this.$message.error('获取角色列表失败')
+        }
+      }).catch(() => {
+        this.$message.error('获取角色列表失败')
       })
+    },
+    getAuthUserList (record) {
+      getAuthUserList(record.roleId).then(res => {
+        if (res.status === '0') {
+          this.selectedUserRowKeys = res.result.userList.map(item => item.userId)
+          this.assignUsersVisible = true
+        } else {
+          this.$message.error('获取用户列表失败')
+        }
+      }).catch(() => {
+        this.$message.error('获取用户列表失败')
+      })
+    },
+    editRole (record) {
+      this.role = record
+      this.visible = true
+    },
+    deleteRole (record) {
+      this.role = record
+      this.$confirm({
+        title: '提示',
+        content: '确定删除该角色吗？',
+        onOk: () => {
+          deleteRole(this.role.roleId).then(res => {
+            this.getRoleList()
+            if (res.status === '0') {
+              this.$message.success('删除成功')
+            } else {
+              this.$message.error('删除失败')
+            }
+          }).catch(() => {
+            this.$message.error('删除失败')
+          })
+        }
+      })
+    },
+    assignUsers (record) {
+      this.role = record
+      this.getAuthUserList(record)
+    },
+    assignMenus (record) {
+      this.role = record
+      this.assignMenusVisible = true
+    },
+    createAuthRoleUserList () {
+      createAuthRoleUserList({ roleId: this.role.roleId, userIds: this.selectedUserRowKeys }).then(res => {
+        if (res.status === '0') {
+          this.$message.success('分配成功')
+          this.assignUsersVisible = false
+        } else {
+          this.$message.error('分配失败')
+        }
+      }).catch(() => {
+        this.$message.error('分配失败')
+      })
+    },
+    createAuthRoleMenuList () {
+      createAuthRoleMenuList({ roleId: this.role.roleId, menuIds: this.selectedMenuRowKeys }).then(res => {
+        if (res.status === '0') {
+          this.$message.success('分配成功')
+          this.assignMenusVisible = false
+        } else {
+          this.$message.error('分配失败')
+        }
+      }).catch(() => {
+        this.$message.error('分配失败')
+      })
+      console.log('selectedMenuRowKeys', this.selectedMenuRowKeys)
+    },
+    onChange (e) {
+      if (!e.target.value) {
+        this.showRoleList = this.roleList
+      } else {
+        this.showRoleList = this.roleList.filter(item => item.roleName.includes(e.target.value))
+      }
     }
   },
   mounted () {
@@ -83,7 +208,11 @@ export default {
 }
 </script>
 <style scoped lang="less">
-.ant-btn{
+.ant-btn {
+  margin-right: 10px;
+}
+
+a {
   margin-right: 10px;
 }
 </style>

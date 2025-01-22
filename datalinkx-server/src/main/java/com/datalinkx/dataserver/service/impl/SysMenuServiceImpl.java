@@ -166,7 +166,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     @Override
     public int insertMenu(SysMenuBean menu) {
-        return 0;
+        return sysMenuRepository.save(menu) != null ? 1 : 0;
     }
 
     /**

@@ -66,7 +66,7 @@ public class SysUserBean {
     private String status;
     @Basic
     @Column(name = "is_del")
-    private String delFlag;
+    private String isDel;
     @Basic
     @Column(name = "login_ip")
     private String loginIp;
@@ -186,12 +186,12 @@ public class SysUserBean {
         this.status = status;
     }
 
-    public String getDelFlag() {
-        return delFlag;
+    public String getIsDel() {
+        return isDel;
     }
 
-    public void setDelFlag(String delFlag) {
-        this.delFlag = delFlag;
+    public void setIsDel(String isDel) {
+        this.isDel = isDel;
     }
 
     public String getLoginIp() {
@@ -260,12 +260,12 @@ public class SysUserBean {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SysUserBean that = (SysUserBean) o;
-        return Objects.equals(userId,that.userId) && Objects.equals(deptId, that.deptId) && Objects.equals(userName, that.userName) && Objects.equals(nickName, that.nickName) && Objects.equals(userType, that.userType) && Objects.equals(email, that.email) && Objects.equals(phonenumber, that.phonenumber) && Objects.equals(sex, that.sex) && Objects.equals(avatar, that.avatar) && Objects.equals(password, that.password) && Objects.equals(status, that.status) && Objects.equals(delFlag, that.delFlag) && Objects.equals(loginIp, that.loginIp) && Objects.equals(loginDate, that.loginDate) && Objects.equals(createBy, that.createBy) && Objects.equals(createTime, that.createTime) && Objects.equals(updateBy, that.updateBy) && Objects.equals(updateTime, that.updateTime) && Objects.equals(remark, that.remark);
+        return Objects.equals(userId,that.userId) && Objects.equals(deptId, that.deptId) && Objects.equals(userName, that.userName) && Objects.equals(nickName, that.nickName) && Objects.equals(userType, that.userType) && Objects.equals(email, that.email) && Objects.equals(phonenumber, that.phonenumber) && Objects.equals(sex, that.sex) && Objects.equals(avatar, that.avatar) && Objects.equals(password, that.password) && Objects.equals(status, that.status) && Objects.equals(isDel, that.isDel) && Objects.equals(loginIp, that.loginIp) && Objects.equals(loginDate, that.loginDate) && Objects.equals(createBy, that.createBy) && Objects.equals(createTime, that.createTime) && Objects.equals(updateBy, that.updateBy) && Objects.equals(updateTime, that.updateTime) && Objects.equals(remark, that.remark);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, deptId, userName, nickName, userType, email, phonenumber, sex, avatar, password, status, delFlag, loginIp, loginDate, createBy, createTime, updateBy, updateTime, remark);
+        return Objects.hash(userId, deptId, userName, nickName, userType, email, phonenumber, sex, avatar, password, status, isDel, loginIp, loginDate, createBy, createTime, updateBy, updateTime, remark);
     }
 
 

@@ -1,27 +1,34 @@
 package com.datalinkx.dataserver.service.impl;
 
 import com.datalinkx.dataserver.bean.domain.SysRoleBean;
+import com.datalinkx.dataserver.bean.domain.SysUserBean;
 import com.datalinkx.dataserver.bean.domain.SysUserRoleBean;
 import com.datalinkx.dataserver.repository.SysRoleRepository;
+import com.datalinkx.dataserver.repository.SysUserRepository;
+import com.datalinkx.dataserver.repository.SysUserRoleRepository;
 import com.datalinkx.dataserver.service.ISysRoleService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 角色 业务层处理
  *
  * @author ruoyi
  */
+@Slf4j
 @Service
 public class SysRoleServiceImpl implements ISysRoleService {
     @Autowired
     SysRoleRepository sysRoleRepository;
+    @Autowired
+    SysUserRepository SysUserRepository;
+    @Autowired
+    SysUserRoleRepository sysUserRoleRepository;
 
     @Override
     public List<SysRoleBean> selectRoleList(SysRoleBean role) {
@@ -87,12 +94,12 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
     @Override
     public int insertRole(SysRoleBean role) {
-        return 0;
+        return sysRoleRepository.save(role) != null ? 1 : 0;
     }
 
     @Override
     public int updateRole(SysRoleBean role) {
-        return 0;
+        return sysRoleRepository.save(role) != null ? 1 : 0;
     }
 
     @Override
@@ -107,11 +114,12 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
     @Override
     public int deleteRoleById(String roleId) {
-        return 0;
+        sysRoleRepository.deleteById(roleId);
+        return 1;
     }
 
     @Override
-    public int deleteRoleByIds(Long[] roleIds) {
+    public int deleteRoleByIds(String[] roleIds) {
         return 0;
     }
 
@@ -121,12 +129,20 @@ public class SysRoleServiceImpl implements ISysRoleService {
     }
 
     @Override
-    public int deleteAuthUsers(String roleId, Long[] userIds) {
-        return 0;
+    public int deleteAuthUsers(String roleId) {
+        return sysUserRoleRepository.deleteAuthUsers(roleId);
     }
 
     @Override
-    public int insertAuthUsers(String roleId, Long[] userIds) {
-        return 0;
+    public int insertAuthUsers(String roleId, String[] userIds) {
+        List<SysUserRoleBean> userRoles = Arrays.stream(userIds)
+                .map(userId -> new SysUserRoleBean(userId, roleId))
+                .collect(Collectors.toList());
+        return sysUserRoleRepository.saveAll(userRoles).size();
+    }
+
+    @Override
+    public List<SysUserBean> selectUserListByRoleId(String roleId) {
+        return SysUserRepository.selectUserListByRoleId(roleId);
     }
 }
