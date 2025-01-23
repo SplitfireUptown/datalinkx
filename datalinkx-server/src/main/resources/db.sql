@@ -156,21 +156,21 @@ INSERT INTO `sys_menu` VALUES (5, 'menu.computeTransferTask', 1, 4, '/compute/tr
 INSERT INTO `sys_menu` VALUES (6, 'menu.taskrelationlist', 1, 5, '/job_relation', 'jobrelation/JobRelationList', NULL, 'jobRelation', 1, 1, 'C', '0', '0', 'jobRelation', 'taskLog', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (7, 'menu.taskrelationmap', 1, 6, '/job_relation_map', 'jobrelation/JobRelationBloodMap', NULL, 'jobMap', 1, 1, 'C', '0', '0', 'jobMap', 'taskLog', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (8, 'menu.tasklistlog', 1, 7, '/job_log', 'joblog/JobLogList', NULL, 'jobLog', 1, 1, 'C', '0', '0', 'jobLog', 'taskLog', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `sys_menu` VALUES (9, 'menu.systemMonitor', 2001, 1, '/system/monitor', 'system/systemMonitor', NULL, 'systemMonitor', 1, 0, 'C', '0', '0', 'systemMonitor', 'task', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `sys_menu` VALUES (9, 'menu.systemMonitor', 21, 1, '/system/monitor', 'system/systemMonitor', NULL, 'systemMonitor', 1, 0, 'C', '0', '0', 'systemMonitor', 'task', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (10, 'menu.datasourceList', 2, 1, '/dashboard', 'datasource/DsList', NULL, 'dashboard', 1, 1, 'C', '0', '0', 'dashboard', 'dataList', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (11, 'menu.taskList', 3, 1, '/job', 'job/JobList', NULL, 'job', 1, 1, 'C', '0', '0', 'job', 'taskList', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (12, 'menu.streamingTaskList', 4, 1, '/streaming/job', 'job/JobListOfStreaming', NULL, 'StreamingJob', 1, 1, 'C', '0', '0', 'StreamingJob', 'taskList', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (13, 'menu.computeTaskList', 5, 1, '/compute/job', 'job/JobListOfCompute', NULL, 'ComputeJob', 1, 1, 'C', '0', '0', 'ComputeJob', 'taskList', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `sys_menu` VALUES (14, 'menu.account.center', 1, 1, '/account/center', 'account/center', NULL, 'AccountCenter', 1, 1, 'M', '1', '0', 'AccountCenter', '#', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `sys_menu` VALUES (15, 'menu.account.settings', 1, 1, '/account/settings', 'account/settings', NULL, 'AccountSettings', 1, 1, 'M', '1', '0', 'AccountSettings', '#', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `sys_menu` VALUES (14, 'menu.account.center', 1, 8, '/account/center', 'account/center', NULL, 'AccountCenter', 1, 1, 'M', '1', '0', 'AccountCenter', '#', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `sys_menu` VALUES (15, 'menu.account.settings', 1, 9, '/account/settings', 'account/settings', NULL, 'AccountSettings', 1, 1, 'M', '1', '0', 'AccountSettings', '#', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (16, 'account.settings.menuMap.basic', 15, 1, '/account/settings/basic', 'account/settings/BasicSetting', NULL, 'BasicSetting', 1, 1, 'C', '1', '0', 'BasicSetting', '#', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (17, 'account.settings.menuMap.security', 15, 2, '/account/settings/security', 'account/settings/Security', NULL, 'SecuritySettings', 1, 1, 'C', '1', '0', 'SecuritySettings', '#', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (18, 'account.settings.menuMap.custom', 15, 3, '/account/settings/custom', 'account/settings/Custom', NULL, 'CustomSettings', 1, 1, 'C', '1', '0', 'CustomSettings', '#', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (19, 'account.settings.menuMap.binding', 15, 4, '/account/settings/binding', 'account/settings/Binding', NULL, 'BindingSettings', 1, 1, 'C', '1', '0', 'BindingSettings', '#', NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_menu` VALUES (20, 'account.settings.menuMap.notification', 15, 5, '/account/settings/notification', 'account/settings/Notification', NULL, 'NotificationSettings', 1, 1, 'C', '1', '0', 'NotificationSettings', '#', NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `sys_menu` VALUES (21, 'menu.systemMenu', 2001, 2, '/system/menu', 'system/systemMenu', NULL, 'systemMenu', 1, 0, 'C', '0', '0', 'systemMenu', 'menuManagement', '', NULL, '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2001, '系统管理', 1, 8, '/systemManager', 'RouteView', NULL, 'systemManager', 1, 1, 'M', '0', '0', 'systemManager', 'systemManagement', '', NULL, '', NULL, '');
-INSERT INTO `sys_menu` VALUES (2003, '角色管理', 2001, 3, '/system/role', 'system/systemRole', NULL, 'systemRole', 0, 0, 'C', '0', '0', 'systemRole', 'roleManagement', '', NULL, '', NULL, '');
+INSERT INTO `sys_menu` VALUES (21, '系统管理', 1, 10, '/systemManager', 'RouteView', NULL, 'systemManager', 1, 1, 'M', '0', '0', 'systemManager', 'systemManagement', '', NULL, '', NULL, '');
+INSERT INTO `sys_menu` VALUES (22, 'menu.systemMenu', 21, 2, '/system/menu', 'system/systemMenu', NULL, 'systemMenu', 1, 0, 'C', '0', '0', 'systemMenu', 'menuManagement', '', NULL, '', NULL, '');
+INSERT INTO `sys_menu` VALUES (23, '角色管理', 21, 3, '/system/role', 'system/systemRole', NULL, 'systemRole', 0, 0, 'C', '0', '0', 'systemRole', 'roleManagement', '', NULL, '', NULL, '');
 
 -- ----------------------------
 -- Table structure for sys_role

@@ -6,6 +6,7 @@
     <div>
       <a-table
         v-if="menuTree.length > 0"
+        :scroll="{ x: 'max-content' }"
         style="width: 100%;"
         :data-source="menuTree"
         :columns="columns"

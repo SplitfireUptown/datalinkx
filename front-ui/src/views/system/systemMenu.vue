@@ -10,6 +10,7 @@
     </div>
     <div>
       <a-table
+        :scroll="{ x: 'max-content' }"
         v-if="menuTree.length > 0"
         style="width: 100%;"
         :data-source="menuTree"
@@ -75,6 +76,7 @@ export default {
           title: '序号ID',
           dataIndex: 'menuId',
           key: 'menuId',
+          width: '10%',
           scopedSlots: { customRender: 'menuId' }
         },
         {
