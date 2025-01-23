@@ -7,7 +7,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${MYSQL_USERNAME:root}
-    password: "@Qwer2002"
+    password: ${MYSQL_PASSWORD:123456}
     url: jdbc:mysql://${MYSQL_URL:127.0.0.1}:3306/datalinkx?characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -24,7 +24,7 @@ spring:
     database: 0       # Redis数据库索引（默认为0）,如果设置为1，那么存入的key-value都存放在select 1中
     host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:6379}
-    password:
+    password: ${REDIS_PASSWORD:123456}
     timeout: 10000
 #  elasticsearch:  # 开启大模型时打开注解
 #    rest:
@@ -33,7 +33,7 @@ spring:
 xxl-job:
   username: admin
   password: 123456
-  job-group: 1
+  job-group: 3
   exec-handler: dataTransJobHandler
   executor-route-strategy: FIRST
   client:
@@ -79,6 +79,7 @@ logging:
   level:
     com.datalinkx: INFO
     org.hibernate.SQL: DEBUG
+    org.hibernate.type: DEBUG
 
 retrofit:
   # 日志打印配置
@@ -107,3 +108,11 @@ token:
   secret: NBgkqhkiG9w0BAQEFAASCBKgwggSkA
   # 令牌有效期（默认30分钟）
   expireTime: 30
+
+# 用户配置
+user:
+  password:
+    # 密码最大错误次数
+    maxRetryCount: 5
+    # 密码锁定时间（默认10分钟）
+    lockTime: 10
