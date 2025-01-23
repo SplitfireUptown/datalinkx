@@ -287,8 +287,8 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, 103, 'admin', '管理员', '00', '123456@qq.com', '15888888888', '1', NULL, '$2a$10$3TwDoYF7MD44JYZXk5nIxO/aMCyuIoXZNWvDgB0pSl2ssmv4veNny', '1', '0', '0', '127.0.0.1', '2025-01-07 13:40:30', 'admin', '2025-01-07 13:40:30', '', NULL, NULL);
-INSERT INTO `sys_user` VALUES (2, 105, 'user', '普通用户', '00', '123456@qq.com', '15666666666', '1', NULL, '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '2', '0', '0', '127.0.0.1', '2025-01-08 10:34:24', 'admin', '2025-01-08 10:34:24', '', NULL, NULL);
+INSERT INTO `sys_user` VALUES (1, 103, 'admin', '管理员', '00', '123456@qq.com', '15888888888', '1', NULL, '$2a$10$3wC82lCJDXcG8E3ETiQcoes/gmO4ENUDeT5JVrk.eLY02SQrGi5Xe', '1', '0', '0', '127.0.0.1', '2025-01-07 13:40:30', 'admin', '2025-01-07 13:40:30', '', NULL, NULL);
+INSERT INTO `sys_user` VALUES (2, 105, 'user', '普通用户', '00', '123456@qq.com', '15666666666', '1', NULL, '$2a$10$3wC82lCJDXcG8E3ETiQcoes/gmO4ENUDeT5JVrk.eLY02SQrGi5Xe', '2', '0', '0', '127.0.0.1', '2025-01-08 10:34:24', 'admin', '2025-01-08 10:34:24', '', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for sys_user_role
