@@ -24,11 +24,11 @@ export function createRole (parameter) {
   })
 }
 
-export function deleteRole (roleId) {
+export function deleteRole (data) {
   return request({
     url: '/system/role/delete',
     method: 'DELETE',
-    params: { roleId }
+    data
   })
 }
 
@@ -45,6 +45,14 @@ export function createAuthRoleUserList (parameter) {
     url: '/system/role/authUserList',
     method: 'POST',
     data: parameter
+  })
+}
+
+export function getAuthMenuList (roleId) {
+  return request({
+    url: '/system/role/authMenuList',
+    method: 'GET',
+    params: { roleId }
   })
 }
 

@@ -3,9 +3,11 @@ package com.datalinkx.dataserver.repository;
 import com.datalinkx.dataserver.bean.domain.SysMenuBean;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
@@ -54,10 +56,39 @@ public interface SysMenuRepository extends JpaRepository<SysMenuBean, String> {
             nativeQuery = true)
     List<String> selectMenuPermsByUserId(@Param("userId") String userId);
 
+    /**
+     * 根据角色ID查询菜单
+     *
+     * @param roleId 角色ID
+     * @return 菜单列表
+     */
     @Query(value = "select distinct m.perms " +
             "from sys_menu m " +
             "LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id " +
             "WHERE m.status = '0' AND rm.role_id = :roleId",
             nativeQuery = true)
     List<String> selectMenuPermsByRoleId(String roleId);
+
+    /**
+     * 根据角色ID查询菜单
+     *
+     * @param roleId 角色ID
+     * @return 菜单列表
+     */
+    @Query(value = "select distinct m.* " +
+            "from sys_menu m " +
+            "LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id " +
+            "WHERE m.status = '0' AND rm.role_id = :roleId",
+            nativeQuery = true)
+    List<SysMenuBean> selectMenuListByRoleId(String roleId);
+
+    /**
+     * 批量删除菜单权限
+     * @param menuIds
+     * @return
+     */
+    @Modifying
+    @Transactional
+    @Query(value = "delete from sys_menu where menu_id in (:menuIds)", nativeQuery = true)
+    int deleteByIds(String[] menuIds);
 }

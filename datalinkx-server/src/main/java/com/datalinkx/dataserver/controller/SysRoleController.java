@@ -3,10 +3,13 @@ package com.datalinkx.dataserver.controller;
 
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.WebResult;
+import com.datalinkx.dataserver.bean.domain.SysMenuBean;
 import com.datalinkx.dataserver.bean.domain.SysRoleBean;
 import com.datalinkx.dataserver.bean.domain.SysUserBean;
+import com.datalinkx.dataserver.bean.model.AuthMenuBody;
 import com.datalinkx.dataserver.bean.model.AuthUserBody;
 import com.datalinkx.dataserver.repository.SysRoleRepository;
+import com.datalinkx.dataserver.service.ISysMenuService;
 import com.datalinkx.dataserver.service.ISysRoleService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,8 @@ public class SysRoleController {
     private ISysRoleService roleService;
     @Autowired
     private SysRoleRepository sysRoleRepository;
+    @Autowired
+    private ISysMenuService menuService;
 
     /**
      * 获取角色列表
@@ -82,8 +87,8 @@ public class SysRoleController {
      * @param roleId
      */
     @DeleteMapping("/delete")
-    public WebResult<HashMap<String, Integer>> deleteRole(@RequestParam String roleId) {
-        int count = roleService.deleteRoleById(roleId);
+    public WebResult<HashMap<String, Integer>> deleteRole(@RequestBody String[] roleIds) {
+        int count = roleService.deleteRoleByIds(roleIds);
         HashMap<String, Integer> resultMap = new HashMap<>();
         resultMap.put("count", count);
         return WebResult.of(resultMap);
@@ -116,6 +121,39 @@ public class SysRoleController {
         List<SysUserBean> sysUserBeans = roleService.selectUserListByRoleId(roleId);
         HashMap<String, List<SysUserBean>> resultMap = new HashMap<>();
         resultMap.put("userList", sysUserBeans);
+        return WebResult.of(resultMap);
+    }
+
+    /**
+     * 查询角色菜单列表
+     *
+     *
+     * @param roleId
+     */
+    @GetMapping("/authMenuList")
+    public WebResult<HashMap<String, List<SysMenuBean>>> authMenu(@RequestParam String roleId) {
+        List<SysMenuBean> sysMenuBeans = menuService.selectMenuListByRoleId(roleId);
+        HashMap<String, List<SysMenuBean>> resultMap = new HashMap<>();
+        resultMap.put("menuList", sysMenuBeans);
+        return WebResult.of(resultMap);
+    }
+
+    /**
+     * 批量授权角色菜单
+     * @param roleId
+     * @param menuIds
+     */
+    @PostMapping("/authMenuList")
+    @Transactional(rollbackOn = Exception.class)
+    public WebResult<HashMap<String, Integer>> authMenu(@RequestBody AuthMenuBody authMenuBody) {
+        int deleted = roleService.deleteAuthMenus(authMenuBody.getRoleId());
+        int count = roleService.insertAuthMenus(authMenuBody.getRoleId(), authMenuBody.getMenuIds());
+        if (count != authMenuBody.getMenuIds().length) {
+            throw new DatalinkXServerException("授权菜单失败");
+        }
+        HashMap<String, Integer> resultMap = new HashMap<>();
+        resultMap.put("count", count);
+        resultMap.put("deleted", deleted);
         return WebResult.of(resultMap);
     }
 }

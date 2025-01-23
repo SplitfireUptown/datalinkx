@@ -24,6 +24,10 @@
         <a-input
           v-decorator="[ 'path', { initialValue: menu.path,rules: [ { required: true, message: '请输入路径' } ] } ]" />
       </a-form-item>
+      <a-form-item label="权限标识">
+        <a-input
+          v-decorator="[ 'perms', { initialValue: menu.perms,rules: [ { required: true, message: '请输入权限标识' } ] } ]" />
+      </a-form-item>
       <a-form-item label="父级菜单">
         <a-tree-select
           :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"

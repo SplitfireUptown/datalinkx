@@ -159,10 +159,22 @@ public interface ISysRoleService {
      * 批量取消授权用户角色
      *
      * @param roleId  角色ID
-     * @param userIds 需要取消授权的用户数据ID
      * @return 结果
      */
     public int deleteAuthUsers(String roleId);
+
+    /**
+     * 批量取消授权角色菜单
+     * @param roleId 角色ID
+     */
+    public int deleteAuthMenus(String roleId);
+
+    /**
+     * 批量选择授权角色菜单
+     * @param roleId 角色ID
+     * @param menuIds 需要选择授权的菜单数据ID
+     */
+    public int insertAuthMenus(String roleId, String[] menuIds);
 
     /**
      * 批量选择授权用户角色
@@ -176,7 +188,7 @@ public interface ISysRoleService {
     /**
      * 查询角色已分配用户列表
      *
-     * @param user 用户信息
+     * @param roleId 用户信息
      * @return 用户信息集合
      */
     public List<SysUserBean> selectUserListByRoleId(String roleId);

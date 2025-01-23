@@ -56,7 +56,7 @@ public interface ISysMenuService {
      * @param roleId 角色ID
      * @return 选中菜单列表
      */
-    public List<Long> selectMenuListByRoleId(String roleId);
+    public List<SysMenuBean> selectMenuListByRoleId(String roleId);
 
     /**
      * 构建前端路由所需要的菜单
@@ -128,7 +128,7 @@ public interface ISysMenuService {
      * @param menuId 菜单ID
      * @return 结果
      */
-    public int deleteMenuById(String menuId);
+    public int deleteMenuByIds(String[] menuIds);
 
     /**
      * 校验菜单名称是否唯一

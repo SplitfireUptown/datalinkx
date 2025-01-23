@@ -1,11 +1,10 @@
 package com.datalinkx.dataserver.service.impl;
 
 import com.datalinkx.dataserver.bean.domain.SysRoleBean;
+import com.datalinkx.dataserver.bean.domain.SysRoleMenuBean;
 import com.datalinkx.dataserver.bean.domain.SysUserBean;
 import com.datalinkx.dataserver.bean.domain.SysUserRoleBean;
-import com.datalinkx.dataserver.repository.SysRoleRepository;
-import com.datalinkx.dataserver.repository.SysUserRepository;
-import com.datalinkx.dataserver.repository.SysUserRoleRepository;
+import com.datalinkx.dataserver.repository.*;
 import com.datalinkx.dataserver.service.ISysRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -29,6 +28,10 @@ public class SysRoleServiceImpl implements ISysRoleService {
     SysUserRepository SysUserRepository;
     @Autowired
     SysUserRoleRepository sysUserRoleRepository;
+    @Autowired
+    private SysMenuRepository sysMenuRepository;
+    @Autowired
+    private SysRoleMenuRepository sysRoleMenuRepository;
 
     @Override
     public List<SysRoleBean> selectRoleList(SysRoleBean role) {
@@ -120,7 +123,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
 
     @Override
     public int deleteRoleByIds(String[] roleIds) {
-        return 0;
+        return sysRoleRepository.deleteByIds(roleIds);
     }
 
     @Override
@@ -131,6 +134,19 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public int deleteAuthUsers(String roleId) {
         return sysUserRoleRepository.deleteAuthUsers(roleId);
+    }
+
+    @Override
+    public int deleteAuthMenus(String roleId) {
+        return sysRoleMenuRepository.deleteAuthMenus(roleId);
+    }
+
+    @Override
+    public int insertAuthMenus(String roleId, String[] menuIds) {
+        List<SysRoleMenuBean> roleMenus = Arrays.stream(menuIds)
+                .map(menuId -> new SysRoleMenuBean(roleId, menuId))
+                .collect(Collectors.toList());
+        return sysRoleMenuRepository.saveAll(roleMenus).size();
     }
 
     @Override

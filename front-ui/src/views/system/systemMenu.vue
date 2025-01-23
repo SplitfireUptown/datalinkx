@@ -3,6 +3,10 @@
     <div style="display: flex">
       <a-input-search style="margin-right: 200px;margin-bottom: 8px" placeholder="搜索" @change="onChange"/>
       <a-button type="primary" style="margin-bottom: 8px" @click="editMenu({})">新增</a-button>
+      <a-button type="primary" style="margin-bottom: 8px" @click="deleteMenu(checkedKeys)">删除</a-button>
+    </div>
+    <div style="margin-bottom: 8px">
+      <a type="primary" @click="toggleExpandAll">{{ expandAll ? '折叠所有' : '展开所有' }}</a>
     </div>
     <div>
       <a-table
@@ -14,6 +18,9 @@
         :expandable="expandable"
         :expanded-row-keys.sync="expandedKeys"
         :row-selection="rowSelection">
+        <template v-slot:menuId="menuId">
+          <span style="font-weight: bold">{{ menuId }}</span>
+        </template>
         <template v-slot:customTitle="customTitle">
           <span v-if="customTitle.indexOf(searchValue) > -1" style="font-weight: bold">
             {{ customTitle.substr(0, customTitle.indexOf(searchValue)) }}
@@ -57,12 +64,19 @@ export default {
     return {
       menuList: [],
       menuTree: [],
+      expandAll: false,
       checkedKeys: [],
       searchValue: '',
       expandedKeys: [],
       visible: false,
       menu: {},
       columns: [
+        {
+          title: '序号ID',
+          dataIndex: 'menuId',
+          key: 'menuId',
+          scopedSlots: { customRender: 'menuId' }
+        },
         {
           title: '菜单名称',
           dataIndex: 'title',
@@ -83,6 +97,16 @@ export default {
           title: '路径',
           dataIndex: 'path',
           key: 'path'
+        },
+        {
+          title: '权限标识',
+          dataIndex: 'perms',
+          key: 'perms'
+        },
+        {
+          title: '父菜单ID',
+          dataIndex: 'parentId',
+          key: 'parentId'
         },
         {
           title: '图标',
@@ -117,6 +141,14 @@ export default {
     }
   },
   methods: {
+    toggleExpandAll () {
+      this.expandAll = !this.expandAll
+      if (this.expandAll) {
+        this.expandedKeys = this.menuList.map(menu => menu.menuId)
+      } else {
+        this.expandedKeys = ['1']
+      }
+    },
     getSystemMenu () {
       getMenuList().then(res => {
         this.menuList = res.result.menus.map(menu => {
@@ -151,6 +183,7 @@ export default {
 
       menus.forEach((menu) => {
         const node = {
+          menuId: menu.menuId, // 菜单 ID
           title: this.$t(menu.menuName), // 菜单名称
           value: menu.menuId, // 唯一标识
           key: menu.menuId, // 同样用 menuId 做 key
@@ -158,6 +191,7 @@ export default {
           component: menu.component,
           isCache: menu.isCache,
           routeName: menu.routeName,
+          perms: menu.perms,
           path: menu.path,
           parentId: menu.parentId,
           menuType: menu.menuType,
@@ -203,11 +237,12 @@ export default {
       this.visible = true
     },
     deleteMenu (record) {
+      record = record instanceof Array ? record : [record.menuId]
       this.$confirm({
         title: '提示',
-        content: '确定删除该菜单吗？',
+        content: record.length > 1 ? '确定删除选中的菜单吗？' : '确定删除该菜单吗？',
         onOk: () => {
-          deleteMenu(record.key).then(res => {
+          deleteMenu(record).then(res => {
             this.getSystemMenu()
             if (res.status === '0') {
               this.$message.success('删除成功')

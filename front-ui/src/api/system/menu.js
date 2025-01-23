@@ -23,10 +23,10 @@ export function createMenu (data) {
   })
 }
 
-export function deleteMenu (menuId) {
+export function deleteMenu (data) {
   return request({
     url: '/system/menu/delete',
     method: 'DELETE',
-    params: { menuId }
+    data
   })
 }

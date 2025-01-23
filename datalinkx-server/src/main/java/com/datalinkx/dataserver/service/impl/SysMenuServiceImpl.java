@@ -79,8 +79,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
     }
 
     @Override
-    public List<Long> selectMenuListByRoleId(String roleId) {
-        return null;
+    public List<SysMenuBean> selectMenuListByRoleId(String roleId) {
+        return sysMenuRepository.selectMenuListByRoleId(roleId);
     }
 
     /**
@@ -185,9 +185,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return
      */
     @Override
-    public int deleteMenuById(String menuId) {
-        sysMenuRepository.deleteById(menuId);
-        return 1;
+    public int deleteMenuByIds(String[] menuIds) {
+        return sysMenuRepository.deleteByIds(menuIds);
     }
 
     @Override

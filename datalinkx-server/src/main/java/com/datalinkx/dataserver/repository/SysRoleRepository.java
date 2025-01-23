@@ -18,6 +18,12 @@ public interface SysRoleRepository extends JpaRepository<SysRoleBean, String> {
             nativeQuery = true)
     List<SysRoleBean> selectRoleByUserId(@Param("userId") String userId);
 
-    @Query(value = "SELECT * FROM sys_role WHERE is_del = '0' AND status = '0' ORDER BY role_sort", nativeQuery = true)
+    @Query(value = "SELECT * FROM sys_role WHERE is_del = '0' ORDER BY role_sort", nativeQuery = true)
     List<SysRoleBean> selectRoleAll();
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE sys_role SET is_del = '1' WHERE role_id IN :ids", nativeQuery = true)
+    int deleteByIds(String[] ids);
+
 }

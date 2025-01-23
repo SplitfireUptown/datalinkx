@@ -81,8 +81,8 @@ public class SysMenuController {
      * @param menuId
      */
     @DeleteMapping("/delete")
-    public WebResult<HashMap<String, Integer>> deleteMenu(@RequestParam String menuId) {
-        int count = menuService.deleteMenuById(menuId);
+    public WebResult<HashMap<String, Integer>> deleteMenu(@RequestBody String[] menuIds) {
+        int count = menuService.deleteMenuByIds(menuIds);
         HashMap<String, Integer> resultMap = new HashMap<>();
         resultMap.put("count", count);
         return WebResult.of(resultMap);
