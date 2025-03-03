@@ -53,12 +53,7 @@ public class StreamTaskDaemonConfig implements InitializingBean {
     @Scheduled(fixedDelay = 10000) // 每10秒检查
     public void processQueueItems() {
         log.info("start to check stream task status");
-        List<JobBean> restartJob = jobRepository.findRestartJob(MetaConstants.JobType.JOB_TYPE_STREAM,
-                Arrays.asList(
-                        MetaConstants.JobStatus.JOB_STATUS_CREATE,
-                        MetaConstants.JobStatus.JOB_STATUS_SYNCING,
-                        MetaConstants.JobStatus.JOB_STATUS_ERROR
-                ));
+        List<JobBean> restartJob = jobRepository.findRestartJob(MetaConstants.JobType.JOB_TYPE_STREAM);
 
         if (ObjectUtils.isEmpty(restartJob)) {
             return;
@@ -127,7 +122,8 @@ public class StreamTaskDaemonConfig implements InitializingBean {
      * @param jobId
      */
     public void runStreamTask(String jobId) {
-        boolean isLock = distributedLock.lock(jobId, jobId, DistributedLock.LOCK_TIME);
+        String lockId = UUID.randomUUID().toString();
+        boolean isLock = distributedLock.lock(jobId, lockId, DistributedLock.LOCK_TIME);
         try {
             // 拿到了流式任务的锁就提交任务，任务状态在datalinkx-job提交流程中更改
             if (isLock) {
@@ -136,6 +132,17 @@ public class StreamTaskDaemonConfig implements InitializingBean {
                 if (!jobBeanOp.isPresent()) {
                     return;
                 }
+
+                JsonNode jsonNode = flinkClient.jobOverview();
+                Set<String> runningJobIds = JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
+                        .stream()
+                        .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
+                        .map(FlinkJobOverview::getName)
+                        .collect(Collectors.toSet());
+                if (runningJobIds.contains(jobId)) {
+                    return;
+                }
+
                 if (!Arrays.asList(
                         MetaConstants.JobStatus.JOB_STATUS_CREATE,
                         MetaConstants.JobStatus.JOB_STATUS_SYNCING,

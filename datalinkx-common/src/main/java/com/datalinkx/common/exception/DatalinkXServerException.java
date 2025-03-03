@@ -11,8 +11,6 @@ public class DatalinkXServerException extends RuntimeException {
 
 	private StatusCode status;
 
-	@JsonProperty("err_parameter")
-	private Map<String, Object> errorParam;
 
 	public DatalinkXServerException(String msg) {
 		super(msg);
@@ -39,27 +37,7 @@ public class DatalinkXServerException extends RuntimeException {
 		status = StatusCode.API_INTERNAL_ERROR;
 	}
 
-	public DatalinkXServerException(String msg, Throwable throwable, StatusCode status) {
-		super(msg, throwable);
-		this.status = status;
-	}
-
-	public DatalinkXServerException(Throwable throwable, StatusCode status) {
-		super(throwable);
-		this.status = status;
-	}
-
-	public DatalinkXServerException(StatusCode status, String msg, Map<String, Object> errorParam) {
-		super(msg);
-		this.status = status;
-		this.errorParam = errorParam;
-	}
-
 	public StatusCode getStatus() {
 		return status;
-	}
-
-	public Map<String, Object> getErrorParam() {
-		return errorParam;
 	}
 }

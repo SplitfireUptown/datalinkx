@@ -25,6 +25,9 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 	@Query(value = "select * from JOB where type = :type and status in :jobStatus and retry_time < 5 and is_del = 0", nativeQuery = true)
 	List<JobBean> findRestartJob(Integer type, List<Integer> jobStatus);
 
+	@Query(value = "select * from JOB where type = :type and retry_time < 5 and is_del = 0", nativeQuery = true)
+	List<JobBean> findRestartJob(Integer type);
+
 	@Query(value = "select * from JOB where (reader_ds_id = :jobId or writer_ds_id = :jobId)", nativeQuery = true)
 	List<JobBean> findDependJobId(String jobId);
 

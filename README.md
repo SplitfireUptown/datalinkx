@@ -131,6 +131,7 @@ seatunnel:
 | 支持operator计算任务					       | ✔️					           |✔️
 | 适配flink、seatunnel多引擎					 | ✔️					           |✔️
 | 支持clickhouse读写					       | ❌					           |✔️
+| 支持mysqlcdc读写					         | ❌					           |✔️
 | 告警中心		                    | ❌			 |✔️
 | 数据源新插件定制					             | ❌				      |✔️
 | UI优化					                 | ❌				      |✔️
