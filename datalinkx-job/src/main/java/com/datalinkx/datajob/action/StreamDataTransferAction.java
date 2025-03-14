@@ -108,7 +108,7 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<DataTra
             return true;
         }
         // 看门狗，续约分布式锁，防止其他节点重复提交任务
-        distributedLock.lock(unit.getJobId(), unit.getLockId(), DistributedLock.LOCK_TIME);
+        distributedLock.renewLock(unit.getJobId(), unit.getLockId(), DistributedLock.LOCK_TIME);
 
         // 流式任务不用检测太频繁，歇会
         try {

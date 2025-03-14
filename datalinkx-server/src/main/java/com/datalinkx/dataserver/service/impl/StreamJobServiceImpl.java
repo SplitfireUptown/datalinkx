@@ -218,6 +218,8 @@ public class StreamJobServiceImpl implements StreamJobService {
         JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
         if (!ObjectUtils.isEmpty(jobBean.getTaskId())) {
             this.stopFlinkTask(jobBean);
+            // 记录checkpoint
+            jobRepository.save(jobBean);
         }
     }
 

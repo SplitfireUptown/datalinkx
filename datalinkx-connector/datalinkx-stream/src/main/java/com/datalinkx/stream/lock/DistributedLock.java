@@ -21,13 +21,15 @@ public class DistributedLock {
 
 	private static final String LOCK_LUA = "if redis.call('setnx', KEYS[1], ARGV[1]) == 1 then redis.call('expire', KEYS[1], ARGV[2]) return 'true' else return 'false' end";
 	private static final String UNLOCK_LUA = "if redis.call('get', KEYS[1]) == ARGV[1] then redis.call('del', KEYS[1]) end return 'true' ";
+	private static final String RENEW_LUA = "if redis.call('get', KEYS[1]) == ARGV[1] then redis.call('expire', KEYS[1], ARGV[2]) return 'true' else return 'false' end";
 
 	private RedisScript lockRedisScript;
 	private RedisScript unLockRedisScript;
+	private RedisScript renewRedisScript;
 
 	private RedisSerializer<String> argsSerializer;
 	private RedisSerializer<String> resultSerializer;
-	public static Integer LOCK_TIME = 15;
+	public static Integer LOCK_TIME = 60;
 
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
@@ -41,6 +43,7 @@ public class DistributedLock {
 		resultSerializer = new StringRedisSerializer();
 		lockRedisScript = RedisScript.of(LOCK_LUA, String.class);
 		unLockRedisScript = RedisScript.of(UNLOCK_LUA, String.class);
+		renewRedisScript = RedisScript.of(RENEW_LUA, String.class);
 	}
 
 	public boolean lock(String lock, String val, int second) {
@@ -52,5 +55,12 @@ public class DistributedLock {
 	public void unlock(String lock, String val) {
 		List<String> keys = Collections.singletonList(lock);
 		redisTemplate.execute(unLockRedisScript, argsSerializer, resultSerializer, keys, val);
+	}
+
+
+	public boolean renewLock(String lock, String val, int second) {
+		List<String> keys = Collections.singletonList(lock);
+		String flag = redisTemplate.execute(renewRedisScript, argsSerializer, resultSerializer, keys, val, String.valueOf(second));
+		return Boolean.parseBoolean(flag);
 	}
 }
