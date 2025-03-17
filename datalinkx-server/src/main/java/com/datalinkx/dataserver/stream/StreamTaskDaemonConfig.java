@@ -1,5 +1,6 @@
 package com.datalinkx.dataserver.stream;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,14 +77,21 @@ public class StreamTaskDaemonConfig implements InitializingBean {
                     if (!runningJobIds.contains(jobId)) {
 
                         this.runStreamTask(jobId);
+                        continue;
                     } else {
                         // 如果因为datalinkx挂掉后重启，flink任务正常，datalinkx任务状态正常，判断健康检查线程是否挂掉, 如果挂掉，先停止再重新提交
                         String stringWebResult = datalinkXJobClient.streamJobHealth(jobId).getResult();
-                        if (ObjectUtils.isEmpty(stringWebResult)) {
-                            // 更新状态为失败，等待调度重新提交
-                            jobRepository.updateJobStatus(jobId, MetaConstants.JobStatus.JOB_STATUS_ERROR, "health check thread is dead, restart job");
+
+
+                        // 排除掉刚提交的任务
+                        Timestamp startTime = streamTaskBean.getStartTime();
+                        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+
+                        long differenceInMillis = Math.abs(currentTime.getTime() - startTime.getTime());
+                        if (differenceInMillis > 1 * 1000 * 60 && ObjectUtils.isEmpty(stringWebResult)) {
                             this.retryTime(jobId);
                             streamJobService.pause(jobId);
+                            continue;
                         }
                     }
                 }
@@ -143,13 +151,8 @@ public class StreamTaskDaemonConfig implements InitializingBean {
                     return;
                 }
 
-                if (!Arrays.asList(
-                        MetaConstants.JobStatus.JOB_STATUS_CREATE,
-                        MetaConstants.JobStatus.JOB_STATUS_SYNCING,
-                        MetaConstants.JobStatus.JOB_STATUS_ERROR).contains(jobBeanOp.get().getStatus())) {
-                    return;
-                }
                 streamJobService.streamJobExec(jobId, jobId);
+                this.retryTime(jobId);
             }
         } catch (Exception e){
             // 成功一直持有锁，失败需要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来

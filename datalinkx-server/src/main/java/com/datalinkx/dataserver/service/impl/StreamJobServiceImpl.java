@@ -20,6 +20,7 @@ import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataclient.client.flink.FlinkClient;
 import com.datalinkx.dataclient.client.flink.request.FlinkJobStopReq;
+import com.datalinkx.dataclient.client.flink.response.FlinkJobOverview;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.JobVo;
@@ -207,8 +208,33 @@ public class StreamJobServiceImpl implements StreamJobService {
                 }
             }
 
-            flinkJobStopReq.setTargetDirectory(checkpoint);
-            flinkClient.jobStop(jobBean.getTaskId(), flinkJobStopReq);
+            boolean isRunning = true;
+            while (isRunning) {
+                flinkJobStopReq.setTargetDirectory(checkpoint);
+                flinkClient.jobStop(jobBean.getTaskId(), flinkJobStopReq);
+
+
+                // 检查任务是否已经停止
+                JsonNode jsonNode = flinkClient.jobOverview();
+                Map<String, FlinkJobOverview> jobId2TaskInfo = JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
+                        .stream()
+                        .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
+                        .collect(Collectors.toMap(FlinkJobOverview::getName, v -> v));
+
+                if (jobId2TaskInfo.containsKey(jobBean.getJobId())) {
+
+                    FlinkJobOverview flinkJobOverview = jobId2TaskInfo.remove(jobBean.getJobId());
+                    flinkClient.jobStop(flinkJobOverview.getJid(), flinkJobStopReq);
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    isRunning = false;
+                }
+            }
             jobBean.setCheckpoint(checkpoint);
         }
     }
