@@ -22,6 +22,8 @@ public class JobStateForm {
     Long endTime;
     @Field("errmsg")
     String errmsg;
+    @Field("checkpoint")
+    String checkpoint;
     @Field("appendCount")
     private Integer appendCount = 0;
     @Field("filterCount")

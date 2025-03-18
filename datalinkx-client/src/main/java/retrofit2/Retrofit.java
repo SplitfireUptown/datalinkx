@@ -1,4 +1,4 @@
-// CHECKSTYLE:OFF
+
 /*
  * Copyright (C) 2012 Square, Inc.
  *

@@ -1,6 +1,8 @@
 package com.datalinkx.dataserver.bean.domain;
 
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -59,9 +61,19 @@ public class JobBean extends BaseDomainBean {
 	// CREATE = 0; SYNCING = 1; NORMAL = 2; ERROR = 3; QUEUE = 4; STOP = 5
 	@Column(name = "status", nullable = false, columnDefinition = "int(2)")
 	private Integer status;
-	@Column(name = "error_msg", nullable = true, columnDefinition = "longtext")
+	@Column(name = "error_msg", columnDefinition = "longtext")
 	private String errorMsg;
+	// 流式任务断点续传
+	@Column(name = "checkpoint", columnDefinition = "longtext")
+	private String checkpoint;
+	@Column(name = "graph", columnDefinition = "longtext")
+	private String graph;
 	// 0 不覆盖 1 覆盖
 	@Column(name = "cover")
 	private Integer cover;
+	// 0 批式任务 1 流式任务 2 计算任务
+	@Column(name = "type")
+	private Integer type;
+	@Column(name = "start_time")
+	public Timestamp startTime;
 }

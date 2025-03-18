@@ -53,7 +53,7 @@ public class MessageHubServiceImpl implements MessageHubService, ApplicationCont
         String[] topicSplit = topic.split(":");
         String innerTopic = String.format("%s:%s", topicSplit[1], topicSplit[2]);
         if (!Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(MessageHubConstants.WHITE_TOPIC, innerTopic))) {
-            throw new RuntimeException("当前topic未配置");
+            log.error("检测到topic未配置");
         }
     }
 

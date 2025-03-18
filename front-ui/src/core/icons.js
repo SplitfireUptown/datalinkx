@@ -17,6 +17,7 @@ import oraclePng from '@/assets/icons/ORACLE.png'
 import ESPng from '@/assets/icons/ELASTICSEARCH.png'
 import httpPng from '@/assets/icons/HTTP.png'
 import redisPng from '@/assets/icons/REDIS.png'
+import kafkaPng from '@/assets/icons/KAFKA.png'
 
 export {
   bxAnaalyse,
@@ -29,5 +30,6 @@ export {
   oraclePng,
   ESPng,
   httpPng,
-  redisPng
+  redisPng,
+  kafkaPng
 }

@@ -13,12 +13,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import com.datalinkx.dataclient.client.DatalinkXClientUtils;
+import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
+import com.datalinkx.dataclient.client.flink.FlinkClient;
+import com.datalinkx.dataclient.client.seatunnel.SeaTunnelClient;
+import com.datalinkx.dataclient.config.DatalinkXClientUtils;
 import com.datalinkx.dataserver.client.xxljob.XxlJobClient;
 import com.datalinkx.dataserver.client.xxljob.XxlLoginClient;
 import com.datalinkx.dataserver.client.xxljob.interceptor.LoginInterceptor;
 import com.datalinkx.dataserver.controller.formatter.UserGenericConverter;
 import com.google.common.base.CaseFormat;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -89,5 +93,21 @@ public class WebConfig implements WebMvcConfigurer {
 	public XxlJobClient xxlJobClient(XxlClientProperties xxlClientProperties, LoginInterceptor loginInterceptor) {
 		return DatalinkXClientUtils.createClient("xxljob", xxlClientProperties.getClient(),
 				XxlJobClient.class, loginInterceptor);
+	}
+
+	@Bean
+	public DatalinkXJobClient datalinkXJobClient(ClientProperties clientProperties) {
+		return DatalinkXClientUtils.createClient("datajob", clientProperties.getDatajob(), DatalinkXJobClient.class);
+	}
+
+	@Bean
+	public FlinkClient flinkClient(ClientProperties clientProperties) {
+		return DatalinkXClientUtils.createClient("flink", clientProperties.getFlink(), FlinkClient.class);
+	}
+
+	@Bean
+	@ConditionalOnProperty(prefix = "client.seatunnel", name = "url")
+	public SeaTunnelClient SeatunnelClient(ClientProperties clientProperties) {
+		return DatalinkXClientUtils.createClient("seatunnel", clientProperties.getSeatunnel(), SeaTunnelClient.class);
 	}
 }

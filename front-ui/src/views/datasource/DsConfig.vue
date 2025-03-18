@@ -26,7 +26,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
         >
-          <span>{{currentDs.label}}</span>
+          <span>{{ currentDs.label }}</span>
         </a-form-item>
 
         <a-form-item
@@ -154,6 +154,9 @@ export default {
             item.isRequired = ['host', 'port', 'username', 'password', 'database'].includes(item.key)
             break
           }
+          case 100: {
+            item.isRequired = ['host', 'port'].includes(item.key)
+          }
         }
       })
       if (this.currentDs.dsTypeKey === 3) {
@@ -237,29 +240,48 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           values.type = this.currentDs.dsTypeKey
-          values.dsId = this.dsId
+          values.ds_id = this.dsId
           if (this.currentDs.dsTypeKey === 3) {
             const temp = {}
-            temp[values.servertype] = values[values.servertype]
+            temp[values.servertype] = values['sid']
             values.config = JSON.stringify(temp)
           }
           this.confirmLoading = true
           if (this.type === 'add') {
             console.log(values)
             addObj(values).then(res => {
-              if (res.status !== '0') {
+              if (res.status === '0') {
+                this.$emit('ok')
+                this.confirmLoading = false
+                // 清楚表单数据
+                this.handleCancel()
+                this.$message.success('新增成功')
+              } else {
+                this.confirmLoading = false
                 this.$message.error(res.errstr)
               }
+            }).catch(err => {
+              this.confirmLoading = false
+              this.$message.error(err.errstr)
             })
           } else if (this.type === 'edit') {
             console.log('----', values)
-            await putObj(values)
+            await putObj(values).then(res => {
+              if (res.status === '0') {
+                this.$emit('ok')
+                this.confirmLoading = false
+                // 清楚表单数据
+                this.handleCancel()
+                this.$message.success('修改成功')
+              } else {
+                this.confirmLoading = false
+                this.$message.error(res.errstr)
+              }
+            }).catch(err => {
+              this.confirmLoading = false
+              this.$message.error(err.errstr)
+            })
           }
-          setTimeout(() => {
-            this.confirmLoading = false
-            this.$emit('ok', { type: this.type })
-            this.visible = false
-          }, 1500)
         }
       })
       selectTables = []

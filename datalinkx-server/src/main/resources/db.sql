@@ -92,3 +92,15 @@ INSERT INTO `MESSAGEHUB_TOPIC` (`topic`, `fields`, `info_type`, `desc`) VALUES (
 alter table JOB ADD COLUMN  `name` varchar(64) DEFAULT NULL COMMENT '任务名称';;
 
 alter table JOB ADD COLUMN `cover` tinyint NOT NULL DEFAULT '0' COMMENT '是否开启覆盖';
+
+-- 流式任务表结构变更
+
+alter table JOB ADD COLUMN `type` tinyint NOT NULL DEFAULT '0' COMMENT '是否是流式任务';
+
+alter table JOB ADD COLUMN `checkpoint` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '流式任务端点续传';
+
+alter table JOB ADD COLUMN `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+alter table JOB ADD COLUMN `retry_time` int NOT NULL DEFAULT '0' COMMENT '流式任务重试次数';
+
+alter table JOB ADD COLUMN `graph` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '计算画布';

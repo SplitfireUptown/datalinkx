@@ -2,6 +2,7 @@ package com.datalinkx.dataserver.client.xxljob;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.exception.DatalinkXServerException;
@@ -140,10 +141,6 @@ public class JobClientApi {
 
     public Integer getXxlJobId(String jobId) {
         JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "xxljob not exist"));
-        if (StringUtils.isEmpty(jobBean.getXxlId())) {
-            throw new DatalinkXServerException(StatusCode.INVALID_ARGUMENTS, "invalid xxl job id");
-        }
-
         return Integer.parseInt(jobBean.getXxlId());
     }
 }

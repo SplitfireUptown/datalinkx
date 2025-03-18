@@ -40,7 +40,7 @@ public class JobLogBean {
 	@Column(name = "job_id", nullable = false, length = 35, columnDefinition = "varchar(35)")
 	private String jobId;
 	@ApiModelProperty(value = "0成功 1失败")
-	@Column(name = "status", nullable = true, columnDefinition = "tinyint(2) unsigned")
+	@Column(name = "status", columnDefinition = "tinyint(2) unsigned")
 	private Integer status;
 	@NotBlank
 	@Column(name = "count", nullable = false, columnDefinition = "text")

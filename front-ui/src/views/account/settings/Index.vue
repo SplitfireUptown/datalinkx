@@ -91,6 +91,7 @@ export default {
   },
   methods: {
     onOpenChange (openKeys) {
+      console.log('111111111111111111')
       this.openKeys = openKeys
     },
     updateMenu () {

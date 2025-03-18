@@ -1,4 +1,4 @@
-// CHECKSTYLE:OFF
+
 package com.datalinkx.dataserver.client.xxljob.interceptor;
 
 import java.io.EOFException;

@@ -25,9 +25,22 @@ export function exec (jobId) {
     method: 'POST'
   })
 }
+
+export function streamExec (jobId) {
+  return axios({
+    url: `/api/stream/job/exec/${jobId}`,
+    method: 'POST'
+  })
+}
 export function stop (jobId) {
   return axios({
     url: `/api/job/stop/${jobId}`,
+    method: 'POST'
+  })
+}
+export function streamStop (jobId) {
+  return axios({
+    url: `/api/stream/job/stop/${jobId}`,
     method: 'POST'
   })
 }
@@ -39,9 +52,25 @@ export function addObj (obj) {
   })
 }
 
+export function streamAddObj (obj) {
+  return axios({
+    url: '/api/stream/job/create',
+    method: 'POST',
+    data: obj
+  })
+}
+
 export function modifyObj (obj) {
   return axios({
     url: '/api/job/modify',
+    method: 'POST',
+    data: obj
+  })
+}
+
+export function streamModifyObj (obj) {
+  return axios({
+    url: '/api/stream/job/modify',
     method: 'POST',
     data: obj
   })

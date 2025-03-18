@@ -1,67 +1,72 @@
 <template>
-<div class="ds-list-root">
-  <div class="list-left">
-    <ul>
-      <li
-      v-for="ds in dsTypeList"
-      :key="ds.value"
-      class="ds-list"
-      :class="{active: ds.dsTypeKey === currentDs.dsTypeKey}"
-      @click="selectDs(ds)"
-      >
-      <span class="ds-icon">
-        <img :src="ds.img" alt="">
-      </span>
-      <div class="ds-name">
-        <div class="nowrap">
-          <span class="name">{{ds.label}}</span>
-          <span class="num-in ml4">{{dsGroupNumber[ds.dsTypeKey]}}</span>
-        </div>
+  <div class="ds-list-root">
+    <div class="list-left">
+      <ul>
+        <li
+          v-for="ds in dsTypeList"
+          :key="ds.value"
+          class="ds-list"
+          :class="{active: ds.dsTypeKey === currentDs.dsTypeKey}"
+          @click="selectDs(ds)"
+        >
+          <span class="ds-icon">
+            <img :src="ds.img" alt="">
+          </span>
+          <div class="ds-name">
+            <div class="nowrap">
+              <span class="name">{{ ds.label }}</span>
+              <span class="num-in ml4">{{ dsGroupNumber[ds.dsTypeKey] }}</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <a-card :bordered="false" class="list-acard">
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <a-col :md="8" :sm="24">
+              <a-form-item label="数据源名称">
+                <a-input v-model="queryParam.name" placeholder="数据源名称"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-button @click="() => {this.queryData()}" type="primary">查询</a-button>
+              <a-button @click="() => queryParam = {}" style="margin-left: 8px">重置</a-button>
+            </a-col>
+          </a-row>
+        </a-form>
       </div>
-      </li>
-    </ul>
+      <div class="table-operator">
+        <!--      v-action="'upms:user:add'"-->
+<!--        <a-button @click="$refs.refDsConfig.show('','add')" icon="plus" type="primary">新建</a-button>-->
+        <a-button @click="createDS" icon="plus" type="primary">新建</a-button>
+      </div>
+      <a-table
+        :columns="columns"
+        :dataSource="tableData"
+        :loading="loading"
+        :pagination="pagination"
+        :rowKey="record => record.id"
+        @change="handleTableChange"
+      >
+      </a-table>
+      <ds-config
+        @ok="handleOk"
+        :currentDs="currentDs"
+        ref="refDsConfig"
+      />
+      <http-ds-save-or-update
+        @ok="handleOk"
+        ref="httpDsSaveOrUpdate"
+      />
+    </a-card>
   </div>
-  <a-card :bordered="false" class="list-acard">
-    <div class="table-page-search-wrapper">
-      <a-form layout="inline">
-        <a-row :gutter="48">
-          <a-col :md="8" :sm="24">
-            <a-form-item label="数据源名称">
-              <a-input v-model="queryParam.name" placeholder="数据源名称"/>
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24">
-            <a-button @click="() => {this.queryData()}" type="primary">查询</a-button>
-            <a-button @click="() => queryParam = {}" style="margin-left: 8px">重置</a-button>
-          </a-col>
-        </a-row>
-      </a-form>
-    </div>
-    <div class="table-operator">
-      <!--      v-action="'upms:user:add'"-->
-      <a-button @click="$refs.refDsConfig.show('','add')" icon="plus" type="primary">新建</a-button>
-    </div>
-    <a-table
-      :columns="columns"
-      :dataSource="tableData"
-      :loading="loading"
-      :pagination="pagination"
-      :rowKey="record => record.id"
-      @change="handleTableChange"
-    >
-    </a-table>
-    <ds-config
-      @ok="handleOk"
-      :currentDs="currentDs"
-      ref="refDsConfig"
-    />
-  </a-card>
-</div>
 </template>
 
 <script>
 import { pageQuery, delObj, getDsGroup } from '@/api/datasource/datasource'
-// import DsSaveOrUpdate from './DsSaveOrUpdate.vue'
+import HttpDsSaveOrUpdate from './HttpDsSaveOrUpdate.vue'
 import DsConfig from './DsConfig.vue'
 import { dsTypeList } from './const'
 import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
@@ -69,7 +74,7 @@ import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
 export default {
   name: 'ContainerBottom',
   components: {
-    // DsSaveOrUpdate,
+    HttpDsSaveOrUpdate,
     DsConfig
   },
   data () {
@@ -144,7 +149,9 @@ export default {
         1: 0,
         2: 0,
         3: 0,
-        4: 0
+        4: 0,
+        5: 0,
+        100: 0
       },
       currentDs: {
         value: 'MySQL',
@@ -168,6 +175,13 @@ export default {
       }).catch(reason => {
         this.loading = false
       })
+    },
+    createDS () {
+      if (this.currentDs.dsTypeKey === 5) {
+        this.$refs.httpDsSaveOrUpdate.show('', 'add')
+      } else {
+        this.$refs.refDsConfig.show('', 'add')
+      }
     },
     getAllDsNumber () {
       getDsGroup().then(res => {
@@ -196,7 +210,11 @@ export default {
     },
 
     edit (record) {
-      this.$refs.refDsConfig.show(record.dsId, 'edit', record)
+      if (this.currentDs.dsTypeKey === 5) {
+        this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'edit')
+      } else {
+        this.$refs.refDsConfig.show(record.dsId, 'edit', record)
+      }
       // this.init()
     },
     delete (record) {
@@ -219,7 +237,11 @@ export default {
       })
     },
     show (record) {
-      this.$refs.refDsConfig.show(record.dsId, 'show', record)
+      if (this.currentDs.dsTypeKey === 5) {
+        this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'show')
+      } else {
+        this.$refs.refDsConfig.show(record.dsId, 'show', record)
+      }
     },
     handleOk (data) {
       this.init()

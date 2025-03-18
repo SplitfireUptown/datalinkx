@@ -1,7 +1,13 @@
 package com.datalinkx.datajob.job;
 
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -10,15 +16,13 @@ import java.util.regex.Pattern;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.common.utils.ObjectUtils;
+import com.datalinkx.common.utils.ProcessStreamHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
 
 @Slf4j
@@ -26,7 +30,7 @@ import org.springframework.util.ResourceUtils;
 public class ExecutorJobHandler {
 
 	@Value("${flinkx.path}")
-	private String flinkXHomePath;
+	String flinkXHomePath;
 
 	@Value("${flinkx.syncplugins.path:${flinkx.path}}")
 	private String syncPluginsPath;
@@ -35,19 +39,19 @@ public class ExecutorJobHandler {
 	private String flinkConf;
 
 	@Value("${reserve.job_graph:false}")
-	private Boolean reserveJobGraph;
+	Boolean reserveJobGraph;
 
 
-	public String execute(String jobId, String reader, String writer) throws Exception {
+	public String execute(String jobId, String reader, String writer, Map<String, Object> otherSetting) throws Exception {
 
 		StringBuffer errorRet = new StringBuffer();
 		StringBuffer successRet = new StringBuffer();
 
-		String jobSettings = this.generateJobSetting();
+		String jobSettings = this.generateJobSetting("classpath:job_setting.json", otherSetting);
 		String jobJsonFile = this.generateJobJsonFile(jobId, reader, writer, jobSettings);
 
 		try {
-			String cmdStr = this.generateFlinkCmd(jobId, jobJsonFile);
+			String cmdStr = this.generateFlinkCmd(jobId, jobJsonFile, otherSetting);
 			try {
 				log.info("job_id: {}, execute job command: {}", jobId, cmdStr);
 				Process process = Runtime.getRuntime().exec(cmdStr);
@@ -85,7 +89,7 @@ public class ExecutorJobHandler {
 		if (!matcher.find()) {
 			log.error(errorRet.toString());
 			log.error(successRet.toString());
-			throw new Exception(ObjectUtils.isEmpty(errorRet.toString()) ? successRet.toString() : errorRet.toString());
+			throw new Exception(errorRet.toString());
 		}
 
 		String received = matcher.group();
@@ -95,9 +99,8 @@ public class ExecutorJobHandler {
 		return jobUrl.substring("/jobs/".length());
 	}
 
-	private String generateFlinkCmd(String jobId, String jobJsonFile) {
+	public String generateFlinkCmd(String jobId, String jobJsonFile, Map<String, Object> otherSetting) {
 		String javaHome = System.getenv("JAVA_HOME");
-        log.info("javaHome: {}", javaHome);
 		String os = System.getProperty("os.name").toLowerCase();
 
 		return String.format(
@@ -111,7 +114,7 @@ public class ExecutorJobHandler {
 		);
 	}
 
-	private String generateJobJsonFile(String jobId, String reader, String writer, String setting) {
+	public String generateJobJsonFile(String jobId, String reader, String writer, String setting) {
 		String jobJson = String.format("{\"job\":{\"content\":[{\"reader\":%s,\"writer\":%s}],\"setting\":%s}}", reader, writer, setting);
 		log.info("flink job_id: {} graph: {}", jobId, jobJson);
 		String jsonPath = flinkXHomePath;
@@ -136,8 +139,8 @@ public class ExecutorJobHandler {
 	}*/
 
     @SneakyThrows
-    private String generateJobSetting() {
-        Resource resource = new DefaultResourceLoader().getResource("classpath:job_setting.json");
+	public String generateJobSetting(String jobSettingPath, Map<String, Object> commonSettings) {
+        Resource resource = new DefaultResourceLoader().getResource(jobSettingPath);
 
         log.info(resource.toString());
 

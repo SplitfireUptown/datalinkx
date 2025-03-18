@@ -128,7 +128,7 @@ const vueConfig = {
     proxy: {
       '/api': {
         target: 'http://localhost:12345',
-        // target: 'http://192.168.11.67:12345',
+        // target: '',
         ws: true,
         changeOrigin: true,
         pathRewrite: {
@@ -140,7 +140,7 @@ const vueConfig = {
 
   // disable source map in production
   productionSourceMap: false,
-  lintOnSave: undefined,
+  lintOnSave: false,
   // babel-loader no-ignore node_modules/*
   transpileDependencies: []
 }

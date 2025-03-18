@@ -25,7 +25,7 @@ public class JobVo {
 		@ApiModelProperty(value = "任务id")
 		@JsonProperty("job_id")
 		private String jobId;
-		@ApiModelProperty(value = "任务id")
+		@ApiModelProperty(value = "任务名称")
 		@JsonProperty("job_name")
 		private String jobName;
 
@@ -38,6 +38,27 @@ public class JobVo {
 		private String progress;
 
 		private Integer status;
+	}
+
+	@Data
+	@ApiModel
+	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static final class JobStreamPageVo {
+		@ApiModelProperty(value = "任务id")
+		@JsonProperty("job_id")
+		private String jobId;
+		@ApiModelProperty(value = "任务名称")
+		@JsonProperty("job_name")
+		private String jobName;
+		@JsonProperty("from_tb_name")
+		private String fromTbName;
+		@JsonProperty("to_tb_name")
+		private String toTbName;
+		@ApiModelProperty(value = "任务启动开始时间")
+		@JsonProperty("start_time")
+		private Timestamp startTime;
 	}
 
 	@Data
@@ -100,6 +121,7 @@ public class JobVo {
 		private List<JobForm.FieldMappingForm> fieldMappings;
 		@JsonProperty("sync_mode")
 		private JobForm.SyncModeForm syncMode;
+		private String graph;
 	}
 
 
@@ -134,6 +156,8 @@ public class JobVo {
 		@ApiModelProperty(value = "任务名称")
 		@JsonProperty("job_name")
 		private String jobName;
+		@ApiModelProperty(value = "任务类型")
+		private Integer type;
 	}
 
 	@Data

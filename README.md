@@ -1,7 +1,10 @@
 ![输入图片说明](datalinkx-server/src/main/resources/readme/project_name.png)
+## DatalinkX Stars
+[![Stargazers over time](https://starchart.cc/SplitfireUptown/datalinkx.svg?variant=adaptive)](https://starchart.cc/SplitfireUptown/datalinkx)
 
 <p align="center">
 <a href="https://github.com/SplitfireUptown/datalinkx"><img src="https://img.shields.io/github/stars/SplitfireUptown/datalinkx.svg?style=flat&label=GithubStars"></a>
+[![star](https://gitcode.com/m0_37817220/datalinkx/star/badge.svg)](https://gitcode.com/m0_37817220/datalinkx)
 <a href="https://gitee.com/atuptown/datalinkx"><img src="https://gitee.com/atuptown/datalinkx/badge/star.svg?theme=dark" alt="Gitee Starts"></a>
   <a href="https://gitee.com/atuptown/datalinkx"><img src="https://gitee.com/atuptown/datalinkx/badge/fork.svg?theme=dark" alt="Gitee Starts"></a>
 <a href="#"><img src="https://img.shields.io/badge/Author-在下uptown-orange.svg" alt="作者"></a>
@@ -13,11 +16,14 @@
   <a href="#项目文档"><img src="https://img.shields.io/badge/ORM-SpringData JPA-blue.svg" alt="ORM框架"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/分布式定时任务-xxljob-green.svg" alt="分布式定时任务"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/分布式计算引擎-Flink-red.svg" alt="计算引擎"></a>
+  <a href="#项目文档"><img src="https://img.shields.io/badge/分布式计算引擎-Seatunnel-blue.svg" alt="计算引擎"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/系统部署-Docker & DockerCompose-yellow.svg" alt="部署"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/前端-Vue2.x-green.svg" alt="部署"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/前端UI-AntDesignUI-red.svg" alt="前端"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/RPC-Retrofit2-blue.svg" alt="RPC框架"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/同步框架-Chunjun(FlinkX)-green.svg" alt="同步框架"></a>
+<a href="#项目文档"><img src="https://img.shields.io/badge/向量库-ElasticSearch 7.9.3-blue.svg" alt="向量库"></a>
+<a href="#项目文档"><img src="https://img.shields.io/badge/大模型框架-ollama-orange.svg" alt="大模型框架"></a>
 
 ## 异构数据源同步服务DatalinkX介绍
 
@@ -35,16 +41,26 @@
 - **高性能同步**：使用高性能流式flink计算引擎   
 - **容器化部署**：支持docker部署
 
+
+## 项目地址
+
+| 项目   | GITEE                                       | GITHUB                                          | GITCODE                                       |
+|------|---------------------------------------------|-------------------------------------------------|-----------------------------------------------|
+| 项目地址 | [GITEE](https://gitee.com/atuptown/datalinkx)  | [GITHUB](https://github.com/SplitfireUptown/datalinkx)    | [GITCODE](https://gitcode.com/m0_37817220/datalinkx) |
+
 ## 项目技术栈
 | 依赖					            | 版本					         |描述
 |--------------------|-----------------|-------
-| Spring Boot			     | 3.2.1					      |项目脚手架
-| SpringData JPA			  | 3.2.1					      |持久层框架
+| Spring Boot			     | 2.4.3					      |项目脚手架
+| SpringData JPA			  | 2.4.3					      |持久层框架
 | MySQL					         | 8.0					        |DB数据库
-| ElasticSearch					 | 7.x					        |支持流转的数据库
+| ElasticSearch					 | 7.9.3					      |向量库、支持流转的数据库
 | Redis					         | 5.0 ↑					      |缓存数据库
+| RedisStream					   | 5.0 ↑					      |消息中间件
 | ChunJun(原FlinkX)		 | 1.10_release			 |袋鼠云开源数据同步框架
+| Seatunnel		        | 2.3.8			        |apache开源数据同步框架
 | Flink					         | 1.10.3					     |分布式大数据计算引擎
+| Ollama					        | x					          |大模型执行框架
 | Xxl-job				        | 2.3.0					      |分布式调度框架
 | Retrofit2				      | 2.9.0					      |RPC通信服务
 | Jackson				        | 2.11.4					     |反序列化框架
@@ -58,13 +74,17 @@
 #### 中间件
 执行 `docker compose -p datalinkx up -d` 命令将各组件启动
 
-##### 手动搭建组件（linux）：
+##### 手动搭建组件：
 xxl-job: https://github.com/xuxueli/xxl-job/archive/refs/tags/2.3.0.zip
 纯Java项目，可clone代码后打包成jar包启动，xxl-job依赖mysql，需要修改对应数据库地址配置，表结构在/xxl-job-2.3.0/doc/db/tables_xxl_job.sql，导入mysql即可。
 
 
 flink：https://archive.apache.org/dist/flink/flink-1.10.3/
 选择flink-1.10.3-bin-scala_2.12.tgz下载，解压进入bin目录执行./start-cluster.sh，首次运行默认只有一个任务slot，访问http://localhost:8081 进去flink后台页面。
+
+seatunnel: 
+进入seatunnel/bin目录直接执行
+
 
 #### DB层
 执行  /datalinkx-server/src/main/resources/db.sql
@@ -92,8 +112,13 @@ flink：https://archive.apache.org/dist/flink/flink-1.10.3/
 ![img.png](datalinkx-server/src/main/resources/readme/login.png)
 2. 数据源管理，配置数据流转数据源信息
 ![img.png](datalinkx-server/src/main/resources/readme/ds_config.png)
-3. 任务管理，配置from_db与to_db构造job_graph
-![img.png](datalinkx-server/src/main/resources/readme/job_config.png)
+3. 任务管理
+   1. 批式任务：配置from_db与to_db构造job_graph
+   ![img.png](datalinkx-server/src/main/resources/readme/job_config.png)
+   2. 批式任务：配置from_db与to_db构造job_graph，仅支持kafka
+   ![img.png](datalinkx-server/src/main/resources/readme/stream_job_config.png)
+   3. 计算任务: 配置画布信息，支持transform算子操作
+   ![img.png](datalinkx-server/src/main/resources/readme/transform_job_config.png)
 5. 任务级联配置
 ![img.png](datalinkx-server/src/main/resources/readme/job_cascade.png)
 6. 任务血缘
@@ -103,9 +128,23 @@ flink：https://archive.apache.org/dist/flink/flink-1.10.3/
 7. 任务执行
 ![img.png](datalinkx-server/src/main/resources/readme/flink.png)
 
-## datalinkx交流群
-私聊进群我会拉到项目交流群中
-![输入图片说明](datalinkx-server/src/main/resources/readme/author.png)
+## 商业版核心功能差异
+| 功能				                    | datalinkx					  | datalinkx pro
+|---------------------------|-----------------|-------
+| 支持mysql读写			              | 	✔️					        | ✔️
+| 支持oracle读写			             | ✔️					         | ✔️
+| 支持elasticsearch读写					    | ✔️					         |✔️
+| 支持http读					              | ✔️					         |✔️
+| 支持redis写					             | ✔️					           |✔️
+| 支持operator计算任务					       | ✔️					           |✔️
+| 适配flink、seatunnel多引擎					 | ✔️					           |✔️
+| 支持clickhouse读写					       | ❌					           |✔️
+| 支持mysqlcdc读写					         | ❌					           |✔️
+| 告警中心		                    | ❌			 |✔️
+| 数据源新插件定制					             | ❌				      |✔️
+| UI优化					                 | ❌				      |✔️
+| 支持定制化需求					              | ❌				      |✔️
+
 
 ## 项目文档
 [细致文档带你吃透DatalinkX](https://note.youdao.com/s/a9ltzlc1)

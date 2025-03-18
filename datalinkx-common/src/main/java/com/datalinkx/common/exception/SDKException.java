@@ -1,9 +1,9 @@
 package com.datalinkx.common.exception;
 
+import lombok.Getter;
+
+@Getter
 public class SDKException extends RuntimeException {
-	public Integer getStatus() {
-		return status;
-	}
 
 	private Integer status;
 

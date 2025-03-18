@@ -1,4 +1,4 @@
-// CHECKSTYLE:OFF
+
 package com.datalinkx.datajob.action;
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
@@ -18,13 +18,13 @@ import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.dataclient.client.flink.FlinkClient;
+import com.datalinkx.dataclient.client.flink.response.FlinkJobAccumulators;
+import com.datalinkx.dataclient.client.flink.response.FlinkJobStatus;
 import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.datalinkx.datajob.bean.JobStateForm;
 import com.datalinkx.datajob.bean.JobSyncModeForm;
 import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.datajob.client.flink.FlinkClient;
-import com.datalinkx.datajob.client.flink.response.FlinkJobAccumulators;
-import com.datalinkx.datajob.client.flink.response.FlinkJobStatus;
 import com.datalinkx.datajob.job.ExecutorJobHandler;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
@@ -77,9 +77,9 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected void end(DataTransJobDetail info, int status, String errmsg) {
+    protected void end(FlinkActionMeta unit, int status, String errmsg) {
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
-        log.info(String.format("jobid: %s, end to transfer", info.getJobId()));
+        log.info(String.format("jobid: %s, end to transfer", unit.getJobId()));
 
 
         if (COUNT_RES.get() != null) {
@@ -89,7 +89,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
                 jobExecCountDto.setFilterCount(jobExecCountDto.getFilterCount() + value.getFilterCount());
             });
         }
-        datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
+        datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(unit.getJobId())
                 .jobStatus(status).startTime(START_TIME.get()).endTime(new Date().getTime())
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
@@ -98,7 +98,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
                 .build());
         // 父任务执行成功后级联触发子任务
         if (JOB_STATUS_SUCCESS == status) {
-            datalinkXServerClient.cascadeJob(info.getJobId());
+            datalinkXServerClient.cascadeJob(unit.getJobId());
         }
     }
 
@@ -144,7 +144,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
 
             String readerStr = JsonUtils.toJson(reader);
             String writerStr = JsonUtils.toJson(writer);
-            taskId = executorJobHandler.execute(unit.getJobId(), readerStr, writerStr);
+            taskId = executorJobHandler.execute(unit.getJobId(), readerStr, writerStr, new HashMap<>());
             unit.setTaskId(taskId) ;
             // 更新task
             datalinkXServerClient.updateJobTaskRel(unit.getJobId(), taskId);
@@ -157,8 +157,8 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     @Override
     protected boolean checkResult(FlinkActionMeta unitParam) throws DatalinkXJobException {
         String taskId = unitParam.getTaskId();
-        if (StringUtils.isEmpty(taskId)) {
-            throw new DatalinkXJobException("flink task id is empty.");
+        if (ObjectUtils.isEmpty(taskId)) {
+            throw new DatalinkXJobException("task id is empty.");
         }
 
 
@@ -173,16 +173,13 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         if ("failed".equalsIgnoreCase(state)) {
             String errorMsg = "data-transfer task failed.";
 
-            if (flinkClient != null) {
-                JsonNode jsonNode = flinkClient.jobExceptions(taskId);
-                if (jsonNode.has("all-exceptions")) {
-                    Iterator<JsonNode> exceptions = jsonNode.get("all-exceptions").elements();
-                    if (exceptions.hasNext()) {
-                        errorMsg = exceptions.next().get("exception").asText();
-                    }
+            JsonNode jsonNode = flinkClient.jobExceptions(taskId);
+            if (jsonNode.has("all-exceptions")) {
+                Iterator<JsonNode> exceptions = jsonNode.get("all-exceptions").elements();
+                if (exceptions.hasNext()) {
+                    errorMsg = exceptions.next().get("exception").asText();
                 }
             }
-
             log.error(errorMsg);
             throw new DatalinkXJobException(errorMsg);
         }
@@ -263,10 +260,6 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
         // 同步表状态
         if (success) {
             log.info(String.format("jobid: %s, after from %s to %s", unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
-            // 触发after钩子函数，留个后门
-            unit.getDsReader().afterRead(unit);
-            unit.getDsWriter().afterWrite(unit);
-
             String tableName = unit.getReader().getTableName();
             getExecCount(tableName).setAllCount(getExecCount(tableName).getAllCount() == null ? 0 : getExecCount(tableName).getAllCount());
             getExecCount(tableName).setAppendCount(getExecCount(tableName).getAppendCount() + unit.getReadRecords());

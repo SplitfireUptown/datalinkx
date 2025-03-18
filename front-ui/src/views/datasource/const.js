@@ -2,8 +2,9 @@ import {
   mysqlPng,
   oraclePng,
   ESPng,
-  redisPng
-  // httpPng
+  redisPng,
+  kafkaPng,
+  httpPng
 } from '@/core/icons'
 
 const DataSourceType = [
@@ -22,6 +23,14 @@ const DataSourceType = [
   {
     label: 'REDIS',
     value: 4
+  },
+  {
+    label: 'HTTP',
+    value: 5
+  },
+  {
+    label: 'KAFKA',
+    value: 100
   }
 ]
 const dsTypeList = [
@@ -33,7 +42,7 @@ const dsTypeList = [
   },
   {
     value: 'es',
-    label: 'ES',
+    label: 'ElasticSearch',
     dsTypeKey: 2,
     img: ESPng
   },
@@ -48,14 +57,28 @@ const dsTypeList = [
     label: 'Redis',
     dsTypeKey: 4,
     img: redisPng
+  },
+  {
+    value: 'kafka',
+    label: 'Kafka',
+    dsTypeKey: 100,
+    img: kafkaPng
+  },
+  {
+    value: 'http',
+    label: 'HTTP',
+    dsTypeKey: 5,
+    img: httpPng
   }
-  // {
-  //   value: 'http',
-  //   label: 'Http',
-  //   dsTypeKey: 4,
-  //   img: httpPng
-  // }
 ]
+const dsImgObj = {
+  1: mysqlPng,
+  2: ESPng,
+  3: oraclePng,
+  4: redisPng,
+  5: httpPng,
+  100: kafkaPng
+}
 // 目标数据源 redis 类型
 const RedisTypes = [
   {
@@ -140,7 +163,11 @@ const OracleServerTypes = [
   {
     label: 'SID',
     value: 'sid'
+  },
+  {
+    label: '服务名',
+    value: 'servername'
   }
 ]
 
-export { DataSourceType, dsTypeList, RedisTypes, dsConfigOriginList, OracleServerTypes }
+export { DataSourceType, dsTypeList, RedisTypes, dsConfigOriginList, OracleServerTypes, dsImgObj }

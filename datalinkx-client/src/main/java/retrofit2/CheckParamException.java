@@ -1,5 +1,7 @@
-// CHECKSTYLE:OFF
+
 package retrofit2;
+
+import lombok.Getter;
 
 import java.util.Map;
 import java.util.Set;
@@ -7,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 
+@Getter
 public class CheckParamException extends RuntimeException {
 	private static final long serialVersionUID = -3921694200794135865L;
 	private Map<String, Object> errors;
@@ -20,10 +23,6 @@ public class CheckParamException extends RuntimeException {
 		super(message);
 		this.errors = errors.stream()
 				.collect(Collectors.toMap(k -> k.getPropertyPath().toString(), ConstraintViolation::getMessage));
-	}
-
-	public Map<String, Object> getErrors() {
-		return errors;
 	}
 
 	@Override

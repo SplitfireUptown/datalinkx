@@ -37,13 +37,12 @@ public class RedisStreamProcessor extends MessageHubServiceImpl {
         stringRedisTemplate.opsForStream().add(stringObjectRecord);
     }
 
-    @Async
     @Override
     public void consume(ConsumerAdapterForm messageForm) {
 
         String topic = messageForm.getTopic();
         String group = messageForm.getGroup();
-        String consumerName = messageForm.getConsumerName();
+        String consumerName = messageForm.getInvokeMethod().getName();
         Object consumerBean = messageForm.getBean();
         Method invokeMethod = messageForm.getInvokeMethod();
 
