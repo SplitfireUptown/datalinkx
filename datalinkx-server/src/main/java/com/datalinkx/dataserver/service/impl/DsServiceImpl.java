@@ -33,6 +33,7 @@ import com.datalinkx.driver.dsdriver.kafkadriver.KafkaSetupInfo;
 import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
 import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
 import com.datalinkx.driver.dsdriver.redisdriver.RedisSetupInfo;
+import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -271,8 +272,11 @@ public class DsServiceImpl implements DsService {
 	}
 
 	public List<DsBean> list() {
-		return dsRepository.findAllByIsDel(0).stream()
-				.sorted(Comparator.comparing(DsBean::getType)).collect(Collectors.toList());
+		return Optional.ofNullable(dsRepository.findAllByIsDel(0))
+		       .map(beans -> beans.stream()
+		               .sorted(Comparator.comparing(DsBean::getType))
+		               .collect(Collectors.toList()))
+		       .orElse(Collections.emptyList());
 	}
 
 
