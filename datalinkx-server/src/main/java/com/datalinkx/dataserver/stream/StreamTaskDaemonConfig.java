@@ -61,22 +61,16 @@ public class StreamTaskDaemonConfig implements InitializingBean {
         }
 
         try {
-            JsonNode jsonNode = flinkClient.jobOverview();
-            Set<String> runningJobIds = JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
-                    .stream()
-                    .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
-                    .map(FlinkJobOverview::getName)
-                    .collect(Collectors.toSet());
-
+            Set<String> runningJobs = this.flinkRunningJobs();
             for (JobBean streamTaskBean : restartJob) {
                 String jobId = streamTaskBean.getJobId();
 
                 // 如果datalinkx任务同步中，检查flink任务是否存在
                 if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == streamTaskBean.getStatus()) {
                     // 如果flink任务不存在，则重新提交任务
-                    if (!runningJobIds.contains(jobId)) {
+                    if (!runningJobs.contains(jobId)) {
 
-                        this.runStreamTask(jobId);
+                        this.runStreamTask(runningJobs, jobId);
                         continue;
                     } else {
                         // 如果因为datalinkx挂掉后重启，flink任务正常，datalinkx任务状态正常，判断健康检查线程是否挂掉, 如果挂掉，先停止再重新提交
@@ -97,23 +91,35 @@ public class StreamTaskDaemonConfig implements InitializingBean {
                 }
 
                 // 如果flink任务在运行，而datalinkx中的任务状态为停止，以datalinkx的状态为准，手动停掉flink任务
-                if (runningJobIds.contains(jobId) && MetaConstants.JobStatus.JOB_STATUS_STOP == streamTaskBean.getStatus()) {
+                if (runningJobs.contains(jobId) && MetaConstants.JobStatus.JOB_STATUS_STOP == streamTaskBean.getStatus()) {
                     streamJobService.pause(jobId);
                 }
 
                 // 如果任务是失败，重新提交
                 if (MetaConstants.JobStatus.JOB_STATUS_ERROR == streamTaskBean.getStatus()) {
                     this.retryTime(jobId);
-                    this.runStreamTask(jobId);
+                    this.runStreamTask(runningJobs, jobId);
                 }
 
                 if (MetaConstants.JobStatus.JOB_STATUS_CREATE == streamTaskBean.getStatus()) {
-                    this.runStreamTask(jobId);
+                    this.runStreamTask(runningJobs, jobId);
                 }
             }
         } catch (Throwable t) {
             log.error(t.getMessage(), t);
         }
+    }
+
+    /**
+     * flink 任务是否运行
+     */
+    private Set<String> flinkRunningJobs() {
+        JsonNode jsonNode = flinkClient.jobOverview();
+        return JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
+                .stream()
+                .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
+                .map(FlinkJobOverview::getName)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -129,7 +135,7 @@ public class StreamTaskDaemonConfig implements InitializingBean {
      * 提交流式任务
      * @param jobId
      */
-    public void runStreamTask(String jobId) {
+    public void runStreamTask(Set<String> runningJobs, String jobId) {
         String lockId = UUID.randomUUID().toString();
         boolean isLock = distributedLock.lock(jobId, lockId, DistributedLock.LOCK_TIME);
         try {
@@ -141,13 +147,7 @@ public class StreamTaskDaemonConfig implements InitializingBean {
                     return;
                 }
 
-                JsonNode jsonNode = flinkClient.jobOverview();
-                Set<String> runningJobIds = JsonUtils.toList(JsonUtils.toJson(jsonNode.get("jobs")), FlinkJobOverview.class)
-                        .stream()
-                        .filter(task -> "RUNNING".equalsIgnoreCase(task.getState()))
-                        .map(FlinkJobOverview::getName)
-                        .collect(Collectors.toSet());
-                if (runningJobIds.contains(jobId)) {
+                if (runningJobs.contains(jobId)) {
                     return;
                 }
 
