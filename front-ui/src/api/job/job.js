@@ -19,6 +19,12 @@ export function delObj (jobId) {
     method: 'POST'
   })
 }
+export function streamDelObj (jobId) {
+  return axios({
+    url: `/api/stream/job/delete/${jobId}`,
+    method: 'POST'
+  })
+}
 export function exec (jobId) {
   return axios({
     url: `/api/job/exec/${jobId}`,
