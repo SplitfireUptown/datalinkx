@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { pageQuery, delObj, streamStop, streamExec } from '@/api/job/job'
+import { pageQuery, streamDelObj, streamStop, streamExec } from '@/api/job/job'
 import JobSaveOrUpdateStreaming from '@/views/job/JobSaveOrUpdateStreaming.vue'
 // 0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING
 const StatusType = [
@@ -33,7 +33,7 @@ const StatusType = [
     value: 1
   },
   {
-    label: '流转停止',
+    label: '流转完成',
     value: 2
   },
   {
@@ -155,7 +155,8 @@ export default {
       }
     },
     delete (record) {
-      delObj(record.job_id).then(res => {
+      this.loading = true
+      streamDelObj(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('删除成功')
           this.init()
@@ -167,6 +168,7 @@ export default {
       })
     },
     execJob (record) {
+      this.loading = true
       streamExec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')
@@ -182,8 +184,8 @@ export default {
       this.$refs.JobSaveOrUpdateStreaming.edit(record.job_id, 'show')
     },
     stopJob (record) {
+      this.loading = true
       streamStop(record.job_id).then(res => {
-        this.loading = false
         if (res.status === '0') {
           this.$message.info('停止成功')
           this.init()

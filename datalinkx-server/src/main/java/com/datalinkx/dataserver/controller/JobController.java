@@ -50,7 +50,7 @@ public class JobController {
 	@ApiOperation("流转任务-删除")
 	@PostMapping("/delete/{jobId}")
 	public WebResult<String> delete(@PathVariable String jobId) {
-		jobServiceImpl.del(jobId);
+		jobServiceImpl.del(jobId, false);
 		return WebResult.of(jobId);
 	}
 

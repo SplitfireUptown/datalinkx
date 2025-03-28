@@ -34,6 +34,7 @@ import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.dataserver.service.StreamJobService;
 import com.datalinkx.driver.model.DataTransJobDetail;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class StreamJobServiceImpl implements StreamJobService {
 
@@ -177,11 +179,17 @@ public class StreamJobServiceImpl implements StreamJobService {
     public void stop(String jobId) {
         JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
         if (JOB_STATUS_STOP == jobBean.getStatus()) {
-            throw new DatalinkXServerException(StatusCode.JOB_IS_STOP, "任务已停止");
+            return;
         }
 
         // 记录checkpoint
-        this.stopFlinkTask(jobBean);
+        try {
+
+            this.stopFlinkTask(jobBean);
+        } catch (Exception e) {
+
+            log.error("checkpoint失败", e);
+        }
 
         jobBean.setStatus(JOB_STATUS_STOP);
         jobRepository.save(jobBean);
@@ -253,6 +261,6 @@ public class StreamJobServiceImpl implements StreamJobService {
     @Override
     public void delete(String jobId) {
         this.stop(jobId);
-        jobService.del(jobId);
+        jobService.del(jobId, true);
     }
 }

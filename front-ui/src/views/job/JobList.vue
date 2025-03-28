@@ -159,6 +159,7 @@ export default {
       this.$refs.JobSaveOrUpdate.edit('edit', record.job_id)
     },
     delete (record) {
+      this.loading = true
       delObj(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('删除成功')
