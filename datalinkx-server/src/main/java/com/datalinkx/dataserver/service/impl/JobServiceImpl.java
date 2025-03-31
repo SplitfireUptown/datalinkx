@@ -263,13 +263,17 @@ public class JobServiceImpl implements JobService {
 
 	@Transactional(rollbackFor = Exception.class)
 	public void del(String jobId, Boolean stream) {
+		// 删除任务日志
 		this.jobLogRepository.logicDeleteByJobId(jobId);
 
 		// 流式任务没有使用xxl-job调度
 		if (!stream) {
-
+			// 删除任务调度配置
 			this.jobClientApi.del(jobId);
 		}
+		// 删除任务依赖
+		this.jobRelationRepository.logicDeleteByJobId(jobId);
+		// 删除任务
 		this.jobRepository.logicDeleteByJobId(jobId);
 	}
 
