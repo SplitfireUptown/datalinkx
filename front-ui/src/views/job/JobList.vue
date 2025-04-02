@@ -98,6 +98,12 @@ export default {
           dataIndex: 'progress'
         },
         {
+          title: '任务上次执行时间',
+          width: '10%',
+          dataIndex: 'start_time',
+          sorter: true
+        },
+        {
           title: '操作',
           width: '15%',
           customRender: (record) => {

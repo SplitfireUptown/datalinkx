@@ -93,6 +93,12 @@
             }
           },
           {
+            title: '任务上次执行时间',
+            dataIndex: 'start_time',
+            width: '10%',
+            sorter: true
+          },
+          {
             title: '操作',
             width: '15%',
             customRender: (record) => {

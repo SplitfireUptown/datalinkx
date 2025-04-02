@@ -248,6 +248,7 @@ public class JobServiceImpl implements JobService {
 					.progress(String.format("%s/%s", dataCountDto.getAppendCount(), dataCountDto.getFilterCount()))
 					.fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + jobBean.getFromTbId())
 					.toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + jobBean.getToTbId())
+					.startTime(jobBean.getStartTime())
 					.status(jobBean.getStatus())
 					.build();
 		}).collect(Collectors.toList());

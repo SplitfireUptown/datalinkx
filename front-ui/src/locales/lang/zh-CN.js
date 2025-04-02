@@ -21,7 +21,7 @@ export default {
 
   'layouts.usermenu.dialog.title': '信息',
   'layouts.usermenu.dialog.content': '您确定要注销吗？',
-  'layouts.userLayout.title': 'DatalinkX 基于Flink的异构数据源流转系统',
+  'layouts.userLayout.title': 'DatalinkX 异构数据源流转系统',
   ...components,
   ...global,
   ...menu,
