@@ -1,8 +1,6 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
 import com.datalinkx.compute.connector.jdbc.TransformNode;
-import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;

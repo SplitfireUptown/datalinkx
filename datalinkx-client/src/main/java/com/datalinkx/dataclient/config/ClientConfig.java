@@ -15,7 +15,6 @@ public class ClientConfig {
     @NoArgsConstructor
     @Builder
     public static class ServicePropertieBean {
-
         private String url;
         private Integer connectTimeoutMs;
         private Integer callTimeoutMs;

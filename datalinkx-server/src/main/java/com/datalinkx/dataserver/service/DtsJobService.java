@@ -2,7 +2,7 @@ package com.datalinkx.dataserver.service;
 
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
-import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 
 /**
  * 任务流转运行时service
@@ -11,9 +11,9 @@ public interface DtsJobService {
     /**
      * 获取任务JobGraph
      */
-    DataTransJobDetail getJobExecInfo(String jobId);
+    DatalinkXJobDetail getJobExecInfo(String jobId);
 
-    DataTransJobDetail getStreamJobExecInfo(String jobId);
+    DatalinkXJobDetail getStreamJobExecInfo(String jobId);
     /**
      * 更新流转任务状态
      */

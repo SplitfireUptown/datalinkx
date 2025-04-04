@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.client.xxljob;
+package com.datalinkx.dataclient.client.xxljob;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

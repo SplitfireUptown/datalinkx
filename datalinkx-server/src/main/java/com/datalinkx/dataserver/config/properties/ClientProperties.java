@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.config;
+package com.datalinkx.dataserver.config.properties;
 
 
 import com.datalinkx.dataclient.config.ClientConfig;

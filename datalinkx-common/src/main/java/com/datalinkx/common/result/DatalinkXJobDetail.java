@@ -1,4 +1,4 @@
-package com.datalinkx.driver.model;
+package com.datalinkx.common.result;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +21,7 @@ import lombok.experimental.FieldNameConstants;
 @Builder
 @ToString(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DataTransJobDetail {
+public class DatalinkXJobDetail {
     @JsonProperty("job_id")
     String jobId;
     Integer type;

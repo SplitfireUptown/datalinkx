@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.client.xxljob.request;
+package com.datalinkx.dataclient.client.xxljob.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +13,13 @@ import retrofit2.http.Field;
 @Builder
 public class LogQueryParam {
     @Field("start")
-    int start;
+    private int start;
     @Field("length")
-    int length;
+    private int length;
     @Field("jobGroup")
-    int jobGroup;
+    private int jobGroup;
     @Field("logStatus")
-    int logStatus;
+    private int logStatus;
     @Field("jobId")
-    int jobId;
+    private int jobId;
 }

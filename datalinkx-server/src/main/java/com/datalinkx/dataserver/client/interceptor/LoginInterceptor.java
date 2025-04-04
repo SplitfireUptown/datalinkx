@@ -1,11 +1,11 @@
 
-package com.datalinkx.dataserver.client.xxljob.interceptor;
+package com.datalinkx.dataserver.client.interceptor;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import com.datalinkx.dataserver.client.xxljob.XxlLoginClient;
+import com.datalinkx.dataclient.client.xxljob.XxlLoginClient;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import okhttp3.Interceptor;
@@ -46,8 +46,6 @@ public class LoginInterceptor implements Interceptor {
 
 	@Override
 	public Response intercept(Chain chain) throws IOException {
-		Request request = chain.request();
-
 		Response response;
 		try {
 			if (StringUtils.isEmpty(cookieValue)) {
@@ -61,7 +59,7 @@ public class LoginInterceptor implements Interceptor {
 						.build();
 				response = chain.proceed(newRequest);
 			} else {
-				log.error("xxl-job login error");
+				log.error("datalink xxl-job login error");
 				response = chain.proceed(chain.request());
 			}
 		} catch (Exception e) {
@@ -76,14 +74,6 @@ public class LoginInterceptor implements Interceptor {
 				bodyString = bodyString.replaceFirst("\"result\":\\s*\"\\s*\"", "\"result\": null");
 				ResponseBody body = ResponseBody.create(contentType, bodyString);
 				response = response.newBuilder().body(body).build();
-				// HashMap<String, Object> jsonMap = gson.fromJson(bodyString, new
-				// TypeToken<HashMap<String, Object>>() {
-				// }.getType());
-				// if (jsonMap.get("result") != null && jsonMap.get("result").equals("")) {
-				// jsonMap.put("result", null);
-				// ResponseBody body = ResponseBody.create(contentType, gson.toJson(jsonMap));
-				// response = response.newBuilder().body(body).build();
-				// }
 			}
 		}
 

@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.client.xxljob.request;
+package com.datalinkx.dataclient.client.xxljob.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,5 +14,5 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 @ToString(callSuper = true)
 public class XxlJobParam {
-    String jobId;
+    private String jobId;
 }

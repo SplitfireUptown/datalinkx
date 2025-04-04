@@ -1,4 +1,4 @@
-package com.datalinkx.datajob.bean;
+package com.datalinkx.dataclient.client.datalinkxserver.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,18 +12,18 @@ import retrofit2.http.Field;
 @Builder
 public class JobStateForm {
     @Field("jobId")
-    String jobId;
+    private String jobId;
     /* 0:运行中, 1:失败, 2:成功, 3:手动停止 */
     @Field("jobStatus")
-    Integer jobStatus;
+    private Integer jobStatus;
     @Field("startTime")
-    Long startTime;
+    private Long startTime;
     @Field("endTime")
-    Long endTime;
+    private Long endTime;
     @Field("errmsg")
-    String errmsg;
+    private String errmsg;
     @Field("checkpoint")
-    String checkpoint;
+    private String checkpoint;
     @Field("appendCount")
     private Integer appendCount = 0;
     @Field("filterCount")

@@ -2,6 +2,7 @@ package com.datalinkx.driver.dsdriver.kafkadriver;
 
 import java.util.stream.Collectors;
 
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.TelnetUtil;
@@ -10,7 +11,6 @@ import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
-import com.datalinkx.driver.model.DataTransJobDetail;
 
 public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, KafkaWriter>, IStreamDriver {
     private final KafkaSetupInfo kafkaSetupInfo;
@@ -33,7 +33,7 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
     }
 
     @Override
-    public Object getReaderInfo(DataTransJobDetail.Reader reader) {
+    public Object getReaderInfo(DatalinkXJobDetail.Reader reader) {
         ReaderInfo<KafkaReader> readerInfo = new ReaderInfo<>();
         readerInfo.setName("kafkacustomreader");
 
@@ -52,14 +52,14 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
     }
 
     @Override
-    public Object getWriterInfo(DataTransJobDetail.Writer writer) {
+    public Object getWriterInfo(DatalinkXJobDetail.Writer writer) {
         WriterInfo<KafkaWriter> writerInfo = new WriterInfo<>();
         writerInfo.setName("kafkacustomwriter");
 
         writerInfo.setParameter(KafkaWriter.builder().topic(writer.getTableName())
                 .timezone(kafkaSetupInfo.getTimezone())
                 .producerSettings(CommonSetting.builder().bootstrapServers(kafkaSetupInfo.getServer() + ":" + kafkaSetupInfo.getPort()).build())
-                .tableFields(writer.getColumns().stream().map(DataTransJobDetail.Column::getName).collect(Collectors.toList()))
+                .tableFields(writer.getColumns().stream().map(DatalinkXJobDetail.Column::getName).collect(Collectors.toList()))
                 .build());
         return writerInfo;
     }

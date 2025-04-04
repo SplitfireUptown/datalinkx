@@ -1,9 +1,9 @@
-package com.datalinkx.datajob.client.datalinkxserver;
+package com.datalinkx.dataclient.client.datalinkxserver;
 
 import com.datalinkx.common.result.WebResult;
-import com.datalinkx.datajob.bean.JobStateForm;
-import com.datalinkx.datajob.bean.JobSyncModeForm;
-import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.dataclient.client.datalinkxserver.request.JobStateForm;
+import com.datalinkx.dataclient.client.datalinkxserver.request.JobSyncModeForm;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -15,7 +15,7 @@ import retrofit2.http.QueryBean;
 public interface DatalinkXServerClient {
 
     @GET("/api/job_graph/execute_info")
-    WebResult<DataTransJobDetail> getJobExecInfo(@Query("jobId") String jobId);
+    WebResult<DatalinkXJobDetail> getJobExecInfo(@Query("jobId") String jobId);
 
     @POST("/api/job_graph/cascade_job")
     @FormUrlEncoded

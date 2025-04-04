@@ -1,4 +1,4 @@
-package com.datalinkx.datajob.bean;
+package com.datalinkx.dataclient.client.datalinkxserver.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

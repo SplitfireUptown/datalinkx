@@ -11,14 +11,14 @@ import java.util.Map;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.IdUtils;
 import com.datalinkx.datajob.bean.JobExecCountDto;
-import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.xxl.job.core.thread.JobThread;
 import lombok.extern.slf4j.Slf4j;
 
 
 
 @Slf4j
-public abstract class AbstractDataTransferAction<T extends DataTransJobDetail, U> {
+public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U> {
     protected abstract void begin(T info);
     protected abstract void end(U unit, int status, String errmsg);
     protected abstract void beforeExec(U unit) throws Exception;

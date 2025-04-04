@@ -181,6 +181,7 @@ export default {
       this.$refs.JobSaveOrUpdate.edit(record.job_id, 'show')
     },
     execJob (record) {
+      this.createEventSource()
       exec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')

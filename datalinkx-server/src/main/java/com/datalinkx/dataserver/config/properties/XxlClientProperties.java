@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.config;
+package com.datalinkx.dataserver.config.properties;
 
 
 import com.datalinkx.dataclient.config.ClientConfig;
@@ -15,6 +15,10 @@ public class XxlClientProperties {
     private ClientConfig.ServicePropertieBean client;
     private String username;
     private String password;
-    private Integer jobGroup;
     private String execHandler;
+    private String executorRouteStrategy;
+    private String misfireStrategy;
+    private String executorBlockStrategy;
+    // 执行器端口，与datalinkx-job配置文件中xxl.job.executor.port相同
+    private Integer executorPort;
 }

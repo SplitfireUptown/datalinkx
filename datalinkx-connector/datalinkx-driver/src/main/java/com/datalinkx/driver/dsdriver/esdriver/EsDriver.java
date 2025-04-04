@@ -86,11 +86,6 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
 
     @Override
     public String retrieveMax(FlinkActionMeta param, String maxField) throws Exception {
-        String fieldType = param.getReaderFieldType(maxField);
-        if (!"number".equals(fieldType) && !"date".equals(fieldType)) {
-            throw new Exception(String.format("字段%s类型为%s, 不支持增量同步", maxField, fieldType));
-        }
-
         Map<String, Object> boolMap = getBoolQuery(param);
         Map<String, Object> queryMap = new HashMap<String, Object>() {
             {

@@ -8,7 +8,6 @@ import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import org.apache.commons.lang3.StringUtils;
 
 

@@ -1,13 +1,15 @@
-package com.datalinkx.dataserver.client.xxljob.response;
+package com.datalinkx.dataclient.client.xxljob.response;
 
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ReturnT<T> implements Serializable {
     public static final long serialVersionUID = 42L;
 
@@ -20,9 +22,6 @@ public class ReturnT<T> implements Serializable {
     private int code;
     private String msg;
     private T content;
-
-    public ReturnT() {
-    }
 
     public ReturnT(int code, String msg) {
         this.code = code;

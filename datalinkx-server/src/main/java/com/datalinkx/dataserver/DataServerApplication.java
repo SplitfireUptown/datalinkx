@@ -1,6 +1,6 @@
 package com.datalinkx.dataserver;
 
-import com.datalinkx.dataserver.config.SpringBeanFilter;
+import com.datalinkx.dataserver.config.filter.SpringBeanFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

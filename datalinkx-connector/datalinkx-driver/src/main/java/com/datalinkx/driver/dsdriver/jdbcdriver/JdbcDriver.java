@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
@@ -40,7 +41,6 @@ import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import com.google.common.collect.Lists;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import lombok.extern.slf4j.Slf4j;
@@ -357,7 +357,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                         .jdbcUrl(jdbcUrl())
                         .table(Collections.singletonList(unit.getWriter().getTableName()))
                         .build()))
-                .column(unit.getWriter().getColumns().stream().map(DataTransJobDetail.Column::getName).collect(Collectors.toList()))
+                .column(unit.getWriter().getColumns().stream().map(DatalinkXJobDetail.Column::getName).collect(Collectors.toList()))
                 .insertSqlMode("copy")
                 .writeMode("insert")
                 .batchSize(unit.getWriter().getBatchSize())
@@ -407,7 +407,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     @Override
     public String transferSourceSQL(FlinkActionMeta unit) {
-        DataTransJobDetail.Reader reader = unit.getReader();
+        DatalinkXJobDetail.Reader reader = unit.getReader();
 
         String sourceSQL = String.format("select %s from %s.%s", reader.getQueryFields(), reader.getSchema(), reader.getTableName());
         try {
@@ -441,7 +441,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     @Override
     public String transferSinkSQL(SeatunnelActionMeta param) {
-        DataTransJobDetail.Writer writer = param.getWriter();
+        DatalinkXJobDetail.Writer writer = param.getWriter();
         StringBuilder abstractQuery = new StringBuilder();
         for (int i = 0; i < writer.getInsertFields().split(",").length; i++) {
             if (i == 0) {

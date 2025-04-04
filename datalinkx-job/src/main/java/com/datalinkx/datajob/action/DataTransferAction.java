@@ -22,15 +22,15 @@ import com.datalinkx.dataclient.client.flink.FlinkClient;
 import com.datalinkx.dataclient.client.flink.response.FlinkJobAccumulators;
 import com.datalinkx.dataclient.client.flink.response.FlinkJobStatus;
 import com.datalinkx.datajob.bean.JobExecCountDto;
-import com.datalinkx.datajob.bean.JobStateForm;
-import com.datalinkx.datajob.bean.JobSyncModeForm;
-import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.dataclient.client.datalinkxserver.request.JobStateForm;
+import com.datalinkx.dataclient.client.datalinkxserver.request.JobSyncModeForm;
+import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.datajob.job.ExecutorJobHandler;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
-import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,11 +38,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Component
-public class DataTransferAction extends AbstractDataTransferAction<DataTransJobDetail, FlinkActionMeta> {
+public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobDetail, FlinkActionMeta> {
     public static ThreadLocal<Long> START_TIME = new ThreadLocal<>();
     public static ThreadLocal<Map<String, JobExecCountDto>> COUNT_RES = new ThreadLocal<>();
 
@@ -62,14 +61,14 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
 
 
     @Override
-    protected void begin(DataTransJobDetail info) {
+    protected void begin(DatalinkXJobDetail info) {
         // 更新同步任务的状态
         START_TIME.set(new Date().getTime());
         COUNT_RES.set(new HashMap<>());
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
         log.info(String.format("jobid: %s, start to transfer", info.getJobId()));
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
-                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE).startTime(START_TIME.get()).endTime(null)
+                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_SYNCING).startTime(START_TIME.get()).endTime(null)
                 .allCount(jobExecCountDto.getAllCount())
                 .appendCount(jobExecCountDto.getAppendCount())
                 .filterCount(jobExecCountDto.getFilterCount())
@@ -268,7 +267,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DataTransJobD
     }
 
     @Override
-    protected FlinkActionMeta convertExecUnit(DataTransJobDetail jobDetail) {
+    protected FlinkActionMeta convertExecUnit(DatalinkXJobDetail jobDetail) {
         return FlinkActionMeta.builder()
                     .reader(jobDetail.getSyncUnit().getReader())
                     .writer(jobDetail.getSyncUnit().getWriter())

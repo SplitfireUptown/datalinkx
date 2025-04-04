@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
@@ -22,8 +21,8 @@ import com.datalinkx.dataserver.bean.domain.JobLogBean;
 import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
-import com.datalinkx.dataserver.client.xxljob.JobClientApi;
-import com.datalinkx.dataserver.client.xxljob.request.XxlJobParam;
+import com.datalinkx.dataserver.client.JobClientApi;
+import com.datalinkx.dataclient.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobLogRepository;

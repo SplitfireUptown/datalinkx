@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.config;
+package com.datalinkx.dataserver.config.properties;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

@@ -3,10 +3,8 @@ package com.datalinkx.dataclient.config;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.net.ConnectException;
 
-import com.datalinkx.common.exception.SDKConnectException;
-import com.datalinkx.common.exception.SDKException;
+import com.datalinkx.common.exception.DatalinkXSDKException;
 import lombok.SneakyThrows;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
@@ -57,12 +55,10 @@ public final class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 					if (resp.isSuccessful()) {
 						return handlerSuccessResp(resp);
 					} else {
-						throw new SDKException(call.request() + "\r\n" + resp);
+						throw new DatalinkXSDKException(call.request() + "\r\n" + resp);
 					}
-				} catch (ConnectException e) {
-					throw new SDKConnectException(e);
 				} catch (Exception e) {
-					throw new SDKException(e);
+					throw new DatalinkXSDKException(e);
 				}
 			}
 		};
@@ -80,7 +76,7 @@ public final class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 			// 如果字段不存在，说明接受返回值的对象不属于常规返回对象，是否请求成功由调用者自己判断
 			return body;
 		} catch (SecurityException e) {
-			throw new SDKException(e);
+			throw new DatalinkXSDKException(e);
 		}
 		statusField.setAccessible(true);
 		Integer status = Integer.parseInt(statusField.get(body).toString());
@@ -102,7 +98,7 @@ public final class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 					}
 				}
 			}
-			throw new SDKException(status, reason);
+			throw new DatalinkXSDKException(reason);
 		} else {
 			return body;
 		}

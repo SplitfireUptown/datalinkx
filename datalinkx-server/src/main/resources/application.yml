@@ -30,12 +30,18 @@ spring:
 #    rest:
 #      uris:
 
+topic:
+  daemon: true
+
 xxl-job:
   username: admin
   password: 123456
-  job-group: 1
+  ## 执行器端口，与datalinkx-job配置文件中xxl.job.executor.port相同
+  executor-port: 9999
   exec-handler: dataTransJobHandler
   executor-route-strategy: FIRST
+  misfire-strategy: DO_NOTHING
+  executor-blockStrategy: SERIAL_EXECUTION
   client:
     url: http://127.0.0.1:8080
     connect_timeout_ms: 20000
@@ -62,15 +68,9 @@ data-transfer:
 client:
   datajob:
     url: http://localhost:23456
-    connect_timeout_ms: 20000
-    call_timeout_ms: 600000
-    read_timeout_ms: 600000
     logging: true
   flink:
     url: http://localhost:8081
-    connect_timeout_ms: 20000
-    call_timeout_ms: 600000
-    read_timeout_ms: 600000
     logging: true
   ollama:
     url: http://localhost:11434
