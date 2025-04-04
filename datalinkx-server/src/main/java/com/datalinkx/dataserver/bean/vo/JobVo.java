@@ -28,15 +28,13 @@ public class JobVo {
 		@ApiModelProperty(value = "任务名称")
 		@JsonProperty("job_name")
 		private String jobName;
-
 		@JsonProperty("from_tb_name")
 		private String fromTbName;
-
 		@JsonProperty("to_tb_name")
 		private String toTbName;
-
+		@JsonProperty("start_time")
+		private Timestamp startTime;
 		private String progress;
-
 		private Integer status;
 	}
 

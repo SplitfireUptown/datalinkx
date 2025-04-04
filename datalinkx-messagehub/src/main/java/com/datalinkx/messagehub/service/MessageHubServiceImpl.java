@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import com.datalinkx.common.constants.MessageHubConstants;
+import com.datalinkx.common.exception.DatalinkXSDKException;
 import com.datalinkx.messagehub.bean.form.BaseMessageForm;
 import com.datalinkx.messagehub.bean.form.ConsumerAdapterForm;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
@@ -40,33 +41,14 @@ public class MessageHubServiceImpl implements MessageHubService, ApplicationCont
         this.messageHubServiceMap.put(MessageHubConstants.REDIS_QUEUE_TYPE, applicationContext.getBean(RedisQueueProcessor.class));
     }
 
-    public void checkTopic(BaseMessageForm baseMessageForm) {
-        String topic = baseMessageForm.getTopic();
-        String type = baseMessageForm.getType();
-
-        if (!this.messageHubServiceMap.containsKey(type)) {
-
-            throw new RuntimeException("消息类型不支持");
-        }
-
-        // 由外部携带前缀topic转换成内部白名单不携带前缀topic
-        String[] topicSplit = topic.split(":");
-        String innerTopic = String.format("%s:%s", topicSplit[1], topicSplit[2]);
-        if (!Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(MessageHubConstants.WHITE_TOPIC, innerTopic))) {
-            log.error("检测到topic未配置");
-        }
-    }
-
     @Override
     public void produce(ProducerAdapterForm producerAdapterForm) {
-        this.checkTopic(producerAdapterForm);
         this.messageHubServiceMap.get(producerAdapterForm.getType()).produce(producerAdapterForm);
     }
 
 
     @Override
     public void consume(ConsumerAdapterForm messageForm) {
-        this.checkTopic(messageForm);
         this.messageHubServiceMap.get(messageForm.getType()).consume(messageForm);
         log.info("messagehub consumer init successful: type {}, topic {} , class {}#{}", messageForm.getType(), messageForm.getTopic(), messageForm.getBean().getClass().getName(), messageForm.getInvokeMethod().getName());
     }

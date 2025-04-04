@@ -9,42 +9,42 @@ import lombok.Data;
 @Data
 public class FlinkJobStatus {
     @JsonProperty("name")
-    String jobId;
-    String state;
+    private String jobId;
+    private String state;
     @JsonProperty("start-time")
-    Long startTime;
+    private Long startTime;
     @JsonProperty("end-time")
-    Long endTime;
-    Long duration;
-    List<Vertice> vertices;
+    private Long endTime;
+    private Long duration;
+    private List<Vertice> vertices;
 
     @Data
     public static class Vertice {
-        String id;
-        String name;
-        Metrics metrics;
+        private String id;
+        private String name;
+        private Metrics metrics;
     }
 
     @Data
     public static class Metrics {
         @JsonProperty("read-bytes")
-        Long readBytes;
+        private Long readBytes;
         @JsonProperty("read-bytes-complete")
-        Boolean readBytesComplete;
+        private Boolean readBytesComplete;
 
         @JsonProperty("write-bytes")
-        Long writeBytes;
+        private Long writeBytes;
         @JsonProperty("write-bytes-complete")
-        Boolean writeBytesComplete;
+        private Boolean writeBytesComplete;
 
         @JsonProperty("read-records")
-        Long readRecords;
+        private Long readRecords;
         @JsonProperty("read-records-complete")
-        Boolean readRecordsComplete;
+        private Boolean readRecordsComplete;
 
         @JsonProperty("write-records")
-        Long writeRecords;
+        private Long writeRecords;
         @JsonProperty("write-records-complete")
-        Boolean writeRecordsComplete;
+        private Boolean writeRecordsComplete;
     }
 }

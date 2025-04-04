@@ -1,12 +1,11 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,9 +26,9 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FlinkActionMeta extends EngineActionMeta {
     // datalinkx-server业务来源库信息
-    public DataTransJobDetail.Reader reader;
+    public DatalinkXJobDetail.Reader reader;
     // datalinkx-server业务目标库信息
-    public DataTransJobDetail.Writer writer;
+    public DatalinkXJobDetail.Writer writer;
     // 来源库driver驱动
     public IDsReader dsReader;
     // 目标库driver驱动
@@ -44,10 +43,4 @@ public class FlinkActionMeta extends EngineActionMeta {
     public int errorRecords = 0;
     // 写字节数
     public long writeBytes;
-
-    public String getReaderFieldType(String fieldName) {
-        Map<String, DataTransJobDetail.Column> columnTypeMap = this.getReader().getColumns().stream()
-                .collect(Collectors.toMap(DataTransJobDetail.Column::getName, x -> x));
-        return columnTypeMap.get(fieldName).getType();
-    }
 }

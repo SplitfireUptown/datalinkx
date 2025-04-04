@@ -98,6 +98,12 @@ export default {
           dataIndex: 'progress'
         },
         {
+          title: '任务上次执行时间',
+          width: '10%',
+          dataIndex: 'start_time',
+          sorter: true
+        },
+        {
           title: '操作',
           width: '15%',
           customRender: (record) => {
@@ -175,6 +181,7 @@ export default {
       this.$refs.JobSaveOrUpdate.edit(record.job_id, 'show')
     },
     execJob (record) {
+      this.createEventSource()
       exec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')

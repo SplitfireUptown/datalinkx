@@ -5,7 +5,7 @@ import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
 import com.datalinkx.dataserver.service.DtsJobService;
-import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class JobGraphController {
 
     @ApiOperation("获取流转任务job_graph")
     @RequestMapping("/execute_info")
-    public WebResult<DataTransJobDetail> getJobExecInfo(String jobId) {
+    public WebResult<DatalinkXJobDetail> getJobExecInfo(String jobId) {
         return WebResult.of(dtsJobService.getJobExecInfo(jobId));
     }
 

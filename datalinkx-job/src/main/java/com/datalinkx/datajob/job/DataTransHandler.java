@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.result.WebResult;
@@ -18,13 +17,10 @@ import com.datalinkx.datajob.action.DataTransferAction;
 import com.datalinkx.datajob.action.StreamDataTransferAction;
 import com.datalinkx.datajob.action.TransformDataTransferAction;
 import com.datalinkx.datajob.bean.JobExecCountDto;
-import com.datalinkx.datajob.bean.JobStateForm;
+import com.datalinkx.dataclient.client.datalinkxserver.request.JobStateForm;
 import com.datalinkx.datajob.bean.XxlJobParam;
-import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.driver.model.DataTransJobDetail;
-import com.datalinkx.messagehub.service.redis.RedisPubSubProcessor;
-import com.datalinkx.messagehub.service.redis.RedisQueueProcessor;
-import com.datalinkx.messagehub.service.redis.RedisStreamProcessor;
+import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.SneakyThrows;
@@ -32,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,16 +66,16 @@ public class DataTransHandler {
         }
     }
 
-    public DataTransJobDetail getJobDetail(String jobId) {
+    public DatalinkXJobDetail getJobDetail(String jobId) {
         return dataServerClient.getJobExecInfo(jobId).getResult();
     }
 
     @SneakyThrows
     @RequestMapping("/stream_exec")
     public String streamJobHandler(String detail) {
-        DataTransJobDetail dataTransJobDetail = JsonUtils.toObject(detail, DataTransJobDetail.class);
-        streamDataTransferAction.doAction(dataTransJobDetail);
-        return dataTransJobDetail.getJobId();
+        DatalinkXJobDetail datalinkXJobDetail = JsonUtils.toObject(detail, DatalinkXJobDetail.class);
+        streamDataTransferAction.doAction(datalinkXJobDetail);
+        return datalinkXJobDetail.getJobId();
     }
 
     @RequestMapping("/stream_health")
@@ -111,7 +106,7 @@ public class DataTransHandler {
         MDC.put("trace_id", new Date().getTime() + ":" + jobId);
 
         long startTime = new Date().getTime();
-        DataTransJobDetail jobDetail;
+        DatalinkXJobDetail jobDetail;
         try {
             jobDetail = this.getJobDetail(jobId);
             AbstractDataTransferAction engine = this.actionEngine.get(jobDetail.getType());

@@ -10,15 +10,15 @@ import com.datalinkx.compute.transform.ITransformFactory;
 import com.datalinkx.dataclient.client.seatunnel.SeaTunnelClient;
 import com.datalinkx.dataclient.client.seatunnel.response.JobCommitResp;
 import com.datalinkx.dataclient.client.seatunnel.response.JobOverviewResp;
-import com.datalinkx.datajob.bean.JobStateForm;
-import com.datalinkx.datajob.bean.JobSyncModeForm;
-import com.datalinkx.datajob.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.dataclient.client.datalinkxserver.request.JobStateForm;
+import com.datalinkx.dataclient.client.datalinkxserver.request.JobSyncModeForm;
+import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
-import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
@@ -33,7 +33,7 @@ import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_
 @Slf4j
 @Component
 @DependsOn("seaTunnelClient")
-public class TransformDataTransferAction extends AbstractDataTransferAction<DataTransJobDetail, SeatunnelActionMeta> {
+public class TransformDataTransferAction extends AbstractDataTransferAction<DatalinkXJobDetail, SeatunnelActionMeta> {
     public static ThreadLocal<Long> START_TIME = new ThreadLocal<>();
 
     @Autowired
@@ -42,7 +42,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
     DatalinkXServerClient datalinkXServerClient;
 
     @Override
-    protected void begin(DataTransJobDetail info) {
+    protected void begin(DatalinkXJobDetail info) {
         START_TIME.set(new Date().getTime());
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
                 .jobStatus(MetaConstants.JobStatus.JOB_STATUS_SYNCING).startTime(START_TIME.get())
@@ -132,7 +132,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
     }
 
     @Override
-    protected SeatunnelActionMeta convertExecUnit(DataTransJobDetail info) throws Exception {
+    protected SeatunnelActionMeta convertExecUnit(DatalinkXJobDetail info) throws Exception {
         IDsReader dsReader = DsDriverFactory.getDsReader(info.getSyncUnit().getReader().getConnectId());
         IDsWriter dsWriter = DsDriverFactory.getDsWriter(info.getSyncUnit().getWriter().getConnectId());
 
@@ -140,7 +140,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
         List<TransformNode> transformNodes = new ArrayList<>();
         String lastTransformNodeName = "";
 
-        for (DataTransJobDetail.Compute.Transform transform : info.getSyncUnit().getCompute().getTransforms()) {
+        for (DatalinkXJobDetail.Compute.Transform transform : info.getSyncUnit().getCompute().getTransforms()) {
             ITransformDriver computeDriver = ITransformFactory.getComputeDriver(transform.getType());
             TransformNode transformNode = computeDriver.transferInfo(commonSettings, transform.getMeta());
             lastTransformNodeName = transformNode.getResultTableName();

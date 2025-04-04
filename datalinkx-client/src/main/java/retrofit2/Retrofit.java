@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
@@ -43,6 +44,7 @@ import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import com.datalinkx.common.exception.DatalinkXServerException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -172,17 +174,21 @@ public final class Retrofit {
 							Set<ConstraintViolation<Object>> errors = ((ValidatorImpl) validatorFactory.getValidator())
 									.validateParameters(proxy, method, args);
 							if (!errors.isEmpty()) {
-								throw new CheckParamException("request params check errors", errors);
+								Map<String, String> error = errors.stream()
+										.collect(Collectors.toMap(k -> k.getPropertyPath().toString(), ConstraintViolation::getMessage));
+								throw new DatalinkXServerException(String.format("request params check errors %s", error));
 							}
 						}
 						Parameter[] ps = method.getParameters();
 						for (int i = 0; i < method.getParameterCount(); i++) {
 							Parameter p = ps[i];
 							if (p.getAnnotation(Valid.class) != null) {
-								Set<ConstraintViolation<Object>> errors = ((ValidatorImpl) validatorFactory
-										.getValidator()).validate(args[i]);
+								Set<ConstraintViolation<Object>> errors = validatorFactory
+										.getValidator().validate(args[i]);
 								if (!errors.isEmpty()) {
-									throw new CheckParamException("request params check errors", errors);
+									Map<String, String> error = errors.stream()
+											.collect(Collectors.toMap(k -> k.getPropertyPath().toString(), ConstraintViolation::getMessage));
+									throw new DatalinkXServerException(String.format("request params check errors %s", error));
 								}
 							}
 						}

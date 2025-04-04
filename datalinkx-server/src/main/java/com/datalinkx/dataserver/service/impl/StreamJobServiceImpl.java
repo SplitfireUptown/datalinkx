@@ -6,10 +6,8 @@ import static com.datalinkx.common.utils.JsonUtils.toJson;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
@@ -25,18 +23,17 @@ import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
-import com.datalinkx.dataserver.client.xxljob.JobClientApi;
-import com.datalinkx.dataserver.config.CommonProperties;
+import com.datalinkx.dataserver.client.JobClientApi;
+import com.datalinkx.dataserver.config.properties.CommonProperties;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.dataserver.service.StreamJobService;
-import com.datalinkx.driver.model.DataTransJobDetail;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
@@ -156,7 +153,7 @@ public class StreamJobServiceImpl implements StreamJobService {
     @Async
     @Override
     public void streamJobExec(String jobId, String lockId) {
-        DataTransJobDetail jobExecInfo = dtsJobService.getStreamJobExecInfo(jobId);
+        DatalinkXJobDetail jobExecInfo = dtsJobService.getStreamJobExecInfo(jobId);
         jobExecInfo.setLockId(lockId);
         if (!ObjectUtils.isEmpty(jobExecInfo.getSyncUnit().getCheckpoint())) {
             String checkpoint = jobExecInfo.getSyncUnit().getCheckpoint().replace("file://", "");

@@ -15,12 +15,14 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
 
 @Slf4j
+@Order
 @Component
 public class ConsumerConfig implements BeanPostProcessor, EnvironmentAware {
 

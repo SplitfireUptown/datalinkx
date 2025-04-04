@@ -4,7 +4,6 @@ package com.datalinkx.driver.dsdriver;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
-import com.datalinkx.driver.model.DataTransJobDetail;
 
 public interface IDsWriter extends IDsDriver {
     // ============= Flinkx 引擎

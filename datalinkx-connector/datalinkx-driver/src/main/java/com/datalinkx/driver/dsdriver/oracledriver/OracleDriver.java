@@ -4,11 +4,9 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcDriver;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcReader;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcWriter;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import lombok.extern.slf4j.Slf4j;
 
 

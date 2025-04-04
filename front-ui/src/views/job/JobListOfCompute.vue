@@ -93,6 +93,12 @@
             }
           },
           {
+            title: '任务上次执行时间',
+            dataIndex: 'start_time',
+            width: '10%',
+            sorter: true
+          },
+          {
             title: '操作',
             width: '15%',
             customRender: (record) => {
@@ -127,7 +133,8 @@
         queryParam: {
           'type': 2
         },
-        source: null
+        source: null,
+        refreshIntervalId: null // 用于存储定时器的 ID
       }
     },
     provide () {
@@ -212,13 +219,26 @@
       queryData () {
         this.pages.current = 1
         this.init()
+      },
+      startRefresh () {
+        this.refreshIntervalId = setInterval(() => {
+          this.init()
+        }, 60000) // 每 10 秒执行一次 init 方法
+      },
+      stopRefresh () {
+        if (this.refreshIntervalId) {
+          clearInterval(this.refreshIntervalId)
+          this.refreshIntervalId = null
+        }
       }
     },
     beforeDestroy () {
       this.eventSource.close()
+      this.stopRefresh() // 组件销毁时停止定时器
     },
     created () {
       this.init()
+      this.startRefresh() // 组件创建时启动定时器
     }
   }
 </script>

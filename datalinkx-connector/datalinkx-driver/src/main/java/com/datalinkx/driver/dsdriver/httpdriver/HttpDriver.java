@@ -1,6 +1,7 @@
 package com.datalinkx.driver.dsdriver.httpdriver;
 
 import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
@@ -13,7 +14,6 @@ import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
-import com.datalinkx.driver.model.DataTransJobDetail;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.*;
@@ -117,7 +117,7 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
         HttpSource.Schema schema = new HttpSource.Schema();
         // 为什么用LinkedHashMap？ 因为要保证写入顺序与页面上配置的字段映射顺序一致
         LinkedHashMap<String, String> fields = new LinkedHashMap<>();
-        for (DataTransJobDetail.Column column : unit.getReader().getColumns()) {
+        for (DatalinkXJobDetail.Column column : unit.getReader().getColumns()) {
             if (!responseFields.contains(column.getName())) {
                 // 如果不是接口返回的字段，跳过处理
                 continue;
@@ -130,7 +130,7 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
         JsonNode responseJsonNode = JsonUtils.toJsonNode(revData);
         Map<String, String> jsonField = new HashMap<>();
 
-        for (DataTransJobDetail.Column column : unit.getReader().getColumns()) {
+        for (DatalinkXJobDetail.Column column : unit.getReader().getColumns()) {
             if (!responseFields.contains(column.getName())) {
                 // 如果不是接口返回的字段，跳过处理
                 continue;

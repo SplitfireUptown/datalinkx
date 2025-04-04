@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
@@ -22,8 +21,8 @@ import com.datalinkx.dataserver.bean.domain.JobLogBean;
 import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
-import com.datalinkx.dataserver.client.xxljob.JobClientApi;
-import com.datalinkx.dataserver.client.xxljob.request.XxlJobParam;
+import com.datalinkx.dataserver.client.JobClientApi;
+import com.datalinkx.dataclient.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobLogRepository;
@@ -248,6 +247,7 @@ public class JobServiceImpl implements JobService {
 					.progress(String.format("%s/%s", dataCountDto.getAppendCount(), dataCountDto.getFilterCount()))
 					.fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + jobBean.getFromTbId())
 					.toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + jobBean.getToTbId())
+					.startTime(jobBean.getStartTime())
 					.status(jobBean.getStatus())
 					.build();
 		}).collect(Collectors.toList());
@@ -263,13 +263,17 @@ public class JobServiceImpl implements JobService {
 
 	@Transactional(rollbackFor = Exception.class)
 	public void del(String jobId, Boolean stream) {
+		// 删除任务日志
 		this.jobLogRepository.logicDeleteByJobId(jobId);
 
 		// 流式任务没有使用xxl-job调度
 		if (!stream) {
-
+			// 删除任务调度配置
 			this.jobClientApi.del(jobId);
 		}
+		// 删除任务依赖
+		this.jobRelationRepository.logicDeleteByJobId(jobId);
+		// 删除任务
 		this.jobRepository.logicDeleteByJobId(jobId);
 	}
 

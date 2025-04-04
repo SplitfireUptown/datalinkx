@@ -21,10 +21,4 @@ public interface MessageHubService {
      * 消费消息
      */
     void consume(ConsumerAdapterForm adapterForm);
-
-
-    /**
-     * 检查topic、type合法性
-     */
-    void checkTopic(BaseMessageForm baseMessageForm);
 }
