@@ -30,9 +30,6 @@ spring:
 #    rest:
 #      uris:
 
-topic:
-  daemon: true
-
 xxl-job:
   username: admin
   password: 123456
