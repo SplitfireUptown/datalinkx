@@ -1,9 +1,6 @@
 package com.datalinkx.driver.dsdriver.esdriver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.datalinkx.common.utils.ConnectIdUtils;
@@ -204,5 +201,14 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                         .collect(Collectors.toList()))
                 .build());
         return writerInfo;
+    }
+
+
+    @Override
+    public Set<String> incrementalFields() {
+        return new HashSet<String>() {{
+            add("number");
+            add("date");
+        }};
     }
 }

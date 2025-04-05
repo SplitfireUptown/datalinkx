@@ -54,18 +54,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     protected String connectId;
     protected String PLUGIN_NAME = "Jdbc";
 
-    private static final Set<String> INCREMENTAL_TYPE_SET = new HashSet<>();
-    static {
-        INCREMENTAL_TYPE_SET.add("datetime");
-        INCREMENTAL_TYPE_SET.add("date");
-        INCREMENTAL_TYPE_SET.add("timestamp");
-        INCREMENTAL_TYPE_SET.add("time");
-        INCREMENTAL_TYPE_SET.add("int");
-        INCREMENTAL_TYPE_SET.add("double");
-        INCREMENTAL_TYPE_SET.add("long");
-        INCREMENTAL_TYPE_SET.add("bigint");
-        INCREMENTAL_TYPE_SET.add("bigint unsigned");
-    }
 
     public JdbcDriver(String connectId) {
         Class clazz = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
@@ -147,20 +135,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         List<Map<String, Object>> maps = fetchColumn(catalog, schema, tableName, connection);
         return JsonUtils.toList(JsonUtils.toJson(maps), DbTableField.class);
     }
-
-    @Override
-    public Boolean judgeIncrementalField(String catalog, String schema, String tableName, String field) throws Exception {
-        List<DbTableField> incrementalFields = this.getFields(catalog, schema, tableName)
-                .stream().filter(tableField -> tableField.getName().equals(field))
-                .collect(Collectors.toList());
-
-        if (ObjectUtils.isEmpty(incrementalFields)) {
-            throw new Exception("增量字段不存在");
-        }
-
-        return INCREMENTAL_TYPE_SET.contains(incrementalFields.get(0).getType().toLowerCase());
-    }
-
 
 
     public List<DbTree.DbTreeTable> generateTree(String catalog, String schema, Connection connection) {
