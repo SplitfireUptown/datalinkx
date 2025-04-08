@@ -27,28 +27,6 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
     protected abstract void afterExec(U unit, boolean success);
     protected abstract U convertExecUnit(T info) throws Exception;
 
-    private boolean isStop() {
-        if (!(Thread.currentThread() instanceof  JobThread)) {
-            return false;
-        }
-        JobThread jobThread = ((JobThread)Thread.currentThread());
-        Field toStopField;
-        boolean toStop = false;
-        try {
-            toStopField = jobThread.getClass().getDeclaredField("toStop");
-            toStopField.setAccessible(true);
-            try {
-                toStop = toStopField.getBoolean(jobThread);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        return toStop;
-    }
-
     public void doAction(T actionInfo) throws Exception {
         Thread taskCheckerThread;
         // T -> U 获取引擎执行类对象
@@ -78,7 +56,7 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
                         }
                         Thread.sleep(5000);
                     } catch (Exception e) {
-                        log.error("data-transfer-job error ", e);
+                        log.error("datalinkx job error ", e);
                         String errorMsg = e.getMessage();
                         error.append(errorMsg).append("\r\n");
                         log.info(errorMsg);
@@ -91,20 +69,11 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
 
             // 4、向引擎提交任务
             try {
-                // 4.1、是否用户取消任务
-                if (isStop()) {
-                    log.error("job shutdown trigger");
-                    throw new InterruptedException();
-                }
-
-                // 4.2、每个单元执行前的准备
+                // 4.1、每个单元执行前的准备
                 this.beforeExec(execUnit);
 
-                // 4.3、启动任务
+                // 4.2、启动任务
                 this.execute(execUnit);
-            } catch (InterruptedException e) {
-                // 用户手动取消任务
-                throw e;
             } catch (Throwable e) {
                 log.error("execute task error.", e);
                 afterExec(execUnit, false);
@@ -118,12 +87,8 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
 
             // 5、整个Job结束后的处理
             this.end(execUnit, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
-        } catch (InterruptedException e) {
-            log.error("shutdown job by user.");
-            this.end(execUnit, JOB_STATUS_STOP, "cancel the job");
-            throw e;
         } catch (Throwable e) {
-            log.error("transfer failed -> ", e);
+            log.error("datalinkx job failed -> ", e);
             this.end(execUnit, JOB_STATUS_ERROR, e.getMessage());
         }
     }

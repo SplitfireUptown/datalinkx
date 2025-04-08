@@ -1,4 +1,4 @@
-package com.datalinkx.copilot.client.response;
+package com.datalinkx.dataclient.client.ollama.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

@@ -19,29 +19,14 @@ public final class DatalinkXClientUtils {
     private DatalinkXClientUtils() {
     }
 
-    public static <T> T createClient(String serviceName, ClientConfig.ServicePropertieBean properties, Class<T> clazz) {
-        Retrofit retrofit = checkAndBuildRetrofit(serviceName, properties, null);
-        return create(retrofit, clazz);
-    }
 
     public static <T> T createClient(String serviceName, ClientConfig.ServicePropertieBean properties, Class<T> clazz,
                                      Interceptor interceptor) {
-        Retrofit retrofit = checkAndBuildRetrofit(serviceName, properties, interceptor);
-        return create(retrofit, clazz);
+        Retrofit retrofit = checkAndBuildRetrofit(properties, interceptor);
+        return retrofit.create(clazz);
     }
 
-    public static <T> T create(Retrofit retrofit, Class<T> serviceClazz) {
-        return retrofit.create(serviceClazz);
-    }
-
-    private static Retrofit checkAndBuildRetrofit(String name, ClientConfig.ServicePropertieBean prop, Interceptor interceptor) {
-        // check 参数
-        if (prop != null) {
-            if (StringUtils.isEmpty(prop.getUrl())) {
-                log.error(name + " url required");
-            }
-        }
-
+    private static Retrofit checkAndBuildRetrofit(ClientConfig.ServicePropertieBean prop, Interceptor interceptor) {
         OkHttpClient.Builder okHttpBuider = buildOkHttpClient(prop);
         if (null != interceptor) {
             okHttpBuider.addInterceptor(interceptor);

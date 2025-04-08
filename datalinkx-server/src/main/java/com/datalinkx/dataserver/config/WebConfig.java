@@ -13,9 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import com.datalinkx.copilot.client.OllamaProperties;
 import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataclient.client.flink.FlinkClient;
-import com.datalinkx.dataclient.client.seatunnel.SeaTunnelClient;
+import com.datalinkx.dataclient.client.ollama.OllamaClient;
 import com.datalinkx.dataclient.config.DatalinkXClientUtils;
 import com.datalinkx.dataclient.client.xxljob.XxlJobClient;
 import com.datalinkx.dataclient.client.xxljob.XxlLoginClient;
@@ -89,7 +90,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Bean
 	public XxlLoginClient xxlLoginClient(XxlClientProperties xxlClientProperties) {
-		return DatalinkXClientUtils.createClient("xxljoblogin", xxlClientProperties.getClient(), XxlLoginClient.class);
+		return DatalinkXClientUtils.createClient("xxljoblogin", xxlClientProperties.getClient(), XxlLoginClient.class, null);
 	}
 	@Bean
 	public XxlJobClient xxlJobClient(XxlClientProperties xxlClientProperties, LoginInterceptor loginInterceptor) {
@@ -99,17 +100,17 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Bean
 	public DatalinkXJobClient datalinkXJobClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("datajob", clientProperties.getDatajob(), DatalinkXJobClient.class);
+		return DatalinkXClientUtils.createClient("datajob", clientProperties.getDatajob(), DatalinkXJobClient.class, null);
 	}
 
 	@Bean
 	public FlinkClient flinkClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("flink", clientProperties.getFlink(), FlinkClient.class);
+		return DatalinkXClientUtils.createClient("flink", clientProperties.getFlink(), FlinkClient.class, null);
 	}
 
 	@Bean
-	@ConditionalOnProperty(prefix = "client.seatunnel", name = "url")
-	public SeaTunnelClient SeatunnelClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("seatunnel", clientProperties.getSeatunnel(), SeaTunnelClient.class);
+	@ConditionalOnProperty(prefix = "client.ollama", name = "url")
+	public OllamaClient ollamaClient(OllamaProperties ollamaConfig) {
+		return DatalinkXClientUtils.createClient("ollama", ollamaConfig.getOllama(), OllamaClient.class, null);
 	}
 }

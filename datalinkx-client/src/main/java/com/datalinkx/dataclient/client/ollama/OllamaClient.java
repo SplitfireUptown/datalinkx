@@ -1,9 +1,9 @@
-package com.datalinkx.copilot.client;
+package com.datalinkx.dataclient.client.ollama;
 
-import com.datalinkx.copilot.client.request.ChatReq;
-import com.datalinkx.copilot.client.request.EmbeddingReq;
-import com.datalinkx.copilot.client.response.ChatResult;
-import com.datalinkx.copilot.client.response.EmbeddingResult;
+import com.datalinkx.dataclient.client.ollama.request.ChatReq;
+import com.datalinkx.dataclient.client.ollama.request.EmbeddingReq;
+import com.datalinkx.dataclient.client.ollama.response.ChatResult;
+import com.datalinkx.dataclient.client.ollama.response.EmbeddingResult;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 

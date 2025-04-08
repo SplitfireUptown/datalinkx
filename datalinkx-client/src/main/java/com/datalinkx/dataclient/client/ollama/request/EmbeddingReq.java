@@ -1,4 +1,4 @@
-package com.datalinkx.copilot.client.request;
+package com.datalinkx.dataclient.client.ollama.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

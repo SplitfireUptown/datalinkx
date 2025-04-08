@@ -10,7 +10,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.copilot.bean.ElasticVectorData;
-import com.datalinkx.copilot.client.response.EmbeddingResult;
+import com.datalinkx.dataclient.client.ollama.response.EmbeddingResult;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;

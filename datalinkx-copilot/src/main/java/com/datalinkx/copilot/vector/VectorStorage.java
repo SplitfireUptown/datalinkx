@@ -1,6 +1,6 @@
 package com.datalinkx.copilot.vector;
 
-import com.datalinkx.copilot.client.response.EmbeddingResult;
+import com.datalinkx.dataclient.client.ollama.response.EmbeddingResult;
 
 public interface VectorStorage {
     default String getCollectionName(){

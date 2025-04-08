@@ -69,11 +69,10 @@ public final class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 		if (!errorThrow) {
 			return body;
 		}
-		Field statusField = null;
+		Field statusField;
 		try {
 			statusField = body.getClass().getDeclaredField("status");
 		} catch (NoSuchFieldException e) {
-			// 如果字段不存在，说明接受返回值的对象不属于常规返回对象，是否请求成功由调用者自己判断
 			return body;
 		} catch (SecurityException e) {
 			throw new DatalinkXSDKException(e);
@@ -81,24 +80,7 @@ public final class SynchronousCallAdapterFactory extends CallAdapter.Factory {
 		statusField.setAccessible(true);
 		Integer status = Integer.parseInt(statusField.get(body).toString());
 		if (status != 0) {
-			String reason = null;
-			for (Field errField : body.getClass().getDeclaredFields()) {
-				errField.setAccessible(true);
-				if ("errstr".equals(errField.getName())) {
-					reason = (String) errField.get(body);
-				} else if ("msg".equals(errField.getName())) {
-					reason = (String) errField.get(body);
-					if (reason != null && !"".equals(reason)) {
-						break;
-					}
-				} else if ("message".equals(errField.getName())) {
-					reason = (String) errField.get(body);
-					if (reason != null && !"".equals(reason)) {
-						break;
-					}
-				}
-			}
-			throw new DatalinkXSDKException(reason);
+			throw new DatalinkXSDKException(body.toString());
 		} else {
 			return body;
 		}

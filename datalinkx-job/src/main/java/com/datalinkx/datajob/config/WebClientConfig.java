@@ -14,19 +14,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebClientConfig implements WebMvcConfigurer {
 	@Bean
 	public DatalinkXServerClient datalinkXServerClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("dataserver",
-				clientProperties.getDataserver(), DatalinkXServerClient.class);
+		return DatalinkXClientUtils.createClient("dataserver", clientProperties.getDataserver(), DatalinkXServerClient.class, null);
 	}
 
 	@Bean
 	@ConditionalOnProperty(prefix = "client.flink", name = "url")
 	public FlinkClient flinkClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("flink", clientProperties.getFlink(), FlinkClient.class);
+		return DatalinkXClientUtils.createClient("flink", clientProperties.getFlink(), FlinkClient.class, null);
 	}
 
 	@Bean
 	@ConditionalOnProperty(prefix = "client.seatunnel", name = "url")
 	public SeaTunnelClient seaTunnelClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("seatunnel", clientProperties.getSeatunnel(), SeaTunnelClient.class);
+		return DatalinkXClientUtils.createClient("seatunnel", clientProperties.getSeatunnel(), SeaTunnelClient.class, null);
 	}
 }
