@@ -35,7 +35,6 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
             StringBuffer error = new StringBuffer();
             // 1、准备执行job
             this.begin(actionInfo);
-            Map<String, JobExecCountDto> countRes = DataTransferAction.COUNT_RES.get();
 
             String healthCheck = "patch-data-job-check-thread";
             if (MetaConstants.DsType.STREAM_DB_LIST.contains(actionInfo.getSyncUnit().getReader().getType())) {
@@ -44,8 +43,6 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
 
             // 3、循环检查任务结果
             taskCheckerThread = new Thread(() -> {
-                DataTransferAction.COUNT_RES.set(countRes);
-
                 while (true) {
                     try {
                         // 3.1、如果任务执行完成
@@ -64,7 +61,6 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
                         break;
                     }
                 }
-                DataTransferAction.COUNT_RES.remove();
             }, healthCheck);
 
             // 4、向引擎提交任务

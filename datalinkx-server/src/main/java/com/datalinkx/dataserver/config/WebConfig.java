@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
-import com.datalinkx.copilot.client.OllamaProperties;
 import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataclient.client.flink.FlinkClient;
 import com.datalinkx.dataclient.client.ollama.OllamaClient;
@@ -110,7 +109,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Bean
 	@ConditionalOnProperty(prefix = "client.ollama", name = "url")
-	public OllamaClient ollamaClient(OllamaProperties ollamaConfig) {
-		return DatalinkXClientUtils.createClient("ollama", ollamaConfig.getOllama(), OllamaClient.class, null);
+	public OllamaClient ollamaClient(ClientProperties clientProperties) {
+		return DatalinkXClientUtils.createClient("ollama", clientProperties.getOllama(), OllamaClient.class, null);
 	}
 }

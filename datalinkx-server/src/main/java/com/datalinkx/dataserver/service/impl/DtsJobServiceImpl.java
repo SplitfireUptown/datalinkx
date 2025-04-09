@@ -348,7 +348,9 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .appendCount(jobStateForm.getAppendCount())
                 .filterCount(jobStateForm.getFilterCount())
                 .build();
-        jobBean.setStartTime(ObjectUtils.isEmpty(jobStateForm.getStartTime()) ? null : new Timestamp(jobStateForm.getStartTime()));
+        if (!ObjectUtils.isEmpty(jobStateForm.getStartTime())) {
+            jobBean.setStartTime(new Timestamp(jobStateForm.getStartTime()));
+        }
         jobBean.setStatus(status);
         jobBean.setCount(JsonUtils.toJson(countVo));
         jobBean.setErrorMsg(StringUtils.equalsIgnoreCase(jobStateForm.getErrmsg(), "success") ? "任务成功"

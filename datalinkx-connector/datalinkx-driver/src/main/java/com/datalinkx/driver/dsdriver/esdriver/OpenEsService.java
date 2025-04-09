@@ -130,8 +130,6 @@ public class OpenEsService implements EsService {
         } catch (IOException e) {
             log.error("", e);
             throw e;
-        } finally {
-            ConnectPool.releaseConnection(esDriver.getConnectId(), restClient);
         }
     }
 
@@ -183,8 +181,6 @@ public class OpenEsService implements EsService {
         } catch (IOException e) {
             log.error("", e);
             throw e;
-        } finally {
-            ConnectPool.releaseConnection(esDriver.getConnectId(), restClient);
         }
     }
 
@@ -224,8 +220,6 @@ public class OpenEsService implements EsService {
             throw new Exception(getErrorInfo(EntityUtils.toString(e.getResponse().getEntity())));
         } catch (IOException e) {
             throw e;
-        } finally {
-            ConnectPool.releaseConnection(esDriver.getConnectId(), restClient);
         }
     }
 
@@ -254,8 +248,6 @@ public class OpenEsService implements EsService {
         } catch (IOException e) {
             log.error("", e);
             throw e;
-        } finally {
-            ConnectPool.releaseConnection(esDriver.getConnectId(), restClient);
         }
     }
 
@@ -276,8 +268,6 @@ public class OpenEsService implements EsService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw e;
-        } finally {
-            ConnectPool.releaseConnection(esDriver.getConnectId(), restClient);
         }
     }
 }

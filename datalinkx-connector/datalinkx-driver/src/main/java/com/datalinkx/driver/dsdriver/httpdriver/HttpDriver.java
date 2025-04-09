@@ -11,7 +11,6 @@ import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
-import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -57,11 +56,8 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
     }
 
     @Override
-    public List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception {
-        DbTree.DbTreeTable dbTreeTable = new DbTree.DbTreeTable();
-        dbTreeTable.setName("json_path解析内置表");
-        dbTreeTable.setLevel("table");
-        return Collections.singletonList(dbTreeTable);
+    public List<String> treeTable(String catalog, String schema) throws Exception {
+        return Collections.singletonList("json_path解析内置表");
     }
 
     @Override

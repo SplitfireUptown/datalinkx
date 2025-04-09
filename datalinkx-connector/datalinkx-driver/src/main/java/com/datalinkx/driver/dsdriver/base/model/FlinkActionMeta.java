@@ -39,8 +39,6 @@ public class FlinkActionMeta extends EngineActionMeta {
     public int readRecords = 0;
     // 数据总写行数 = readRecords - errorRecords
     public int writeRecords = 0;
-    // 数据失败行数
-    public int errorRecords = 0;
     // 写字节数
     public long writeBytes;
 }

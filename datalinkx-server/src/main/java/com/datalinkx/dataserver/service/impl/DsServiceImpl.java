@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import cn.hutool.core.lang.Pair;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
@@ -17,7 +16,6 @@ import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.PageVo;
-import com.datalinkx.dataserver.client.HttpConstructor;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
@@ -27,13 +25,6 @@ import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
-import com.datalinkx.driver.dsdriver.base.model.DbTree;
-import com.datalinkx.driver.dsdriver.esdriver.EsSetupInfo;
-import com.datalinkx.driver.dsdriver.httpdriver.HttpSetupInfo;
-import com.datalinkx.driver.dsdriver.kafkadriver.KafkaSetupInfo;
-import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
-import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
-import com.datalinkx.driver.dsdriver.redisdriver.RedisSetupInfo;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -43,7 +34,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 
@@ -223,7 +213,7 @@ public class DsServiceImpl implements DsService {
 			IDsDriver dsDriver = DsDriverFactory.getDriver(getConnectId(dsBean));
 			if (dsDriver instanceof IDsReader) {
 				IDsReader dsReader = (IDsReader) dsDriver;
-				tableList = dsReader.treeTable(dsBean.getDatabase(), dsBean.getSchema()).stream().map(DbTree::getName).collect(Collectors.toList());
+				tableList = dsReader.treeTable(dsBean.getDatabase(), dsBean.getSchema());
 			}
 		} catch (Exception e) {
 			log.error("connect error", e);

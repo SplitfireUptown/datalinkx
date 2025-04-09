@@ -6,13 +6,11 @@ import java.util.stream.Collectors;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.common.utils.RefUtils;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
-import com.datalinkx.driver.dsdriver.base.model.DbTree;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
@@ -148,19 +146,11 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
 
 
     @Override
-    public List<DbTree.DbTreeTable> treeTable(String catalog, String schema) throws Exception {
-        List<DbTree.DbTreeTable> dbTreeTables = new ArrayList<>();
+    public List<String> treeTable(String catalog, String schema) throws Exception {
+        List<String> dbTreeTables = new ArrayList<>();
         if ("".equals(catalog)) {
             List<String> indexes = esService.getIndexes();
-            indexes.forEach(idx -> {
-                DbTree.DbTreeTable dbTreeTable = new DbTree.DbTreeTable();
-                dbTreeTable.setName(idx);
-                dbTreeTable.setRemark("");
-                dbTreeTable.setType("table");
-                dbTreeTable.setLevel("table");
-                dbTreeTable.setRef(RefUtils.encode(Lists.newArrayList("", null, idx)));
-                dbTreeTables.add(dbTreeTable);
-            });
+            dbTreeTables.addAll(indexes);
         }
         return dbTreeTables;
     }
