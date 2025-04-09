@@ -46,10 +46,10 @@ public class JobBean extends BaseDomainBean {
 	private String config;
 	@Column(name = "crontab", length = 256, columnDefinition = "varchar(256)")
 	private String crontab;
-	@Column(name = "to_tb_id", columnDefinition = "char(40)")
-	private String toTbId;
-	@Column(name = "from_tb_id", columnDefinition = "char(40)")
-	private String fromTbId;
+	@Column(name = "to_tb", columnDefinition = "char(40)")
+	private String toTb;
+	@Column(name = "from_tb", columnDefinition = "char(40)")
+	private String fromTb;
 	@Column(name = "xxl_id", columnDefinition = "char(40)")
 	private String xxlId;
 	@Column(name = "task_id", columnDefinition = "char(40)")

@@ -82,8 +82,8 @@ public class StreamJobServiceImpl implements StreamJobService {
         jobBean.setWriterDsId(form.getToDsId());
 
         jobBean.setConfig(toJson(form.getFieldMappings()));
-        jobBean.setFromTbId(form.getFromTbName());
-        jobBean.setToTbId(form.getToTbName());
+        jobBean.setFromTb(form.getFromTbName());
+        jobBean.setToTb(form.getToTbName());
         jobBean.setStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE);
         jobBean.setName(form.getJobName());
 
@@ -98,8 +98,8 @@ public class StreamJobServiceImpl implements StreamJobService {
         jobBean.setReaderDsId(form.getFromDsId());
         jobBean.setWriterDsId(form.getToDsId());
         jobBean.setConfig(toJson(form.getFieldMappings()));
-        jobBean.setFromTbId(form.getFromTbName());
-        jobBean.setToTbId(form.getToTbName());
+        jobBean.setFromTb(form.getFromTbName());
+        jobBean.setToTb(form.getToTbName());
         jobBean.setName(form.getJobName());
         jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
         jobRepository.save(jobBean);
@@ -136,8 +136,8 @@ public class StreamJobServiceImpl implements StreamJobService {
                 .builder()
                 .jobId(jobBean.getJobId())
                 .jobName(jobBean.getName())
-                .fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + jobBean.getFromTbId())
-                .toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + jobBean.getToTbId())
+                .fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + jobBean.getFromTb())
+                .toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + jobBean.getToTb())
                 .startTime(jobBean.getStartTime())
                 .build()).collect(Collectors.toList());
 

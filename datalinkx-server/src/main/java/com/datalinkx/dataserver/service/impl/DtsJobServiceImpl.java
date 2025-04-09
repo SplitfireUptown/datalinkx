@@ -122,14 +122,14 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .collect(Collectors.toMap(DsBean::getDsId, v -> v));
 
         DatalinkXJobDetail.Reader reader = DatalinkXJobDetail.Reader.builder()
-                .tableName(jobBean.getFromTbId())
+                .tableName(jobBean.getFromTb())
                 .columns(fromColumns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getReaderDsId())))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsId2Object.get(jobBean.getReaderDsId()).getType()))
                 .build();
 
         DatalinkXJobDetail.Writer writer = DatalinkXJobDetail.Writer.builder()
-                .tableName(jobBean.getToTbId())
+                .tableName(jobBean.getToTb())
                 .columns(toColumns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getWriterDsId())))
                 .batchSize(commonProperties.getStreamBatchSize())
@@ -168,7 +168,7 @@ public class DtsJobServiceImpl implements DtsJobService {
         IDsReader dsReader = DsDriverFactory.getDsReader(dsServiceImpl.getConnectId(fromDs));
 
         // 4、获取对应增量条件
-        Map<String, String> typeMappings = dsReader.getFields(fromDs.getDatabase(), fromDs.getSchema(), jobBean.getFromTbId())
+        Map<String, String> typeMappings = dsReader.getFields(fromDs.getDatabase(), fromDs.getSchema(), jobBean.getFromTb())
                 .stream().collect(Collectors.toMap(DbTableField::getName, DbTableField::getType));
         JobForm.SyncModeForm syncModeForm = JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class);
 
@@ -194,7 +194,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .schema(fromDs.getDatabase())
                 .sync(sync)
                 .maxValue(syncModeForm.getIncreateValue())
-                .tableName(jobBean.getFromTbId())
+                .tableName(jobBean.getFromTb())
                 .columns(fromCols)
                 .queryFields(selectField)
                 .build();
@@ -313,7 +313,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .schema(toDs.getDatabase()).connectId(dsServiceImpl.getConnectId(toDs))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
                 .insertFields(insertFields)
-                .tableName(jobBean.getToTbId()).columns(toCols).build();
+                .tableName(jobBean.getToTb()).columns(toCols).build();
     }
 
 

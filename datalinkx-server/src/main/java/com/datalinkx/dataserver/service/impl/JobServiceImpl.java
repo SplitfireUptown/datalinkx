@@ -76,8 +76,8 @@ public class JobServiceImpl implements JobService {
 		jobBean.setWriterDsId(form.getToDsId());
 
 		jobBean.setConfig(toJson(form.getFieldMappings()));
-		jobBean.setFromTbId(form.getFromTbName());
-		jobBean.setToTbId(form.getToTbName());
+		jobBean.setFromTb(form.getFromTbName());
+		jobBean.setToTb(form.getToTbName());
 		jobBean.setStatus(MetaConstants.JobStatus.JOB_STATUS_CREATE);
 		jobBean.setCrontab(form.getSchedulerConf());
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
@@ -101,8 +101,8 @@ public class JobServiceImpl implements JobService {
 		jobBean.setReaderDsId(form.getFromDsId());
 		jobBean.setWriterDsId(form.getToDsId());
 		jobBean.setConfig(toJson(form.getFieldMappings()));
-		jobBean.setFromTbId(form.getFromTbName());
-		jobBean.setToTbId(form.getToTbName());
+		jobBean.setFromTb(form.getFromTbName());
+		jobBean.setToTb(form.getToTbName());
 		jobBean.setCrontab(form.getSchedulerConf());
 		jobBean.setSyncMode(JsonUtils.toJson(form.getSyncMode()));
 		jobBean.setName(form.getJobName());
@@ -209,8 +209,8 @@ public class JobServiceImpl implements JobService {
 				.jobName(jobBean.getName())
 				.fromDsId(jobBean.getReaderDsId())
 				.toDsId(jobBean.getWriterDsId())
-				.fromTbName(jobBean.getFromTbId())
-				.toTbName(jobBean.getToTbId())
+				.fromTbName(jobBean.getFromTb())
+				.toTbName(jobBean.getToTb())
 				.schedulerConf(jobBean.getCrontab())
 				.cover(jobBean.getCover())
 				.graph(jobBean.getGraph())
@@ -245,8 +245,8 @@ public class JobServiceImpl implements JobService {
 					.jobId(jobBean.getJobId())
 					.jobName(jobBean.getName())
 					.progress(String.format("%s/%s", dataCountDto.getAppendCount(), dataCountDto.getFilterCount()))
-					.fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + jobBean.getFromTbId())
-					.toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + jobBean.getToTbId())
+					.fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + jobBean.getFromTb())
+					.toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + jobBean.getToTb())
 					.startTime(jobBean.getStartTime())
 					.status(jobBean.getStatus())
 					.build();
