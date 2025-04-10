@@ -1,9 +1,9 @@
 package com.datalinkx.datajob.config;
 
+import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.dataclient.client.flink.FlinkClient;
 import com.datalinkx.dataclient.client.seatunnel.SeaTunnelClient;
 import com.datalinkx.dataclient.config.DatalinkXClientUtils;
-import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

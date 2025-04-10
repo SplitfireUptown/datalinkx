@@ -1,12 +1,12 @@
 package com.datalinkx.dataserver.controller.advice;
 
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 
 
 /**

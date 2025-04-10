@@ -1,12 +1,12 @@
 package com.datalinkx.dataserver.monitor;
 
+import com.datalinkx.dataserver.bean.vo.SystemMonitorVo;
+import com.sun.management.OperatingSystemMXBean;
+
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-
-import com.datalinkx.dataserver.bean.vo.SystemMonitorVo;
-import com.sun.management.OperatingSystemMXBean;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,26 +1,19 @@
 package com.datalinkx.datajob.job;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.result.WebResult;
 import com.datalinkx.common.utils.IdUtils;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.dataclient.client.datalinkxserver.request.JobStateForm;
 import com.datalinkx.datajob.action.AbstractDataTransferAction;
 import com.datalinkx.datajob.action.DataTransferAction;
 import com.datalinkx.datajob.action.StreamDataTransferAction;
 import com.datalinkx.datajob.action.TransformDataTransferAction;
 import com.datalinkx.datajob.bean.JobExecCountDto;
-import com.datalinkx.dataclient.client.datalinkxserver.request.JobStateForm;
 import com.datalinkx.datajob.bean.XxlJobParam;
-import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.SneakyThrows;
@@ -33,6 +26,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 /**
@@ -133,7 +132,7 @@ public class DataTransHandler {
         JobExecCountDto jobExecCountDto = new JobExecCountDto();
         dataServerClient.updateJobStatus(JobStateForm.builder().jobId(jobId)
                 .jobStatus(MetaConstants.JobStatus.JOB_STATUS_ERROR).startTime(startTime).endTime(new Date().getTime())
-                .errmsg(message).allCount(jobExecCountDto.getAllCount())
+                .errmsg(message)
                 .appendCount(jobExecCountDto.getAppendCount())
                 .build());
     }

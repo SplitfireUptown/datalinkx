@@ -1,8 +1,5 @@
 package com.datalinkx.dataserver.bean.vo;
 
-import java.sql.Timestamp;
-import java.util.List;
-
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
@@ -11,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 
 

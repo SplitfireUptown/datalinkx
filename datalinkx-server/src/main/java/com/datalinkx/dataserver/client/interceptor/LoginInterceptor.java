@@ -1,18 +1,9 @@
 
 package com.datalinkx.dataserver.client.interceptor;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
 import com.datalinkx.dataclient.client.xxljob.XxlLoginClient;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Headers;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import okhttp3.*;
 import okio.Buffer;
 import okio.BufferedSource;
 import okio.GzipSource;
@@ -20,6 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 
 @Slf4j

@@ -1,20 +1,11 @@
 package com.datalinkx.dataserver.service.impl;
 
 
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
-import static com.datalinkx.common.utils.IdUtils.genKey;
-import static com.datalinkx.common.utils.JsonUtils.toJson;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.dataclient.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.domain.JobLogBean;
@@ -22,7 +13,6 @@ import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.client.JobClientApi;
-import com.datalinkx.dataclient.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobLogRepository;
@@ -39,6 +29,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
+import static com.datalinkx.common.utils.IdUtils.genKey;
+import static com.datalinkx.common.utils.JsonUtils.toJson;
 
 
 

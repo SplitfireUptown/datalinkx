@@ -1,17 +1,8 @@
 package com.datalinkx.dataserver.service.impl;
 
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
-import static com.datalinkx.common.utils.IdUtils.genKey;
-import static com.datalinkx.common.utils.JsonUtils.toJson;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
@@ -30,7 +21,6 @@ import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.dataserver.service.StreamJobService;
-import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +29,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
+import static com.datalinkx.common.utils.IdUtils.genKey;
+import static com.datalinkx.common.utils.JsonUtils.toJson;
 
 @Slf4j
 @Service

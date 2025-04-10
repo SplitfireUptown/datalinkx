@@ -1,8 +1,8 @@
 package com.datalinkx.dataserver.service;
 
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
-import com.datalinkx.common.result.DatalinkXJobDetail;
 
 /**
  * 任务流转运行时service

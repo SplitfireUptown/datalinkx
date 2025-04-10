@@ -1,11 +1,11 @@
 package com.datalinkx.dataserver.controller;
 
 
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.result.WebResult;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.controller.form.JobStateForm;
 import com.datalinkx.dataserver.service.DtsJobService;
-import com.datalinkx.common.result.DatalinkXJobDetail;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

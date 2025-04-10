@@ -1,24 +1,11 @@
 package com.datalinkx.dataserver.config;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-
 import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
 import com.datalinkx.dataclient.client.flink.FlinkClient;
 import com.datalinkx.dataclient.client.ollama.OllamaClient;
-import com.datalinkx.dataclient.config.DatalinkXClientUtils;
 import com.datalinkx.dataclient.client.xxljob.XxlJobClient;
 import com.datalinkx.dataclient.client.xxljob.XxlLoginClient;
+import com.datalinkx.dataclient.config.DatalinkXClientUtils;
 import com.datalinkx.dataserver.client.interceptor.LoginInterceptor;
 import com.datalinkx.dataserver.config.properties.ClientProperties;
 import com.datalinkx.dataserver.config.properties.XxlClientProperties;
@@ -30,6 +17,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Configuration

@@ -1,13 +1,13 @@
 package com.datalinkx.datajob.job;
 
-import java.util.Map;
-
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 import static com.datalinkx.common.constants.MetaConstants.CommonConstant.KEY_CHECKPOINT_INTERVAL;
 

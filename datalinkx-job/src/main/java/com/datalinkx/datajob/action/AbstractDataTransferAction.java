@@ -1,19 +1,13 @@
 
 package com.datalinkx.datajob.action;
 
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_ERROR;
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_STOP;
-import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
-
-import java.lang.reflect.Field;
-import java.util.Map;
-
 import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.common.utils.IdUtils;
-import com.datalinkx.datajob.bean.JobExecCountDto;
 import com.datalinkx.common.result.DatalinkXJobDetail;
-import com.xxl.job.core.thread.JobThread;
+import com.datalinkx.common.utils.IdUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_ERROR;
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SUCCESS;
 
 
 

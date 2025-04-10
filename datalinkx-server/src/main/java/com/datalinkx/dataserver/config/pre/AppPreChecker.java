@@ -1,11 +1,8 @@
 package com.datalinkx.dataserver.config.pre;
 
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.dataclient.client.xxljob.XxlJobClient;
-import com.datalinkx.dataclient.client.xxljob.request.PageQueryParam;
 import com.datalinkx.dataclient.client.xxljob.request.XxlJobGroupParam;
 import com.datalinkx.dataclient.client.xxljob.response.JobGroupPageListResp;
-import com.datalinkx.dataclient.client.xxljob.response.ReturnT;
 import com.datalinkx.dataserver.client.JobClientApi;
 import com.datalinkx.dataserver.config.properties.XxlClientProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 import static com.datalinkx.common.constants.MessageHubConstants.GLOBAL_COMMON_GROUP;
 

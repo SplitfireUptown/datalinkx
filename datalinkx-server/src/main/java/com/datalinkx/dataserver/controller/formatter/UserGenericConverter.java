@@ -1,10 +1,5 @@
 package com.datalinkx.dataserver.controller.formatter;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +8,11 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.core.convert.converter.GenericConverter;
+
+import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 

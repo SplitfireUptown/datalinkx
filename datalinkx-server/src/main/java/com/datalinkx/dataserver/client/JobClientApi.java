@@ -1,24 +1,22 @@
 package com.datalinkx.dataserver.client;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.datalinkx.common.exception.DatalinkXSDKException;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.dataclient.client.xxljob.request.*;
-import com.datalinkx.dataclient.client.xxljob.response.JobGroupPageListResp;
-import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataclient.client.xxljob.XxlJobClient;
+import com.datalinkx.dataclient.client.xxljob.request.PageQueryParam;
+import com.datalinkx.dataclient.client.xxljob.request.XxlJobGroupParam;
+import com.datalinkx.dataclient.client.xxljob.request.XxlJobInfo;
+import com.datalinkx.dataclient.client.xxljob.request.XxlJobParam;
+import com.datalinkx.dataclient.client.xxljob.response.JobGroupPageListResp;
 import com.datalinkx.dataclient.client.xxljob.response.ReturnT;
+import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.config.properties.XxlClientProperties;
 import com.datalinkx.dataserver.repository.JobRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import static com.datalinkx.common.constants.MessageHubConstants.GLOBAL_COMMON_GROUP;
