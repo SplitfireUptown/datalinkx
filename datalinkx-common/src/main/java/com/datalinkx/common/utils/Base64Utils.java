@@ -7,7 +7,7 @@ import java.util.Base64;
 public final class Base64Utils {
 	private Base64Utils() {
 	}
-	public static String encodeBase64(byte[] src) throws UnsupportedEncodingException {
+	public static String encodeBase64(byte[] src) {
 
 		return Base64.getEncoder().encodeToString(src);
 	}
