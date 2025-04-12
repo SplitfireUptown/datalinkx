@@ -7,7 +7,6 @@ import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.compute.transform.ITransformDriver;
-import com.datalinkx.dataclient.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.domain.JobLogBean;
@@ -363,7 +362,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                     .startTime(ObjectUtils.isEmpty(jobStateForm.getStartTime()) ? null : new Timestamp(jobStateForm.getStartTime()))
                     .status(ObjectUtils.nullSafeEquals(status, MetaConstants.JobStatus.JOB_STATUS_ERROR) ? 1 : 0)
                     .endTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) ? null : new Timestamp(jobStateForm.getEndTime()))
-                    .costTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) ? 0 : (int) ((jobStateForm.getEndTime() - jobStateForm.getStartTime()) / 1000))
+                    .costTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) || ObjectUtils.isEmpty(jobBean.getStartTime())  ? 0 : (int) ((jobStateForm.getEndTime() - jobBean.getStartTime().getTime()) / 1000))
                     .errorMsg(StringUtils.equalsIgnoreCase(jobStateForm.getErrmsg(), "success") ? "任务成功" : jobStateForm.getErrmsg())
                     .count(JsonUtils.toJson(countVo))
                     .isDel(0)
@@ -415,12 +414,12 @@ public class DtsJobServiceImpl implements DtsJobService {
 
         // 如果xxl-job未创建任务，新建一个
         if (!jobClientApi.isXxljobExist(jobId)) {
-            String xxlJobId = jobClientApi.add(jobBean.getCrontab(), XxlJobParam.builder().jobId(jobId).build());
+            String xxlJobId = jobClientApi.add(jobBean.getCrontab(), jobId);
             jobBean.setXxlId(xxlJobId);
             jobClientApi.start(jobId);
         }
 
         jobRepository.save(jobBean);
-        jobClientApi.trigger(jobId, XxlJobParam.builder().jobId(jobId).build());
+        jobClientApi.trigger(jobId);
     }
 }

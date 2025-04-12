@@ -1,17 +1,14 @@
 package com.datalinkx.copilot.service;
 
-import java.util.Collections;
-import java.util.UUID;
-
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.dataclient.client.ollama.OllamaClient;
-import com.datalinkx.dataclient.client.ollama.request.ChatReq;
-import com.datalinkx.dataclient.client.ollama.request.EmbeddingReq;
-import com.datalinkx.dataclient.client.ollama.response.ChatResult;
-import com.datalinkx.dataclient.client.ollama.response.EmbeddingResult;
 import com.datalinkx.copilot.llm.LLMUtils;
 import com.datalinkx.copilot.vector.ElasticSearchVectorStorage;
+import com.datalinkx.rpc.client.ollama.OllamaClient;
+import com.datalinkx.rpc.client.ollama.request.ChatReq;
+import com.datalinkx.rpc.client.ollama.request.EmbeddingReq;
+import com.datalinkx.rpc.client.ollama.response.ChatResult;
+import com.datalinkx.rpc.client.ollama.response.EmbeddingResult;
 import com.datalinkx.sse.config.SseTransformUtil;
 import okhttp3.MediaType;
 import okhttp3.Request;
@@ -20,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.Collections;
+import java.util.UUID;
 
 @Service
 public class ChatServiceImpl implements ChatService {

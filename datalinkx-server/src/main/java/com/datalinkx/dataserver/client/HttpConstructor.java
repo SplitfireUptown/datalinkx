@@ -23,7 +23,6 @@ public class HttpConstructor {
         contentTypeMapping.put("raw", "application/json");
         contentTypeMapping.put("x-www-form-urlencoded", "application/x-www-form-urlencoded");
         contentTypeMapping.put("form-data", "multipart/form-data");
-
     }
 
     private static OkHttpClient client = new OkHttpClient();

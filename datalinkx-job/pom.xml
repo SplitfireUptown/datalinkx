@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>com.datalinkx</groupId>
-            <artifactId>datalinkx-client</artifactId>
+            <artifactId>datalinkx-feign</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>

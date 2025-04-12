@@ -1,16 +1,10 @@
 package com.datalinkx.copilot.vector;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.copilot.bean.ElasticVectorData;
-import com.datalinkx.dataclient.client.ollama.response.EmbeddingResult;
+import com.datalinkx.rpc.client.ollama.response.EmbeddingResult;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -34,6 +28,8 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Slf4j
 @Component

@@ -7,21 +7,20 @@ import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.compute.transform.ITransformDriver;
 import com.datalinkx.compute.transform.ITransformFactory;
-import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.dataclient.client.datalinkxserver.request.JobStateForm;
-import com.datalinkx.dataclient.client.datalinkxserver.request.JobSyncModeForm;
-import com.datalinkx.dataclient.client.seatunnel.SeaTunnelClient;
-import com.datalinkx.dataclient.client.seatunnel.request.ComputeJobGraph;
-import com.datalinkx.dataclient.client.seatunnel.response.JobCommitResp;
-import com.datalinkx.dataclient.client.seatunnel.response.JobOverviewResp;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
+import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.rpc.client.datalinkxserver.request.JobStateForm;
+import com.datalinkx.rpc.client.datalinkxserver.request.JobSyncModeForm;
+import com.datalinkx.rpc.client.seatunnel.SeaTunnelClient;
+import com.datalinkx.rpc.client.seatunnel.request.ComputeJobGraph;
+import com.datalinkx.rpc.client.seatunnel.response.JobCommitResp;
+import com.datalinkx.rpc.client.seatunnel.response.JobOverviewResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -32,7 +31,6 @@ import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_
 
 @Slf4j
 @Component
-@DependsOn("seaTunnelClient")
 public class TransformDataTransferAction extends AbstractDataTransferAction<DatalinkXJobDetail, SeatunnelActionMeta> {
     public static ThreadLocal<Long> START_TIME = new ThreadLocal<>();
 

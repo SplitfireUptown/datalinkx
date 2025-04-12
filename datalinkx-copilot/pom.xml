@@ -20,11 +20,6 @@
     <dependencies>
         <dependency>
             <groupId>com.datalinkx</groupId>
-            <artifactId>datalinkx-client</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.datalinkx</groupId>
             <artifactId>datalinkx-sse</artifactId>
             <version>1.0.0</version>
             <exclusions>
@@ -33,6 +28,11 @@
                     <artifactId>datalinkx-messagehub</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.datalinkx</groupId>
+            <artifactId>datalinkx-feign</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

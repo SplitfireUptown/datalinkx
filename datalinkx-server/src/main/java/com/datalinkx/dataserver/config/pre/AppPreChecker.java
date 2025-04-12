@@ -1,10 +1,10 @@
 package com.datalinkx.dataserver.config.pre;
 
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.dataclient.client.xxljob.request.XxlJobGroupParam;
-import com.datalinkx.dataclient.client.xxljob.response.JobGroupPageListResp;
 import com.datalinkx.dataserver.client.JobClientApi;
 import com.datalinkx.dataserver.config.properties.XxlClientProperties;
+import com.datalinkx.rpc.client.xxljob.request.XxlJobGroupParam;
+import com.datalinkx.rpc.client.xxljob.response.JobGroupPageListResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ public class AppPreChecker implements ApplicationRunner {
     @Autowired
     XxlClientProperties xxlClientProperties;
 
-    @Value("${client.datajob.url}")
+    @Value("${client.datalinkxjob.url}")
     String dataJobUrl;
 
     // 自动注册xxl-job执行器

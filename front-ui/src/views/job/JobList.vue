@@ -181,7 +181,6 @@ export default {
       this.$refs.JobSaveOrUpdate.edit(record.job_id, 'show')
     },
     execJob (record) {
-      this.createEventSource()
       exec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')
@@ -230,11 +229,14 @@ export default {
           for (const i of this.tableData) {
             if (i.job_id === flashData.job_id) {
               if (flashData.status === 1) {
-                i.status = flashData.status
-                i.progress = (flashData.write_records + '/' + flashData.read_records)
+                // 添加空值检查
+                const writeRecords = flashData.write_records || 0;
+                const readRecords = flashData.read_records || 0;
+                i.status = flashData.status;
+                i.progress = `${writeRecords}/${readRecords}`;
               } else {
                 // 防止消息先到前端后端未入库
-                i.status = flashData.status
+                i.status = flashData.status;
               }
             }
           }

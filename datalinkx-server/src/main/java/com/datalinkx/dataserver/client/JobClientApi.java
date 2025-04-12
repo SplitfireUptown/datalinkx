@@ -3,18 +3,16 @@ package com.datalinkx.dataserver.client;
 import com.datalinkx.common.exception.DatalinkXSDKException;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
-import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.dataclient.client.xxljob.XxlJobClient;
-import com.datalinkx.dataclient.client.xxljob.request.PageQueryParam;
-import com.datalinkx.dataclient.client.xxljob.request.XxlJobGroupParam;
-import com.datalinkx.dataclient.client.xxljob.request.XxlJobInfo;
-import com.datalinkx.dataclient.client.xxljob.request.XxlJobParam;
-import com.datalinkx.dataclient.client.xxljob.response.JobGroupPageListResp;
-import com.datalinkx.dataclient.client.xxljob.response.ReturnT;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.config.properties.XxlClientProperties;
 import com.datalinkx.dataserver.repository.JobRepository;
+import com.datalinkx.rpc.client.xxljob.XxlJobClient;
+import com.datalinkx.rpc.client.xxljob.request.PageQueryParam;
+import com.datalinkx.rpc.client.xxljob.request.XxlJobGroupParam;
+import com.datalinkx.rpc.client.xxljob.request.XxlJobInfo;
+import com.datalinkx.rpc.client.xxljob.response.JobGroupPageListResp;
+import com.datalinkx.rpc.client.xxljob.response.ReturnT;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,8 +47,8 @@ public class JobClientApi {
         return handleResult(client.remove(getXxlJobId(jobId)));
     }
 
-    public String trigger(String jobId, XxlJobParam jobParam) {
-        return handleResult(client.trigger(getXxlJobId(jobId), JsonUtils.toJson(jobParam)));
+    public String trigger(String jobId) {
+        return handleResult(client.trigger(getXxlJobId(jobId), jobId));
     }
 
 
@@ -68,18 +66,18 @@ public class JobClientApi {
         return !ObjectUtils.isEmpty(jobNotExist.getXxlId());
     }
 
-    public String add(String cronExpr, XxlJobParam xxlJobParam) {
+    public String add(String cronExpr, String jobId) {
         JobGroupPageListResp jobGroupPageListResp = this.jobGroupPage(this.getDefaultJobGroupParam());
         Long jobGroupId = jobGroupPageListResp.getData().stream().findFirst().map(JobGroupPageListResp.JobGroupDetail::getId)
                 .orElseThrow(() -> new DatalinkXSDKException("xxl-job job group not registered"));
 
 
         ReturnT<String> result = client.add(XxlJobInfo.builder()
-                .jobDesc(xxlJobParam.getJobId())
+                .jobDesc(jobId)
                 .author(GLOBAL_COMMON_GROUP)
                 .scheduleType("CRON")
                 .scheduleConf(cronExpr)
-                .executorParam(JsonUtils.toJson(xxlJobParam))
+                .executorParam(jobId)
                 .executorBlockStrategy(xxlClientProperties.getExecutorBlockStrategy())
                 .misfireStrategy(xxlClientProperties.getMisfireStrategy())
                 .executorRouteStrategy(xxlClientProperties.getExecutorRouteStrategy())
@@ -113,8 +111,8 @@ public class JobClientApi {
     public PageQueryParam getDefaultJobGroupParam() {
         return PageQueryParam
                 .builder()
-                .appname(GLOBAL_COMMON_GROUP)
-                .title(GLOBAL_COMMON_GROUP)
+                .appname(xxlClientProperties.getExecHandler())
+                .title(xxlClientProperties.getExecHandler())
                 .start(0)
                 .length(10)
                 .build();

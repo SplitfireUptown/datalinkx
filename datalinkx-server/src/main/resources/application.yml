@@ -35,7 +35,7 @@ xxl-job:
   password: 123456
   ## 执行器端口，与datalinkx-job配置文件中xxl.job.executor.port相同
   executor-port: 9999
-  exec-handler: dataTransJobHandler
+  exec-handler: datalinkx
   executor-route-strategy: FIRST
   misfire-strategy: DO_NOTHING
   executor-blockStrategy: SERIAL_EXECUTION
@@ -58,9 +58,14 @@ data-transfer:
   # kafka读取规则
   kafka-read-mode: group-offsets
 
-
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 60000
+        readTimeout: 60000
 client:
-  datajob:
+  datalinkxjob:
     url: http://localhost:23456
     logging: true
   flink:

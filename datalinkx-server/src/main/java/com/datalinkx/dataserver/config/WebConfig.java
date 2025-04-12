@@ -1,17 +1,8 @@
 package com.datalinkx.dataserver.config;
 
-import com.datalinkx.dataclient.client.datalinkxjob.DatalinkXJobClient;
-import com.datalinkx.dataclient.client.flink.FlinkClient;
-import com.datalinkx.dataclient.client.ollama.OllamaClient;
-import com.datalinkx.dataclient.client.xxljob.XxlJobClient;
-import com.datalinkx.dataclient.client.xxljob.XxlLoginClient;
-import com.datalinkx.dataclient.config.DatalinkXClientUtils;
-import com.datalinkx.dataserver.client.interceptor.LoginInterceptor;
-import com.datalinkx.dataserver.config.properties.ClientProperties;
-import com.datalinkx.dataserver.config.properties.XxlClientProperties;
+
 import com.datalinkx.dataserver.controller.formatter.UserGenericConverter;
 import com.google.common.base.CaseFormat;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -83,32 +74,5 @@ public class WebConfig implements WebMvcConfigurer {
 				}, response);
 			}
 		};
-	}
-
-
-	@Bean
-	public XxlLoginClient xxlLoginClient(XxlClientProperties xxlClientProperties) {
-		return DatalinkXClientUtils.createClient("xxljoblogin", xxlClientProperties.getClient(), XxlLoginClient.class, null);
-	}
-	@Bean
-	public XxlJobClient xxlJobClient(XxlClientProperties xxlClientProperties, LoginInterceptor loginInterceptor) {
-		return DatalinkXClientUtils.createClient("xxljob", xxlClientProperties.getClient(),
-				XxlJobClient.class, loginInterceptor);
-	}
-
-	@Bean
-	public DatalinkXJobClient datalinkXJobClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("datajob", clientProperties.getDatajob(), DatalinkXJobClient.class, null);
-	}
-
-	@Bean
-	public FlinkClient flinkClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("flink", clientProperties.getFlink(), FlinkClient.class, null);
-	}
-
-	@Bean
-	@ConditionalOnProperty(prefix = "client.ollama", name = "url")
-	public OllamaClient ollamaClient(ClientProperties clientProperties) {
-		return DatalinkXClientUtils.createClient("ollama", clientProperties.getOllama(), OllamaClient.class, null);
 	}
 }

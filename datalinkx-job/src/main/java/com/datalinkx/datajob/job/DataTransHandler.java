@@ -6,14 +6,13 @@ import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.result.WebResult;
 import com.datalinkx.common.utils.IdUtils;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.dataclient.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.dataclient.client.datalinkxserver.request.JobStateForm;
+import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.rpc.client.datalinkxserver.request.JobStateForm;
 import com.datalinkx.datajob.action.AbstractDataTransferAction;
 import com.datalinkx.datajob.action.DataTransferAction;
 import com.datalinkx.datajob.action.StreamDataTransferAction;
 import com.datalinkx.datajob.action.TransformDataTransferAction;
 import com.datalinkx.datajob.bean.JobExecCountDto;
-import com.datalinkx.datajob.bean.XxlJobParam;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.SneakyThrows;
@@ -45,7 +44,7 @@ public class DataTransHandler {
     @Autowired
     private DataTransferAction dataTransferAction;
 
-    @Autowired(required = false)
+    @Autowired
     private TransformDataTransferAction transformDataTransferAction;
 
     @Autowired
@@ -58,11 +57,7 @@ public class DataTransHandler {
     @PostConstruct
     public void init() {
         this.actionEngine.put(MetaConstants.JobType.JOB_TYPE_BATCH, dataTransferAction);
-
-        if (!ObjectUtils.isEmpty(transformDataTransferAction)) {
-            // 配置了seatunnel client后加载计算引擎
-            this.actionEngine.put(MetaConstants.JobType.JOB_TYPE_COMPUTE, transformDataTransferAction);
-        }
+        this.actionEngine.put(MetaConstants.JobType.JOB_TYPE_COMPUTE, transformDataTransferAction);
     }
 
     public DatalinkXJobDetail getJobDetail(String jobId) {
@@ -95,11 +90,10 @@ public class DataTransHandler {
     /**
      * data trans job
      */
-    @XxlJob("dataTransJobHandler")
+    @XxlJob("datalinkx")
     public void dataTransJobHandler() throws InterruptedException {
         XxlJobHelper.log("begin dataTransJobHandler. ");
-        XxlJobParam jobParam = JsonUtils.toObject(XxlJobHelper.getJobParam(), XxlJobParam.class);
-        String jobId = jobParam.getJobId();
+        String jobId = XxlJobHelper.getJobParam();
 
         // 定时异步调用无法统一trace_id，这里用job_id做trace_id
         MDC.put("trace_id", new Date().getTime() + ":" + jobId);

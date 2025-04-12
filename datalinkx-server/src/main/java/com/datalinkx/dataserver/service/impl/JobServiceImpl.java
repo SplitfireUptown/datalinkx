@@ -5,7 +5,6 @@ import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.dataclient.client.xxljob.request.XxlJobParam;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.domain.JobLogBean;
@@ -87,7 +86,7 @@ public class JobServiceImpl implements JobService {
 		jobBean.setType(form.getType());
 
 		// 创建 xxljob
-		String xxlJobId = jobClientApi.add(form.getSchedulerConf(), XxlJobParam.builder().jobId(jobId).build());
+		String xxlJobId = jobClientApi.add(form.getSchedulerConf(), jobId);
 
 		jobBean.setXxlId(xxlJobId);
 		jobRepository.save(jobBean);
@@ -194,7 +193,7 @@ public class JobServiceImpl implements JobService {
 		// 1、创建后开启任务
 		jobClientApi.start(jobId);
 		// 2、默认触发一次任务
-		jobClientApi.trigger(jobId, XxlJobParam.builder().jobId(jobId).build());
+		jobClientApi.trigger(jobId);
 		return jobId;
 	}
 

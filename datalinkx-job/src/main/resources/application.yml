@@ -25,14 +25,20 @@ xxl:
       addresses: http://127.0.0.1:8080/xxl-job-admin
     executor:
       address: ''
-      appname: dataTransJobHandler
+      appname: datalinkx
       ip: ''
       logpath: log/jobhandler
       logretentiondays: 30
       port: 9999
 
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 60000
+        readTimeout: 60000
 client:
-  dataserver:
+  datalinkxserver:
     url: http://localhost:12345
   flink:
     url: http://localhost:8081
