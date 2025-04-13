@@ -9,7 +9,7 @@
   <a href="https://gitee.com/atuptown/datalinkx"><img src="https://gitee.com/atuptown/datalinkx/badge/fork.svg?theme=dark" alt="Gitee Starts"></a>
 <a href="#"><img src="https://img.shields.io/badge/Author-在下uptown-orange.svg" alt="作者"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/JDK-8-red.svg" alt="jdk版本"></a>
-  <a href="#项目文档"><img src="https://img.shields.io/badge/SpringBoot-2.4.3-green.svg" alt="SpringBoot版本"></a>
+  <a href="#项目文档"><img src="https://img.shields.io/badge/SpringBoot-2.7.15-green.svg" alt="SpringBoot版本"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/MySQL-8.0-orange.svg" alt="MySQL版本"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/Redis-5.0-green.svg" alt="Redis版本"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/消息队列-Redis Stream-red.svg" alt="Redis版本"></a>
@@ -20,7 +20,7 @@
   <a href="#项目文档"><img src="https://img.shields.io/badge/系统部署-Docker & DockerCompose-yellow.svg" alt="部署"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/前端-Vue2.x-green.svg" alt="部署"></a>
   <a href="#项目文档"><img src="https://img.shields.io/badge/前端UI-AntDesignUI-red.svg" alt="前端"></a>
-<a href="#项目文档"><img src="https://img.shields.io/badge/RPC-Retrofit2-blue.svg" alt="RPC框架"></a>
+<a href="#项目文档"><img src="https://img.shields.io/badge/RPC-OpenFeign-blue.svg" alt="RPC框架"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/同步框架-Chunjun(FlinkX)-green.svg" alt="同步框架"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/向量库-ElasticSearch 7.9.3-blue.svg" alt="向量库"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/大模型框架-ollama-orange.svg" alt="大模型框架"></a>
@@ -51,8 +51,8 @@
 ## 项目技术栈
 | 依赖					            | 版本					         |描述
 |--------------------|-----------------|-------
-| Spring Boot			     | 2.4.3					      |项目脚手架
-| SpringData JPA			  | 2.4.3					      |持久层框架
+| Spring Boot			     | 2.7.15					      |项目脚手架
+| SpringData JPA			  | 2.7.15					      |持久层框架
 | MySQL					         | 8.0					        |DB数据库
 | ElasticSearch					 | 7.9.3					      |向量库、支持流转的数据库
 | Redis					         | 5.0 ↑					      |缓存数据库
@@ -62,7 +62,7 @@
 | Flink					         | 1.10.3					     |分布式大数据计算引擎
 | Ollama					        | x					          |大模型执行框架
 | Xxl-job				        | 2.3.0					      |分布式调度框架
-| Retrofit2				      | 2.9.0					      |RPC通信服务
+| OpenFeign				      | 3.1.9					      |RPC通信服务
 | Jackson				        | 2.11.4					     |反序列化框架
 | Maven					         | 3.6.X					      |Java包管理
 | Vue.js					        | 2.X					        |前端框架

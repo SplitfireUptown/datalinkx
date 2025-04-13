@@ -1,17 +1,17 @@
 package com.datalinkx.sse.config;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
-
-import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.sse.config.oksse.RealEventSource;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class SseTransformUtil {

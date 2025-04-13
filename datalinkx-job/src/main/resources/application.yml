@@ -9,6 +9,8 @@ spring:
     host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:123456}
     password: ${REDIS_PASSWORD:123456}
+  main:
+    allow-circular-references: true
 
 logging:
   pattern:

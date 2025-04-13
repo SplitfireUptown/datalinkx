@@ -26,6 +26,8 @@ spring:
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:123456}
     timeout: 10000
+  main:
+    allow-circular-references: true
 #  elasticsearch:  # 开启大模型时打开注解
 #    rest:
 #      uris:
@@ -97,7 +99,7 @@ retrofit:
     global-log-strategy: body
 
 llm:
-#  embedding: "shaw/dmeta-embedding-zh"
+  embedding: "shaw/dmeta-embedding-zh"
   model: "qwen:7b"
   vector: "elasticsearch"
   response_parse: "$.message.content"

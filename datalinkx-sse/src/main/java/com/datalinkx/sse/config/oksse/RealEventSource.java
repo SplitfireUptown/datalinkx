@@ -14,21 +14,13 @@ package com.datalinkx.sse.config.oksse;/*
  * limitations under the License.
  */
 
-import java.io.IOException;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.EventListener;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okhttp3.internal.Internal;
+import okhttp3.*;
 import okhttp3.internal.Util;
-import okhttp3.internal.connection.Exchange;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 import org.springframework.lang.Nullable;
+
+import java.io.IOException;
 
 public final class RealEventSource
         implements EventSource, ServerSentEventReader.Callback, Callback {
@@ -73,8 +65,8 @@ public final class RealEventSource
             }
 
             // This is a long-lived response. Cancel full-call timeouts.
-            Exchange exchange = Internal.instance.exchange(response);
-            if (exchange != null) exchange.timeoutEarlyExit();
+//            Exchange exchange = Internal.instance.exchange(response);
+//            if (exchange != null) exchange.timeoutEarlyExit();
 
             // Replace the body with an empty one so the callbacks can't see real data.
             response = response.newBuilder().body(Util.EMPTY_RESPONSE).build();
