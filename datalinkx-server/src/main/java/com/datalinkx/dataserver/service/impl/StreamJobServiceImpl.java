@@ -6,10 +6,6 @@ import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.rpc.client.datalinkxjob.DatalinkXJobClient;
-import com.datalinkx.rpc.client.flink.FlinkClient;
-import com.datalinkx.rpc.client.flink.request.FlinkJobStopReq;
-import com.datalinkx.rpc.client.flink.response.FlinkJobOverview;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.vo.JobVo;
@@ -21,6 +17,10 @@ import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.dataserver.service.StreamJobService;
+import com.datalinkx.rpc.client.datalinkxjob.DatalinkXJobClient;
+import com.datalinkx.rpc.client.flink.FlinkClient;
+import com.datalinkx.rpc.client.flink.request.FlinkJobStopReq;
+import com.datalinkx.rpc.client.flink.response.FlinkJobOverview;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -234,7 +234,7 @@ public class StreamJobServiceImpl implements StreamJobService {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+                        throw new DatalinkXServerException(e);
                     }
                 } else {
                     isRunning = false;

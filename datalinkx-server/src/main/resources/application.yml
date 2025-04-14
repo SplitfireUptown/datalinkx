@@ -69,10 +69,8 @@ feign:
 client:
   datalinkxjob:
     url: http://localhost:23456
-    logging: true
   flink:
     url: http://localhost:8081
-    logging: true
   ollama:
     url: http://localhost:11434
 
@@ -86,17 +84,6 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.hql: INFO
 
-retrofit:
-  # 日志打印配置
-  log:
-    # 启用日志打印
-    enable: true
-    # 日志打印拦截器
-    logging-interceptor: com.github.lianjiatech.retrofit.spring.boot.interceptor.DefaultLoggingInterceptor
-    # 全局日志打印级别
-    global-log-level: info
-    # 全局日志打印策略
-    global-log-strategy: body
 
 llm:
   embedding: "shaw/dmeta-embedding-zh"

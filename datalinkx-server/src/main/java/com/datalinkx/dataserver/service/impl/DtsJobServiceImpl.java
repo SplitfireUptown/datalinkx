@@ -7,6 +7,7 @@ import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.compute.transform.ITransformDriver;
+import com.datalinkx.compute.transform.ITransformFactory;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.domain.JobLogBean;
@@ -40,7 +41,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNCING;
-import static com.datalinkx.compute.transform.ITransformFactory.TRANSFORM_DRIVER_MAP;
 
 /**
  * @author: uptown
@@ -233,6 +233,7 @@ public class DtsJobServiceImpl implements DtsJobService {
     }
 
     // 解析计算任务图
+    @SneakyThrows
     private void analysisComputeGraph(DatalinkXJobDetail.SyncUnit syncUnit,
                                       String graph) {
         DatalinkXJobDetail.Compute compute = new DatalinkXJobDetail.Compute();
@@ -250,7 +251,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 containSQLNode = true;
             }
 
-            ITransformDriver transformDriver = TRANSFORM_DRIVER_MAP.get(transformType);
+            ITransformDriver transformDriver = ITransformFactory.getComputeDriver(transformType);
 
             if (!ObjectUtils.isEmpty(transformDriver)) {
                 transforms.add(

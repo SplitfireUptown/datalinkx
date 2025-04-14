@@ -91,7 +91,7 @@ public class DataTransHandler {
      * data trans job
      */
     @XxlJob("datalinkx")
-    public void dataTransJobHandler() throws InterruptedException {
+    public void dataTransJobHandler() {
         XxlJobHelper.log("begin dataTransJobHandler. ");
         String jobId = XxlJobHelper.getJobParam();
 
@@ -107,9 +107,6 @@ public class DataTransHandler {
                 throw new DatalinkXJobException("引擎加载失败，检查配置!");
             }
             engine.doAction(jobDetail);
-        } catch (InterruptedException e) {
-            // cancel job
-            throw e;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             this.shutdownJob(startTime, jobId, e.getMessage());

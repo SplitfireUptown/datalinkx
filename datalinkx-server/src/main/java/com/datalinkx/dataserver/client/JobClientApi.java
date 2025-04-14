@@ -1,6 +1,5 @@
 package com.datalinkx.dataserver.client;
 
-import com.datalinkx.common.exception.DatalinkXSDKException;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.ObjectUtils;
@@ -69,7 +68,7 @@ public class JobClientApi {
     public String add(String cronExpr, String jobId) {
         JobGroupPageListResp jobGroupPageListResp = this.jobGroupPage(this.getDefaultJobGroupParam());
         Long jobGroupId = jobGroupPageListResp.getData().stream().findFirst().map(JobGroupPageListResp.JobGroupDetail::getId)
-                .orElseThrow(() -> new DatalinkXSDKException("xxl-job job group not registered"));
+                .orElseThrow(() -> new DatalinkXServerException("xxl-job job group not registered"));
 
 
         ReturnT<String> result = client.add(XxlJobInfo.builder()

@@ -2,7 +2,6 @@
 ## DatalinkX Stars
 [![Stargazers over time](https://starchart.cc/SplitfireUptown/datalinkx.svg?variant=adaptive)](https://starchart.cc/SplitfireUptown/datalinkx)
 
-<p align="center">
 <a href="https://github.com/SplitfireUptown/datalinkx"><img src="https://img.shields.io/github/stars/SplitfireUptown/datalinkx.svg?style=flat&label=GithubStars"></a>
 [![star](https://gitcode.com/m0_37817220/datalinkx/star/badge.svg)](https://gitcode.com/m0_37817220/datalinkx)
 <a href="https://gitee.com/atuptown/datalinkx"><img src="https://gitee.com/atuptown/datalinkx/badge/star.svg?theme=dark" alt="Gitee Starts"></a>

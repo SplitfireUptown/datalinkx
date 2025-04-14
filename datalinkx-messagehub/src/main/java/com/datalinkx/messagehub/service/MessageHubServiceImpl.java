@@ -7,8 +7,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import com.datalinkx.common.constants.MessageHubConstants;
-import com.datalinkx.common.exception.DatalinkXSDKException;
-import com.datalinkx.messagehub.bean.form.BaseMessageForm;
 import com.datalinkx.messagehub.bean.form.ConsumerAdapterForm;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.redis.RedisPubSubProcessor;
