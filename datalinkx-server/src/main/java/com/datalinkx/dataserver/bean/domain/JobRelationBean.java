@@ -22,7 +22,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "JOB_RELATION")
-public class    JobRelationBean extends BaseDomainBean {
+public class JobRelationBean extends BaseDomainBean {
     private static final long serialVersionUID = 1L;
     @Column(name = "relation_id", nullable = false, length = 40, columnDefinition = "char(40)")
     private String relationId;

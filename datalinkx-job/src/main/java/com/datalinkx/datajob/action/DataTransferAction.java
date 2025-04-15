@@ -71,7 +71,8 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(unit.getJobId())
                 .jobStatus(status)
                 .endTime(new Date().getTime())
-                .appendCount(unit.getWriteRecords())
+                .readCount(unit.getReadRecords())
+                .writeCount(unit.getWriteRecords())
                 .errmsg(errmsg)
                 .build());
         // 父任务执行成功后级联触发子任务

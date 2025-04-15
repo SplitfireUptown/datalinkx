@@ -86,7 +86,7 @@ logging:
 
 
 llm:
-  embedding: "shaw/dmeta-embedding-zh"
+#  embedding: "shaw/dmeta-embedding-zh"
   model: "qwen:7b"
   vector: "elasticsearch"
   response_parse: "$.message.content"

@@ -1,8 +1,5 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -36,9 +33,9 @@ public class FlinkActionMeta extends EngineActionMeta {
     // 是否覆盖 0 - 否 1 - 是
     public Integer cover;
     // 数据总读行数
-    public int readRecords = 0;
-    // 数据总写行数 = readRecords - errorRecords
-    public int writeRecords = 0;
+    public long readRecords = 0L;
+    // 数据总写行数
+    public long writeRecords = 0L;
     // 写字节数
     public long writeBytes;
 }

@@ -20,7 +20,7 @@ public interface DsRepository extends CRUDRepository<DsBean, String> {
 
 	List<DsBean> findAllByIsDel(Integer isDel);
 
-	@Query(value = "select * from DS where name = :name and is_del = 0", nativeQuery = true)
+	@Query("select d from DsBean d where d.name = :name and d.isDel = 0")
 	DsBean findByName(String name);
 
 	List<DsBean> findAllByDsIdIn(List<String> dsIds);
@@ -28,10 +28,10 @@ public interface DsRepository extends CRUDRepository<DsBean, String> {
 	@Query(value = " select * from DS where is_del = 0 "
 			+ " and if(:name != '', name like concat('%', :name, '%'), 1=1) "
 			+ " and if(:type != '', type = :type, 1=1) ", nativeQuery = true)
-    Page<DsBean> pageQuery(Pageable pageable, String name, Integer type);
+	Page<DsBean> pageQuery(Pageable pageable, String name, Integer type);
 
 	@Transactional
 	@Modifying
-	@Query(value = "update DS set is_del = 1 where ds_id = :dsId", nativeQuery = true)
+	@Query("update DsBean d set d.isDel = 1 where d.dsId = :dsId")
 	void deleteByDsId(String dsId);
 }

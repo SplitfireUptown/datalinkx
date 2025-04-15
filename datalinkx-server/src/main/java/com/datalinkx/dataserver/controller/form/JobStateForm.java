@@ -10,13 +10,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class JobStateForm {
-    String jobId;
-    String jobTaskId;
-    Integer jobStatus;
-    Long startTime;
-    Long endTime;
-    String errmsg;
-    private Long appendCount = 0L;
-    private Long allCount = 0L;
-    private Long filterCount = 0L;
+    private String jobId;
+    private String jobTaskId;
+    private Integer jobStatus;
+    private Long startTime;
+    private Long endTime;
+    private String errmsg;
+    private Long readCount = 0L;
+    private Long writeCount = 0L;
 }

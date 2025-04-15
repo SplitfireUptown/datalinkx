@@ -243,7 +243,7 @@ public class JobServiceImpl implements JobService {
 					.builder()
 					.jobId(jobBean.getJobId())
 					.jobName(jobBean.getName())
-					.progress(String.format("%s/%s", dataCountDto.getAppendCount(), dataCountDto.getFilterCount()))
+					.progress(String.format("%s/%s", dataCountDto.getWriteCount(), dataCountDto.getReadCount()))
 					.fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + jobBean.getFromTb())
 					.toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + jobBean.getToTb())
 					.startTime(jobBean.getStartTime())
@@ -291,7 +291,7 @@ public class JobServiceImpl implements JobService {
 
 
 			JobDto.DataCountDto dataCountDto = JsonUtils.toObject(jobLogBean.getCount(), JobDto.DataCountDto.class);
-			logPageVo.setAppendCount(dataCountDto.getAppendCount());
+			logPageVo.setAppendCount(dataCountDto.getReadCount());
 			return logPageVo;
 		}).collect(Collectors.toList());
 

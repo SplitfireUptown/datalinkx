@@ -25,8 +25,7 @@ public class JobDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static final class DataCountDto {
-        private Long appendCount = 0L;
-        private Long allCount = 0L;
-        private Long filterCount = 0L;
+        private Long readCount = 0L;
+        private Long writeCount = 0L;
     }
 }

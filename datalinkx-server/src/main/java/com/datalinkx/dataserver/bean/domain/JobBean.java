@@ -75,4 +75,6 @@ public class JobBean extends BaseDomainBean {
 	private Integer type;
 	@Column(name = "start_time")
 	public Timestamp startTime;
+	@Column(name = "retry_time")
+	public Integer retryTime;
 }

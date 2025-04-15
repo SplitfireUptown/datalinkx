@@ -6,13 +6,12 @@ import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.result.WebResult;
 import com.datalinkx.common.utils.IdUtils;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
-import com.datalinkx.rpc.client.datalinkxserver.request.JobStateForm;
 import com.datalinkx.datajob.action.AbstractDataTransferAction;
 import com.datalinkx.datajob.action.DataTransferAction;
 import com.datalinkx.datajob.action.StreamDataTransferAction;
 import com.datalinkx.datajob.action.TransformDataTransferAction;
-import com.datalinkx.datajob.bean.JobExecCountDto;
+import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
+import com.datalinkx.rpc.client.datalinkxserver.request.JobStateForm;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.SneakyThrows;
@@ -120,11 +119,11 @@ public class DataTransHandler {
     }
 
     private void shutdownJob(long startTime, String jobId, String message) {
-        JobExecCountDto jobExecCountDto = new JobExecCountDto();
         dataServerClient.updateJobStatus(JobStateForm.builder().jobId(jobId)
                 .jobStatus(MetaConstants.JobStatus.JOB_STATUS_ERROR).startTime(startTime).endTime(new Date().getTime())
                 .errmsg(message)
-                .appendCount(jobExecCountDto.getAppendCount())
+                .readCount(0L)
+                .writeCount(0L)
                 .build());
     }
 }

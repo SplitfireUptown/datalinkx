@@ -233,7 +233,6 @@ public class DtsJobServiceImpl implements DtsJobService {
     }
 
     // 解析计算任务图
-    @SneakyThrows
     private void analysisComputeGraph(DatalinkXJobDetail.SyncUnit syncUnit,
                                       String graph) {
         DatalinkXJobDetail.Compute compute = new DatalinkXJobDetail.Compute();
@@ -251,19 +250,21 @@ public class DtsJobServiceImpl implements DtsJobService {
                 containSQLNode = true;
             }
 
-            ITransformDriver transformDriver = ITransformFactory.getComputeDriver(transformType);
+            try {
+                ITransformDriver transformDriver = ITransformFactory.getComputeDriver(transformType);
 
-            if (!ObjectUtils.isEmpty(transformDriver)) {
-                transforms.add(
-                        DatalinkXJobDetail
-                                .Compute
-                                .Transform
-                                .builder()
-                                .meta(transformDriver.analysisTransferMeta(node))
-                                .type(transformType)
-                                .build()
-                );
-            }
+                if (!ObjectUtils.isEmpty(transformDriver)) {
+                    transforms.add(
+                            DatalinkXJobDetail
+                                    .Compute
+                                    .Transform
+                                    .builder()
+                                    .meta(transformDriver.analysisTransferMeta(node))
+                                    .type(transformType)
+                                    .build()
+                    );
+                }
+            } catch (Exception ignored) {}
         }
 
         compute.setTransforms(transforms);
@@ -343,9 +344,8 @@ public class DtsJobServiceImpl implements DtsJobService {
 
         // 2、存储流转任务状态
         JobDto.DataCountDto countVo = JobDto.DataCountDto.builder()
-                .allCount(jobStateForm.getAllCount())
-                .appendCount(jobStateForm.getAppendCount())
-                .filterCount(jobStateForm.getFilterCount())
+                .readCount(jobStateForm.getReadCount())
+                .writeCount(jobStateForm.getWriteCount())
                 .build();
         if (!ObjectUtils.isEmpty(jobStateForm.getStartTime())) {
             jobBean.setStartTime(new Timestamp(jobStateForm.getStartTime()));

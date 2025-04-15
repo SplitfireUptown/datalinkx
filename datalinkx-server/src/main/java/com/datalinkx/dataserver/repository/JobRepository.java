@@ -22,36 +22,30 @@ public interface JobRepository extends CRUDRepository<JobBean, String> {
 
 	List<JobBean> findByJobIdIn(List<String> jobIds);
 
-	@Query(value = "select * from JOB where type = :type and status in :jobStatus and retry_time < 5 and is_del = 0", nativeQuery = true)
-	List<JobBean> findRestartJob(Integer type, List<Integer> jobStatus);
-
-	@Query(value = "select * from JOB where type = :type and retry_time < 5 and is_del = 0", nativeQuery = true)
+	@Query("select j from JobBean j where j.type = :type and j.retryTime < 5 and j.isDel = 0")
 	List<JobBean> findRestartJob(Integer type);
 
-	@Query(value = "select * from JOB where (reader_ds_id = :jobId or writer_ds_id = :jobId)", nativeQuery = true)
+
+	@Query("select j from JobBean j where (j.readerDsId = :jobId or j.writerDsId = :jobId)")
 	List<JobBean> findDependJobId(String jobId);
 
-	@Query(value = "select * from JOB where is_del = 0", nativeQuery = true)
+	@Query("select j from JobBean j where j.isDel = 0")
 	List<JobBean> findAll();
 
 	@Modifying
 	@Transactional
-	@Query(value = "update JOB set status = :status where job_id = :jobId", nativeQuery = true)
+	@Query("update JobBean j set j.status = :status where j.jobId = :jobId")
 	void updateJobStatus(String jobId, Integer status);
 
-	@Modifying
-	@Transactional
-	@Query(value = "update JOB set status = :status, error_msg = :errorMsg  where job_id = :jobId", nativeQuery = true)
-	void updateJobStatus(String jobId, Integer status, String errorMsg);
 
 	@Modifying
 	@Transactional
-	@Query(value = "update JOB set retry_time = retry_time + 1 where job_id = :jobId", nativeQuery = true)
+	@Query("update JobBean j set j.retryTime = j.retryTime + 1 where j.jobId = :jobId")
 	void addRetryTime(String jobId);
 
 	@Modifying
 	@Transactional
-	@Query(value = "update JOB set is_del = 1 where job_id = :jobId", nativeQuery = true)
+	@Query("update JobBean j set j.isDel = 1 where j.jobId = :jobId")
 	void logicDeleteByJobId(String jobId);
 
 
