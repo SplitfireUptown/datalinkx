@@ -24,6 +24,8 @@
 <a href="#项目文档"><img src="https://img.shields.io/badge/向量库-ElasticSearch 7.9.3-blue.svg" alt="向量库"></a>
 <a href="#项目文档"><img src="https://img.shields.io/badge/大模型框架-ollama-orange.svg" alt="大模型框架"></a>
 
+
+🔥🔥 **9W+字，共92个文档，带你玩转datalinkx**，详情可戳：[细致文档带你吃透DatalinkX](https://note.youdao.com/s/a9ltzlc1)
 ## 异构数据源同步服务DatalinkX介绍
 
  **核心功能** ：在不同的异构数据源中进行数据同步，对同步任务进行管理和维护
