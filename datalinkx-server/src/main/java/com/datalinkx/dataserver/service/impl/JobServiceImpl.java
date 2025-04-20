@@ -166,6 +166,9 @@ public class JobServiceImpl implements JobService {
 				&& ObjectUtils.isEmpty(form.getSyncMode().getIncreateField())) {
 			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "增量模式必须指定增量字段");
 		}
+		if ("increment".equals(form.getSyncMode().getMode())) {
+			form.getSyncMode().setIncreateValue("");
+		}
 		// 4、判断增量模式下是否是时间类型或数值类型
 		if ((!ObjectUtils.isEmpty(form.getSyncMode()) && MetaConstants.JobSyncMode.INCREMENT_MODE.equals(form.getSyncMode().getMode()))) {
 			try {

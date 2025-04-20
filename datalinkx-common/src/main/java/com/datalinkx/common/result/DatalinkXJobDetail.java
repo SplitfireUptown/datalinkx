@@ -1,16 +1,12 @@
 package com.datalinkx.common.result;
 
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.FieldNameConstants;
+
+import java.util.List;
+import java.util.Map;
 
 
 
@@ -74,7 +70,7 @@ public class DatalinkXJobDetail {
         String schema;
         String tableName;
         List<Column> columns;
-        Sync sync;
+        TransferSetting transferSetting;
         String connectId;
         String type;
         String maxValue;
@@ -109,32 +105,14 @@ public class DatalinkXJobDetail {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Sync {
+    public static class TransferSetting {
         String type; // [overwrite全量更新，increment增量更新]
         Integer fetchSize = 10000; // 每次获取的条数
         Integer queryTimeOut = 10000; // flinkx查询执行超时时间
-        SyncCondition syncCondition;
-
-        @Data
-        @AllArgsConstructor
-        @NoArgsConstructor
-        @Builder
-        public static class SyncCondition {
-            String field;
-            String fieldType;
-            Conditon start;
-            Conditon end;
-
-            @Data
-            @AllArgsConstructor
-            @NoArgsConstructor
-            @Builder
-            public static class Conditon {
-                String operator; // 算子，比如 >=, <=
-                Integer enable;
-                String value;
-            }
-        }
+        String increaseField;
+        String increaseFieldType;
+        String start;
+        String end; // 暂时没有end
     }
 
 }

@@ -1,13 +1,13 @@
 package com.datalinkx.driver.dsdriver.oracledriver;
 
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcDriver;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcReader;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcWriter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 
 
 @Slf4j
@@ -51,11 +51,6 @@ public class OracleDriver extends JdbcDriver<OracleSetupInfo, JdbcReader, JdbcWr
     @Override
     public String columnQuota() {
         return "\"";
-    }
-
-    @Override
-    public String valueQuota() {
-        return "'";
     }
 
     @Override

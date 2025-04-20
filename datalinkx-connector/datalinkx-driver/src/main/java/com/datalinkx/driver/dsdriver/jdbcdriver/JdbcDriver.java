@@ -1,22 +1,6 @@
 package com.datalinkx.driver.dsdriver.jdbcdriver;
 
 
-import java.lang.reflect.ParameterizedType;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.result.DatalinkXJobDetail;
@@ -42,6 +26,11 @@ import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+
+import java.lang.reflect.ParameterizedType;
+import java.sql.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> implements
@@ -145,7 +134,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     @Override
     public String retrieveMax(FlinkActionMeta unit, String field) throws Exception {
-        String fieldName = unit.getReader().getSync().getSyncCondition().getField();
+        String fieldName = unit.getReader().getTransferSetting().getIncreaseField();
         String catalog = unit.getReader().getCatalog();
         String schema = unit.getReader().getSchema();
         String tableName = unit.getReader().getTableName();
@@ -277,8 +266,8 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         readerInfo.setParameter((P) JdbcReader.builder()
                 .username(jdbcSetupInfo.getUid())
                 .password(jdbcSetupInfo.getPwd())
-                .fetchSize(unit.getReader().getSync().getFetchSize())
-                .queryTimeOut(unit.getReader().getSync().getQueryTimeOut())
+                .fetchSize(unit.getReader().getTransferSetting().getFetchSize())
+                .queryTimeOut(unit.getReader().getTransferSetting().getQueryTimeOut())
                 .connection(Collections.singletonList(ReaderConnection.builder()
                         .jdbcUrl(Collections.singletonList(jdbcUrl()))
                         .table(Collections.singletonList(unit.getReader().getTableName()))

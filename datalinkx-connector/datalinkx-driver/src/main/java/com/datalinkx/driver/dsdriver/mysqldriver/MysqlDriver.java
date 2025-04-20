@@ -1,13 +1,13 @@
 package com.datalinkx.driver.dsdriver.mysqldriver;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcDriver;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcReader;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcWriter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Slf4j
@@ -50,30 +50,20 @@ public class MysqlDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWrit
                 this.jdbcSetupInfo.getSocketTimeout()
         );
     }
+    @Override
+    public String wrapValue(String fieldType, String value) {
+        if (DATE_TYPE_SET.contains(fieldType)) {
 
+            return valueQuota() + value + valueQuota();
+        } else {
+
+            return value;
+        }
+    }
 
 
     @Override
     protected String driverClass() {
         return MYSQL_DRIVER_CLASS;
-    }
-
-    @Override
-    public String columnQuota() {
-        return "`";
-    }
-
-    @Override
-    public String valueQuota() {
-        return "'";
-    }
-
-    @Override
-    public String wrapValue(String fieldType, String value) {
-        if ("String".equalsIgnoreCase(fieldType) || DATE_TYPE_SET.contains(fieldType.toLowerCase())) {
-            return super.wrapValue(fieldType, value);
-        } else {
-            return value;
-        }
     }
 }

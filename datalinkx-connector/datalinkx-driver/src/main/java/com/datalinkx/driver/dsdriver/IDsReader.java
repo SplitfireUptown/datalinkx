@@ -1,16 +1,16 @@
 package com.datalinkx.driver.dsdriver;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public interface IDsReader extends IDsDriver {
@@ -48,11 +48,11 @@ public interface IDsReader extends IDsDriver {
 
     default String genWhere(FlinkActionMeta unit) throws Exception {
 
-        if (unit.getReader().getSync().getSyncCondition() != null) {
+        if (unit.getReader().getTransferSetting().getIncreaseField() != null) {
             // 1、获取增量字段
-            String field = unit.getReader().getSync().getSyncCondition().getField();
+            String field = unit.getReader().getTransferSetting().getIncreaseField();
             // 2、获取增量条件
-            String fieldType = unit.getReader().getSync().getSyncCondition().getFieldType();
+            String fieldType = unit.getReader().getTransferSetting().getIncreaseFieldType();
 
             IDsReader readDsDriver = DsDriverFactory.getDsReader(unit.getReader().getConnectId());
             // 3、如果不是首次增量同步，取上一次同步字段最大值
@@ -65,9 +65,7 @@ public interface IDsReader extends IDsDriver {
                     unit.getReader().setMaxValue(nextMaxValue);
                 }
 
-                return String.format(" %s %s %s ", wrapColumnName(field),
-                        unit.getReader().getSync().getSyncCondition().getStart().getOperator(),
-                        wrapValue(fieldType, maxValue));
+                return String.format(" %s > %s ", wrapColumnName(field), wrapValue(fieldType, maxValue));
             }
             // 4、如果是首次增量同步，上一次同步字段最大值为空，保存到下次
             String nextMaxValue = readDsDriver.retrieveMax(unit, field);

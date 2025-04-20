@@ -223,7 +223,7 @@
       startRefresh () {
         this.refreshIntervalId = setInterval(() => {
           this.init()
-        }, 60000) // 每 10 秒执行一次 init 方法
+        }, 10000) // 每 10 秒执行一次 init 方法
       },
       stopRefresh () {
         if (this.refreshIntervalId) {

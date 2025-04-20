@@ -154,7 +154,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .orElseThrow(
                         () -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "from ds not exist")
                 );
-        // 1、流转任务来源表字段列表
+        // 流转任务来源表字段列表
         List<DatalinkXJobDetail.Column> fromCols = jobConf.stream()
                 .filter(x -> StringUtils.isNotEmpty(x.getSourceField()) && StringUtils.isNotEmpty(x.getTargetField()))
                 .map(x -> DatalinkXJobDetail.Column.builder()
@@ -162,23 +162,27 @@ public class DtsJobServiceImpl implements DtsJobService {
                         .build())
                 .collect(Collectors.toList());
 
-        // 3、获取数据源对应driver驱动
-        IDsReader dsReader = DsDriverFactory.getDsReader(dsServiceImpl.getConnectId(fromDs));
-
-        // 4、获取对应增量条件
-        Map<String, String> typeMappings = dsReader.getFields(fromDs.getDatabase(), fromDs.getSchema(), jobBean.getFromTb())
-                .stream().collect(Collectors.toMap(DbTableField::getName, DbTableField::getType));
         JobForm.SyncModeForm syncModeForm = JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class);
 
-        DatalinkXJobDetail.Sync.SyncCondition syncCond = this.getSyncCond(syncModeForm, typeMappings);
-
-        DatalinkXJobDetail.Sync sync = DatalinkXJobDetail.Sync
+        DatalinkXJobDetail.TransferSetting transferSetting = DatalinkXJobDetail.TransferSetting
                 .builder()
                 .type(syncModeForm.getMode())
-                .syncCondition(syncCond)
                 .queryTimeOut(commonProperties.getQueryTimeOut())
                 .fetchSize(commonProperties.getFetchSize())
                 .build();
+
+        // 获取对应增量条件
+        IDsReader dsReader = DsDriverFactory.getDsReader(dsServiceImpl.getConnectId(fromDs));
+        Map<String, String> typeMappings = dsReader.getFields(fromDs.getDatabase(), fromDs.getSchema(), jobBean.getFromTb())
+                .stream().collect(Collectors.toMap(DbTableField::getName, DbTableField::getType));
+
+        if ("increment".equalsIgnoreCase(syncModeForm.getMode())) {
+            transferSetting.setIncreaseFieldType(typeMappings.getOrDefault(syncModeForm.getIncreateField(), "string"));
+            transferSetting.setIncreaseField(syncModeForm.getIncreateField());
+            transferSetting.setStart(syncModeForm.getIncreateValue());
+        }
+
+
 
         String selectField = jobConf.stream()
                 .map(JobForm.FieldMappingForm::getSourceField)
@@ -190,46 +194,12 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .connectId(dsServiceImpl.getConnectId(fromDs))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(fromDs.getType()))
                 .schema(fromDs.getDatabase())
-                .sync(sync)
+                .transferSetting(transferSetting)
                 .maxValue(syncModeForm.getIncreateValue())
                 .tableName(jobBean.getFromTb())
                 .columns(fromCols)
                 .queryFields(selectField)
                 .build();
-    }
-
-    private DatalinkXJobDetail.Sync.SyncCondition getSyncCond(JobForm.SyncModeForm exportMode,
-                                                              Map<String, String> typeMappings) {
-        DatalinkXJobDetail.Sync.SyncCondition syncCon = null;
-        if (ObjectUtils.isEmpty(exportMode) || ObjectUtils.isEmpty(exportMode.getMode())) {
-            return syncCon;
-        }
-        if ("increment".equalsIgnoreCase(exportMode.getMode())) {
-            for (String field : typeMappings.keySet()) {
-                if (!ObjectUtils.nullSafeEquals(field, exportMode.getIncreateField())) {
-                    continue;
-                }
-
-                String synFieldType = typeMappings.getOrDefault(field, "string");
-                syncCon = DatalinkXJobDetail.Sync.SyncCondition.builder()
-                        .field(field)
-                        .fieldType(synFieldType)
-                        .start(DatalinkXJobDetail.Sync.SyncCondition.Conditon
-                                .builder()
-                                .enable(1)
-                                .operator(">")
-                                .value(exportMode.getIncreateValue())
-                                .build())
-                        .end(DatalinkXJobDetail.Sync.SyncCondition.Conditon
-                                .builder()
-                                .enable(0)
-                                .build())
-                        .build();
-                break;
-            }
-        }
-
-        return syncCon;
     }
 
     // 解析计算任务图

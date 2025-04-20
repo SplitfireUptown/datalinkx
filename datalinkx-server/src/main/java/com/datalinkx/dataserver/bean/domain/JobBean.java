@@ -55,7 +55,7 @@ public class JobBean extends BaseDomainBean {
 	private String taskId;
 	@Column(name = "sync_mode", columnDefinition = "char(40)")
 	private String syncMode;
-	@Column(name = "`count`", columnDefinition = "text")
+	@Column(name = "count", columnDefinition = "text")
 	private String count;
 	// CREATE = 0; SYNCING = 1; NORMAL = 2; ERROR = 3; QUEUE = 4; STOP = 5
 	@Column(name = "status", nullable = false, columnDefinition = "int(2)")
