@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @ApiModel(description = "流转任务执行记录")
@@ -24,7 +25,7 @@ import java.sql.Timestamp;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "JOB_LOG")
-public class JobLogBean {
+public class JobLogBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

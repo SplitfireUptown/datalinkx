@@ -31,7 +31,6 @@ import java.util.Map;
 @Slf4j
 @Component
 public class StreamDataTransferAction extends AbstractDataTransferAction<DatalinkXJobDetail, StreamFlinkActionMeta> {
-    public static ThreadLocal<Long> START_TIME = new ThreadLocal<>();
     @Autowired
     FlinkClient flinkClient;
 
@@ -47,9 +46,8 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<Datalin
     @Override
     protected void begin(DatalinkXJobDetail info) {
         // 修改任务状态
-        START_TIME.set(new Date().getTime());
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
-                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_SYNCING).startTime(START_TIME.get())
+                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_SYNCING).startTime(new Date().getTime())
                 .build());
     }
 
@@ -58,7 +56,7 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<Datalin
         log.info(String.format("stream job jobid: %s, end to transfer", unit.getJobId()));
         // 修改任务状态，存储checkpoint
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(unit.getJobId())
-                .jobStatus(status).endTime(new Date().getTime()).startTime(START_TIME.get())
+                .jobStatus(status).endTime(new Date().getTime())
                 .checkpoint(unit.getCheckpoint())
                 .errmsg(errmsg)
                 .build());

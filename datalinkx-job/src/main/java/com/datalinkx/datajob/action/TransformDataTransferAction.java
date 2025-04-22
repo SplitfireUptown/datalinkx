@@ -32,7 +32,6 @@ import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_
 @Slf4j
 @Component
 public class TransformDataTransferAction extends AbstractDataTransferAction<DatalinkXJobDetail, SeatunnelActionMeta> {
-    public static ThreadLocal<Long> START_TIME = new ThreadLocal<>();
 
     @Autowired
     SeaTunnelClient seaTunnelClient;
@@ -41,9 +40,8 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
 
     @Override
     protected void begin(DatalinkXJobDetail info) {
-        START_TIME.set(new Date().getTime());
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(info.getJobId())
-                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_SYNCING).startTime(START_TIME.get())
+                .jobStatus(MetaConstants.JobStatus.JOB_STATUS_SYNCING).startTime(new Date().getTime())
                 .build());
     }
 
@@ -51,7 +49,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
     protected void end(SeatunnelActionMeta unit, int status, String errmsg) {
         log.info(String.format("transform job jobid: %s, end to transfer", unit.getJobId()));
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(unit.getJobId())
-                .jobStatus(status).endTime(new Date().getTime()).startTime(START_TIME.get())
+                .jobStatus(status).endTime(new Date().getTime())
                 .errmsg(errmsg)
                 .build());
 

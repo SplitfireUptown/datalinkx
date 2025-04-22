@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 
 @ApiModel(description = "流转任务")
 @Entity
@@ -22,7 +23,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "JOB_RELATION")
-public class JobRelationBean extends BaseDomainBean {
+public class JobRelationBean extends BaseDomainBean implements Serializable {
     private static final long serialVersionUID = 1L;
     @Column(name = "relation_id", nullable = false, length = 40, columnDefinition = "char(40)")
     private String relationId;

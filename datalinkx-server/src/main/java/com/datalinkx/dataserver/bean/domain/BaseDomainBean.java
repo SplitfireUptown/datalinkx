@@ -1,6 +1,5 @@
 package com.datalinkx.dataserver.bean.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,8 +22,6 @@ public class BaseDomainBean {
     public Timestamp ctime;
     @Column(name = "utime")
     public Timestamp utime;
-
-    @JsonIgnore
     @Column(name = "is_del")
     public Integer isDel = 0;
 }

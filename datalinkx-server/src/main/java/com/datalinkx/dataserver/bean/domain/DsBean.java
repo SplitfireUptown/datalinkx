@@ -1,10 +1,7 @@
 package com.datalinkx.dataserver.bean.domain;
 
 import io.swagger.annotations.ApiModel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
@@ -13,6 +10,9 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.io.Serializable;
+
+@EqualsAndHashCode(callSuper = true)
 @ApiModel(description = "数据源")
 @Data
 @FieldNameConstants
@@ -24,7 +24,7 @@ import javax.persistence.Table;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "DS")
-public class DsBean extends BaseDomainBean {
+public class DsBean extends BaseDomainBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Column(name = "ds_id", length = 35, columnDefinition = "char(35)")

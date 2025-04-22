@@ -2,10 +2,7 @@ package com.datalinkx.dataserver.bean.domain;
 
 
 import io.swagger.annotations.ApiModel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
@@ -15,8 +12,10 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
+@EqualsAndHashCode(callSuper = true)
 @ApiModel(description = "流转任务")
 @Data
 @FieldNameConstants
@@ -28,7 +27,7 @@ import java.sql.Timestamp;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "JOB")
-public class JobBean extends BaseDomainBean {
+public class JobBean extends BaseDomainBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@NotBlank
 	@Column(name = "name", nullable = false, length = 64, columnDefinition = "char(64)")
