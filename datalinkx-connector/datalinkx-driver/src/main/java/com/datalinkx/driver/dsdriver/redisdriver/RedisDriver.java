@@ -1,11 +1,11 @@
 package com.datalinkx.driver.dsdriver.redisdriver;
 
 import com.datalinkx.common.constants.MetaConstants;
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.reader.AbstractReader;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 
@@ -34,13 +34,13 @@ public class RedisDriver implements AbstractDriver<RedisSetupInfo, AbstractReade
 
 
     @Override
-    public void truncateData(FlinkActionMeta param) throws Exception {
+    public void truncateData(DatalinkXJobDetail.Writer writer) throws Exception {
 
     }
 
     @Override
-    public Object getWriterInfo(FlinkActionMeta param) throws Exception {
-        String tableName = param.getWriter().getTableName();
+    public Object getWriterInfo(DatalinkXJobDetail.Writer writer) throws Exception {
+        String tableName = writer.getTableName();
         String[] typeKeyArray = tableName.split(MetaConstants.DsType.REDIS_SPIT_STR);
         String typeArray = typeKeyArray[0];
         String key = typeKeyArray[1];

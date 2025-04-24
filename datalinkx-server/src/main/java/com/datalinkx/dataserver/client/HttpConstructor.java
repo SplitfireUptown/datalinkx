@@ -25,7 +25,7 @@ public class HttpConstructor {
         contentTypeMapping.put("form-data", "multipart/form-data");
     }
 
-    private static OkHttpClient client = new OkHttpClient();
+    private static final OkHttpClient client = new OkHttpClient();
 
     public static Object go(JobForm.HttpTestForm httpTestForm) {
 

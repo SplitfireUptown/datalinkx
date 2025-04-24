@@ -11,7 +11,6 @@ import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -46,12 +45,12 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
 
 
     @Override
-    public String retrieveMax(FlinkActionMeta param, String field) throws Exception {
+    public String retrieveMax(DatalinkXJobDetail.Reader reader, String field) throws Exception {
         return null;
     }
 
     @Override
-    public Object getReaderInfo(FlinkActionMeta param) throws Exception {
+    public Object getReaderInfo(DatalinkXJobDetail.Reader reader) throws Exception {
         return null;
     }
 
@@ -86,7 +85,7 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
     }
 
     @Override
-    public TransformNode getSourceInfo(FlinkActionMeta unit) throws Exception {
+    public TransformNode getSourceInfo(DatalinkXJobDetail.Reader reader) throws Exception {
         Map<String, Object> paramMap = new HashMap<>();
         Map<String, Object> headerMap = new HashMap<>();
         Map<String, Object> bodyMap = new HashMap<>();
@@ -113,7 +112,7 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
         HttpSource.Schema schema = new HttpSource.Schema();
         // 为什么用LinkedHashMap？ 因为要保证写入顺序与页面上配置的字段映射顺序一致
         LinkedHashMap<String, String> fields = new LinkedHashMap<>();
-        for (DatalinkXJobDetail.Column column : unit.getReader().getColumns()) {
+        for (DatalinkXJobDetail.Column column : reader.getColumns()) {
             if (!responseFields.contains(column.getName())) {
                 // 如果不是接口返回的字段，跳过处理
                 continue;
@@ -126,7 +125,7 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
         JsonNode responseJsonNode = JsonUtils.toJsonNode(revData);
         Map<String, String> jsonField = new HashMap<>();
 
-        for (DatalinkXJobDetail.Column column : unit.getReader().getColumns()) {
+        for (DatalinkXJobDetail.Column column : reader.getColumns()) {
             if (!responseFields.contains(column.getName())) {
                 // 如果不是接口返回的字段，跳过处理
                 continue;

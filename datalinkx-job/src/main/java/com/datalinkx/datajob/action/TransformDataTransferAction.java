@@ -10,7 +10,6 @@ import com.datalinkx.compute.transform.ITransformFactory;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
 import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.rpc.client.datalinkxserver.request.JobStateForm;
@@ -61,12 +60,10 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
 
     @Override
     protected void beforeExec(SeatunnelActionMeta unit) throws Exception {
-        if (1 == unit.getCover()) {
-            unit.getDsWriter().truncateData(
-                    FlinkActionMeta.builder()
-                            .writer(unit.getWriter())
-                            .build()
-            );
+        IDsWriter writeDsDriver = DsDriverFactory.getDsWriter(unit.getWriter().getConnectId());
+        // 是否覆盖数据
+        if (unit.getCover() == 1) {
+            writeDsDriver.truncateData(unit.getWriter());
         }
     }
 
@@ -146,8 +143,6 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
         SeatunnelActionMeta seatunnelActionMeta = SeatunnelActionMeta.builder()
                 .writer(info.getSyncUnit().getWriter())
                 .reader(info.getSyncUnit().getReader())
-                .dsWriter(dsWriter)
-                .dsReader(dsReader)
                 .transformInfo(transformNodes)
                 .jobMode("batch")
                 .jobId(info.getJobId())
@@ -155,11 +150,11 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
                 .parallelism(1)
                 .build();
 
-        TransformNode sinkInfo = dsWriter.getSinkInfo(seatunnelActionMeta);
+        TransformNode sinkInfo = dsWriter.getSinkInfo(info.getSyncUnit().getWriter());
         sinkInfo.setSourceTableName(lastTransformNodeName);
 
 
-        seatunnelActionMeta.setSourceInfo(dsReader.getSourceInfo(seatunnelActionMeta));
+        seatunnelActionMeta.setSourceInfo(dsReader.getSourceInfo(info.getSyncUnit().getReader()));
         seatunnelActionMeta.setSinkInfo(sinkInfo);
 
         return seatunnelActionMeta;

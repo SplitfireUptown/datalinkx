@@ -20,8 +20,6 @@ import com.datalinkx.driver.dsdriver.base.column.ReaderConnection;
 import com.datalinkx.driver.dsdriver.base.column.WriterConnection;
 import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
-import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -133,11 +131,11 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
 
     @Override
-    public String retrieveMax(FlinkActionMeta unit, String field) throws Exception {
-        String fieldName = unit.getReader().getTransferSetting().getIncreaseField();
-        String catalog = unit.getReader().getCatalog();
-        String schema = unit.getReader().getSchema();
-        String tableName = unit.getReader().getTableName();
+    public String retrieveMax(DatalinkXJobDetail.Reader reader, String field) throws Exception {
+        String fieldName = reader.getTransferSetting().getIncreaseField();
+        String catalog = reader.getCatalog();
+        String schema = reader.getSchema();
+        String tableName = reader.getTableName();
 
         String maxSql = String.format("select max(%s) from %s ", wrapColumnName(fieldName), wrapTableName(catalog, schema, tableName));
 
@@ -158,10 +156,10 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
     @Override
-    public void truncateData(FlinkActionMeta param) throws Exception {
-        String catalog = param.getWriter().getCatalog();
-        String schema = param.getWriter().getSchema();
-        String tableName = param.getWriter().getTableName();
+    public void truncateData(DatalinkXJobDetail.Writer writer) throws Exception {
+        String catalog = writer.getCatalog();
+        String schema = writer.getSchema();
+        String tableName = writer.getTableName();
         String fullTableName = wrapTableName(catalog, schema, tableName);
 
         Connection connection = ConnectPool.getConnection(this, Connection.class);
@@ -253,35 +251,35 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
 
     @Override
-    public Object getReaderInfo(FlinkActionMeta unit) throws Exception {
+    public Object getReaderInfo(DatalinkXJobDetail.Reader reader) throws Exception {
 
         // 若是增量，查询最大值，作为下次的起始值
-        String whereSql = unit.getDsReader().genWhere(unit);
+        String whereSql = this.genWhere(reader);
 
         ReaderInfo<P> readerInfo = new ReaderInfo<>();
-        String schema = unit.getReader().getSchema();
-        String type = unit.getReader().getType();
+        String schema = reader.getSchema();
+        String type = reader.getType();
         readerInfo.setName(type.toLowerCase() + "reader");
 
         readerInfo.setParameter((P) JdbcReader.builder()
                 .username(jdbcSetupInfo.getUid())
                 .password(jdbcSetupInfo.getPwd())
-                .fetchSize(unit.getReader().getTransferSetting().getFetchSize())
-                .queryTimeOut(unit.getReader().getTransferSetting().getQueryTimeOut())
+                .fetchSize(reader.getTransferSetting().getFetchSize())
+                .queryTimeOut(reader.getTransferSetting().getQueryTimeOut())
                 .connection(Collections.singletonList(ReaderConnection.builder()
                         .jdbcUrl(Collections.singletonList(jdbcUrl()))
-                        .table(Collections.singletonList(unit.getReader().getTableName()))
+                        .table(Collections.singletonList(reader.getTableName()))
                         .schema(schema)
                         .build()))
                 .column(
-                        ObjectUtils.isEmpty(unit.getReader().getColumns()) ?
+                        ObjectUtils.isEmpty(reader.getColumns()) ?
                                 Collections.singletonList(
                                         MetaColumn.builder()
                                                 .name("*")
                                                 .build()
                                 )
                                 :
-                                unit.getReader().getColumns().stream().map(col ->
+                                reader.getColumns().stream().map(col ->
                                 MetaColumn.builder()
                                         .name(col.getName())
                                         .build())
@@ -292,13 +290,13 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return readerInfo;
     }
 
-    public Object getWriterInfo(FlinkActionMeta unit) {
+    public Object getWriterInfo(DatalinkXJobDetail.Writer writer) {
         WriterInfo<Q> jdbcWriterInfo = new WriterInfo<>();
 
         List<String> preSql = new ArrayList<>();
 
-        String schema = unit.getWriter().getSchema();
-        String type = unit.getWriter().getType();
+        String schema = writer.getSchema();
+        String type = writer.getType();
         jdbcWriterInfo.setName(type.toLowerCase() + "writer");
         jdbcWriterInfo.setParameter((Q) JdbcWriter.builder()
                 .username(jdbcSetupInfo.getUid())
@@ -306,12 +304,12 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .connection(Collections.singletonList(WriterConnection.builder()
                         .schema(schema)
                         .jdbcUrl(jdbcUrl())
-                        .table(Collections.singletonList(unit.getWriter().getTableName()))
+                        .table(Collections.singletonList(writer.getTableName()))
                         .build()))
-                .column(unit.getWriter().getColumns().stream().map(DatalinkXJobDetail.Column::getName).collect(Collectors.toList()))
+                .column(writer.getColumns().stream().map(DatalinkXJobDetail.Column::getName).collect(Collectors.toList()))
                 .insertSqlMode("copy")
                 .writeMode("insert")
-                .batchSize(unit.getWriter().getBatchSize())
+                .batchSize(writer.getBatchSize())
                 .preSql(preSql)
                 .build());
 
@@ -343,27 +341,25 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
     @Override
-    public TransformNode getSourceInfo(FlinkActionMeta unit) {
+    public TransformNode getSourceInfo(DatalinkXJobDetail.Reader reader) {
 
         return JdbcSource.builder()
                 .url(this.jdbcUrl())
                 .driver(this.driverClass())
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
-                .query(this.transferSourceSQL(unit))
+                .query(this.transferSourceSQL(reader))
                 .pluginName(PLUGIN_NAME)
                 .resultTableName(MetaConstants.CommonConstant.SOURCE_TABLE)
                 .build();
     }
 
     @Override
-    public String transferSourceSQL(FlinkActionMeta unit) {
-        DatalinkXJobDetail.Reader reader = unit.getReader();
-
+    public String transferSourceSQL(DatalinkXJobDetail.Reader reader) {
         String sourceSQL = String.format("select %s from %s.%s", reader.getQueryFields(), reader.getSchema(), reader.getTableName());
         try {
 
-            String increaseSQL = this.genWhere(unit);
+            String increaseSQL = this.genWhere(reader);
             if (!ObjectUtils.isEmpty(increaseSQL)) {
                 sourceSQL += String.format(" where %s", increaseSQL);
             }
@@ -377,7 +373,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     }
 
     @Override
-    public TransformNode getSinkInfo(SeatunnelActionMeta param) {
+    public TransformNode getSinkInfo(DatalinkXJobDetail.Writer writer) {
 
 
         return JdbcSink.builder()
@@ -386,13 +382,12 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .user(this.jdbcSetupInfo.getUid())
                 .password(this.jdbcSetupInfo.getPwd())
                 .pluginName(PLUGIN_NAME)
-                .query(this.transferSinkSQL(param))
+                .query(this.transferSinkSQL(writer))
                 .build();
     }
 
     @Override
-    public String transferSinkSQL(SeatunnelActionMeta param) {
-        DatalinkXJobDetail.Writer writer = param.getWriter();
+    public String transferSinkSQL(DatalinkXJobDetail.Writer writer) {
         StringBuilder abstractQuery = new StringBuilder();
         for (int i = 0; i < writer.getInsertFields().split(",").length; i++) {
             if (i == 0) {

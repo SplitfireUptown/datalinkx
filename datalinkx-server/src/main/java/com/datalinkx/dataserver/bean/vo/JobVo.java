@@ -128,25 +128,6 @@ public class JobVo {
 	@Builder
 	@AllArgsConstructor
 	@NoArgsConstructor
-	public static final class FieldMappingInnerVo {
-
-		@ApiModelProperty(value = "原始字段")
-		@JsonProperty("originalName")
-		private String originalName;
-		@ApiModelProperty(value = "映射字段")
-		@JsonProperty("mappingName")
-		private String mappingName;
-		@ApiModelProperty(value = "映射字段类型")
-		@JsonProperty("mappingValue")
-		private String mappingValue = "";
-
-	}
-
-	@Data
-	@ApiModel
-	@Builder
-	@AllArgsConstructor
-	@NoArgsConstructor
 	public static final class JobId2NameVo {
 		@ApiModelProperty(value = "任务id")
 		@JsonProperty("job_id")

@@ -16,10 +16,7 @@ public class PageVo<T> {
 	private Integer pageSize;
 	//总数据量
 	private Long total;
-
 	private Integer totalPage;
-
 	private T data;
-
 }
 

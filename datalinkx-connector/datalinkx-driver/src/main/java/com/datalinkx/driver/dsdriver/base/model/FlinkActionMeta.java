@@ -1,8 +1,6 @@
 package com.datalinkx.driver.dsdriver.base.model;
 
 import com.datalinkx.common.result.DatalinkXJobDetail;
-import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,10 +24,6 @@ public class FlinkActionMeta extends EngineActionMeta {
     public DatalinkXJobDetail.Reader reader;
     // datalinkx-server业务目标库信息
     public DatalinkXJobDetail.Writer writer;
-    // 来源库driver驱动
-    public IDsReader dsReader;
-    // 目标库driver驱动
-    public IDsWriter dsWriter;
     // 是否覆盖 0 - 否 1 - 是
     public Integer cover;
     // 数据总读行数

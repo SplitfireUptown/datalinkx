@@ -1,10 +1,10 @@
 package com.datalinkx.driver.dsdriver;
 
 
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 public interface IDsReader extends IDsDriver {
     // ============= Flinkx 引擎
-    String retrieveMax(FlinkActionMeta param, String field) throws Exception;
-    Object getReaderInfo(FlinkActionMeta param) throws Exception;
+    String retrieveMax(DatalinkXJobDetail.Reader reader, String field) throws Exception;
+    Object getReaderInfo(DatalinkXJobDetail.Reader reader) throws Exception;
     List<String> treeTable(String catalog, String schema) throws Exception;
     List<DbTableField> getFields(String catalog, String schema, String tableName) throws Exception;
 
@@ -46,31 +46,31 @@ public interface IDsReader extends IDsDriver {
         }};
     }
 
-    default String genWhere(FlinkActionMeta unit) throws Exception {
+    default String genWhere(DatalinkXJobDetail.Reader reader) throws Exception {
 
-        if (unit.getReader().getTransferSetting().getIncreaseField() != null) {
+        if (reader.getTransferSetting().getIncreaseField() != null) {
             // 1、获取增量字段
-            String field = unit.getReader().getTransferSetting().getIncreaseField();
+            String field = reader.getTransferSetting().getIncreaseField();
             // 2、获取增量条件
-            String fieldType = unit.getReader().getTransferSetting().getIncreaseFieldType();
+            String fieldType = reader.getTransferSetting().getIncreaseFieldType();
 
-            IDsReader readDsDriver = DsDriverFactory.getDsReader(unit.getReader().getConnectId());
+            IDsReader readDsDriver = DsDriverFactory.getDsReader(reader.getConnectId());
             // 3、如果不是首次增量同步，取上一次同步字段最大值
-            if (!StringUtils.isEmpty(unit.getReader().getMaxValue())) {
-                String maxValue = unit.getReader().getMaxValue();
+            if (!StringUtils.isEmpty(reader.getMaxValue())) {
+                String maxValue = reader.getMaxValue();
 
                 // 3.1、更新下一次的增量条件
-                String nextMaxValue = readDsDriver.retrieveMax(unit, field);
+                String nextMaxValue = readDsDriver.retrieveMax(reader, field);
                 if (!ObjectUtils.isEmpty(nextMaxValue)) {
-                    unit.getReader().setMaxValue(nextMaxValue);
+                    reader.setMaxValue(nextMaxValue);
                 }
 
                 return String.format(" %s > %s ", wrapColumnName(field), wrapValue(fieldType, maxValue));
             }
             // 4、如果是首次增量同步，上一次同步字段最大值为空，保存到下次
-            String nextMaxValue = readDsDriver.retrieveMax(unit, field);
+            String nextMaxValue = readDsDriver.retrieveMax(reader, field);
             if (!ObjectUtils.isEmpty(nextMaxValue)) {
-                unit.getReader().setMaxValue(nextMaxValue);
+                reader.setMaxValue(nextMaxValue);
             }
         }
         return " (1=1) ";
@@ -78,12 +78,12 @@ public interface IDsReader extends IDsDriver {
 
     // ============= Seatunnel引擎
     // 构造seatunnel引擎读信息
-    default TransformNode getSourceInfo(FlinkActionMeta unit) throws Exception {
+    default TransformNode getSourceInfo(DatalinkXJobDetail.Reader reader) throws Exception {
         return null;
     }
 
     // 构造seatunnel引擎source中sql
-    default String transferSourceSQL(FlinkActionMeta unit) {
+    default String transferSourceSQL(DatalinkXJobDetail.Reader reader) {
         return "";
     }
 }

@@ -33,7 +33,7 @@ public class UserGenericConverter implements GenericConverter {
 
 	@Override
 	public Object convert(Object o, TypeDescriptor sourceType, TypeDescriptor targetType) {
-		if (o == null || sourceType == null || targetType == null) {
+		if (o == null) {
 			return null;
 		}
 		if (objectMapper == null) {

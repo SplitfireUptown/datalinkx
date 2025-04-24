@@ -6,19 +6,18 @@ import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.datajob.job.ExecutorJobHandler;
+import com.datalinkx.driver.dsdriver.DsDriverFactory;
+import com.datalinkx.driver.dsdriver.IDsWriter;
+import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
+import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
+import com.datalinkx.messagehub.service.MessageHubService;
 import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.rpc.client.datalinkxserver.request.JobStateForm;
 import com.datalinkx.rpc.client.datalinkxserver.request.JobSyncModeForm;
 import com.datalinkx.rpc.client.flink.FlinkClient;
 import com.datalinkx.rpc.client.flink.response.FlinkJobAccumulators;
 import com.datalinkx.rpc.client.flink.response.FlinkJobStatus;
-import com.datalinkx.datajob.job.ExecutorJobHandler;
-import com.datalinkx.driver.dsdriver.DsDriverFactory;
-import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
-import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
-import com.datalinkx.messagehub.service.MessageHubService;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,21 +83,11 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
     @Override
     protected void beforeExec(FlinkActionMeta unit) throws Exception {
         log.info(String.format("jobid: %s, begin from %s to %s", unit.getJobId(), unit.getReader().getTableName(), unit.getWriter().getTableName()));
-
         // 同步表状态
-        IDsReader readDsDriver;
-        IDsWriter writeDsDriver;
-        try {
-            readDsDriver = DsDriverFactory.getDsReader(unit.getReader().getConnectId());
-            writeDsDriver = DsDriverFactory.getDsWriter(unit.getWriter().getConnectId());
-            unit.setDsReader(readDsDriver);
-            unit.setDsWriter(writeDsDriver);
-        } catch (Exception e) {
-            throw new Exception("driver init error: ", e);
-        }
+        IDsWriter writeDsDriver = DsDriverFactory.getDsWriter(unit.getWriter().getConnectId());
         // 是否覆盖数据
         if (unit.getCover() == 1) {
-            writeDsDriver.truncateData(unit);
+            writeDsDriver.truncateData(unit.getWriter());
         }
     }
 
@@ -118,12 +107,12 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
                 return;
             }
 
-            Object reader = unit.getDsReader().getReaderInfo(unit);
-            Object writer = unit.getDsWriter().getWriterInfo(unit);
-
-            String readerStr = JsonUtils.toJson(reader);
-            String writerStr = JsonUtils.toJson(writer);
-            taskId = executorJobHandler.execute(unit.getJobId(), readerStr, writerStr, new HashMap<>());
+            taskId = executorJobHandler.execute(
+                    unit.getJobId(),
+                    JsonUtils.toJson(unit.getReader().getReaderGraph()),
+                    JsonUtils.toJson(unit.getWriter().getWriterGraph()),
+                    new HashMap<>()
+            );
             unit.setTaskId(taskId) ;
             // 更新task
             datalinkXServerClient.updateJobTaskRel(unit.getJobId(), taskId);

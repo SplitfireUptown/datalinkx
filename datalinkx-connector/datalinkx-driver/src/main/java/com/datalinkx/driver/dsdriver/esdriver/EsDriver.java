@@ -1,5 +1,6 @@
 package com.datalinkx.driver.dsdriver.esdriver;
 
+import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
@@ -8,7 +9,6 @@ import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
 import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import com.google.common.collect.Lists;
@@ -42,21 +42,21 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
         return this.connectId;
     }
 
-    private Map<String, Object> getBoolQuery(FlinkActionMeta param) throws Exception {
+    private Map<String, Object> getBoolQuery(DatalinkXJobDetail.Reader reader) throws Exception {
 
         List<Map<String, Object>> mustList = new ArrayList<>();
-        if (param.getReader().getTransferSetting().getIncreaseField() != null) {
-            String field = param.getReader().getTransferSetting().getIncreaseField();
-            String fieldType = param.getReader().getTransferSetting().getIncreaseFieldType();
+        if (reader.getTransferSetting().getIncreaseField() != null) {
+            String field = reader.getTransferSetting().getIncreaseField();
+            String fieldType = reader.getTransferSetting().getIncreaseFieldType();
 
 
-            if ("increment".equalsIgnoreCase(param.getReader().getTransferSetting().getType())) {
-                String startValue = param.getReader().getTransferSetting().getStart();
+            if ("increment".equalsIgnoreCase(reader.getTransferSetting().getType())) {
+                String startValue = reader.getTransferSetting().getStart();
                 if (startValue != null) {
                     mustList.add(esService.buildRange(field, startValue, ">", "must", fieldType));
                 }
 
-                String endValue = param.getReader().getTransferSetting().getEnd();
+                String endValue = reader.getTransferSetting().getEnd();
                 if (endValue != null) {
                     mustList.add(esService.buildRange(field, endValue, "<", "must", fieldType));
                 }
@@ -76,8 +76,8 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
     }
 
     @Override
-    public String retrieveMax(FlinkActionMeta param, String maxField) throws Exception {
-        Map<String, Object> boolMap = getBoolQuery(param);
+    public String retrieveMax(DatalinkXJobDetail.Reader reader, String maxField) throws Exception {
+        Map<String, Object> boolMap = getBoolQuery(reader);
         Map<String, Object> queryMap = new HashMap<String, Object>() {
             {
                 put("query", boolMap);
@@ -89,21 +89,21 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 put("size", 1);
             }
         };
-        return esService.retrieveMax(param.getReader().getTableName(), JsonUtils.toJson(queryMap), maxField);
+        return esService.retrieveMax(reader.getTableName(), JsonUtils.toJson(queryMap), maxField);
     }
 
 
     @Override
-    public Object getReaderInfo(FlinkActionMeta param) throws Exception {
-        Map<String, Object> boolMap = getBoolQuery(param);
+    public Object getReaderInfo(DatalinkXJobDetail.Reader reader) throws Exception {
+        Map<String, Object> boolMap = getBoolQuery(reader);
         Map<String, Object> mustMap = (Map<String, Object>) boolMap.get("bool");
-        if (param.getReader().getTransferSetting().getIncreaseField() != null
-                && StringUtils.isEmpty(param.getReader().getMaxValue())) {
-            String maxField = param.getReader().getTransferSetting().getIncreaseField();
-            String maxValue = retrieveMax(param, maxField);
+        if (reader.getTransferSetting().getIncreaseField() != null
+                && StringUtils.isEmpty(reader.getMaxValue())) {
+            String maxField = reader.getTransferSetting().getIncreaseField();
+            String maxValue = retrieveMax(reader, maxField);
             if (null != maxValue) {
-                param.getReader().setMaxValue(maxValue);
-                String fieldType = param.getReader().getTransferSetting().getIncreaseFieldType();
+                reader.setMaxValue(maxValue);
+                String fieldType = reader.getTransferSetting().getIncreaseFieldType();
                 if (mustMap.get("must") != null) {
                     ((List<Map<String, Object>>) mustMap.get("must"))
                             .add(esService.buildRange(maxField, maxValue, "<=", "must", fieldType));
@@ -116,7 +116,7 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
         }
 
         List<String> types = new ArrayList<>();
-        types.addAll(esService.getIndexType(param.getReader().getTableName()));
+        types.addAll(esService.getIndexType(reader.getTableName()));
 
         ReaderInfo<EsReader> readerInfo = new ReaderInfo<>();
         readerInfo.setName("esreader");
@@ -126,12 +126,12 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 .address(esSetupInfo.getAddress())
                 .username(esSetupInfo.getUid())
                 .password(esSetupInfo.getPwd())
-                .batchSize(param.getReader().getTransferSetting().getFetchSize() == null ? DEFAULT_FETCH_SIZE
-                        : param.getReader().getTransferSetting().getFetchSize().longValue())
-                .index(param.getReader().getTableName())
+                .batchSize(reader.getTransferSetting().getFetchSize() == null ? DEFAULT_FETCH_SIZE
+                        : reader.getTransferSetting().getFetchSize().longValue())
+                .index(reader.getTableName())
                 .type(types.toArray(new String[0]))
                 .query(JsonUtils.toJsonNode(JsonUtils.toJson(boolMap)))
-                .timeout(ES_TIMEOUT).column(param.getReader().getColumns().stream()
+                .timeout(ES_TIMEOUT).column(reader.getColumns().stream()
                         .map(col -> MetaColumn.builder()
                                 .name(col.getName())
                                 .build()).collect(Collectors.toList()))
@@ -158,13 +158,13 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
 
 
     @Override
-    public void truncateData(FlinkActionMeta param) throws Exception {
-        esService.truncateData(param.getWriter().getTableName());
+    public void truncateData(DatalinkXJobDetail.Writer writer) throws Exception {
+        esService.truncateData(writer.getTableName());
     }
 
     @Override
-    public Object getWriterInfo(FlinkActionMeta param) throws Exception {
-        String tableName = param.getWriter().getTableName();
+    public Object getWriterInfo(DatalinkXJobDetail.Writer writer) throws Exception {
+        String tableName = writer.getTableName();
         WriterInfo<EsWriter> writerInfo = new WriterInfo<>();
         // es 7.x后续版本后取消了索引类型
         List<String> indexTypeList = this.esService.getIndexType(tableName);
@@ -179,7 +179,7 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 .bulkAction(DEFAULT_FETCH_SIZE)
                 .index(tableName)
                 .type(indexType)
-                .column(param.getWriter().getColumns().stream().map(col ->
+                .column(writer.getColumns().stream().map(col ->
                                 MetaColumn.builder()
                                         .name(col.getName())
                                         .build()

@@ -75,6 +75,7 @@ public class DatalinkXJobDetail {
         String type;
         String maxValue;
         String queryFields;
+        String readerGraph;
     }
 
     @Data
@@ -90,6 +91,7 @@ public class DatalinkXJobDetail {
         Integer batchSize;
         String type;
         String insertFields;
+        String writerGraph;
     }
 
     @Data

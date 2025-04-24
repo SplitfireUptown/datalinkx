@@ -24,6 +24,7 @@ import com.datalinkx.dataserver.repository.JobRepository;
 import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
+import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.model.DbTableField;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
@@ -189,7 +190,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .filter(typeMappings::containsKey)
                 .collect(Collectors.joining(", "));
 
-        return DatalinkXJobDetail.Reader
+        DatalinkXJobDetail.Reader reader = DatalinkXJobDetail.Reader
                 .builder()
                 .connectId(dsServiceImpl.getConnectId(fromDs))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(fromDs.getType()))
@@ -200,6 +201,8 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .columns(fromCols)
                 .queryFields(selectField)
                 .build();
+        reader.setReaderGraph(JsonUtils.toJson(dsReader.getReaderInfo(reader)));
+        return reader;
     }
 
     // 解析计算任务图
@@ -278,12 +281,19 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .map(JobForm.FieldMappingForm::getTargetField)
                 .filter(targetField -> !ObjectUtils.isEmpty(targetField))
                 .collect(Collectors.joining(", "));
+        IDsWriter dsWriter = DsDriverFactory.getDsWriter(dsServiceImpl.getConnectId(toDs));
 
-        return DatalinkXJobDetail.Writer.builder()
-                .schema(toDs.getDatabase()).connectId(dsServiceImpl.getConnectId(toDs))
+
+        DatalinkXJobDetail.Writer writer = DatalinkXJobDetail.Writer.builder()
+                .schema(toDs.getDatabase())
+                .connectId(dsServiceImpl.getConnectId(toDs))
                 .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
                 .insertFields(insertFields)
-                .tableName(jobBean.getToTb()).columns(toCols).build();
+                .tableName(jobBean.getToTb())
+                .columns(toCols)
+                .build();
+        writer.setWriterGraph(JsonUtils.toJson(dsWriter.getWriterInfo(writer)));
+        return writer;
     }
 
 

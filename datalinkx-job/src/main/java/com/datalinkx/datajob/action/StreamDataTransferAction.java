@@ -161,7 +161,7 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<Datalin
                                     .build()
                     )
                     .build();
-            writerDsInfo = DsDriverFactory.getDsWriter(info.getSyncUnit().getWriter().getConnectId()).getWriterInfo(writerMeta);
+            writerDsInfo = DsDriverFactory.getDsWriter(info.getSyncUnit().getWriter().getConnectId()).getWriterInfo(info.getSyncUnit().getWriter());
         }
 
         return StreamFlinkActionMeta.builder()
