@@ -5,12 +5,16 @@ import com.datalinkx.dataserver.client.JobClientApi;
 import com.datalinkx.dataserver.config.properties.XxlClientProperties;
 import com.datalinkx.rpc.client.xxljob.request.XxlJobGroupParam;
 import com.datalinkx.rpc.client.xxljob.response.JobGroupPageListResp;
+import com.datalinkx.stream.lock.DistributedLock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.UUID;
 
 import static com.datalinkx.common.constants.MessageHubConstants.GLOBAL_COMMON_GROUP;
 
@@ -26,36 +30,47 @@ public class AppPreChecker implements ApplicationRunner {
     JobClientApi jobClientApi;
     @Autowired
     XxlClientProperties xxlClientProperties;
-
     @Value("${client.datalinkxjob.url}")
     String dataJobUrl;
+    @Resource
+    DistributedLock distributedLock;
 
     // 自动注册xxl-job执行器
     @Override
     public void run(ApplicationArguments args) {
+        // 防止其他节点已经创建
+        String lockId = UUID.randomUUID().toString();
         try {
+            while (true) {
+                JobGroupPageListResp jobGroupPageListResp = jobClientApi.jobGroupPage(jobClientApi.getDefaultJobGroupParam());
 
-            JobGroupPageListResp jobGroupPageListResp = jobClientApi.jobGroupPage(jobClientApi.getDefaultJobGroupParam());
+                if (!ObjectUtils.isEmpty(jobGroupPageListResp) && !ObjectUtils.isEmpty(jobGroupPageListResp.getData())) {
+                    break;
+                }
+                boolean isLock = distributedLock.lock(GLOBAL_COMMON_GROUP, lockId, DistributedLock.LOCK_TIME);
+                if (isLock) {
+                    String executorUrl = String.format("%s:%s", dataJobUrl.substring(0, dataJobUrl.lastIndexOf(":")), xxlClientProperties.getExecutorPort());
 
-            if (!ObjectUtils.isEmpty(jobGroupPageListResp) && !ObjectUtils.isEmpty(jobGroupPageListResp.getData())) {
-                return;
+                    this.jobClientApi.jobGroupSave(
+                            XxlJobGroupParam.builder()
+                                    .addressList(executorUrl)
+                                    .title(GLOBAL_COMMON_GROUP)
+                                    .appname(GLOBAL_COMMON_GROUP)
+                                    .build()
+                    );
+
+                    log.info("auto create xxl-job datalinkx executor success");
+                    break;
+                } else {
+                    Thread.sleep(5000);
+                }
             }
-
-            String executorUrl = String.format("%s:%s", dataJobUrl.substring(0, dataJobUrl.lastIndexOf(":")), xxlClientProperties.getExecutorPort());
-
-            String jobGroupSaveResp = jobClientApi.jobGroupSave(
-                    XxlJobGroupParam.builder()
-                            .addressList(executorUrl)
-                            .title(GLOBAL_COMMON_GROUP)
-                            .appname(GLOBAL_COMMON_GROUP)
-                            .build()
-            );
-
-            log.info("auto create xxl-job datalinkx executor success");
         } catch (Exception e) {
-
+            distributedLock.unlock(GLOBAL_COMMON_GROUP, lockId);
             log.error("###### damn it bro，system is a unhealth status !!!");
             log.error("###### check it ", e);
+        } finally {
+            distributedLock.unlock(GLOBAL_COMMON_GROUP, lockId);
         }
     }
 }
