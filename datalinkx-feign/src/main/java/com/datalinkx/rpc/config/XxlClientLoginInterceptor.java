@@ -1,6 +1,8 @@
 
 package com.datalinkx.rpc.config;
 
+import com.datalinkx.common.exception.DatalinkXServerException;
+import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.rpc.client.xxljob.XxlLoginClient;
 import com.datalinkx.rpc.util.ApplicationContextUtil;
 import feign.RequestInterceptor;
@@ -33,6 +35,9 @@ public class XxlClientLoginInterceptor implements RequestInterceptor {
 		if (StringUtils.isEmpty(xxlJobCookie)) {
 
 			feign.Response loginResponse = xxlLoginClient.login(username, passwd);
+			if (ObjectUtils.isEmpty(loginResponse.headers().get(SET_COOKIE_HEADER))) {
+				throw new DatalinkXServerException("xxl-job login failed, check xxl-job log");
+			}
             xxlJobCookie = loginResponse.headers().get(SET_COOKIE_HEADER).stream().findFirst().orElse("");
 		}
 

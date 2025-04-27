@@ -106,23 +106,23 @@ public class DsServiceImpl implements DsService {
 
 	private void checkConfigFormat(DsBean dsBean) {
 		if (!ObjectUtils.isEmpty(dsBean.getConfig())) {
+			Map map;
 			try {
-				Map map = JsonUtils.toObject(dsBean.getConfig(), Map.class);
-
-				// HTTP数据源校验url是否合法
-				if (MetaConstants.DsType.HTTP.equals(dsBean.getType())) {
-					String url = (String) map.get("url");
-					if (ObjectUtils.isEmpty(url)) {
-						throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "接口地址未配置");
-					}
-
-					if (!url.contains("http") && !url.contains("https")) {
-						throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "接口地址格式不正确，请包含协议");
-					}
-				}
+				 map = JsonUtils.toObject(dsBean.getConfig(), Map.class);
 			} catch (Exception e) {
 				log.error("dsbean config json format error", e);
 				throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "数据源附加信息转化Json格式异常");
+			}
+			// HTTP数据源校验url是否合法
+			if (MetaConstants.DsType.HTTP.equals(dsBean.getType())) {
+				String url = (String) map.get("url");
+				if (ObjectUtils.isEmpty(url)) {
+					throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "接口地址未配置");
+				}
+
+				if (!url.contains("http") && !url.contains("https")) {
+					throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "接口地址格式不正确，请包含协议");
+				}
 			}
 		}
 	}

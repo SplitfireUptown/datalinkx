@@ -26,7 +26,7 @@ public interface XxlJobClient {
     ReturnT<String> jobGroupSave(@SpringQueryMap XxlJobGroupParam xxlJobGroupParam);
 
     @PostMapping("/xxl-job-admin/jobgroup/pageList")
-    JobGroupPageListResp jobGroupPage(@RequestParam PageQueryParam queryParam);
+    JobGroupPageListResp jobGroupPage(@SpringQueryMap PageQueryParam queryParam);
 
     @PostMapping("/xxl-job-admin/jobinfo/remove")
     ReturnT<String> remove(@RequestParam("id") int id);

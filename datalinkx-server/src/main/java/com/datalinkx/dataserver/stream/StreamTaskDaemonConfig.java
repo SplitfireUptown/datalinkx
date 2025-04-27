@@ -157,8 +157,12 @@ public class StreamTaskDaemonConfig implements InitializingBean {
                 this.retryTime(jobId);
             }
         } catch (Exception e){
-            // 成功一直持有锁，失败需要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来
-            distributedLock.unlock(jobId, jobId);
+            try {
+                // 成功一直持有锁，失败需要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来
+                distributedLock.unlock(jobId, jobId);
+            } catch (Exception ex) {
+                log.error("redis distributedLock error", ex);
+            }
         }
     }
 }
