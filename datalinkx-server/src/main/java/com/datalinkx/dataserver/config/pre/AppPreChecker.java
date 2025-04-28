@@ -66,11 +66,15 @@ public class AppPreChecker implements ApplicationRunner {
                 }
             }
         } catch (Exception e) {
-            distributedLock.unlock(GLOBAL_COMMON_GROUP, lockId);
             log.error("###### damn it bro，system is a unhealth status !!!");
             log.error("###### check it ", e);
         } finally {
-            distributedLock.unlock(GLOBAL_COMMON_GROUP, lockId);
+            try {
+
+                distributedLock.unlock(GLOBAL_COMMON_GROUP, lockId);
+            } catch (Exception e) {
+                log.error("#### check redis health", e);
+            }
         }
     }
 }

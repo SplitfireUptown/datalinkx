@@ -127,7 +127,7 @@
         <a href="https://tool.lu/crontab" target="_blank">定时配置（Spring crontab表达式）</a>
         <a-input
           type="text"
-          v-decorator="['schedulerConf', {rules: [{required: true, message: '请输入crontab表达式', trigger: 'blur'}],initialValue: schedulerConf}]"/>
+          v-decorator="['schedulerConf', {rules: [{required: false, message: '请输入crontab表达式', trigger: 'blur'}],initialValue: schedulerConf}]"/>
       </a-form-item>
       <a-form-item label="字段映射关系">
         <a-row :gutter="16">

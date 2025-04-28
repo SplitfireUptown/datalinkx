@@ -41,7 +41,9 @@ public final class MetaConstants {
         public static final Integer JOB_TYPE_COMPUTE = 2;
         public static final Integer JOB_TYPE_STREAM = 1;
         public static final Integer JOB_TYPE_BATCH = 0;
-
+        public static final String JOB_CRON_SCHEDULE_TYPE = "CRON";
+        public static final String JOB_NONE_SCHEDULE_TYPE = "FIX_RATE";
+        public static final String JOB_RATE_SCHEDULE_CONF = "315360000";
         public static final String STREAM_JOB_HEALTH_CHECK = "stream_health_check";
     }
 

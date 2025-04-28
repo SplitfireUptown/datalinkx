@@ -182,9 +182,9 @@ public class JobServiceImpl implements JobService {
 			}
 		}
 		// 5、配置流转任务定时表达式
-		if (ObjectUtils.isEmpty(form.getSchedulerConf()) && !ObjectUtils.nullSafeEquals(form.getType(), MetaConstants.JobType.JOB_TYPE_STREAM)) {
-			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "批式流转任务需要配置crontab表达式");
-		}
+//		if (ObjectUtils.isEmpty(form.getSchedulerConf()) && !ObjectUtils.nullSafeEquals(form.getType(), MetaConstants.JobType.JOB_TYPE_STREAM)) {
+//			throw new DatalinkXServerException(StatusCode.JOB_CONFIG_ERROR, "批式流转任务需要配置crontab表达式");
+//		}
 		// 6、校验计算任务transform graph是否合法
 		this.validTransformGraph(fromDsBean, form);
 	}
@@ -196,7 +196,7 @@ public class JobServiceImpl implements JobService {
 		// 1、创建后开启任务
 		jobClientApi.start(jobId);
 		// 2、默认触发一次任务
-		jobClientApi.trigger(jobId);
+//		jobClientApi.trigger(jobId);
 		return jobId;
 	}
 

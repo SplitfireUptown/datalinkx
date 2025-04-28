@@ -201,7 +201,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .columns(fromCols)
                 .queryFields(selectField)
                 .build();
-        reader.setReaderGraph(JsonUtils.toJson(dsReader.getReaderInfo(reader)));
+        reader.setReaderGraph(dsReader.getReaderInfo(reader));
         return reader;
     }
 
@@ -292,7 +292,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .tableName(jobBean.getToTb())
                 .columns(toCols)
                 .build();
-        writer.setWriterGraph(JsonUtils.toJson(dsWriter.getWriterInfo(writer)));
+        writer.setWriterGraph(dsWriter.getWriterInfo(writer));
         return writer;
     }
 

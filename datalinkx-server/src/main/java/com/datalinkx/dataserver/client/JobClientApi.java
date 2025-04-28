@@ -1,5 +1,6 @@
 package com.datalinkx.dataserver.client;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
 import com.datalinkx.common.utils.ObjectUtils;
@@ -70,12 +71,9 @@ public class JobClientApi {
         Long jobGroupId = jobGroupPageListResp.getData().stream().findFirst().map(JobGroupPageListResp.JobGroupDetail::getId)
                 .orElseThrow(() -> new DatalinkXServerException("xxl-job job group not registered"));
 
-
-        ReturnT<String> result = client.add(XxlJobInfo.builder()
+        XxlJobInfo xxlJobInfo = XxlJobInfo.builder()
                 .jobDesc(jobId)
                 .author(GLOBAL_COMMON_GROUP)
-                .scheduleType("CRON")
-                .scheduleConf(cronExpr)
                 .executorParam(jobId)
                 .executorBlockStrategy(xxlClientProperties.getExecutorBlockStrategy())
                 .misfireStrategy(xxlClientProperties.getMisfireStrategy())
@@ -85,7 +83,17 @@ public class JobClientApi {
                 .executorFailRetryCount(0)
                 .executorTimeout(0)
                 .executorHandler(xxlClientProperties.getExecHandler())
-                .build());
+                .build();
+
+        if (ObjectUtils.isEmpty(cronExpr)) {
+            xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_CRON_SCHEDULE_TYPE);
+            xxlJobInfo.setScheduleConf(cronExpr);
+        } else {
+            xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_CRON_SCHEDULE_TYPE);
+            xxlJobInfo.setScheduleConf(MetaConstants.JobType.JOB_RATE_SCHEDULE_CONF);
+        }
+
+        ReturnT<String> result = client.add(xxlJobInfo);
 
         return handleResult(result);
     }
