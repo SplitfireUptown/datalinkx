@@ -204,8 +204,10 @@ export default {
       console.log(sorter.field)
       console.log(sorter.order)
       this.pagination = pagination
-      this.pages.size = pagination.pageSize
-      this.pages.current = pagination.current
+      this.pages = {
+        page_size: pagination.pageSize,
+        page_no: pagination.current
+      }
       this.init()
     },
 
