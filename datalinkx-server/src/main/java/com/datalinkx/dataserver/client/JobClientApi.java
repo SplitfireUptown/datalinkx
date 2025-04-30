@@ -85,12 +85,13 @@ public class JobClientApi {
                 .executorHandler(xxlClientProperties.getExecHandler())
                 .build();
 
+        // cron表达式为空时，表示不需要执行
         if (ObjectUtils.isEmpty(cronExpr)) {
-            xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_CRON_SCHEDULE_TYPE);
-            xxlJobInfo.setScheduleConf(cronExpr);
+            xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_NONE_SCHEDULE_TYPE);
+            xxlJobInfo.setScheduleConf(MetaConstants.JobType.JOB_RATE_SCHEDULE_CONF);
         } else {
             xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_CRON_SCHEDULE_TYPE);
-            xxlJobInfo.setScheduleConf(MetaConstants.JobType.JOB_RATE_SCHEDULE_CONF);
+            xxlJobInfo.setScheduleConf(cronExpr);
         }
 
         ReturnT<String> result = client.add(xxlJobInfo);
