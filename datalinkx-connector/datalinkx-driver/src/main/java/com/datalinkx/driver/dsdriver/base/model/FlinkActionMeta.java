@@ -32,4 +32,6 @@ public class FlinkActionMeta extends EngineActionMeta {
     public long writeRecords = 0L;
     // 写字节数
     public long writeBytes;
+    // 开始时间
+    public long startTime;
 }

@@ -39,6 +39,8 @@ public class DatalinkXJobDetail {
         String checkpoint;
         // 公共配置
         Map<String, Object> commonSettings;
+        // 开始时间
+        Long startTime;
     }
 
 

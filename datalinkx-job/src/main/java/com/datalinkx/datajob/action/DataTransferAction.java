@@ -51,13 +51,16 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
 
     @Override
     protected void begin(DatalinkXJobDetail info) {
+        Long startTime = new Date().getTime();
+        info.getSyncUnit().setStartTime(startTime);
+
         // 更新同步任务的状态
         log.info(String.format("jobid: %s, start to transfer", info.getJobId()));
         datalinkXServerClient.updateJobStatus(
                 JobStateForm.builder()
                         .jobId(info.getJobId())
                         .jobStatus(MetaConstants.JobStatus.JOB_STATUS_SYNCING)
-                        .startTime(new Date().getTime())
+                        .startTime(startTime)
                         .endTime(null)
                         .build()
         );
@@ -67,8 +70,14 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
     protected void end(FlinkActionMeta unit, int status, String errmsg) {
         log.info(String.format("jobid: %s, end to transfer", unit.getJobId()));
 
+        if (unit == null) {
+            log.error("Error occured: {}, execunit is null", errmsg);
+            return;
+        }
+
         datalinkXServerClient.updateJobStatus(JobStateForm.builder().jobId(unit.getJobId())
                 .jobStatus(status)
+                .startTime(unit.getStartTime())
                 .endTime(new Date().getTime())
                 .readCount(unit.getReadRecords())
                 .writeCount(unit.getWriteRecords())
@@ -128,7 +137,6 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
         if (ObjectUtils.isEmpty(taskId)) {
             throw new DatalinkXJobException("task id is empty.");
         }
-
 
         FlinkJobStatus flinkJobStatus = JsonUtils.toObject(JsonUtils.toJson(flinkClient.jobStatus(taskId)), FlinkJobStatus.class);
         String state = flinkJobStatus.getState();
@@ -220,6 +228,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
         return FlinkActionMeta.builder()
                     .reader(jobDetail.getSyncUnit().getReader())
                     .writer(jobDetail.getSyncUnit().getWriter())
+                    .startTime(jobDetail.getSyncUnit().getStartTime())
                     .jobId(jobDetail.getJobId())
                     .cover(jobDetail.getCover())
                     .build();

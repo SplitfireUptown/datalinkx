@@ -23,8 +23,6 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
 
     public void doAction(T actionInfo) throws Exception {
         Thread taskCheckerThread;
-        // T -> U 获取引擎执行类对象
-        U execUnit = convertExecUnit(actionInfo);
         try {
             StringBuffer error = new StringBuffer();
             // 1、准备执行job
@@ -34,6 +32,9 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
             if (MetaConstants.DsType.STREAM_DB_LIST.contains(actionInfo.getSyncUnit().getReader().getType())) {
                 healthCheck = IdUtils.getHealthThreadName(actionInfo.getJobId());
             }
+
+            // 2、T -> U 获取引擎执行类对象
+            U execUnit = convertExecUnit(actionInfo);
 
             // 3、循环检查任务结果
             taskCheckerThread = new Thread(() -> {
@@ -79,7 +80,7 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
             this.end(execUnit, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
         } catch (Throwable e) {
             log.error("datalinkx job failed -> ", e);
-            this.end(execUnit, JOB_STATUS_ERROR, e.getMessage());
+            this.end(null, JOB_STATUS_ERROR, e.getMessage()); // 执行单元可传null，说明发生重大异常
         }
     }
 }
