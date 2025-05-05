@@ -338,16 +338,23 @@ public class DtsJobServiceImpl implements DtsJobService {
 
         // 3、保存流转任务执行日志
         if (!ObjectUtils.isEmpty(jobStateForm.getErrmsg())) {
-            jobLogRepository.save(JobLogBean.builder()
+            JobLogBean jobLogBean = JobLogBean.builder()
                     .jobId(jobStateForm.getJobId())
-                    .startTime(ObjectUtils.isEmpty(jobStateForm.getStartTime()) ? null : new Timestamp(jobStateForm.getStartTime()))
                     .status(ObjectUtils.nullSafeEquals(status, MetaConstants.JobStatus.JOB_STATUS_ERROR) ? 1 : 0)
-                    .endTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) ? null : new Timestamp(jobStateForm.getEndTime()))
-                    .costTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) || ObjectUtils.isEmpty(jobBean.getStartTime())  ? 0 : (int) ((jobStateForm.getEndTime() - jobBean.getStartTime().getTime()) / 1000))
+                    .costTime(ObjectUtils.isEmpty(jobStateForm.getEndTime()) || ObjectUtils.isEmpty(jobBean.getStartTime()) ? 0 : (int) ((jobStateForm.getEndTime() - jobBean.getStartTime().getTime()) / 1000))
                     .errorMsg(StringUtils.equalsIgnoreCase(jobStateForm.getErrmsg(), "success") ? "任务成功" : jobStateForm.getErrmsg())
                     .count(JsonUtils.toJson(countVo))
                     .isDel(0)
-                    .build());
+                    .build();
+
+            if (!ObjectUtils.isEmpty(jobStateForm.getStartTime())) {
+                jobLogBean.setStartTime(new Timestamp(jobStateForm.getStartTime()));
+            }
+            if (!ObjectUtils.isEmpty(jobStateForm.getEndTime())) {
+                jobLogBean.setEndTime(new Timestamp(jobStateForm.getEndTime()));
+            }
+
+            jobLogRepository.save(jobLogBean);
         }
         return jobBean.getJobId();
     }

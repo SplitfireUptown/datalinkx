@@ -85,7 +85,7 @@ public class JobClientApi {
                 .executorHandler(xxlClientProperties.getExecHandler())
                 .build();
 
-        if (ObjectUtils.isEmpty(cronExpr)) {
+        if (!ObjectUtils.isEmpty(cronExpr)) {
             xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_CRON_SCHEDULE_TYPE);
             xxlJobInfo.setScheduleConf(cronExpr);
         } else {
