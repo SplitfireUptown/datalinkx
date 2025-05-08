@@ -89,7 +89,7 @@ public class DataTransHandler {
     /**
      * data trans job
      */
-    @XxlJob("dataTransJob")
+    @XxlJob("datalinkx")
     public void dataTransJobHandler() {
         XxlJobHelper.log("begin dataTransJobHandler. ");
         String jobId = XxlJobHelper.getJobParam();
