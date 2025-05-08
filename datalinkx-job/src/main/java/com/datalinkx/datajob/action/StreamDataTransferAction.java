@@ -5,14 +5,13 @@ import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.ObjectUtils;
+import com.datalinkx.datajob.job.ExecutorStreamJobHandler;
+import com.datalinkx.driver.dsdriver.DsDriverFactory;
+import com.datalinkx.driver.dsdriver.base.model.StreamFlinkActionMeta;
 import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.rpc.client.datalinkxserver.request.JobStateForm;
 import com.datalinkx.rpc.client.flink.FlinkClient;
 import com.datalinkx.rpc.client.flink.response.FlinkJobStatus;
-import com.datalinkx.datajob.job.ExecutorStreamJobHandler;
-import com.datalinkx.driver.dsdriver.DsDriverFactory;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
-import com.datalinkx.driver.dsdriver.base.model.StreamFlinkActionMeta;
 import com.datalinkx.stream.lock.DistributedLock;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
@@ -147,20 +146,6 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<Datalin
         if (MetaConstants.DsType.STREAM_DB_LIST.contains(info.getSyncUnit().getWriter().getType())) {
             writerDsInfo = DsDriverFactory.getStreamDriver(info.getSyncUnit().getWriter().getConnectId()).getWriterInfo(info.getSyncUnit().getWriter());
         } else {
-            FlinkActionMeta writerMeta = FlinkActionMeta.builder()
-                    .writer(
-                            DatalinkXJobDetail
-                                    .Writer
-                                    .builder()
-                                    .type(info.getSyncUnit().getWriter().getType())
-                                    .connectId(info.getSyncUnit().getWriter().getConnectId())
-                                    .tableName(info.getSyncUnit().getWriter().getTableName())
-                                    .schema(info.getSyncUnit().getWriter().getSchema())
-                                    .columns(info.getSyncUnit().getWriter().getColumns())
-                                    .batchSize(info.getSyncUnit().getWriter().getBatchSize())
-                                    .build()
-                    )
-                    .build();
             writerDsInfo = DsDriverFactory.getDsWriter(info.getSyncUnit().getWriter().getConnectId()).getWriterInfo(info.getSyncUnit().getWriter());
         }
 
