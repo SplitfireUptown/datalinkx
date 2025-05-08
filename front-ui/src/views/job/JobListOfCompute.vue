@@ -161,8 +161,8 @@
       },
       handleTableChange (pagination) {
         this.pagination = pagination
-        this.pages.size = pagination.pageSize
-        this.pages.current = pagination.current
+        this.pages.page_size = pagination.pageSize
+        this.pages.page_no = pagination.current
         this.init()
       },
       edit (record) {
