@@ -1,6 +1,6 @@
 package com.datalinkx.driver.dsdriver.jdbcdriver;
 
-import com.datalinkx.driver.dsdriver.base.connect.SetupInfo;
+import com.datalinkx.driver.dsdriver.base.meta.SetupInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 

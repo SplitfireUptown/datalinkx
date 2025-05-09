@@ -25,7 +25,7 @@ import com.datalinkx.dataserver.service.DtsJobService;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -95,18 +95,14 @@ public class DtsJobServiceImpl implements DtsJobService {
     @Override
     public DatalinkXJobDetail getStreamJobExecInfo(String jobId) {
         JobBean jobBean = jobRepository.findByJobId(jobId).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
-        List<DatalinkXJobDetail.Column> fromColumns = new ArrayList<>();
-        List<DatalinkXJobDetail.Column> toColumns = new ArrayList<>();
+        List<String> fromColumns = new ArrayList<>();
+        List<String> toColumns = new ArrayList<>();
 
         JsonUtils.toList(jobBean.getConfig(), JobForm.FieldMappingForm.class).stream()
         .filter(x -> StringUtils.isNotEmpty(x.getSourceField()) && StringUtils.isNotEmpty(x.getTargetField()))
         .forEach(x -> {
-            fromColumns.add(DatalinkXJobDetail.Column.builder()
-                    .name(x.getSourceField())
-                    .build());
-            toColumns.add(DatalinkXJobDetail.Column.builder()
-                    .name(x.getTargetField())
-                    .build());
+            fromColumns.add(x.getSourceField());
+            toColumns.add(x.getTargetField());
         });
 
         JobForm.SyncModeForm syncModeForm = JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class);
@@ -156,11 +152,9 @@ public class DtsJobServiceImpl implements DtsJobService {
                         () -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "from ds not exist")
                 );
         // 流转任务来源表字段列表
-        List<DatalinkXJobDetail.Column> fromCols = jobConf.stream()
+        List<String> fromCols = jobConf.stream()
                 .filter(x -> StringUtils.isNotEmpty(x.getSourceField()) && StringUtils.isNotEmpty(x.getTargetField()))
-                .map(x -> DatalinkXJobDetail.Column.builder()
-                        .name(x.getSourceField())
-                        .build())
+                .map(JobForm.FieldMappingForm::getSourceField)
                 .collect(Collectors.toList());
 
         JobForm.SyncModeForm syncModeForm = JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class);
@@ -267,14 +261,9 @@ public class DtsJobServiceImpl implements DtsJobService {
                         () -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "to ds not exist")
                 );
 
-        List<DatalinkXJobDetail.Column> toCols = jobConf
+        List<String> toCols = jobConf
                 .stream()
-                .map(x -> DatalinkXJobDetail
-                        .Column
-                        .builder()
-                        .name(x.getTargetField())
-                        .build()
-                )
+                .map(JobForm.FieldMappingForm::getTargetField)
                 .collect(Collectors.toList());
 
         String insertFields = jobConf.stream()

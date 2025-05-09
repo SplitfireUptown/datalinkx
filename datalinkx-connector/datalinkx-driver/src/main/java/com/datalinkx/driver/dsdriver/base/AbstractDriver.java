@@ -3,7 +3,7 @@ package com.datalinkx.driver.dsdriver.base;
 
 import com.datalinkx.common.utils.Base64Utils;
 import com.datalinkx.common.utils.ObjectUtils;
-import com.datalinkx.driver.dsdriver.base.connect.SetupInfo;
+import com.datalinkx.driver.dsdriver.base.meta.SetupInfo;
 import com.datalinkx.driver.dsdriver.base.reader.AbstractReader;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import lombok.SneakyThrows;

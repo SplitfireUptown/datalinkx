@@ -1,4 +1,4 @@
-package com.datalinkx.driver.dsdriver.base.connect;
+package com.datalinkx.driver.dsdriver.base.meta;
 
 import lombok.Data;
 

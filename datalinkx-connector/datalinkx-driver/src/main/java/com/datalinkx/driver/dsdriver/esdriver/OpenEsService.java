@@ -18,21 +18,10 @@
 
 package com.datalinkx.driver.dsdriver.esdriver;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.utils.HttpUtil;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -47,11 +36,11 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.ResponseException;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.*;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -108,7 +97,7 @@ public class OpenEsService implements EsService {
     }
 
     public  List<String> getIndexes() throws Exception {
-        RestClient restClient = ConnectPool.getConnection(esDriver, RestClient.class);
+        RestClient restClient = (RestClient) esDriver.connect(true);
         try {
             List<String> indices = new ArrayList<>();
 
@@ -134,9 +123,8 @@ public class OpenEsService implements EsService {
     }
 
     public List<DbTableField> getFields(String tableName) throws Exception {
-        RestClient restClient = ConnectPool.getConnection(esDriver, RestClient.class);
+        RestClient restClient = (RestClient) esDriver.connect(true);
         try {
-//            Response response = restClient.performRequest();
 
             Response response = restClient.performRequest(new Request("GET",
                     String.format("/%s/_mappings?format=json", tableName)));
@@ -200,7 +188,7 @@ public class OpenEsService implements EsService {
     }
 
     public List<String> getIndexType(String tableName) throws Exception {
-        RestClient restClient = ConnectPool.getConnection(esDriver, RestClient.class);
+        RestClient restClient = (RestClient) esDriver.connect(true);
         try {
             Response response = null;
             List<String> typeList = new ArrayList<>();
@@ -226,7 +214,7 @@ public class OpenEsService implements EsService {
 
     @Override
     public String retrieveMax(String tableName, String json, String maxFieldName) throws Exception {
-        RestClient restClient = ConnectPool.getConnection(esDriver, RestClient.class);
+        RestClient restClient = (RestClient) esDriver.connect(true);
         try {
             HttpEntity entity = new NStringEntity(json, ContentType.APPLICATION_JSON);
             Request request = new Request("POST", String.format("/%s/_search?format=json", tableName));
@@ -253,7 +241,7 @@ public class OpenEsService implements EsService {
 
     @Override
     public void truncateData(String indexName) throws Exception {
-        RestClient restClient = ConnectPool.getConnection(esDriver, RestClient.class);
+        RestClient restClient = (RestClient) esDriver.connect(true);
         try {
             HashMap<Object, Object> map = Maps.newHashMap();
             map.put("query", ImmutableMap.of("match_all", Maps.newHashMap()));

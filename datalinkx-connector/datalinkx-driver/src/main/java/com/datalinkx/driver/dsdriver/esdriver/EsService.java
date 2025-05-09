@@ -25,7 +25,7 @@ import java.util.Map;
 
 import com.datalinkx.common.utils.DateUtil;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import com.fasterxml.jackson.databind.JsonNode;
 
 

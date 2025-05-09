@@ -10,7 +10,7 @@ import com.datalinkx.compute.transform.ITransformFactory;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.dsdriver.base.model.SeatunnelActionMeta;
+import com.datalinkx.driver.dsdriver.base.meta.SeatunnelActionMeta;
 import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
 import com.datalinkx.rpc.client.datalinkxserver.request.JobStateForm;
 import com.datalinkx.rpc.client.datalinkxserver.request.JobSyncModeForm;

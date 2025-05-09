@@ -9,7 +9,7 @@ import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.datajob.job.ExecutorJobHandler;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsWriter;
-import com.datalinkx.driver.dsdriver.base.model.FlinkActionMeta;
+import com.datalinkx.driver.dsdriver.base.meta.FlinkActionMeta;
 import com.datalinkx.messagehub.bean.form.ProducerAdapterForm;
 import com.datalinkx.messagehub.service.MessageHubService;
 import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;

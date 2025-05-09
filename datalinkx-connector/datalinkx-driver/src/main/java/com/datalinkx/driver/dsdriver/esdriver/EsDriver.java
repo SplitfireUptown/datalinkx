@@ -7,15 +7,13 @@ import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
-import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>, IDsReader, IDsWriter {
@@ -37,10 +35,6 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
         return esService.getClient();
     }
 
-    @Override
-    public String getConnectId() {
-        return this.connectId;
-    }
 
     private Map<String, Object> getBoolQuery(DatalinkXJobDetail.Reader reader) throws Exception {
 
@@ -131,10 +125,7 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 .index(reader.getTableName())
                 .type(types.toArray(new String[0]))
                 .query(JsonUtils.toJsonNode(JsonUtils.toJson(boolMap)))
-                .timeout(ES_TIMEOUT).column(reader.getColumns().stream()
-                        .map(col -> MetaColumn.builder()
-                                .name(col.getName())
-                                .build()).collect(Collectors.toList()))
+                .timeout(ES_TIMEOUT).column(reader.getColumns())
                 .build());
 
         return readerInfo;
@@ -179,12 +170,7 @@ public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>
                 .bulkAction(DEFAULT_FETCH_SIZE)
                 .index(tableName)
                 .type(indexType)
-                .column(writer.getColumns().stream().map(col ->
-                                MetaColumn.builder()
-                                        .name(col.getName())
-                                        .build()
-                        )
-                        .collect(Collectors.toList()))
+                .column(writer.getColumns())
                 .build());
         return writerInfo;
     }

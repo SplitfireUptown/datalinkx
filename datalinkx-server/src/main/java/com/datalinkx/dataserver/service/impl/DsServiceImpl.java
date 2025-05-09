@@ -17,7 +17,7 @@ import com.datalinkx.dataserver.service.setupgenerator.*;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.datalinkx.driver.dsdriver.base.model;
+package com.datalinkx.driver.dsdriver.base.meta;
 
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

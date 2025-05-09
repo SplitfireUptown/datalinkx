@@ -8,7 +8,7 @@ import com.datalinkx.dataserver.client.HttpConstructor;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.service.impl.DsServiceImpl;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.datalinkx.driver.dsdriver.base.model;
+package com.datalinkx.driver.dsdriver.base.meta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

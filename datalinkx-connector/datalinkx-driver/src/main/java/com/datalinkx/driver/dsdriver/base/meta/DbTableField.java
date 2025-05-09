@@ -1,4 +1,4 @@
-package com.datalinkx.driver.dsdriver.base.model;
+package com.datalinkx.driver.dsdriver.base.meta;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

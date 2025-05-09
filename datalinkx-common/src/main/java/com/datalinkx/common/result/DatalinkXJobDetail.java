@@ -69,7 +69,7 @@ public class DatalinkXJobDetail {
         String catalog;
         String schema;
         String tableName;
-        List<Column> columns;
+        List<String> columns;
         TransferSetting transferSetting;
         String connectId;
         String type;
@@ -86,7 +86,7 @@ public class DatalinkXJobDetail {
         String catalog;
         String schema;
         String tableName;
-        List<Column> columns;
+        List<String> columns;
         String connectId;
         Integer batchSize;
         String type;
@@ -94,14 +94,7 @@ public class DatalinkXJobDetail {
         Object writerGraph;
     }
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class Column {
-        String name;
-        String type;
-    }
+
 
     @Data
     @AllArgsConstructor

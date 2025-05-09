@@ -28,12 +28,6 @@ public class RedisDriver implements AbstractDriver<RedisSetupInfo, AbstractReade
     }
 
     @Override
-    public String getConnectId() {
-        return connectId;
-    }
-
-
-    @Override
     public void truncateData(DatalinkXJobDetail.Writer writer) throws Exception {
 
     }

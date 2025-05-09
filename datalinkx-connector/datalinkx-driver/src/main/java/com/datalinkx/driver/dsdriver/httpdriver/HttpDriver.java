@@ -10,7 +10,7 @@ import com.datalinkx.compute.connector.http.HttpSource;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -38,10 +38,6 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
         return this.httpSetupInfo;
     }
 
-    @Override
-    public String getConnectId() {
-        return this.connectId;
-    }
 
 
     @Override
@@ -112,12 +108,12 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
         HttpSource.Schema schema = new HttpSource.Schema();
         // 为什么用LinkedHashMap？ 因为要保证写入顺序与页面上配置的字段映射顺序一致
         LinkedHashMap<String, String> fields = new LinkedHashMap<>();
-        for (DatalinkXJobDetail.Column column : reader.getColumns()) {
-            if (!responseFields.contains(column.getName())) {
+        for (String column : reader.getColumns()) {
+            if (!responseFields.contains(column)) {
                 // 如果不是接口返回的字段，跳过处理
                 continue;
             }
-            fields.put(column.getName(), "string");
+            fields.put(column, "string");
         }
         schema.setFields(fields);
 
@@ -125,19 +121,19 @@ public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, Abs
         JsonNode responseJsonNode = JsonUtils.toJsonNode(revData);
         Map<String, String> jsonField = new HashMap<>();
 
-        for (DatalinkXJobDetail.Column column : reader.getColumns()) {
-            if (!responseFields.contains(column.getName())) {
+        for (String column : reader.getColumns()) {
+            if (!responseFields.contains(column)) {
                 // 如果不是接口返回的字段，跳过处理
                 continue;
             }
 
             String fieldJsonPath;
             if (responseJsonNode.isArray()) {
-                fieldJsonPath = this.httpSetupInfo.getJsonPath() + "[*]." + column.getName();
+                fieldJsonPath = this.httpSetupInfo.getJsonPath() + "[*]." + column;
             } else {
-                fieldJsonPath = this.httpSetupInfo.getJsonPath() + "." + column.getName();
+                fieldJsonPath = this.httpSetupInfo.getJsonPath() + "." + column;
             }
-            jsonField.put(column.getName(), fieldJsonPath);
+            jsonField.put(column, fieldJsonPath);
         }
 
 

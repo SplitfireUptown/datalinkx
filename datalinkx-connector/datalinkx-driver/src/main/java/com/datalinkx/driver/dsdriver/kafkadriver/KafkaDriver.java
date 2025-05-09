@@ -8,7 +8,6 @@ import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.common.utils.TelnetUtil;
 import com.datalinkx.driver.dsdriver.IStreamDriver;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
-import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 
@@ -27,10 +26,6 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
         return null;
     }
 
-    @Override
-    public String getConnectId() {
-        return this.connectId;
-    }
 
     @Override
     public Object getReaderInfo(DatalinkXJobDetail.Reader reader) {
@@ -42,10 +37,7 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
                 .codec("text")
                 .blankIgnore(false)
                 .consumerSettings(CommonSetting.builder().bootstrapServers(kafkaSetupInfo.getServer() + ":" + kafkaSetupInfo.getPort()).build())
-                        .column(reader.getColumns().stream()
-                                        .map(col -> MetaColumn.builder()
-                                                .name(col.getName())
-                                                .build()).collect(Collectors.toList()))
+                        .column(reader.getColumns())
                 .build());
 
         return readerInfo;
@@ -59,7 +51,7 @@ public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, 
         writerInfo.setParameter(KafkaWriter.builder().topic(writer.getTableName())
                 .timezone(kafkaSetupInfo.getTimezone())
                 .producerSettings(CommonSetting.builder().bootstrapServers(kafkaSetupInfo.getServer() + ":" + kafkaSetupInfo.getPort()).build())
-                .tableFields(writer.getColumns().stream().map(DatalinkXJobDetail.Column::getName).collect(Collectors.toList()))
+                .tableFields(writer.getColumns())
                 .build());
         return writerInfo;
     }

@@ -15,11 +15,9 @@ import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.AbstractDriver;
-import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.column.ReaderConnection;
 import com.datalinkx.driver.dsdriver.base.column.WriterConnection;
-import com.datalinkx.driver.dsdriver.base.connect.ConnectPool;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +28,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 @Slf4j
 public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> implements
         AbstractDriver<T, P, Q>, IDsDriver, IDsReader, IDsWriter {
@@ -98,24 +97,21 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         return connection;
     }
 
-    @Override
-    public String getConnectId() {
-        return this.connectId;
-    }
-
 
     public List<String> treeTable(String catalog, String schema) throws Exception {
-        Connection connection = ConnectPool.getConnection(this, Connection.class);
+        Connection connection = (Connection) this.connect(false);
         try {
+
             return generateTree(catalog, schema, connection);
         } finally {
-            ConnectPool.releaseConnection(connectId, connection);
+
+            this.disConnect(connection);
         }
     }
 
     @Override
     public List<DbTableField> getFields(String catalog, String schema, String tableName) throws Exception {
-        Connection connection = ConnectPool.getConnection(this, Connection.class);
+        Connection connection = (Connection) this.connect(false);
         List<Map<String, Object>> maps = fetchColumn(catalog, schema, tableName, connection);
         return JsonUtils.toList(JsonUtils.toJson(maps), DbTableField.class);
     }
@@ -140,7 +136,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         String maxSql = String.format("select max(%s) from %s ", wrapColumnName(fieldName), wrapTableName(catalog, schema, tableName));
 
         log.info(String.format("retrieveMax, sql: %s", maxSql));
-        Connection connection = ConnectPool.getConnection(this, Connection.class);
+        Connection connection = (Connection) this.connect(false);
         try (Statement stmt = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
             ResultSet resultSet = stmt.executeQuery(maxSql);
             if (resultSet.next()) {
@@ -150,7 +146,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
             log.error("fetch max error", e);
             throw new Exception("fetch max error");
         } finally {
-            ConnectPool.releaseConnection(this.connectId, connection);
+            this.disConnect(connection);
         }
         return null;
     }
@@ -162,13 +158,13 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         String tableName = writer.getTableName();
         String fullTableName = wrapTableName(catalog, schema, tableName);
 
-        Connection connection = ConnectPool.getConnection(this, Connection.class);
+        Connection connection = (Connection) this.connect(false);
         try (Statement stmt = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
             stmt.execute(String.format("truncate table %s", fullTableName));
         } catch (SQLException e) {
             log.error(String.format("truncate table (%s) failed", fullTableName), e);
         } finally {
-            ConnectPool.releaseConnection(this.connectId, connection);
+            this.disConnect(connection);
         }
     }
 
@@ -273,17 +269,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                         .build()))
                 .column(
                         ObjectUtils.isEmpty(reader.getColumns()) ?
-                                Collections.singletonList(
-                                        MetaColumn.builder()
-                                                .name("*")
-                                                .build()
-                                )
-                                :
-                                reader.getColumns().stream().map(col ->
-                                MetaColumn.builder()
-                                        .name(col.getName())
-                                        .build())
-                        .collect(Collectors.toList()))
+                                Collections.singletonList("*") : reader.getColumns())
                 .where(whereSql)
                 .build());
 
@@ -306,7 +292,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                         .jdbcUrl(jdbcUrl())
                         .table(Collections.singletonList(writer.getTableName()))
                         .build()))
-                .column(writer.getColumns().stream().map(DatalinkXJobDetail.Column::getName).collect(Collectors.toList()))
+                .column(writer.getColumns())
                 .insertSqlMode("copy")
                 .writeMode("insert")
                 .batchSize(writer.getBatchSize())

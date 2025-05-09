@@ -4,7 +4,7 @@ package com.datalinkx.driver.dsdriver;
 import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
-import com.datalinkx.driver.dsdriver.base.model.DbTableField;
+import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;

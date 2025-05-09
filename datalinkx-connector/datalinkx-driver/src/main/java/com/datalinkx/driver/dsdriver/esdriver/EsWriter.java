@@ -1,15 +1,14 @@
 package com.datalinkx.driver.dsdriver.esdriver;
 
 
-import java.util.List;
-import java.util.Map;
-
-import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.writer.AbstractWriter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
+import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -24,5 +23,5 @@ public class EsWriter extends AbstractWriter {
     private Long bulkAction;
     private Long timeout;
     private List<Map<String, Object>> idColumn;
-    private List<MetaColumn> column;
+    private List<String> column;
 }

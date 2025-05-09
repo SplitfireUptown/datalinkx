@@ -1,6 +1,6 @@
 package com.datalinkx.driver.dsdriver.kafkadriver;
 
-import com.datalinkx.driver.dsdriver.base.connect.SetupInfo;
+import com.datalinkx.driver.dsdriver.base.meta.SetupInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

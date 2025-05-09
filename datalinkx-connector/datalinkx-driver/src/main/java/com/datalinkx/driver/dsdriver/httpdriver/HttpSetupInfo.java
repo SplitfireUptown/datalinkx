@@ -1,13 +1,12 @@
 package com.datalinkx.driver.dsdriver.httpdriver;
 
-import com.datalinkx.driver.dsdriver.base.connect.SetupInfo;
+import com.datalinkx.driver.dsdriver.base.meta.SetupInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author: uptown

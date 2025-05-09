@@ -1,7 +1,5 @@
-package com.datalinkx.driver.dsdriver.base.model;
+package com.datalinkx.driver.dsdriver.base.meta;
 
-import com.datalinkx.driver.dsdriver.IDsReader;
-import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldNameConstants;
 import lombok.experimental.SuperBuilder;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
