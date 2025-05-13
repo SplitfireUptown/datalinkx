@@ -1,19 +1,15 @@
 package com.datalinkx.driver.dsdriver.httpdriver;
 
-import com.datalinkx.driver.dsdriver.base.column.MetaColumn;
 import com.datalinkx.driver.dsdriver.base.reader.AbstractReader;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.awt.print.Pageable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
