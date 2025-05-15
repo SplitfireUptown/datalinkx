@@ -30,10 +30,8 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
             // 1、准备执行job
             this.begin(actionInfo);
 
-            String healthCheck = "patch-data-job-check-thread";
-            if (MetaConstants.DsType.STREAM_DB_LIST.contains(actionInfo.getSyncUnit().getReader().getType())) {
-                healthCheck = IdUtils.getHealthThreadName(actionInfo.getJobId());
-            }
+            // 2、获取任务健康检查线程名称
+            String healthCheck = IdUtils.getHealthThreadName(actionInfo.getJobId(), actionInfo.getType());
 
             // 3、循环检查任务结果
             taskCheckerThread = new Thread(() -> {

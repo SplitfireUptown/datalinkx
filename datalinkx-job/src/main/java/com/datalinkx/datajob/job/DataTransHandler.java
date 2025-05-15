@@ -71,13 +71,13 @@ public class DataTransHandler {
         return datalinkXJobDetail.getJobId();
     }
 
-    @RequestMapping("/stream_health")
-    public WebResult<String> streamHealth(String jobId) {
+    @RequestMapping("/job_health")
+    public WebResult<String> jobHealth(String jobId, Integer type) {
         // 如果因为datalinkx挂掉后重启，flink任务正常，datalinkx任务状态正常，判断健康检查线程是否挂掉, 如果挂掉，先停止再重新提交
         Set<Thread> threadsSet = Thread.getAllStackTraces().keySet();
         List<Thread> healthThreads = threadsSet.stream()
                 .filter(Thread::isAlive)
-                .filter(th -> th.getName().equals(IdUtils.getHealthThreadName(jobId)))
+                .filter(th -> th.getName().equals(IdUtils.getHealthThreadName(jobId, type)))
                 .collect(Collectors.toList());
 
         if (ObjectUtils.isEmpty(healthThreads)) {

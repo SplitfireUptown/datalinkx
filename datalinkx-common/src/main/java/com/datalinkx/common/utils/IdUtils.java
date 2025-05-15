@@ -1,5 +1,7 @@
 package com.datalinkx.common.utils;
 
+import com.datalinkx.common.constants.MetaConstants;
+
 import java.util.UUID;
 
 
@@ -41,7 +43,10 @@ public final class IdUtils {
 		return shortBuffer.toString();
 	}
 
-	public static String getHealthThreadName(String jobId) {
-		return String.format("stream-data-job-%s-check-thread", jobId);
+	public static String getHealthThreadName(String jobId, Integer type) {
+		if (MetaConstants.JobType.JOB_TYPE_STREAM.equals(type)) {
+			return String.format("stream-data-job-%s-check-thread", jobId);
+		}
+		return String.format("patch-data-job-%s-check-thread", jobId);
 	}
 }

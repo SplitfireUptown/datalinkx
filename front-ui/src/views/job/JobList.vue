@@ -27,23 +27,33 @@ import JobSaveOrUpdate from '../job/JobSaveOrUpdate.vue'
 const StatusType = [
   {
     label: '新建',
-    value: 0
+    value: 0,
+    color: '#1890ff'
   },
   {
     label: '流转中',
-    value: 1
+    value: 1,
+    color: '#1ac4c4'
   },
   {
     label: '流转完成',
-    value: 2
+    value: 2,
+    color: '#52c41a'
   },
   {
     label: '流转失败',
-    value: 3
+    value: 3,
+    color: '#f5222d'
   },
   {
     label: '流转停止',
-    value: 4
+    value: 4,
+    color: '#faad14'
+  },
+  {
+    label: '排队中',
+    value: 5,
+    color: '#ad14fa'
   }
 ]
 export default {
@@ -77,6 +87,12 @@ export default {
           sorter: true
         },
         {
+          title: '上次任务执行时间',
+          width: '10%',
+          dataIndex: 'start_time',
+          sorter: true
+        },
+        {
           title: '任务状态',
           width: '10%',
           dataIndex: 'status',
@@ -85,8 +101,14 @@ export default {
               <div>
                 {StatusType.map(item => {
                   if (item.value === text) {
-                    return <span>{item.label}</span>
+                    return (
+                      <span>
+                        <span class="status-dot" style={'background-color: ' + item.color}></span>
+                        {item.label}
+                      </span>
+                    )
                   }
+                  return null
                 })}
               </div>
             )
@@ -96,12 +118,6 @@ export default {
           title: '流转进度(w/r)',
           width: '10%',
           dataIndex: 'progress'
-        },
-        {
-          title: '任务上次执行时间',
-          width: '10%',
-          dataIndex: 'start_time',
-          sorter: true
         },
         {
           title: '操作',
@@ -228,15 +244,12 @@ export default {
           console.log(flashData)
           for (const i of this.tableData) {
             if (i.job_id === flashData.job_id) {
-              if (flashData.status === 1) {
-                // 添加空值检查
-                const writeRecords = flashData.write_records || 0;
-                const readRecords = flashData.read_records || 0;
-                i.status = flashData.status;
-                i.progress = `${writeRecords}/${readRecords}`;
-              } else {
+              if (flashData.status === 'RUNNING') {
+                i.status = 1
+                i.progress = (flashData.write_records + '/' + flashData.read_records)
+              } else if (flashData.status === 'FINISHED') {
                 // 防止消息先到前端后端未入库
-                i.status = flashData.status;
+                i.status = 2
               }
             }
           }
@@ -258,5 +271,11 @@ export default {
 </script>
 
 <style scoped>
-
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
 </style>

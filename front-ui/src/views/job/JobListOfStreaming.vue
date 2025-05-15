@@ -20,29 +20,39 @@
 </template>
 
 <script>
-import { pageQuery, streamDelObj, streamStop, streamExec } from '@/api/job/job'
+import { streamPageQuery, streamDelObj, streamStop, streamExec } from '@/api/job/job'
 import JobSaveOrUpdateStreaming from '@/views/job/JobSaveOrUpdateStreaming.vue'
 // 0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING
 const StatusType = [
   {
     label: '新建',
-    value: 0
+    value: 0,
+    color: '#1890ff'
   },
   {
     label: '流转中',
-    value: 1
+    value: 1,
+    color: '#1ac4c4'
   },
   {
     label: '流转完成',
-    value: 2
+    value: 2,
+    color: '#52c41a'
   },
   {
     label: '流转失败',
-    value: 3
+    value: 3,
+    color: '#f5222d'
   },
   {
     label: '流转停止',
-    value: 4
+    value: 4,
+    color: '#faad14'
+  },
+  {
+    label: '排队中',
+    value: 5,
+    color: '#ad14fa'
   }
 ]
 export default {
@@ -50,7 +60,7 @@ export default {
   components: {
     JobSaveOrUpdateStreaming
   },
-  data () {
+  data() {
     return {
       loading: false,
       columns: [
@@ -74,6 +84,16 @@ export default {
           dataIndex: 'to_tb_name'
         },
         {
+          title: '任务开始时间',
+          // width: '10%',
+          dataIndex: 'start_time'
+        },
+        {
+          title: '重试次数',
+          // width: '10%',
+          dataIndex: 'retry_time'
+        },
+        {
           title: '任务状态',
           // width: '30%',
           dataIndex: 'status',
@@ -82,17 +102,18 @@ export default {
               <div>
                 {StatusType.map(item => {
                   if (item.value === text) {
-                    return <span>{item.label}</span>
+                    return (
+                      <span>
+                        <span class="status-dot" style={{ backgroundColor: item.color }}></span>
+                        {item.label}
+                      </span>
+                    )
                   }
+                  return null
                 })}
               </div>
             )
           }
-        },
-        {
-          title: '任务上次执行时间',
-          dataIndex: 'start_time',
-          sorter: true
         },
         {
           title: '操作',
@@ -133,9 +154,9 @@ export default {
     }
   },
   methods: {
-    init () {
+    init() {
       this.loading = true
-      pageQuery({
+      streamPageQuery({
         ...this.queryParam,
         ...this.pages
       }).then(res => {
@@ -146,20 +167,20 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange (pagination) {
+    handleTableChange(pagination) {
       this.pagination = pagination
       this.pages.size = pagination.pageSize
       this.pages.current = pagination.current
       this.init()
     },
-    edit (record) {
+    edit(record) {
       if (record.status === 1) {
         this.$refs.JobSaveOrUpdateStreaming.edit('show', record.job_id)
       } else {
         this.$refs.JobSaveOrUpdateStreaming.edit('edit', record.job_id)
       }
     },
-    delete (record) {
+    delete(record) {
       this.loading = true
       streamDelObj(record.job_id).then(res => {
         if (res.status === '0') {
@@ -172,8 +193,7 @@ export default {
         this.loading = false
       })
     },
-    execJob (record) {
-      this.loading = true
+    execJob(record) {
       streamExec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')
@@ -185,12 +205,12 @@ export default {
         this.loading = false
       })
     },
-    show (record) {
+    show(record) {
       this.$refs.JobSaveOrUpdateStreaming.edit(record.job_id, 'show')
     },
-    stopJob (record) {
-      this.loading = true
+    stopJob(record) {
       streamStop(record.job_id).then(res => {
+        this.loading = false
         if (res.status === '0') {
           this.$message.info('停止成功')
           this.init()
@@ -201,20 +221,26 @@ export default {
         this.loading = false
       })
     },
-    handleOk () {
+    handleOk() {
       this.init()
     },
-    queryData () {
+    queryData() {
       this.pages.current = 1
       this.init()
     }
   },
-  created () {
+  created() {
     this.init()
   }
 }
 </script>
 
 <style scoped>
-
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
 </style>

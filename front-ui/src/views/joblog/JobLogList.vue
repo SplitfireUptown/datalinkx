@@ -51,13 +51,27 @@ export default {
           title: '执行日志',
           width: '10%',
           dataIndex: 'error_msg',
-          ellipsis: true,
-          render: value =>
-            <Tooltip title={value}>
-              <div className="ellipsis" style={{ float: 'left', maxWidth: '100%' }}>
-                {value && value.substring(0, 10)}
-              </div>
-            </Tooltip>
+          ellipsis: {
+            showTitle: false
+          },
+          customRender: (value) => {
+            return this.$createElement('a-tooltip', {
+              props: {
+                title: value || ''
+              }
+            }, [
+              this.$createElement('div', {
+                class: 'ellipsis',
+                style: {
+                  float: 'left',
+                  maxWidth: '100%'
+                },
+                domProps: {
+                  textContent: value ? value.substring(0, 30) : ''
+                }
+              })
+            ])
+          }
         },
         {
           title: '开始时间',
@@ -116,7 +130,7 @@ export default {
       })
     },
     getTableCss (status) {
-      return `width:12px;height:12px;border-radius:50%;margin-right:4px;background-color: ${status ? '#f00' : '#0f0'};`
+      return `width:12px;height:12px;border-radius:50%;margin-right:4px;background-color: ${status ? '#f5222d' : '#52c41a'};`
     },
     handleTableChange (pagination, filters, sorter) {
       this.pagination = pagination

@@ -15,32 +15,30 @@
           <div class="ds-name">
             <div class="nowrap">
               <span class="name">{{ ds.label }}</span>
-              <span class="num-in ml4">{{ dsGroupNumber[ds.dsTypeKey] }}</span>
+              <span class="num-badge">{{ dsGroupNumber[ds.dsTypeKey] }}</span>
             </div>
           </div>
         </li>
       </ul>
     </div>
-    <a-card :bordered="false" class="list-acard">
+    <a-card :bordered="false" class="list-card">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="数据源名称">
-                <a-input v-model="queryParam.name" placeholder="数据源名称"/>
+                <a-input v-model="queryParam.name" placeholder="请输入数据源名称" allowClear/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-button @click="() => {this.queryData()}" type="primary">查询</a-button>
-              <a-button @click="() => queryParam = {}" style="margin-left: 8px">重置</a-button>
+              <a-button @click="() => {this.queryData()}" type="primary" icon="search">查询</a-button>
+              <a-button @click="() => queryParam = {}" style="margin-left: 12px" icon="reload">重置</a-button>
             </a-col>
           </a-row>
         </a-form>
       </div>
       <div class="table-operator">
-        <!--      v-action="'upms:user:add'"-->
-<!--        <a-button @click="$refs.refDsConfig.show('','add')" icon="plus" type="primary">新建</a-button>-->
-        <a-button @click="createDS" icon="plus" type="primary">新建</a-button>
+        <a-button @click="createDS" type="primary" icon="plus">新建数据源</a-button>
       </div>
       <a-table
         :columns="columns"
@@ -49,6 +47,7 @@
         :pagination="pagination"
         :rowKey="record => record.id"
         @change="handleTableChange"
+        :rowClassName="() => 'table-row'"
       >
       </a-table>
       <ds-config
@@ -116,15 +115,19 @@ export default {
           width: '15%',
           customRender: (record) => {
             return (
-              <div>
-                <a onClick={(e) => this.edit(record)}>修改</a>
+              <div class="table-actions">
+                <a-button type="link" onClick={(e) => this.edit(record)}>修改</a-button>
                 <a-divider type="vertical" />
-                <a-popconfirm title="是否删除" onConfirm={() => this.delete(record)} okText="是" cancelText="否">
-                  <a-icon slot="icon" type="question-circle-o" style="color: red" />
-                  <a href="javascript:;" style="color: red">删除</a>
+                <a-popconfirm
+                  title="确定要删除该数据源吗?"
+                  onConfirm={() => this.delete(record)}
+                  okText="确定"
+                  cancelText="取消"
+                >
+                  <a-button type="link" class="delete-btn">删除</a-button>
                 </a-popconfirm>
                 <a-divider type="vertical" />
-                <a href="javascript:;"onClick={(e) => this.show(record)}>查看</a>
+                <a-button type="link" onClick={(e) => this.show(record)}>查看</a-button>
               </div>
             )
           }
@@ -135,22 +138,23 @@ export default {
         pageSize: 10,
         current: 1,
         total: 0,
-        showSizeChanger: true
+        showSizeChanger: true,
+        showQuickJumper: true
       },
       pages: {
         size: 10,
         current: 1
       },
-      queryParam: {
-      },
+      queryParam: {},
       dsTypeList,
-      // 各数据源的数量
       dsGroupNumber: {
         1: 0,
         2: 0,
         3: 0,
         4: 0,
         5: 0,
+        6: 0,
+        101: 0,
         100: 0
       },
       currentDs: {
@@ -215,24 +219,19 @@ export default {
       } else {
         this.$refs.refDsConfig.show(record.dsId, 'edit', record)
       }
-      // this.init()
     },
     delete (record) {
       console.log(record)
-      // delObj(record.dsId).then(res => {
-      //   this.$message.info('删除成功')
-      //   this.init()
-      //   this.getAllDsNumber()
-      // })
       delObj(record.dsId).then(res => {
         if (res.status === '0') {
-          this.$message.info('删除成功')
+          this.$message.success('删除成功')
           this.init()
           this.getAllDsNumber()
         } else {
           this.$message.error(res.errstr)
         }
       }).finally(() => {
+        this.getAllDsNumber()
         this.loading = false
       })
     },
@@ -267,92 +266,111 @@ export default {
   display: flex;
   height: 100%;
   width: 100%;
+  background: #f0f2f5;
+
   .list-left {
-    width: 180px;
+    width: 220px;
     height: 100%;
-  }
-  .list-acard {
-    flex: 1;
     margin: 24px 0 16px 24px;
-  }
-  .list-left {
-    border-radius: 0px;
-    padding: 0 8px;
+    border-radius: 8px;
+    padding: 16px;
     overflow: auto;
     cursor: pointer;
     background-color: #fff;
-    box-shadow: 0px 0px 1px rgba(15, 34, 67, 0.3), 0px 1px 3px rgba(15, 34, 67, 0.08), 0px 4px 8px rgba(15, 34, 67, 0.03);
+    box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16),
+    0 3px 6px 0 rgba(0, 0, 0, 0.12),
+    0 5px 12px 4px rgba(0, 0, 0, 0.09);
+
     ul, li {
       list-style: none;
       padding: 0;
       margin: 0;
     }
-    ul {
-      margin-top: 4px;
-    }
+
     .ds-list {
-      line-height: 40px;
-      padding-left: 16px;
-      height: 40px;
-      position: relative;
-      border-radius: 6px;
-      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      transition: all 0.3s;
+
       &:hover {
-        background-color: rgba(15, 34, 67, 0.05);
+        background-color: #f5f5f5;
       }
+
       .ds-icon {
-        float: left;
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+
         img {
-          width: 24px;
-          height: 24px;
-          margin: 0;
-          padding: 0;
-          border: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
         }
       }
+
       .ds-name {
-        margin-left: 8px;
-        line-height: 20px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        display: inline-block;
-        max-width: 130px;
-        .nowrap {
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
+        flex: 1;
+
         .name {
-          line-height: 20px;
-          height: 20px;
           font-size: 14px;
-          display: inline-block;
-          color: rgba(21, 22, 24, 0.72);
-          max-width: 90px;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
+          color: rgba(0, 0, 0, 0.85);
+          font-weight: 500;
         }
-        .num-in {
-          top: 0;
-          line-height: 14px;
-          padding: 3px 4px;
-          background-color: rgba(15, 34, 67, 0.07);
-          color: rgba(15, 34, 67, 0.48);
-          border-radius: 4px;
-          font-size: 10px;
-          display: inline-block;
-          vertical-align: super;
-          transform: scale(0.86);
+
+        .num-badge {
+          margin-left: 8px;
+          padding: 2px 8px;
+          font-size: 12px;
+          line-height: 16px;
+          border-radius: 10px;
+          background: #e6f7ff;
+          color: #1890ff;
         }
       }
     }
+
     .active {
-      background-color: rgba(43, 121, 255, 0.1);
+      background-color: #e6f7ff;
+      border-right: 3px solid #1890ff;
     }
   }
 
+  .list-card {
+    flex: 1;
+    margin: 24px;
+    border-radius: 8px;
+
+    .table-page-search-wrapper {
+      padding: 24px 24px 0;
+    }
+
+    .table-operator {
+      margin-bottom: 16px;
+      padding: 0 24px;
+    }
+
+    .table-row {
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+
+    .table-actions {
+      button {
+        padding: 0 4px;
+      }
+
+      .delete-btn {
+        color: #ff4d4f;
+
+        &:hover {
+          color: #ff7875;
+        }
+      }
+    }
+  }
 }
 </style>

@@ -12,6 +12,6 @@ public interface DatalinkXJobClient {
     @PostMapping("/data/transfer/stream_exec")
     WebResult<String> dataTransExec(@RequestParam("detail") String datalinkXJobDetail);
 
-    @PostMapping("/data/transfer/stream_health")
-    WebResult<String> streamJobHealth(@RequestParam("jobId") String jobId);
+    @PostMapping("/data/transfer/job_health")
+    WebResult<String> jobHealth(@RequestParam("jobId") String jobId, @RequestParam("type") Integer type);
 }

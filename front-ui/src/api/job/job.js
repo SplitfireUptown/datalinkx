@@ -7,6 +7,13 @@ export function pageQuery (params) {
     params: params
   })
 }
+export function streamPageQuery (params) {
+  return axios({
+    url: '/api/stream/job/page',
+    method: 'GET',
+    params: params
+  })
+}
 export function listQuery () {
   return axios({
     url: '/api/job/list',

@@ -41,6 +41,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_QUEUE;
 import static com.datalinkx.common.constants.MetaConstants.JobStatus.JOB_STATUS_SYNCING;
 
 /**
@@ -387,7 +388,8 @@ public class DtsJobServiceImpl implements DtsJobService {
 //			throw new DatalinkXServerException(StatusCode.SYNC_STATUS_ERROR, "任务处于停止状态");
 //		}
 
-        jobBean.setStatus(JOB_STATUS_SYNCING);
+        jobBean.setStatus(JOB_STATUS_QUEUE);
+        jobBean.setStartTime(new Timestamp(System.currentTimeMillis()));
 
         // 如果xxl-job未创建任务，新建一个
         if (!jobClientApi.isXxljobExist(jobId)) {

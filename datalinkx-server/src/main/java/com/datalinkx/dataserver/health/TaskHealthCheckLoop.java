@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.stream;
+package com.datalinkx.dataserver.health;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.JsonUtils;
@@ -16,20 +16,18 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
 @Configuration
 @Slf4j
-public class StreamTaskDaemonConfig implements InitializingBean {
+public class TaskHealthCheckLoop implements InitializingBean {
 
 
     @Autowired
@@ -52,12 +50,67 @@ public class StreamTaskDaemonConfig implements InitializingBean {
     public void afterPropertiesSet() {
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     @Scheduled(fixedDelay = 10000) // 每10秒检查
     public void processQueueItems() {
         log.info("start to check stream task status");
-        List<JobBean> restartJob = jobRepository.findRestartJob(MetaConstants.JobType.JOB_TYPE_STREAM);
 
+        List<JobBean> allTransferJob = jobRepository.findAll();
+        List<JobBean> restartJob = new ArrayList<>();
+        List<JobBean> statusCheckJob = new ArrayList<>();
+        for (JobBean job : allTransferJob) {
+            // 流式任务
+            if (MetaConstants.JobType.JOB_TYPE_STREAM.equals(job.getType()) && job.getRetryTime() < 5) {
+                restartJob.add(job);
+            }
+            // 需要状态检查的批式任务
+            if (!MetaConstants.JobType.JOB_TYPE_STREAM.equals(job.getType()) &&
+                    (Arrays.asList(
+                            MetaConstants.JobStatus.JOB_STATUS_SYNCING,
+                            MetaConstants.JobStatus.JOB_STATUS_QUEUE).contains(job.getStatus()))) {
+
+                statusCheckJob.add(job);
+            }
+        }
+
+        this.patchJobCheck(statusCheckJob);
+        this.streamJobCheck(restartJob);
+    }
+
+    // 批式任务状态检查
+    @Transactional(rollbackFor = Exception.class, propagation= Propagation.REQUIRES_NEW)
+    public void patchJobCheck(List<JobBean> statusCheckJob) {
+        for (JobBean jobBean : statusCheckJob) {
+            if (MetaConstants.JobStatus.JOB_STATUS_QUEUE == jobBean.getStatus()) {
+                // 提交到xxl-job，xxx-job未调度到datalinkx-job
+                Timestamp startTime = jobBean.getStartTime();
+                Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+
+                long differenceInMillis = Math.abs(currentTime.getTime() - startTime.getTime());
+                if (differenceInMillis > 1 * 1000 * 30) {
+
+                    jobBean.setStatus(MetaConstants.JobStatus.JOB_STATUS_ERROR);
+                    jobBean.setErrorMsg("调度组件异常，启动任务失败！！！");
+                    jobRepository.save(jobBean);
+                }
+            }
+
+            if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == jobBean.getStatus()) {
+                // datalinkx重启，任务监听线程挂掉
+                String jobHealthThread = datalinkXJobClient.jobHealth(jobBean.getJobId(), jobBean.getType()).getResult();
+                if (ObjectUtils.isEmpty(jobHealthThread)) {
+
+                    jobBean.setStatus(MetaConstants.JobStatus.JOB_STATUS_ERROR);
+                    jobBean.setErrorMsg("系统运行异常，请检查后台日志！！！");
+                    jobRepository.save(jobBean);
+                }
+            }
+        }
+    }
+
+    // 流式任务检查
+    @Transactional(rollbackFor = Exception.class, propagation= Propagation.REQUIRES_NEW)
+    public void streamJobCheck(List<JobBean> restartJob) {
         if (ObjectUtils.isEmpty(restartJob)) {
             return;
         }
@@ -76,8 +129,7 @@ public class StreamTaskDaemonConfig implements InitializingBean {
                         continue;
                     } else {
                         // 如果因为datalinkx挂掉后重启，flink任务正常，datalinkx任务状态正常，判断健康检查线程是否挂掉, 如果挂掉，先停止再重新提交
-                        String stringWebResult = datalinkXJobClient.streamJobHealth(jobId).getResult();
-
+                        String stringWebResult = datalinkXJobClient.jobHealth(jobId, MetaConstants.JobType.JOB_TYPE_STREAM).getResult();
 
                         // 排除掉刚提交的任务
                         Timestamp startTime = streamTaskBean.getStartTime();

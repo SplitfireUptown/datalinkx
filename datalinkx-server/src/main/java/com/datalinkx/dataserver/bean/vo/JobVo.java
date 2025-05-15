@@ -57,6 +57,10 @@ public class JobVo {
 		@ApiModelProperty(value = "任务启动开始时间")
 		@JsonProperty("start_time")
 		private Timestamp startTime;
+		@ApiModelProperty(value = "任务重试次数")
+		@JsonProperty("retry_time")
+		private Integer retryTime;
+		private Integer status;
 	}
 
 	@Data

@@ -112,7 +112,7 @@ public class StreamJobServiceImpl implements StreamJobService {
         if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == jobBean.getStatus()) {
             throw new DatalinkXServerException(StatusCode.JOB_IS_RUNNING, "任务运行中");
         }
-        jobRepository.updateJobStatus(jobId, MetaConstants.JobStatus.JOB_STATUS_SYNCING);
+        jobRepository.updateJobStatus(jobId, MetaConstants.JobStatus.JOB_STATUS_QUEUE);
     }
 
     @Override
@@ -139,6 +139,8 @@ public class StreamJobServiceImpl implements StreamJobService {
                 .fromTbName(dsNameMap.get(jobBean.getReaderDsId()) + "." + jobBean.getFromTb())
                 .toTbName(dsNameMap.get(jobBean.getWriterDsId()) + "."  + jobBean.getToTb())
                 .startTime(jobBean.getStartTime())
+                .retryTime(jobBean.getRetryTime())
+                .status(jobBean.getStatus())
                 .build()).collect(Collectors.toList());
 
         PageVo<List<JobVo.JobStreamPageVo>> result = new PageVo<>();
