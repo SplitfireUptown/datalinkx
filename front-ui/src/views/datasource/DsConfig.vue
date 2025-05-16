@@ -226,6 +226,8 @@ export default {
           const servertype = Object.keys(config)[0]
           temp['servertype'] = servertype
           temp[servertype] = config[servertype]
+
+          temp['sid'] = config['servername']
         }
       }
       return temp

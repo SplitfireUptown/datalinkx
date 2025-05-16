@@ -84,11 +84,7 @@ public class DsServiceImpl implements DsService {
 		dsBean.setName(form.getName());
 		dsBean.setDatabase(form.getDatabase());
 		dsBean.setConfig(form.getConfig());
-
-		// 2.1、oracle类型数据源有schema概念
-		if (MetaConstants.DsType.ORACLE.equals(form.getType())) {
-			dsBean.setSchema(form.getDatabase());
-		}
+		dsBean.setSchema(form.getDatabase());
 
 		if (form.getPassword() != null) {
 			dsBean.setPassword(Base64Utils.encodeBase64(form.getPassword().getBytes(StandardCharsets.UTF_8)));
@@ -200,11 +196,7 @@ public class DsServiceImpl implements DsService {
 		dsBean.setName(form.getName());
 		dsBean.setDatabase(form.getDatabase());
 		dsBean.setConfig(form.getConfig());
-
-		// oracle类型数据源有schema概念
-		if (MetaConstants.DsType.ORACLE.equals(form.getType())) {
-			dsBean.setSchema(form.getDatabase());
-		}
+		dsBean.setSchema(form.getDatabase());
 		dsRepository.save(dsBean);
 	}
 
