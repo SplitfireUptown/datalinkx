@@ -148,19 +148,19 @@ export default {
       queryParam: {},
       dsTypeList,
       dsGroupNumber: {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0,
-        6: 0,
-        101: 0,
-        100: 0
+        'mysql': 0,
+        'es': 0,
+        'oracle': 0,
+        'redis': 0,
+        'http': 0,
+        'clickhouse': 0,
+        'mysqlcdc': 0,
+        'kafka': 0
       },
       currentDs: {
         value: 'MySQL',
         label: 'MySQL',
-        dsTypeKey: 1
+        dsTypeKey: 'mysql'
       }
     }
   },
@@ -181,7 +181,7 @@ export default {
       })
     },
     createDS () {
-      if (this.currentDs.dsTypeKey === 5) {
+      if (this.currentDs.dsTypeKey === 'http') {
         this.$refs.httpDsSaveOrUpdate.show('', 'add')
       } else {
         this.$refs.refDsConfig.show('', 'add')
@@ -214,7 +214,7 @@ export default {
     },
 
     edit (record) {
-      if (this.currentDs.dsTypeKey === 5) {
+      if (this.currentDs.dsTypeKey === 'http') {
         this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'edit')
       } else {
         this.$refs.refDsConfig.show(record.dsId, 'edit', record)
@@ -236,7 +236,7 @@ export default {
       })
     },
     show (record) {
-      if (this.currentDs.dsTypeKey === 5) {
+      if (this.currentDs.dsTypeKey === 'http') {
         this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'show')
       } else {
         this.$refs.refDsConfig.show(record.dsId, 'show', record)

@@ -1,26 +1,26 @@
 export const DATA_SOURCE_TYPE = [
   {
     label: 'MySQL',
-    value: 1
+    value: 'mysql'
   },
   {
     label: 'ELASTICSEARCH',
-    value: 2
+    value: 'es'
   },
   {
     label: 'ORACLE',
-    value: 3
+    value: 'oracle'
   },
   {
     label: 'REDIS',
-    value: 4
+    value: 'redis'
   },
   {
     label: 'HTTP',
-    value: 5
+    value: 'http'
   },
   {
     label: 'KAFKA',
-    value: 100
+    value: 'kafka'
   }
 ]

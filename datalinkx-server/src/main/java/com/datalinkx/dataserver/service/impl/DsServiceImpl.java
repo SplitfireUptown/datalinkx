@@ -45,16 +45,16 @@ public class DsServiceImpl implements DsService {
 	@Autowired
 	private JobRepository jobRepository;
 
-	private static final Map<Integer, SetupInfoGenerator> SETUP_INFO_GENERATORS = new HashMap<>();
+	private static final Map<String, SetupInfoGenerator> SETUP_INFO_GENERATORS = new HashMap<>();
 
 	@PostConstruct
 	public void init() {
-		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.MYSQL, new MysqlSetupInfoGenerator());
-		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.ELASTICSEARCH, new EsSetupInfoGenerator());
-		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.ORACLE, new OracleSetupInfoGenerator());
-		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.REDIS, new RedisSetupInfoGenerator());
-		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.HTTP, new HttpSetupInfoGenerator());
-		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.KAFKA, new KafkaSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_MYSQL, new MysqlSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_ELASTICSEARCH, new EsSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_ORACLE, new OracleSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_REDIS, new RedisSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_HTTP, new HttpSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_KAFKA, new KafkaSetupInfoGenerator());
 	}
 
 
@@ -110,7 +110,7 @@ public class DsServiceImpl implements DsService {
 				throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "数据源附加信息转化Json格式异常");
 			}
 			// HTTP数据源校验url是否合法
-			if (MetaConstants.DsType.HTTP.equals(dsBean.getType())) {
+			if (MetaConstants.DsType.DS_HTTP.equals(dsBean.getType())) {
 				String url = (String) map.get("url");
 				if (ObjectUtils.isEmpty(url)) {
 					throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "接口地址未配置");
@@ -142,7 +142,7 @@ public class DsServiceImpl implements DsService {
 			return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(setupInfo));
 		} else {
 			Map<String, Object> map = new HashMap<>();
-			map.put("type", MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsBean.getType()));
+			map.put("type", dsBean.getType());
 			return ConnectIdUtils.encodeConnectId(JsonUtils.toJson(map));
 		}
 	}

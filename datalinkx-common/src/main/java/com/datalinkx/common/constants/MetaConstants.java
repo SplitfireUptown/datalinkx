@@ -14,23 +14,24 @@ public final class MetaConstants {
      */
     public static class DsType {
         // 数据源类型
-        public static final Integer MYSQL = 1;
-        public static final Integer ELASTICSEARCH = 2;
-        public static final Integer ORACLE = 3;
-        public static final Integer REDIS = 4;
-        public static final Integer HTTP = 5;
-        public static final Integer KAFKA = 100;
+//        public static final Integer MYSQL = 1;
+//        public static final Integer ELASTICSEARCH = 2;
+//        public static final Integer ORACLE = 3;
+//        public static final Integer REDIS = 4;
+//        public static final Integer HTTP = 5;
+//        public static final Integer KAFKA = 100;
+
+        // 命名规则与包名一样
+        public static final String DS_MYSQL = "mysql";
+        public static final String DS_ELASTICSEARCH = "es";
+        public static final String DS_ORACLE = "oracle";
+        public static final String DS_REDIS = "redis";
+        public static final String DS_HTTP = "http";
+        public static final String DS_KAFKA = "kafka";
+
 
         public static final String REDIS_SPIT_STR = "!-!-!";
 
-        public static final Map<Integer, String> TYPE_TO_DB_NAME_MAP = new HashMap<Integer, String>() {{
-            put(MetaConstants.DsType.MYSQL, "mysql");
-            put(MetaConstants.DsType.ELASTICSEARCH, "elasticsearch");
-            put(MetaConstants.DsType.ORACLE, "oracle");
-            put(MetaConstants.DsType.REDIS, "redis");
-            put(MetaConstants.DsType.HTTP, "http");
-            put(MetaConstants.DsType.KAFKA, "kafka");
-        }};
 
         public static final List<String> STREAM_DB_LIST = new ArrayList<String>() {{
             add("kafka");

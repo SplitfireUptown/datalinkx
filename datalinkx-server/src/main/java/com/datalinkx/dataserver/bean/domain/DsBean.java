@@ -32,7 +32,7 @@ public class DsBean extends BaseDomainBean implements Serializable {
 	@Column(name = "`name`", length = 64, columnDefinition = "varchar(64)")
 	private String name;
 	@Column(name = "type", columnDefinition = "int(11)")
-	private Integer type;
+	private String type;
 	@Column(name = "`host`", length = 64, columnDefinition = "varchar(64)")
 	private String host;
 	@Column(name = "`port`", columnDefinition = "int(11)")

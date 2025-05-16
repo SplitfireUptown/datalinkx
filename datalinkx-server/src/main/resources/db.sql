@@ -5,9 +5,9 @@ SET NAMES utf8mb4;
 
 CREATE TABLE `DS` (
                       `id` int unsigned NOT NULL AUTO_INCREMENT,
-                      `ds_id` char(35) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'ds_[32位uuid]',
+                      `ds_id` char(35) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
                       `name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-                      `type` int DEFAULT NULL COMMENT '1MYSQL|2ORACLE|3SQLSERVER|4OPEN_DS',
+                      `type` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
                       `host` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
                       `port` int DEFAULT NULL,
                       `username` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
@@ -15,7 +15,6 @@ CREATE TABLE `DS` (
                       `database` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
                       `schema` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '数据库的原始schema',
                       `config` text CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '附加配置',
-                      `status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '最后一次同步状态，状态代码用统一的状态代码',
                       `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                       `utime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       `is_del` int DEFAULT '0',
@@ -40,7 +39,7 @@ CREATE TABLE `JOB` (
                        `is_del` int NOT NULL DEFAULT '0',
                        `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                        `utime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                       `status` int NOT NULL DEFAULT '0' COMMENT '0:CREATE|1:SYNCING|2:SYNC_FINISH|3:SYNC_ERROR|4:QUEUING',
+                       `status` int NOT NULL DEFAULT '0' COMMENT '0 - 新建、1 - 运行中、2 - 运行成功、3 - 运行失败、4 - 停止、5 - 队列中',
                        `error_msg` longtext CHARACTER SET utf8 COLLATE utf8_general_ci,
                        PRIMARY KEY (`id`) USING BTREE,
                        KEY `job_id` (`job_id`) USING BTREE
@@ -89,3 +88,6 @@ alter table JOB ADD COLUMN `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMES
 alter table JOB ADD COLUMN `retry_time` int NOT NULL DEFAULT '0' COMMENT '流式任务重试次数';
 
 alter table JOB ADD COLUMN `graph` longtext CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '计算画布';
+
+-- 旧数据暂不处理，需手动将type改为driver name
+ALTER TABLE DS MODIFY COLUMN `type` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL;

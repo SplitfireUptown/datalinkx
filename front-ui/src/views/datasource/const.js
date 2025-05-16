@@ -10,74 +10,74 @@ import {
 const DataSourceType = [
   {
     label: 'MySQL',
-    value: 1
+    value: 'mysql'
   },
   {
     label: 'ELASTICSEARCH',
-    value: 2
+    value: 'es'
   },
   {
     label: 'ORACLE',
-    value: 3
+    value: 'oracle'
   },
   {
     label: 'REDIS',
-    value: 4
+    value: 'redis'
   },
   {
     label: 'HTTP',
-    value: 5
+    value: 'http'
   },
   {
     label: 'KAFKA',
-    value: 100
+    value: 'kafka'
   }
 ]
 const dsTypeList = [
   {
     value: 'MySQL',
     label: 'MySQL',
-    dsTypeKey: 1,
+    dsTypeKey: 'mysql',
     img: mysqlPng
   },
   {
     value: 'es',
     label: 'ElasticSearch',
-    dsTypeKey: 2,
+    dsTypeKey: 'es',
     img: ESPng
   },
   {
     value: 'oracle',
     label: 'Oracle',
-    dsTypeKey: 3,
+    dsTypeKey: 'oracle',
     img: oraclePng
   },
   {
     value: 'redis',
     label: 'Redis',
-    dsTypeKey: 4,
+    dsTypeKey: 'redis',
     img: redisPng
   },
   {
     value: 'kafka',
     label: 'Kafka',
-    dsTypeKey: 100,
+    dsTypeKey: 'kafka',
     img: kafkaPng
   },
   {
     value: 'http',
     label: 'HTTP',
-    dsTypeKey: 5,
+    dsTypeKey: 'http',
     img: httpPng
   }
 ]
 const dsImgObj = {
-  1: mysqlPng,
-  2: ESPng,
-  3: oraclePng,
-  4: redisPng,
-  5: httpPng,
-  100: kafkaPng
+  'mysql': mysqlPng,
+  'es': ESPng,
+  'oracle': oraclePng,
+  'redis': redisPng,
+  'http': httpPng,
+  'kafka': kafkaPng
 }
 // 目标数据源 redis 类型
 const RedisTypes = [

@@ -145,21 +145,21 @@ export default {
       }
       list.forEach(item => {
         switch (this.currentDs.dsTypeKey) {
-          case 4:
-          case 2: {
+          case 'redis':
+          case 'es': {
             item.isRequired = ['host', 'port'].includes(item.key)
             break
           }
-          case 3: {
+          case 'oracle': {
             item.isRequired = ['host', 'port', 'username', 'password', 'database'].includes(item.key)
             break
           }
-          case 100: {
+          case 'kafka': {
             item.isRequired = ['host', 'port'].includes(item.key)
           }
         }
       })
-      if (this.currentDs.dsTypeKey === 3) {
+      if (this.currentDs.dsTypeKey === 'oracle') {
         list.push({
           label: '服务器类型',
           key: 'servertype',
@@ -220,7 +220,7 @@ export default {
     // 格式化复显表单数据
     formatData (info) {
       const temp = pick(info, ['name', 'host', 'port', 'username', 'database', 'password', 'config'])
-      if (this.currentDs.dsTypeKey === 3) {
+      if (this.currentDs.dsTypeKey === 'oracle') {
         const config = JSON.parse(info.config)
         if (config) {
           const servertype = Object.keys(config)[0]
@@ -243,7 +243,7 @@ export default {
         if (!err) {
           values.type = this.currentDs.dsTypeKey
           values.ds_id = this.dsId
-          if (this.currentDs.dsTypeKey === 3) {
+          if (this.currentDs.dsTypeKey === 'oracle') {
             const temp = {}
             temp[values.servertype] = values['sid']
             values.config = JSON.stringify(temp)

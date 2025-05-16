@@ -56,7 +56,7 @@ public class JobBean extends BaseDomainBean implements Serializable {
 	private String syncMode;
 	@Column(name = "`count`", columnDefinition = "text")
 	private String count;
-	// CREATE = 0; SYNCING = 1; NORMAL = 2; ERROR = 3; QUEUE = 4; STOP = 5
+	// 0 - 新建、1 - 运行中、2 - 运行成功、3 - 运行失败、4 - 停止、5 - 队列中
 	@Column(name = "status", nullable = false, columnDefinition = "int(2)")
 	private Integer status;
 	@Column(name = "error_msg", columnDefinition = "longtext")

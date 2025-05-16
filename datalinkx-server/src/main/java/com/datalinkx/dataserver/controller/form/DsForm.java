@@ -22,14 +22,14 @@ public class DsForm {
 		@JsonProperty("database")
 		private String database = "";
 		private Integer port;
-		private Integer type;
+		private String type;
 		private String config;
 	}
 
 	@Data
 	public static class DataSourcePageForm {
 		private String name;
-		private Integer type;
+		private String type;
 
 		@ApiModelProperty(value = "当前页")
 		@JsonProperty("page_no")

@@ -121,7 +121,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .tableName(jobBean.getFromTb())
                 .columns(fromColumns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getReaderDsId())))
-                .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsId2Object.get(jobBean.getReaderDsId()).getType()))
+                .type(dsId2Object.get(jobBean.getReaderDsId()).getType())
                 .build();
 
         DatalinkXJobDetail.Writer writer = DatalinkXJobDetail.Writer.builder()
@@ -129,7 +129,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .columns(toColumns)
                 .connectId(dsServiceImpl.getConnectId(dsId2Object.get(jobBean.getWriterDsId())))
                 .batchSize(commonProperties.getStreamBatchSize())
-                .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(dsId2Object.get(jobBean.getWriterDsId()).getType()))
+                .type(dsId2Object.get(jobBean.getWriterDsId()).getType())
                 .build();
 
         DatalinkXJobDetail.SyncUnit syncUnit = DatalinkXJobDetail.SyncUnit
@@ -188,7 +188,7 @@ public class DtsJobServiceImpl implements DtsJobService {
         DatalinkXJobDetail.Reader reader = DatalinkXJobDetail.Reader
                 .builder()
                 .connectId(dsServiceImpl.getConnectId(fromDs))
-                .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(fromDs.getType()))
+                .type(fromDs.getType())
                 .schema(fromDs.getDatabase())
                 .transferSetting(transferSetting)
                 .maxValue(syncModeForm.getIncreateValue())
@@ -277,7 +277,7 @@ public class DtsJobServiceImpl implements DtsJobService {
         DatalinkXJobDetail.Writer writer = DatalinkXJobDetail.Writer.builder()
                 .schema(toDs.getDatabase())
                 .connectId(dsServiceImpl.getConnectId(toDs))
-                .type(MetaConstants.DsType.TYPE_TO_DB_NAME_MAP.get(toDs.getType()))
+                .type(toDs.getType())
                 .insertFields(insertFields)
                 .tableName(jobBean.getToTb())
                 .columns(toCols)
