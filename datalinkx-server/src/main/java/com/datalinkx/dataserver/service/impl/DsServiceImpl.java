@@ -55,6 +55,7 @@ public class DsServiceImpl implements DsService {
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_REDIS, new RedisSetupInfoGenerator());
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_HTTP, new HttpSetupInfoGenerator());
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_KAFKA, new KafkaSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_CUSTOM, new CustomSetupInfoGenerator());
 	}
 
 

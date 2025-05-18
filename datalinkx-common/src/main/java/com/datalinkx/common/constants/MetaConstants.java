@@ -28,6 +28,7 @@ public final class MetaConstants {
         public static final String DS_REDIS = "redis";
         public static final String DS_HTTP = "http";
         public static final String DS_KAFKA = "kafka";
+        public static final String DS_CUSTOM = "custom";
 
 
         public static final String REDIS_SPIT_STR = "!-!-!";

@@ -2,10 +2,13 @@ package com.datalinkx.driver.dsdriver;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ConnectIdUtils;
+import com.datalinkx.common.utils.JsonUtils;
+import com.datalinkx.driver.dsdriver.customdriver.CustomSetupInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.core.Map;
 
 
 @Slf4j
@@ -22,6 +25,14 @@ public final class DsDriverFactory {
 
     public static IDsDriver getDriver(String connectId) throws Exception {
         String dsType = ConnectIdUtils.getDsType(connectId);
+
+        // 如果是自定义数据源，解析config中的类型进行反射加载对应插件
+        if (MetaConstants.DsType.DS_CUSTOM.equalsIgnoreCase(dsType)) {
+            CustomSetupInfo customSetupInfo = JsonUtils.toObject(ConnectIdUtils.decodeConnectId(connectId), CustomSetupInfo.class);
+            Map object = JsonUtils.toObject(customSetupInfo.getConfig(), Map.class);
+            // TODO: 加载对应自定义插件
+        }
+
         String driverClassName = getDriverClass(dsType);
         Class<?> driverClass = Class.forName(driverClassName);
         Constructor<?> constructor = driverClass.getDeclaredConstructor(String.class);
