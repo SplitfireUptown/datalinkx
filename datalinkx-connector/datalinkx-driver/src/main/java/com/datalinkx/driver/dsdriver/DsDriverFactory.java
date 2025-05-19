@@ -1,19 +1,16 @@
 package com.datalinkx.driver.dsdriver;
 
+import com.datalinkx.common.exception.DatalinkXServerException;
+import com.datalinkx.common.result.StatusCode;
+import com.datalinkx.common.utils.ConnectIdUtils;
+import com.datalinkx.common.utils.JarLoaderUtil;
+import lombok.extern.slf4j.Slf4j;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
-import java.util.Map;
-
-import com.datalinkx.common.constants.MetaConstants;
-import com.datalinkx.common.utils.ConnectIdUtils;
-import com.datalinkx.common.utils.JarLoaderUtil;
-import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.driver.dsdriver.classloader.ClassLoaderManager;
-import com.datalinkx.driver.dsdriver.setupinfo.CustomSetupInfo;
-import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -23,48 +20,49 @@ public final class DsDriverFactory {
 
     }
     private static final String PACKAGE_PREFIX = "com.datalinkx.";
-    private static final String DRIVER_DIST = "com.datalinkx.";
+    private static final String DRIVER_DIST = "driver-dist";
 
     private static String getDriverClass(String driverName) {
         return PACKAGE_PREFIX + driverName.toLowerCase() + "driver" + "." + ConnectIdUtils.toPascalCase(driverName) + "Driver";
     }
 
-    public static IDsDriver discoverSource(String driverName, String connectId) throws Exception {
-        String pluginClassName = getDriverClass(driverName);
-        // 假设 JarLoaderUtil.loadJarsFromDirectory 加载 JAR 包到系统类加载器，不返回 URL 列表
-        List<URL> urls = JarLoaderUtil.loadJarsFromDirectory(System.getProperty("user.dir") + "driver-dist");
-        URLClassLoader urlClassLoader = new URLClassLoader(urls);
+    public static IDsDriver getDriver(String connectId) throws Exception {
+        String dsType = ConnectIdUtils.getDsType(connectId);
+        // 假设 JarLoaderUtil.loadJarsFromDirectory 加载 JAR 包到系统类加载器，返回 URL 列表
+        List<URL> dataSourcePlugins = JarLoaderUtil.loadJarsFromDirectory(DRIVER_DIST);
+        String targetJarName = String.format("datalinkx-driver-%s-1.0.0.jar", dsType.toLowerCase());
+        String targetClassName = getDriverClass(dsType);
 
-        // 使用系统类加载器加载类
-        Class<?> clazz = Class.forName(pluginClassName);
-        // 假设构造函数只需要 connectId 作为参数
+        URL targetJarUrl = dataSourcePlugins.stream()
+                .filter(plugin -> plugin.getPath().endsWith(targetJarName))
+                .findFirst()
+                .orElseThrow(() -> new DatalinkXServerException(StatusCode.DRIVER_LOAD_FAIL));
+
+        // 使用自定义的 URLClassLoader 加载目标 JAR 包中的类
+        URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{targetJarUrl}, Thread.currentThread().getContextClassLoader());
+        Class<?> clazz = Class.forName(targetClassName, true, urlClassLoader);
+
         Constructor<?> constructor = clazz.getConstructor(String.class);
         return (IDsDriver) constructor.newInstance(connectId);
     }
 
-
-    public static IDsDriver getDriver(String connectId) throws Exception {
-        String dsType = ConnectIdUtils.getDsType(connectId);
-
-        // 如果是自定义数据源，解析config中的类型进行反射加载对应插件
-        if (MetaConstants.DsType.DS_CUSTOM.equalsIgnoreCase(dsType)) {
-            CustomSetupInfo customSetupInfo = JsonUtils.toObject(ConnectIdUtils.decodeConnectId(connectId), CustomSetupInfo.class);
-            Map object = JsonUtils.toObject(customSetupInfo.getConfig(), Map.class);
-            // TODO: 加载对应自定义插件
+    public static IStreamDriver getStreamDriver(String connectId) throws Exception {
+//        String dsType = ConnectIdUtils.getDsType(connectId);
+//        String driverClassName = getDriverClass(dsType);
+//        Class<?> driverClass = Class.forName(driverClassName);
+//        Constructor<?> constructor = driverClass.getDeclaredConstructor(String.class);
+//        return (IStreamDriver) constructor.newInstance(connectId);
+        try {
+            try {
+                return (IStreamDriver) getDriver(connectId);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                log.error("driver load error", e);
+            }
+        } catch (NoSuchMethodException e) {
+            log.error("driver load error", e);
         }
 
-        String driverClassName = getDriverClass(dsType);
-        Class<?> driverClass = Class.forName(driverClassName);
-        Constructor<?> constructor = driverClass.getDeclaredConstructor(String.class);
-        return (IDsDriver) constructor.newInstance(connectId);
-    }
-
-    public static IStreamDriver getStreamDriver(String connectId) throws Exception {
-        String dsType = ConnectIdUtils.getDsType(connectId);
-        String driverClassName = getDriverClass(dsType);
-        Class<?> driverClass = Class.forName(driverClassName);
-        Constructor<?> constructor = driverClass.getDeclaredConstructor(String.class);
-        return (IStreamDriver) constructor.newInstance(connectId);
+        throw new Exception("can not initialize driver");
     }
 
     public static IDsReader getDsReader(String connectId) throws Exception {

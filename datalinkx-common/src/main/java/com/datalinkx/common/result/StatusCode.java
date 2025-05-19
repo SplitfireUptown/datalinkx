@@ -3,21 +3,17 @@ package com.datalinkx.common.result;
 import lombok.Getter;
 
 public enum StatusCode {
-    NORMAL(0),
-    COOKIE_EXPIRED(1),
-    API_INTERNAL_ERROR(2),
-    INVALID_ARGUMENTS(3),
+    API_INTERNAL_ERROR(500),
     DS_NOT_EXISTS(101),
     DS_CONFIG_ERROR(102),
     DS_HAS_JOB_DEPEND(102),
-    TB_NOT_EXISTS(201),
 
     JOB_IS_RUNNING(1001),
-    SYNC_STATUS_ERROR(1002),
     JOB_NOT_EXISTS(1000),
     JOB_CONFIG_ERROR(1003),
-    JOB_IS_STOP(1004),
 
+
+    DRIVER_LOAD_FAIL(1111),
 
     XTB_NOT_EXISTS(2000);
 
