@@ -44,6 +44,7 @@ rebel-remote.xml
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
 plugins/
+driver-dist
 lib/
 jobs/
 nohup.out

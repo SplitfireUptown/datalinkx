@@ -16,6 +16,12 @@
         <module>datalinkx-driver</module>
         <module>datalinkx-stream</module>
         <module>datalinkx-transform</module>
+        <module>datalinkx-driver-es</module>
+        <module>datalinkx-driver-oracle</module>
+        <module>datalinkx-driver-http</module>
+        <module>datalinkx-driver-mysql</module>
+        <module>datalinkx-driver-redis</module>
+        <module>datalinkx-driver-kafka</module>
     </modules>
 
     <artifactId>datalinkx-connector</artifactId>
@@ -23,6 +29,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <dist.dir>driver-dist</dist.dir>
     </properties>
 
 </project>

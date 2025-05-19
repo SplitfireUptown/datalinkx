@@ -1,7 +1,7 @@
 package com.datalinkx.dataserver.service.setupgenerator;
 
 import com.datalinkx.dataserver.bean.domain.DsBean;
-import com.datalinkx.driver.dsdriver.customdriver.CustomSetupInfo;
+import com.datalinkx.driver.dsdriver.setupinfo.CustomSetupInfo;
 
 public class CustomSetupInfoGenerator implements SetupInfoGenerator<CustomSetupInfo> {
 

@@ -4,7 +4,7 @@ import cn.hutool.core.lang.Pair;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.client.HttpConstructor;
-import com.datalinkx.driver.dsdriver.httpdriver.HttpSetupInfo;
+import com.datalinkx.driver.dsdriver.setupinfo.HttpSetupInfo;
 
 public class HttpSetupInfoGenerator implements SetupInfoGenerator<HttpSetupInfo> {
 

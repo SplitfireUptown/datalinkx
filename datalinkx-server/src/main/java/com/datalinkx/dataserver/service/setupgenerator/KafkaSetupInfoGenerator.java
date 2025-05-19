@@ -1,7 +1,7 @@
 package com.datalinkx.dataserver.service.setupgenerator;
 
 import com.datalinkx.dataserver.bean.domain.DsBean;
-import com.datalinkx.driver.dsdriver.kafkadriver.KafkaSetupInfo;
+import com.datalinkx.driver.dsdriver.setupinfo.KafkaSetupInfo;
 
 public class KafkaSetupInfoGenerator implements SetupInfoGenerator<KafkaSetupInfo> {
 

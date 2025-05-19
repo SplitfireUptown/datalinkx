@@ -2,13 +2,18 @@ package com.datalinkx.driver.dsdriver;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.List;
+import java.util.Map;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.ConnectIdUtils;
+import com.datalinkx.common.utils.JarLoaderUtil;
 import com.datalinkx.common.utils.JsonUtils;
-import com.datalinkx.driver.dsdriver.customdriver.CustomSetupInfo;
+import com.datalinkx.driver.dsdriver.classloader.ClassLoaderManager;
+import com.datalinkx.driver.dsdriver.setupinfo.CustomSetupInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.core.Map;
 
 
 @Slf4j
@@ -17,11 +22,26 @@ public final class DsDriverFactory {
     private DsDriverFactory() {
 
     }
-    private static final String PACKAGE_PREFIX = "com.datalinkx.driver.dsdriver.";
+    private static final String PACKAGE_PREFIX = "com.datalinkx.";
+    private static final String DRIVER_DIST = "com.datalinkx.";
 
     private static String getDriverClass(String driverName) {
         return PACKAGE_PREFIX + driverName.toLowerCase() + "driver" + "." + ConnectIdUtils.toPascalCase(driverName) + "Driver";
     }
+
+    public static IDsDriver discoverSource(String driverName, String connectId) throws Exception {
+        String pluginClassName = getDriverClass(driverName);
+        // 假设 JarLoaderUtil.loadJarsFromDirectory 加载 JAR 包到系统类加载器，不返回 URL 列表
+        List<URL> urls = JarLoaderUtil.loadJarsFromDirectory(System.getProperty("user.dir") + "driver-dist");
+        URLClassLoader urlClassLoader = new URLClassLoader(urls);
+
+        // 使用系统类加载器加载类
+        Class<?> clazz = Class.forName(pluginClassName);
+        // 假设构造函数只需要 connectId 作为参数
+        Constructor<?> constructor = clazz.getConstructor(String.class);
+        return (IDsDriver) constructor.newInstance(connectId);
+    }
+
 
     public static IDsDriver getDriver(String connectId) throws Exception {
         String dsType = ConnectIdUtils.getDsType(connectId);

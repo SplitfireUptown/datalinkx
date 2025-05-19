@@ -20,6 +20,7 @@ import com.datalinkx.driver.dsdriver.base.column.WriterConnection;
 import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
+import com.datalinkx.driver.dsdriver.setupinfo.JdbcSetupInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 

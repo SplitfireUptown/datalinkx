@@ -1,7 +1,7 @@
 package com.datalinkx.dataserver.service.setupgenerator;
 
 import com.datalinkx.dataserver.bean.domain.DsBean;
-import com.datalinkx.driver.dsdriver.redisdriver.RedisSetupInfo;
+import com.datalinkx.driver.dsdriver.setupinfo.RedisSetupInfo;
 import org.springframework.util.StringUtils;
 
 public class RedisSetupInfoGenerator implements SetupInfoGenerator<RedisSetupInfo> {

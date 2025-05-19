@@ -2,7 +2,7 @@ package com.datalinkx.dataserver.service.setupgenerator;
 
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
-import com.datalinkx.driver.dsdriver.oracledriver.OracleSetupInfo;
+import com.datalinkx.driver.dsdriver.setupinfo.OracleSetupInfo;
 
 import java.util.Map;
 

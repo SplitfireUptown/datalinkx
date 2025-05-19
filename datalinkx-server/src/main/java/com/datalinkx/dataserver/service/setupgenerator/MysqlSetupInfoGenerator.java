@@ -1,7 +1,7 @@
 package com.datalinkx.dataserver.service.setupgenerator;
 
 import com.datalinkx.dataserver.bean.domain.DsBean;
-import com.datalinkx.driver.dsdriver.mysqldriver.MysqlSetupInfo;
+import com.datalinkx.driver.dsdriver.setupinfo.MysqlSetupInfo;
 
 public class MysqlSetupInfoGenerator implements SetupInfoGenerator<MysqlSetupInfo> {
 
