@@ -1,5 +1,7 @@
 package com.datalinkx.dataserver.service.impl;
 
+import cn.hutool.core.lang.Pair;
+import cn.hutool.core.lang.Tuple;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.StatusCode;
@@ -223,7 +225,8 @@ public class DsServiceImpl implements DsService {
 			IDsDriver dsDriver = DsDriverFactory.getDriver(getConnectId(dsBean));
 			if (dsDriver instanceof IDsReader) {
 				IDsReader dsReader = (IDsReader) dsDriver;
-				tableList = dsReader.treeTable(dsBean.getDatabase(), dsBean.getSchema());
+				Pair<String, String> dataBaseAndSchema = this.getDataBaseAndSchema(dsBean);
+				tableList = dsReader.treeTable(dataBaseAndSchema.getKey(), dataBaseAndSchema.getValue());
 			}
 		} catch (Exception e) {
 			log.error("connect error", e);
@@ -247,12 +250,24 @@ public class DsServiceImpl implements DsService {
 			IDsDriver dsDriver = DsDriverFactory.getDriver(getConnectId(dsBean));
 			if (dsDriver instanceof IDsReader) {
 				IDsReader dsReader = (IDsReader) dsDriver;
-				return dsReader.getFields(dsBean.getDatabase(), dsBean.getSchema(), tbName);
+				Pair<String, String> dataBaseAndSchema = this.getDataBaseAndSchema(dsBean);
+				return dsReader.getFields(dataBaseAndSchema.getKey(), dataBaseAndSchema.getValue(), tbName);
 			}
 		} catch (Exception e) {
 			log.error("connect error", e);
 			throw new DatalinkXServerException(e);
 		}
 		return new ArrayList<>();
+	}
+
+
+	private Pair<String, String> getDataBaseAndSchema(DsBean dsBean) {
+		if (!MetaConstants.DsType.DS_CUSTOM.equals(dsBean.getType())) {
+			return Pair.of(dsBean.getDatabase(), dsBean.getSchema());
+		}
+
+		// 自定义插件驱动需要解析config
+		Map<String, Object> configMap = JsonUtils.toObject(dsBean.getConfig(), Map.class);
+		return Pair.of(configMap.getOrDefault("database", "").toString(), configMap.getOrDefault("schema", configMap.getOrDefault("database", "").toString()).toString());
 	}
 }
