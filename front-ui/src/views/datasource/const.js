@@ -4,7 +4,8 @@ import {
   ESPng,
   redisPng,
   kafkaPng,
-  httpPng
+  httpPng,
+  customPng
 } from '@/core/icons'
 
 const DataSourceType = [
@@ -69,6 +70,12 @@ const dsTypeList = [
     label: 'HTTP',
     dsTypeKey: 'http',
     img: httpPng
+  },
+  {
+    value: 'custom',
+    label: 'CUSTOM',
+    dsTypeKey: 'custom',
+    img: customPng
   }
 ]
 const dsImgObj = {
@@ -77,6 +84,7 @@ const dsImgObj = {
   'oracle': oraclePng,
   'redis': redisPng,
   'http': httpPng,
+  'custom': customPng,
   'kafka': kafkaPng
 }
 // 目标数据源 redis 类型

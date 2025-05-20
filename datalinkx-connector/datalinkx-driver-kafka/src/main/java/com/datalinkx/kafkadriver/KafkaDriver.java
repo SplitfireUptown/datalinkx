@@ -10,7 +10,7 @@ import com.datalinkx.driver.dsdriver.base.reader.ReaderInfo;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import com.datalinkx.driver.dsdriver.setupinfo.KafkaSetupInfo;
 
-public class KafkaDriver implements AbstractDriver<KafkaSetupInfo, KafkaReader, KafkaWriter>, IStreamDriver {
+public class KafkaDriver extends AbstractDriver<KafkaSetupInfo, KafkaReader, KafkaWriter> implements IStreamDriver {
     private final KafkaSetupInfo kafkaSetupInfo;
     private final String connectId;
     public KafkaDriver(String connectId) {

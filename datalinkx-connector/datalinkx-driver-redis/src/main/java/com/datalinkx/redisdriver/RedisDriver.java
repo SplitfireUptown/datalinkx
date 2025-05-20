@@ -10,7 +10,7 @@ import com.datalinkx.driver.dsdriver.base.reader.AbstractReader;
 import com.datalinkx.driver.dsdriver.base.writer.WriterInfo;
 import com.datalinkx.driver.dsdriver.setupinfo.RedisSetupInfo;
 
-public class RedisDriver implements AbstractDriver<RedisSetupInfo, AbstractReader, RedisWriter>, IDsWriter {
+public class RedisDriver extends AbstractDriver<RedisSetupInfo, AbstractReader, RedisWriter> implements IDsWriter {
 
     private final String connectId;
     private final RedisSetupInfo redisSetupInfo;

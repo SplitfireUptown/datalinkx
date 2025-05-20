@@ -59,6 +59,7 @@
         @ok="handleOk"
         ref="httpDsSaveOrUpdate"
       />
+      <custom-ds-save-or-update @ok="handleOk" ref="customDsSaveOrUpdate" />
     </a-card>
   </div>
 </template>
@@ -66,6 +67,7 @@
 <script>
 import { pageQuery, delObj, getDsGroup } from '@/api/datasource/datasource'
 import HttpDsSaveOrUpdate from './HttpDsSaveOrUpdate.vue'
+import CustomDsSaveOrUpdate from './CustomDsSaveOrUpdate.vue'
 import DsConfig from './DsConfig.vue'
 import { dsTypeList } from './const'
 import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
@@ -74,6 +76,7 @@ export default {
   name: 'ContainerBottom',
   components: {
     HttpDsSaveOrUpdate,
+    CustomDsSaveOrUpdate,
     DsConfig
   },
   data () {
@@ -153,8 +156,7 @@ export default {
         'oracle': 0,
         'redis': 0,
         'http': 0,
-        'clickhouse': 0,
-        'mysqlcdc': 0,
+        'custom': 0,
         'kafka': 0
       },
       currentDs: {
@@ -183,6 +185,8 @@ export default {
     createDS () {
       if (this.currentDs.dsTypeKey === 'http') {
         this.$refs.httpDsSaveOrUpdate.show('', 'add')
+      } else if (this.currentDs.dsTypeKey === 'custom') {
+        this.$refs.customDsSaveOrUpdate.edit('', 'add')
       } else {
         this.$refs.refDsConfig.show('', 'add')
       }
@@ -216,6 +220,8 @@ export default {
     edit (record) {
       if (this.currentDs.dsTypeKey === 'http') {
         this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'edit')
+      } else if (this.currentDs.dsTypeKey === 'custom') {
+        this.$refs.customDsSaveOrUpdate.edit('', 'edit')
       } else {
         this.$refs.refDsConfig.show(record.dsId, 'edit', record)
       }
@@ -238,6 +244,8 @@ export default {
     show (record) {
       if (this.currentDs.dsTypeKey === 'http') {
         this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'show')
+      } else if (this.currentDs.dsTypeKey === 'custom') {
+        this.$refs.customDsSaveOrUpdate.edit(record.dsId, 'show')
       } else {
         this.$refs.refDsConfig.show(record.dsId, 'show', record)
       }

@@ -312,7 +312,7 @@
         const formData = {
           'ds_id': this.dsId,
           'name': this.ds_name,
-          'type': 5,
+          'type': 'http',
           'config': JSON.stringify(httpConfig)
         }
         if (this.api_url === '') {

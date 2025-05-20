@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @author: uptown
  * @date: 2024/12/17 22:38
  */
-public class HttpDriver implements AbstractDriver<HttpSetupInfo, HttpReader, AbstractWriter>, IDsReader {
+public class HttpDriver extends AbstractDriver<HttpSetupInfo, HttpReader, AbstractWriter> implements IDsReader {
 
     private final String connectId;
     private final HttpSetupInfo httpSetupInfo;

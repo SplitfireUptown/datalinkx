@@ -121,6 +121,11 @@ public class DsServiceImpl implements DsService {
 					throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "接口地址格式不正确，请包含协议");
 				}
 			}
+
+			// 自定义数据源校验config中是否声明的type
+			if (MetaConstants.DsType.DS_CUSTOM.equals(dsBean.getType()) && !map.containsKey("type")) {
+				throw new DatalinkXServerException(StatusCode.DS_CONFIG_ERROR, "自定义数据源需要在CONFIG中声明type");
+			}
 		}
 	}
 
@@ -151,10 +156,19 @@ public class DsServiceImpl implements DsService {
     public PageVo<List<DsBean>> dsPage(DsForm.DataSourcePageForm dataSourcePageForm) {
 		PageRequest pageRequest = PageRequest.of(dataSourcePageForm.getPageNo() - 1, dataSourcePageForm.getPageSize());
 		Page<DsBean> dsBeans = dsRepository.pageQuery(pageRequest, dataSourcePageForm.getName(), dataSourcePageForm.getType());
+
+		List<DsBean> pageDsList = dsBeans.getContent();
+		if (MetaConstants.DsType.DS_CUSTOM.equals(dataSourcePageForm.getType())) {
+			pageDsList = pageDsList.stream().peek(ds -> {
+				Map configMap = JsonUtils.toObject(ds.getConfig(), Map.class);
+				ds.setType((String) configMap.get("type"));
+            }).collect(Collectors.toList());
+		}
+
 		PageVo<List<DsBean>> result = new PageVo<>();
 		result.setPageNo(dataSourcePageForm.getPageNo());
 		result.setPageSize(dataSourcePageForm.getPageSize());
-		result.setData(dsBeans.getContent());
+		result.setData(pageDsList);
 		result.setTotalPage(dsBeans.getTotalPages());
 		result.setTotal(dsBeans.getTotalElements());
 		return result;

@@ -18,6 +18,7 @@ import ESPng from '@/assets/icons/ELASTICSEARCH.png'
 import httpPng from '@/assets/icons/HTTP.png'
 import redisPng from '@/assets/icons/REDIS.png'
 import kafkaPng from '@/assets/icons/KAFKA.png'
+import customPng from '@/assets/icons/CUSTOM.png'
 
 export {
   bxAnaalyse,
@@ -31,5 +32,6 @@ export {
   ESPng,
   httpPng,
   redisPng,
-  kafkaPng
+  kafkaPng,
+  customPng
 }

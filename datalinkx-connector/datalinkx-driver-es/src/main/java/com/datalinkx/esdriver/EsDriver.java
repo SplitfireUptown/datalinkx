@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
 
-public class EsDriver implements AbstractDriver<EsSetupInfo, EsReader, EsWriter>, IDsReader, IDsWriter {
+public class EsDriver extends AbstractDriver<EsSetupInfo, EsReader, EsWriter> implements IDsReader, IDsWriter {
     private static final long ES_TIMEOUT = 3000L;
     private static final long DEFAULT_FETCH_SIZE = 10000L;
 

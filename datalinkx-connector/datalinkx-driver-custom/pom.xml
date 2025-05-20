@@ -20,13 +20,13 @@
     <dependencies>
         <dependency>
             <groupId>com.datalinkx</groupId>
-            <artifactId>datalinkx-common</artifactId>
+            <artifactId>datalinkx-driver</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>com.datalinkx</groupId>
-            <artifactId>datalinkx-driver</artifactId>
-            <version>1.0.0</version>
+            <groupId>ru.yandex.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>0.2.4</version>
         </dependency>
     </dependencies>
 

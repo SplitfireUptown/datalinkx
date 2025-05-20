@@ -92,7 +92,7 @@ export default {
         return {
           value: 'MySQL',
           label: 'MySQL',
-          dsTypeKey: 1
+          dsTypeKey: 'mysql'
         }
       }
     }
@@ -137,8 +137,8 @@ export default {
     },
     currentDsList () {
       let list = cloneDeep(this.dsConfigOriginList)
-      if (this.currentDs.dsTypeKey === 1) return list
-      if (this.currentDs.dsTypeKey === 2) {
+      if (this.currentDs.dsTypeKey === 'mysql') return list
+      if (this.currentDs.dsTypeKey === 'es') {
         list = list.filter(item => {
           return item.key !== 'database'
         })

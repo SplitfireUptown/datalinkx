@@ -9,6 +9,7 @@ public class CustomSetupInfoGenerator implements SetupInfoGenerator<CustomSetupI
     public CustomSetupInfo generateSetupInfo(DsBean dsBean) {
         CustomSetupInfo customSetupInfo = new CustomSetupInfo();
         customSetupInfo.setConfig(dsBean.getConfig());
+        customSetupInfo.setType(dsBean.getType());
         return customSetupInfo;
     }
 }

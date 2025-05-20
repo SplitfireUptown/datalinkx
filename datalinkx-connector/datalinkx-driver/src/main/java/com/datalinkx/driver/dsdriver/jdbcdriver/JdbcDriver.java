@@ -25,14 +25,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.ParameterizedType;
+import java.net.URLClassLoader;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @Slf4j
-public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter> implements
-        AbstractDriver<T, P, Q>, IDsDriver, IDsReader, IDsWriter {
+public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends JdbcWriter>
+        extends AbstractDriver<T, P, Q> implements IDsDriver, IDsReader, IDsWriter {
 
     protected T jdbcSetupInfo;
     protected String connectId;
@@ -74,7 +75,13 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         String url = jdbcUrl();
         String errorMsg;
         try {
-            Class.forName(driverClass()).getDeclaredConstructor().newInstance();
+            if (ObjectUtils.isEmpty(urlClassLoader)) {
+
+                Class.forName(driverClass()).getDeclaredConstructor().newInstance();
+            } else {
+
+                Class.forName(driverClass(), true, urlClassLoader).getDeclaredConstructor().newInstance();
+            }
         } catch (ClassNotFoundException e) {
             errorMsg = "dsdriver class not exist";
             log.error(errorMsg, e);
