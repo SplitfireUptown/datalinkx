@@ -1,22 +1,38 @@
 package com.datalinkx.customdriver;
 
 
+import com.datalinkx.common.utils.ConnectIdUtils;
+import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcDriver;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcReader;
 import com.datalinkx.driver.dsdriver.jdbcdriver.JdbcWriter;
+import com.datalinkx.driver.dsdriver.setupinfo.JdbcSetupInfo;
 import com.datalinkx.driver.dsdriver.setupinfo.MysqlSetupInfo;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
 @Slf4j
-public class CustomDriver extends JdbcDriver<MysqlSetupInfo, JdbcReader, JdbcWriter> {
+public class CustomDriver extends JdbcDriver<JdbcSetupInfo, JdbcReader, JdbcWriter> {
 
 
     public CustomDriver(String connectId) {
-        super(connectId);
+        Map customConfig = JsonUtils.toObject(ConnectIdUtils.decodeConnectId(connectId), Map.class);
+        log.info("inject custom config:{}", customConfig);
+        Map innerConfig = JsonUtils.toObject((String) customConfig.get("config"), Map.class);
+        log.info("inject custom inner config:{}", customConfig);
+        jdbcSetupInfo = new JdbcSetupInfo();
+        jdbcSetupInfo.setPwd((String) innerConfig.get("pwd"));
+        jdbcSetupInfo.setServer((String) innerConfig.get("server"));
+        jdbcSetupInfo.setDatabase((String) innerConfig.get("database"));
+        jdbcSetupInfo.setUid((String) innerConfig.get("uid"));
+        jdbcSetupInfo.setPort((Integer) innerConfig.get("port"));
+
+        this.connectId = connectId;
     }
 
     private static final String CLICKHOUSE_DATABASE_JDBC_PATTERN = "jdbc:clickhouse://%s:%s/%s";

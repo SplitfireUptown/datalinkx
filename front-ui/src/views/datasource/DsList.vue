@@ -97,13 +97,10 @@ export default {
           width: '10%',
           dataIndex: 'type',
           customRender: (text) => {
+            const matchedItem = DATA_SOURCE_TYPE.find(item => item.value === text);
             return (
               <div>
-                {DATA_SOURCE_TYPE.map(item => {
-                  if (item.value === text) {
-                    return <span>{item.label}</span>
-                  }
-                })}
+                {matchedItem ? <span>{matchedItem.label}</span> : <span>custom</span>}
               </div>
             )
           }

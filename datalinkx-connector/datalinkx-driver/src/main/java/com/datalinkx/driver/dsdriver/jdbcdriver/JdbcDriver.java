@@ -3,6 +3,7 @@ package com.datalinkx.driver.dsdriver.jdbcdriver;
 
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.exception.DatalinkXJobException;
+import com.datalinkx.common.exception.DatalinkXServerException;
 import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
@@ -47,6 +48,9 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
         this.connectId = connectId;
     }
 
+    public JdbcDriver() {
+    }
+
     protected String jdbcUrl() {
         return "";
     }
@@ -70,7 +74,8 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
     @Override
     public Object connect(boolean check) throws Exception {
-        Connection connection;
+        Connection connection = null;
+        Driver injectDriver = null;
 
         String url = jdbcUrl();
         String errorMsg;
@@ -80,7 +85,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 Class.forName(driverClass()).getDeclaredConstructor().newInstance();
             } else {
 
-                Class.forName(driverClass(), true, urlClassLoader).getDeclaredConstructor().newInstance();
+                injectDriver = (Driver) Class.forName(driverClass(), true, urlClassLoader).getDeclaredConstructor().newInstance();
             }
         } catch (ClassNotFoundException e) {
             errorMsg = "dsdriver class not exist";
@@ -92,10 +97,15 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
         try {
             connection = DriverManager.getConnection(url, connectProp());
-        } catch (SQLException e) {
-            errorMsg = "connect failed";
-            log.error(errorMsg, e);
-            throw new Exception("数据库连接失败, 原因：" + e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            if (!ObjectUtils.isEmpty(urlClassLoader) && !ObjectUtils.isEmpty(injectDriver)) {
+                connection = injectDriver.connect(url, connectProp());
+            }
+        }
+
+        if (connection == null) {
+            throw new DatalinkXServerException("数据库连接失败, 请检查日志");
         }
 
         if (check) {
