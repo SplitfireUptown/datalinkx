@@ -115,7 +115,7 @@ export default {
           }
         },
         {
-          title: '流转进度(w/r)',
+          title: '流转进度(r/w)',
           width: '10%',
           dataIndex: 'progress'
         },
@@ -244,12 +244,9 @@ export default {
           console.log(flashData)
           for (const i of this.tableData) {
             if (i.job_id === flashData.job_id) {
-              if (flashData.status === 'RUNNING') {
-                i.status = 1
-                i.progress = (flashData.write_records + '/' + flashData.read_records)
-              } else if (flashData.status === 'FINISHED') {
-                // 防止消息先到前端后端未入库
-                i.status = 2
+              i.status = flashData.status
+              if (flashData.status === 1) {
+                i.progress = (flashData.read_records + '/' + flashData.write_records)
               }
             }
           }

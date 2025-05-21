@@ -26,13 +26,14 @@
           <template slot="label">
             <span>
               附加配置
-              <a-tooltip title="请使用 JSON 格式书写数据源配置，必须包含自定义数据源类型，例如：{&quot;type&quot;: &quot;clickhouse&quot;, &quot;username&quot;: &quot;root&quot;, &quot;password&quot;: &quot;123456&quot;}">
+              <a-tooltip title="请严格使用 JSON 格式书写数据源配置，必须包含自定义数据源类型type，type=插件包中的driver-dist/datalinkx-driver-type-1.0.0.jar 例如：{&quot;type&quot;: &quot;clickhouse&quot;, &quot;username&quot;: &quot;root&quot;, &quot;password&quot;: &quot;123456&quot;}}">
                 <a-icon type="question-circle-o" style="margin-left: 4px;" />
               </a-tooltip>
             </span>
           </template>
           <a-textarea
             type="text"
+            :autoSize="{ minRows: 10, maxRows: 6 }"
             :disabled="showable"
             v-decorator="['config', {rules: [{required: true, message: '请填写json格式的数据源配置'}]}]" />
         </a-form-item>
@@ -76,6 +77,7 @@ export default {
       editable: false,
       addable: false,
       showable: false,
+      dsId: '',
       type: 'add'
     }
   },
@@ -85,6 +87,7 @@ export default {
   methods: {
     // 获取用户信息
     edit (id, type) {
+      this.dsId = id
       this.visible = true
       if (type && type === 'add') {
         this.addable = true
@@ -118,6 +121,7 @@ export default {
       this.form.validateFields(async (err, values) => {
         if (!err) {
           values.type = 'custom'
+          values.ds_id = this.dsId
           this.confirmLoading = true
           if (this.type === 'add') {
             addObj(values).then(res => {

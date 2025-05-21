@@ -152,6 +152,10 @@ public class DtsJobServiceImpl implements DtsJobService {
                 .orElseThrow(
                         () -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "from ds not exist")
                 );
+
+        JobDto.JobGraphDto jobGraphInfo = dsServiceImpl.getJobGraphInfo(fromDs);
+
+
         // 流转任务来源表字段列表
         List<String> fromCols = jobConf.stream()
                 .filter(x -> StringUtils.isNotEmpty(x.getSourceField()) && StringUtils.isNotEmpty(x.getTargetField()))
@@ -169,7 +173,7 @@ public class DtsJobServiceImpl implements DtsJobService {
 
         // 获取对应增量条件
         IDsReader dsReader = DsDriverFactory.getDsReader(dsServiceImpl.getConnectId(fromDs));
-        Map<String, String> typeMappings = dsReader.getFields(fromDs.getDatabase(), fromDs.getSchema(), jobBean.getFromTb())
+        Map<String, String> typeMappings = dsReader.getFields(jobGraphInfo.getDatabase(), jobGraphInfo.getSchema(), jobBean.getFromTb())
                 .stream().collect(Collectors.toMap(DbTableField::getName, DbTableField::getType));
 
         if ("increment".equalsIgnoreCase(syncModeForm.getMode())) {
@@ -188,8 +192,8 @@ public class DtsJobServiceImpl implements DtsJobService {
         DatalinkXJobDetail.Reader reader = DatalinkXJobDetail.Reader
                 .builder()
                 .connectId(dsServiceImpl.getConnectId(fromDs))
-                .type(fromDs.getType())
-                .schema(fromDs.getDatabase())
+                .type(jobGraphInfo.getType())
+                .schema(jobGraphInfo.getDatabase())
                 .transferSetting(transferSetting)
                 .maxValue(syncModeForm.getIncreateValue())
                 .tableName(jobBean.getFromTb())
@@ -262,6 +266,7 @@ public class DtsJobServiceImpl implements DtsJobService {
                         () -> new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, "to ds not exist")
                 );
 
+        JobDto.JobGraphDto jobGraphInfo = dsServiceImpl.getJobGraphInfo(toDs);
         List<String> toCols = jobConf
                 .stream()
                 .map(JobForm.FieldMappingForm::getTargetField)
@@ -275,9 +280,9 @@ public class DtsJobServiceImpl implements DtsJobService {
 
 
         DatalinkXJobDetail.Writer writer = DatalinkXJobDetail.Writer.builder()
-                .schema(toDs.getDatabase())
+                .schema(jobGraphInfo.getDatabase())
                 .connectId(dsServiceImpl.getConnectId(toDs))
-                .type(toDs.getType())
+                .type(jobGraphInfo.getType())
                 .insertFields(insertFields)
                 .tableName(jobBean.getToTb())
                 .columns(toCols)

@@ -218,7 +218,7 @@ export default {
       if (this.currentDs.dsTypeKey === 'http') {
         this.$refs.httpDsSaveOrUpdate.show(record.dsId, 'edit')
       } else if (this.currentDs.dsTypeKey === 'custom') {
-        this.$refs.customDsSaveOrUpdate.edit('', 'edit')
+        this.$refs.customDsSaveOrUpdate.edit(record.dsId, 'edit')
       } else {
         this.$refs.refDsConfig.show(record.dsId, 'edit', record)
       }

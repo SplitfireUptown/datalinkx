@@ -89,7 +89,7 @@ public class JobClientApi {
             xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_CRON_SCHEDULE_TYPE);
             xxlJobInfo.setScheduleConf(cronExpr);
         } else {
-            xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_CRON_SCHEDULE_TYPE);
+            xxlJobInfo.setScheduleType(MetaConstants.JobType.JOB_NONE_SCHEDULE_TYPE);
             xxlJobInfo.setScheduleConf(MetaConstants.JobType.JOB_RATE_SCHEDULE_CONF);
         }
 

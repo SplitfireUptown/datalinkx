@@ -272,8 +272,7 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
 
         ReaderInfo<P> readerInfo = new ReaderInfo<>();
         String schema = reader.getSchema();
-        String type = reader.getType();
-        readerInfo.setName(type.toLowerCase() + "reader");
+        readerInfo.setName(reader.getType().toLowerCase() + "reader");
 
         readerInfo.setParameter((P) JdbcReader.builder()
                 .username(jdbcSetupInfo.getUid())
@@ -297,11 +296,9 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
     public Object getWriterInfo(DatalinkXJobDetail.Writer writer) {
         WriterInfo<Q> jdbcWriterInfo = new WriterInfo<>();
 
-        List<String> preSql = new ArrayList<>();
 
         String schema = writer.getSchema();
-        String type = writer.getType();
-        jdbcWriterInfo.setName(type.toLowerCase() + "writer");
+        jdbcWriterInfo.setName(writer.getType().toLowerCase() + "writer");
         jdbcWriterInfo.setParameter((Q) JdbcWriter.builder()
                 .username(jdbcSetupInfo.getUid())
                 .password(jdbcSetupInfo.getPwd())
@@ -314,7 +311,6 @@ public class JdbcDriver<T extends JdbcSetupInfo, P extends JdbcReader, Q extends
                 .insertSqlMode("copy")
                 .writeMode("insert")
                 .batchSize(writer.getBatchSize())
-                .preSql(preSql)
                 .build());
 
         return jdbcWriterInfo;

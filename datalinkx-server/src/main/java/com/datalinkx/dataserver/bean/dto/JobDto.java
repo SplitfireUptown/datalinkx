@@ -28,4 +28,13 @@ public class JobDto {
         private Long readCount = 0L;
         private Long writeCount = 0L;
     }
+
+    @Data
+    @ApiModel
+    @Builder
+    public static final class JobGraphDto {
+        private String database;
+        private String schema;
+        private String type;
+    }
 }

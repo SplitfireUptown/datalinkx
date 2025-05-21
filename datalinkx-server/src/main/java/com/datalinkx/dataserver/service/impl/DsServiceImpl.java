@@ -10,6 +10,7 @@ import com.datalinkx.common.utils.ConnectIdUtils;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
+import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.repository.DsRepository;
@@ -22,6 +23,7 @@ import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +41,7 @@ import static com.datalinkx.common.utils.IdUtils.genKey;
 
 
 @Service
-@Log4j2
+@Slf4j
 public class DsServiceImpl implements DsService {
 
 	@Autowired
@@ -225,8 +227,8 @@ public class DsServiceImpl implements DsService {
 			IDsDriver dsDriver = DsDriverFactory.getDriver(getConnectId(dsBean));
 			if (dsDriver instanceof IDsReader) {
 				IDsReader dsReader = (IDsReader) dsDriver;
-				Pair<String, String> dataBaseAndSchema = this.getDataBaseAndSchema(dsBean);
-				tableList = dsReader.treeTable(dataBaseAndSchema.getKey(), dataBaseAndSchema.getValue());
+				JobDto.JobGraphDto jobGraphDto = this.getJobGraphInfo(dsBean);
+				tableList = dsReader.treeTable(jobGraphDto.getDatabase(), jobGraphDto.getSchema());
 			}
 		} catch (Exception e) {
 			log.error("connect error", e);
@@ -250,8 +252,8 @@ public class DsServiceImpl implements DsService {
 			IDsDriver dsDriver = DsDriverFactory.getDriver(getConnectId(dsBean));
 			if (dsDriver instanceof IDsReader) {
 				IDsReader dsReader = (IDsReader) dsDriver;
-				Pair<String, String> dataBaseAndSchema = this.getDataBaseAndSchema(dsBean);
-				return dsReader.getFields(dataBaseAndSchema.getKey(), dataBaseAndSchema.getValue(), tbName);
+				JobDto.JobGraphDto jobGraphDto = this.getJobGraphInfo(dsBean);
+				return dsReader.getFields(jobGraphDto.getDatabase(), jobGraphDto.getSchema(), tbName);
 			}
 		} catch (Exception e) {
 			log.error("connect error", e);
@@ -261,13 +263,21 @@ public class DsServiceImpl implements DsService {
 	}
 
 
-	private Pair<String, String> getDataBaseAndSchema(DsBean dsBean) {
+	public JobDto.JobGraphDto getJobGraphInfo(DsBean dsBean) {
 		if (!MetaConstants.DsType.DS_CUSTOM.equals(dsBean.getType())) {
-			return Pair.of(dsBean.getDatabase(), dsBean.getSchema());
+			return JobDto.JobGraphDto.builder()
+					.schema(dsBean.getSchema())
+					.database(dsBean.getDatabase())
+					.type(dsBean.getType())
+					.build();
 		}
 
 		// 自定义插件驱动需要解析config
 		Map<String, Object> configMap = JsonUtils.toObject(dsBean.getConfig(), Map.class);
-		return Pair.of(configMap.getOrDefault("database", "").toString(), configMap.getOrDefault("schema", configMap.getOrDefault("database", "").toString()).toString());
+		return JobDto.JobGraphDto.builder()
+				.schema(configMap.getOrDefault("schema", configMap.getOrDefault("database", "").toString()).toString())
+				.database(configMap.getOrDefault("database", "").toString())
+				.type(configMap.get("type").toString())
+				.build();
 	}
 }

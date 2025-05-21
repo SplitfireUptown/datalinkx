@@ -87,21 +87,12 @@ public class TaskHealthCheckLoop implements InitializingBean {
                 Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 
                 long differenceInMillis = Math.abs(currentTime.getTime() - startTime.getTime());
+
+                // 30s内未调度到datalinkx-job，将任务状态置为失败
                 if (differenceInMillis > 1 * 1000 * 30) {
 
                     jobBean.setStatus(MetaConstants.JobStatus.JOB_STATUS_ERROR);
                     jobBean.setErrorMsg("调度组件异常，启动任务失败！！！");
-                    jobRepository.save(jobBean);
-                }
-            }
-
-            if (MetaConstants.JobStatus.JOB_STATUS_SYNCING == jobBean.getStatus()) {
-                // datalinkx重启，任务监听线程挂掉
-                String jobHealthThread = datalinkXJobClient.jobHealth(jobBean.getJobId(), jobBean.getType()).getResult();
-                if (ObjectUtils.isEmpty(jobHealthThread)) {
-
-                    jobBean.setStatus(MetaConstants.JobStatus.JOB_STATUS_ERROR);
-                    jobBean.setErrorMsg("系统运行异常，请检查后台日志！！！");
                     jobRepository.save(jobBean);
                 }
             }
@@ -209,6 +200,8 @@ public class TaskHealthCheckLoop implements InitializingBean {
                 this.retryTime(jobId);
             }
         } catch (Exception e){
+            log.error("启动流式任务失败 {}", e.getMessage(), e);
+        } finally {
             try {
                 // 成功一直持有锁，失败需要释放锁，失败也不需要放入队列，定时任务会从db中扫描出来
                 distributedLock.unlock(jobId, jobId);

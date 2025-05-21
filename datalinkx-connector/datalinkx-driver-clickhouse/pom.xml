@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>datalinkx-driver-custom</artifactId>
+    <artifactId>datalinkx-driver-clickhouse</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
