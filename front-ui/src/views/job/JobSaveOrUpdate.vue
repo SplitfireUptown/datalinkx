@@ -347,8 +347,8 @@
         listQuery().then(res => {
           this.selectloading = false
           const record = res.result
-          const excludeFromDs = [4, 5, 100]
-          const excludeToDs = [5, 100]
+          const excludeFromDs = ['redis', 'http', 'kafka']
+          const excludeToDs = ['http', 'kafka']
           for (var a of record) {
             // redis数据源暂不支持读
             if (!excludeFromDs.includes(a.type)) {

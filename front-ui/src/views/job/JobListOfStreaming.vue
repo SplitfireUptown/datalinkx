@@ -60,7 +60,7 @@ export default {
   components: {
     JobSaveOrUpdateStreaming
   },
-  data() {
+  data () {
     return {
       loading: false,
       columns: [
@@ -154,7 +154,7 @@ export default {
     }
   },
   methods: {
-    init() {
+    init () {
       this.loading = true
       streamPageQuery({
         ...this.queryParam,
@@ -167,20 +167,20 @@ export default {
         this.loading = false
       })
     },
-    handleTableChange(pagination) {
+    handleTableChange (pagination) {
       this.pagination = pagination
       this.pages.size = pagination.pageSize
       this.pages.current = pagination.current
       this.init()
     },
-    edit(record) {
+    edit (record) {
       if (record.status === 1) {
         this.$refs.JobSaveOrUpdateStreaming.edit('show', record.job_id)
       } else {
         this.$refs.JobSaveOrUpdateStreaming.edit('edit', record.job_id)
       }
     },
-    delete(record) {
+    delete (record) {
       this.loading = true
       streamDelObj(record.job_id).then(res => {
         if (res.status === '0') {
@@ -193,7 +193,7 @@ export default {
         this.loading = false
       })
     },
-    execJob(record) {
+    execJob (record) {
       streamExec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')
@@ -205,10 +205,10 @@ export default {
         this.loading = false
       })
     },
-    show(record) {
+    show (record) {
       this.$refs.JobSaveOrUpdateStreaming.edit(record.job_id, 'show')
     },
-    stopJob(record) {
+    stopJob (record) {
       streamStop(record.job_id).then(res => {
         this.loading = false
         if (res.status === '0') {
@@ -221,15 +221,15 @@ export default {
         this.loading = false
       })
     },
-    handleOk() {
+    handleOk () {
       this.init()
     },
-    queryData() {
+    queryData () {
       this.pages.current = 1
       this.init()
     }
   },
-  created() {
+  created () {
     this.init()
   }
 }

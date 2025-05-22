@@ -59,7 +59,7 @@ export default {
   components: {
     JobCompute
   },
-  data() {
+  data () {
     return {
       loading: false,
       currentJobId: '',
@@ -146,13 +146,13 @@ export default {
       source: null
     }
   },
-  provide() {
+  provide () {
     return {
       closeDraw: this.closeDraw
     }
   },
   methods: {
-    init() {
+    init () {
       this.loading = true
       pageQuery({
         ...this.queryParam,
@@ -165,27 +165,27 @@ export default {
         this.loading = false
       })
     },
-    newCompute() {
+    newCompute () {
       this.showJobCompute = true
     },
-    handleTableChange(pagination) {
+    handleTableChange (pagination) {
       this.pagination = pagination
       this.pages.size = pagination.pageSize
       this.pages.current = pagination.current
       this.init()
     },
-    edit(record) {
+    edit (record) {
       console.log(record.job_id)
       this.showJobCompute = true
       setTimeout(() => {
         this.$refs.JobCompute.edit(record.job_id)
       }, 10)
     },
-    closeDraw() {
+    closeDraw () {
       this.showJobCompute = false
       this.init()
     },
-    delete(record) {
+    delete (record) {
       this.loading = true
       delObj(record.job_id).then(res => {
         if (res.status === '0') {
@@ -198,7 +198,7 @@ export default {
         this.loading = false
       })
     },
-    execJob(record) {
+    execJob (record) {
       exec(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('触发成功')
@@ -210,7 +210,7 @@ export default {
         this.loading = false
       })
     },
-    stopJob(record) {
+    stopJob (record) {
       stop(record.job_id).then(res => {
         if (res.status === '0') {
           this.$message.info('停止成功')
@@ -222,18 +222,18 @@ export default {
         this.loading = false
       })
     },
-    handleOk() {
+    handleOk () {
       this.init()
     },
-    queryData() {
+    queryData () {
       this.pages.current = 1
       this.init()
     }
   },
-  beforeDestroy() {
+  beforeDestroy () {
     this.eventSource.close()
   },
-  created() {
+  created () {
     this.init()
   }
 }

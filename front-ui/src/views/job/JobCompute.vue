@@ -389,24 +389,27 @@
       this.initGraph()
       this.selectloading = true
       listQuery().then(res => {
+        this.selectloading = false
         const record = res.result
+        const excludeFromDs = ['redis', 'http', 'kafka', 'custom']
+        const excludeToDs = ['http', 'kafka']
         for (var a of record) {
           // redis数据源暂不支持读
-          if (a.type !== 4) {
+          if (!excludeFromDs.includes(a.type)) {
             this.fromDsList.push({
               dsId: a.dsId,
               name: a.name,
-              type: a.type,
-              catalog: a.database
+              type: a.type
             })
           }
-          this.toDsList.push({
-            dsId: a.dsId,
-            name: a.name,
-            type: a.type
-          })
+          if (!excludeToDs.includes(a.type)) {
+            this.toDsList.push({
+              dsId: a.dsId,
+              name: a.name,
+              type: a.type
+            })
+          }
         }
-        this.selectloading = false
       })
     },
     inject: ['closeDraw'],

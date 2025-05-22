@@ -235,12 +235,13 @@
         this.jobType = jobType
         this.type = type
         this.selectloading = true
-        const excludeToDs = [5]
+        const excludeToDs = ['http']
+        const streamDs = ['kafka']
         listQuery().then(res => {
           this.selectloading = false
           const record = res.result
           for (var a of record) {
-            if (a.type >= 100) {
+            if (streamDs.includes(a.type)) {
               this.fromDsList.push({
                 dsId: a.dsId,
                 name: a.name,
