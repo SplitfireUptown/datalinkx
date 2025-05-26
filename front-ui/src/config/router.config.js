@@ -100,6 +100,27 @@ export const asyncRouterMap = [
         meta: { title: 'menu.tasklistlog', keepAlive: false, icon: taskLog }
       },
       {
+        path: '/alarm',
+        name: 'alarm',
+        redirect: '/alarm/center',
+        component: RouteView,
+        meta: { title: 'menu.alarmCenter', keepAlive: true, icon: task },
+        children: [
+          {
+            path: '/alarm/config',
+            name: 'AlarmConfig',
+            component: () => import('@/views/alarm/alarmConfig.vue'),
+            meta: { title: 'menu.alarmComponentConfig', keepAlive: false, icon: taskList }
+          },
+          {
+            path: '/alarm/rule',
+            name: 'AlarmRule',
+            component: () => import('@/views/alarm/alarmRule.vue'),
+            meta: { title: 'menu.alarmRuleConfig', keepAlive: false, icon: taskList }
+          }
+        ]
+      },
+      {
         path: '/system/monitor',
         name: 'systemMonitor',
         component: () => import('@/views/system/systemMonitor.vue'),

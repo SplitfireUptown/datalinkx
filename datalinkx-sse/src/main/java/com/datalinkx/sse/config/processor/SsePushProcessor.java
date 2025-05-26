@@ -1,8 +1,9 @@
-package com.datalinkx.sse.config;
+package com.datalinkx.sse.config.processor;
 
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.messagehub.config.annotation.MessageHub;
+import com.datalinkx.sse.config.SseEmitterServer;
 import org.springframework.stereotype.Service;
 
 /**

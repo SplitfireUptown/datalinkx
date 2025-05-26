@@ -14,6 +14,7 @@ public enum StatusCode {
 
 
     DRIVER_LOAD_FAIL(1111),
+    ALARM_CONFIG_NOT_EXISTS(1500),
 
     XTB_NOT_EXISTS(2000);
 

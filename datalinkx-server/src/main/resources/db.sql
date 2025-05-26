@@ -91,3 +91,34 @@ alter table JOB ADD COLUMN `graph` longtext CHARACTER SET utf8 COLLATE utf8_gene
 
 -- 旧数据暂不处理，需手动将type改为driver name
 ALTER TABLE DS MODIFY COLUMN `type` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL;
+
+-- 告警表
+
+CREATE TABLE `ALARM_COMPONENT` (
+                                   `id` int unsigned NOT NULL AUTO_INCREMENT,
+                                   `alarm_id` char(35) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '',
+                                   `name` char(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '组件名称',
+                                   `type` int DEFAULT NULL COMMENT '0 email|1 钉钉',
+                                   `config` text CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '附加配置',
+                                   `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                   `utime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                   `is_del` int DEFAULT '0',
+                                   PRIMARY KEY (`id`) USING BTREE,
+                                   KEY `alarm_id` (`alarm_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='告警组件配置';
+
+CREATE TABLE `ALARM_RULE` (
+                              `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                              `rule_id` char(35) CHARACTER SET utf8 DEFAULT NULL COMMENT '规则id',
+                              `alarm_id` char(35) CHARACTER SET utf8 DEFAULT NULL COMMENT '告警组件id',
+                              `job_id` char(35) CHARACTER SET utf8 DEFAULT NULL COMMENT '流转任务id',
+                              `name` varchar(255) DEFAULT NULL,
+                              `status` tinyint(4) DEFAULT '1',
+                              `type` int(11) DEFAULT NULL COMMENT '0 结束后推送| 1 失败后推送| 2 成功后推送',
+                              `push_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                              `ctime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                              `utime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                              `is_del` int(11) DEFAULT '0',
+                              PRIMARY KEY (`id`) USING BTREE,
+                              KEY `rule_id` (`rule_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='告警规则信息表';

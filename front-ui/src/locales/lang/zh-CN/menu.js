@@ -14,6 +14,9 @@ export default {
   'menu.tasklistlog': '任务执行日志',
   'menu.taskrelationlist': '任务级联配置',
   'menu.taskrelationmap': '任务血缘',
+  'menu.alarmCenter': '告警中心',
+  'menu.alarmComponentConfig': '告警组件配置',
+  'menu.alarmRuleConfig': '告警规则配置',
   'menu.systemMonitor': '系统监控',
 
   // 'menu.dashboard': '仪表盘',

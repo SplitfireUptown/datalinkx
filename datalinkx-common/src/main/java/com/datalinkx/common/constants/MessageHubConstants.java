@@ -12,7 +12,7 @@ public class MessageHubConstants {
     public static final String GLOBAL_COMMON_GROUP = "datalinkx";
 
     public static final String JOB_PROGRESS_TOPIC = "JOB_PROGRESS";
-
+    public static final String JOB_ALARM_PUSH = "JOB_ALARM_PUSH";
 
     /**
      * 白名单中包装的topic

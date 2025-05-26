@@ -63,6 +63,14 @@ public final class MetaConstants {
         public static final String SEATUNNEL_SUBMIT_JOB_ERROR_STATUS = "fail";
         public static final String SSE_JOB_STATUS = "jobList";
         public static final String SSE_COPILOT = "datalinkx_copilot";
+        public static Map<Integer, String> JOB_STATUS_TO_DB_NAME_MAP = new HashMap<Integer, String>() {{
+            put(MetaConstants.JobStatus.JOB_STATUS_ERROR, "任务失败");
+            put(MetaConstants.JobStatus.JOB_STATUS_SUCCESS, "任务成功");
+            put(MetaConstants.JobStatus.JOB_STATUS_STOP, "任务停止");
+            put(MetaConstants.JobStatus.JOB_STATUS_SYNCING, "任务同步中");
+            put(MetaConstants.JobStatus.JOB_STATUS_CREATE, "任务新建");
+            put(MetaConstants.JobStatus.JOB_STATUS_QUEUE, "任务排队");
+        }};
     }
 
     public static class JobSyncMode {
@@ -83,6 +91,16 @@ public final class MetaConstants {
         public static final String KEY_KAFKA_READ_INDEX = "kafkaReadMode";
         public static final String KEY_CHECKPOINT_INTERVAL = "checkpoint_interval";
         public static final String KEY_RESTORE = "restore";
+
+        public static final Integer KEY_ALARM_RULE_OPEN= 1;
+        public static final Integer KEY_ALARM_RULE_CLOSE= 0;
+        // 无论成功失败，任务结束后就推送
+        public static final Integer ALARM_ALL_STATUS = 0;
+        // 失败才推送
+        public static final Integer ALARM_FAIL_STATUS = 1;
+        // 成功才推送
+        public static final Integer ALARM_SUCCESS_STATUS = 2;
+        public static final String GLOBAL_ALARM_SUBJECT = "DatalinkX Pro系统告警";
     }
 
     public static class CopilotConstant {
