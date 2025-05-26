@@ -1,4 +1,4 @@
-package com.datalinkx.sse.config.processor;
+package com.datalinkx.sse.config.messagepuller;
 
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  * @date: 2023/11/13 21:48
  */
 @Service
-public class SsePushProcessor {
+public class TransferProgressPuller {
 
     @MessageHub(
             topic = MessageHubConstants.JOB_PROGRESS_TOPIC,

@@ -1,7 +1,6 @@
 
 package com.datalinkx.datajob.action;
 
-import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.IdUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +19,15 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
     protected abstract boolean checkResult(U unit);
     protected abstract void afterExec(U unit, boolean success);
     protected abstract U convertExecUnit(T info) throws Exception;
+    protected abstract void destroyed(U unit, int status, String errmsg);
 
     public void doAction(T actionInfo) throws Exception {
         Thread taskCheckerThread;
         // T -> U 获取引擎执行类对象
         U execUnit = convertExecUnit(actionInfo);
+        int status = JOB_STATUS_SUCCESS;
+        StringBuffer error = new StringBuffer();
         try {
-            StringBuffer error = new StringBuffer();
             // 1、准备执行job
             this.begin(actionInfo);
 
@@ -55,29 +56,28 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
                 }
             }, healthCheck);
 
-            // 4、向引擎提交任务
-            try {
-                // 4.1、每个单元执行前的准备
-                this.beforeExec(execUnit);
+            // 4.1、每个单元执行前的准备
+            this.beforeExec(execUnit);
+            // 4.2、向引擎提交任务
+            this.execute(execUnit);
 
-                // 4.2、启动任务
-                this.execute(execUnit);
-            } catch (Throwable e) {
-                log.error("execute task error.", e);
-                afterExec(execUnit, false);
-                error.append(e.getMessage()).append("\r\n");
-                this.end(execUnit,  JOB_STATUS_ERROR, error.toString());
-                return;
-            }
             // 阻塞至任务完成
             taskCheckerThread.start();
             taskCheckerThread.join();
+            if (error.length() != 0 ) {
+                status = JOB_STATUS_ERROR;
+            }
 
             // 5、整个Job结束后的处理
-            this.end(execUnit, error.length() == 0 ? JOB_STATUS_SUCCESS : JOB_STATUS_ERROR, error.length() == 0 ? "success" : error.toString());
+            this.end(execUnit, status, error.toString());
         } catch (Throwable e) {
             log.error("datalinkx job failed -> ", e);
-            this.end(execUnit, JOB_STATUS_ERROR, e.getMessage());
+            status = JOB_STATUS_ERROR;
+            error.append(e.getMessage()).append("\r\n");
+            this.end(execUnit, JOB_STATUS_ERROR, error.toString());
         }
+
+        // 6、结束后的钩子处理
+        this.destroyed(execUnit, status, error.toString());
     }
 }

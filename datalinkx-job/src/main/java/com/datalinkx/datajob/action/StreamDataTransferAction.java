@@ -159,4 +159,9 @@ public class StreamDataTransferAction extends AbstractDataTransferAction<Datalin
                 .lockId(info.getLockId())
                 .build();
     }
+
+    @Override
+    protected void destroyed(StreamFlinkActionMeta unit, int status, String errmsg) {
+
+    }
 }

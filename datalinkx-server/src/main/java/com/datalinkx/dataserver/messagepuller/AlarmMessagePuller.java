@@ -1,4 +1,4 @@
-package com.datalinkx.dataserver.processor;
+package com.datalinkx.dataserver.messagepuller;
 
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.constants.MetaConstants;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class AlarmMessageProcessor {
+public class AlarmMessagePuller {
 
     @Autowired
     AlarmRuleRepository alarmRuleRepository;
