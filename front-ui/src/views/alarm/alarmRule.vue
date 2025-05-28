@@ -113,22 +113,25 @@ export default {
             )
           }
         },
-        {
-          title: '操作',
-          customRender: (record) => {
-            return (
-              <div>
-              <a onClick={(e) => this.edit(record)}>修改</a>
-              <a-divider type="vertical" />
-              <a href="javascript:;"onClick={(e) => this.shutdownJob(record)}>停用</a>
-              <a-divider type="vertical" />
-              <a-popconfirm title="是否删除" onConfirm={() => this.delete(record)} okText="是" cancelText="否">
-              <a-icon slot="icon" type="question-circle-o" style="color: red" />
-              <a href="javascript:;" style="color: red">删除</a>
-              </a-popconfirm>
-              </div>
-          )
-          }
+        { 
+          title: '操作', 
+          customRender: (record) => { 
+            const isEnabled = record.status === 1; 
+            return ( 
+              <div> 
+                <a onClick={(e) => this.edit(record)}>修改</a> 
+                <a-divider type="vertical" /> 
+                <a href="javascript:;" onClick={(e) => this.shutdownJob(record)}> 
+                  {isEnabled ? '停用' : '开启'} 
+                </a> 
+                <a-divider type="vertical" /> 
+                <a-popconfirm title="是否删除" onConfirm={() => this.delete(record)} okText="是" cancelText="否"> 
+                  <a-icon slot="icon" type="question-circle-o" style="color: red" /> 
+                  <a href="javascript:;" style="color: red">删除</a> 
+                </a-popconfirm> 
+              </div> 
+            ); 
+          } 
         }
       ],
       queryParam: {

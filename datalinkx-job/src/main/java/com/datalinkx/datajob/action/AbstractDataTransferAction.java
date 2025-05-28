@@ -74,7 +74,7 @@ public abstract class AbstractDataTransferAction<T extends DatalinkXJobDetail, U
             log.error("datalinkx job failed -> ", e);
             status = JOB_STATUS_ERROR;
             error.append(e.getMessage()).append("\r\n");
-            this.end(execUnit, JOB_STATUS_ERROR, error.toString());
+            this.end(execUnit, status, error.toString());
         }
 
         // 6、结束后的钩子处理

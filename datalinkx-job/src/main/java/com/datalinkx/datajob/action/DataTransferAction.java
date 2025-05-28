@@ -7,7 +7,7 @@ import com.datalinkx.common.exception.DatalinkXJobException;
 import com.datalinkx.common.result.DatalinkXJobDetail;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.datajob.job.ExecutorJobHandler;
-import com.datalinkx.datajob.messagepusher.AlarmProducePusher;
+import com.datalinkx.datajob.transmitter.AlarmProduceTransmitter;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsWriter;
 import com.datalinkx.driver.dsdriver.base.meta.FlinkActionMeta;
@@ -50,7 +50,7 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
     MessageHubService messageHubService;
 
     @Autowired
-    AlarmProducePusher alarmProducePusher;
+    AlarmProduceTransmitter alarmProduceTransmitter;
 
 
     @Override
@@ -231,6 +231,6 @@ public class DataTransferAction extends AbstractDataTransferAction<DatalinkXJobD
 
     @Override
     protected void destroyed(FlinkActionMeta unit, int status, String errmsg) {
-        alarmProducePusher.pushAlarmMessage(unit.getJobId(), status, errmsg);
+        alarmProduceTransmitter.pushAlarmMessage(unit.getJobId(), status, errmsg);
     }
 }

@@ -1,4 +1,4 @@
-package com.datalinkx.datajob.messagepusher;
+package com.datalinkx.datajob.transmitter;
 
 import com.datalinkx.common.constants.MessageHubConstants;
 import com.datalinkx.common.utils.JsonUtils;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 @Service
-public class AlarmProducePusher {
+public class AlarmProduceTransmitter {
 
     @Resource(name = "messageHubServiceImpl")
     MessageHubService messageHubService;

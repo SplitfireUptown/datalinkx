@@ -8,7 +8,7 @@ import com.datalinkx.common.utils.ObjectUtils;
 import com.datalinkx.compute.connector.jdbc.TransformNode;
 import com.datalinkx.compute.transform.ITransformDriver;
 import com.datalinkx.compute.transform.ITransformFactory;
-import com.datalinkx.datajob.messagepusher.AlarmProducePusher;
+import com.datalinkx.datajob.transmitter.AlarmProduceTransmitter;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.IDsWriter;
@@ -39,7 +39,7 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
     @Autowired
     DatalinkXServerClient datalinkXServerClient;
     @Autowired
-    AlarmProducePusher alarmProducePusher;
+    AlarmProduceTransmitter alarmProduceTransmitter;
 
     @Override
     protected void begin(DatalinkXJobDetail info) {
@@ -166,6 +166,6 @@ public class TransformDataTransferAction extends AbstractDataTransferAction<Data
 
     @Override
     protected void destroyed(SeatunnelActionMeta unit, int status, String errmsg) {
-        alarmProducePusher.pushAlarmMessage(unit.getJobId(), status, errmsg);
+        alarmProduceTransmitter.pushAlarmMessage(unit.getJobId(), status, errmsg);
     }
 }
