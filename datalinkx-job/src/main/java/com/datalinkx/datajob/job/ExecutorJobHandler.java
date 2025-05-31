@@ -43,39 +43,57 @@ public class ExecutorJobHandler {
 
 		String jobSettings = this.generateJobSetting("classpath:job_setting.json", otherSetting);
 		String jobJsonFile = this.generateJobJsonFile(jobId, reader, writer, jobSettings);
+		Process process = null;
+		InputStreamReader ir = null;
+		LineNumberReader errorInput = null;
+		InputStreamReader ii = null;
+		LineNumberReader successInput = null;
 
 		try {
 			String cmdStr = this.generateFlinkCmd(jobId, jobJsonFile, otherSetting);
-			try {
-				log.info("job_id: {}, execute job command: {}", jobId, cmdStr);
-				Process process = Runtime.getRuntime().exec(cmdStr);
-				InputStreamReader ir = new InputStreamReader(process.getErrorStream());
-				LineNumberReader errorInput = new LineNumberReader(ir);
-				Thread threadError = new Thread(new ProcessStreamHandler(errorInput, errorRet));
-				threadError.start();
+			log.info("job_id: {}, execute job command: {}", jobId, cmdStr);
+			process = Runtime.getRuntime().exec(cmdStr);
+			ir = new InputStreamReader(process.getErrorStream());
+			errorInput = new LineNumberReader(ir);
+			Thread threadError = new Thread(new ProcessStreamHandler(errorInput, errorRet));
+			threadError.start();
 
-				InputStreamReader ii = new InputStreamReader(process.getInputStream());
-				LineNumberReader successInput = new LineNumberReader(ii);
-				Thread threadSuccess = new Thread(new ProcessStreamHandler(successInput, successRet));
-				threadSuccess.start();
+			ii = new InputStreamReader(process.getInputStream());
+			successInput = new LineNumberReader(ii);
+			Thread threadSuccess = new Thread(new ProcessStreamHandler(successInput, successRet));
+			threadSuccess.start();
 
-				process.waitFor();
-				threadSuccess.join();
-				threadError.join();
-			} catch (IOException e) {
-				log.error("IOException ", e);
-				errorRet.append("IOException ").append(e.getMessage());
-				throw new Exception(errorRet.toString());
-			}
+			threadSuccess.join();
+			threadError.join();
+			process.waitFor();
+
 		} catch (Exception e) {
+			errorRet.append("flink任务提交失败: ").append(e.getMessage());
 			log.error("flink任务提交异常", e);
-			throw new Exception(e);
+			throw new Exception(errorRet.toString(), e); // 明确异常原因
 		} finally {
 			// 删除临时文件
 			if (FileUtil.exist(jobJsonFile) && !reserveJobGraph) {
 				FileUtil.del(new File(jobJsonFile));
 			}
-		}
+
+			if (process != null) {
+				process.destroy(); // 确保销毁进程避免资源泄漏
+			}
+
+            if (successInput != null) {
+                successInput.close();
+            }
+            if (errorInput != null) {
+                errorInput.close();
+            }
+            if (ii != null) {
+                ii.close();
+            }
+            if (ir != null) {
+                ir.close();
+            }
+        }
 		String pattern = "Received response \\{\"jobUrl\":\"/jobs/.+\"}";
 		Pattern rg = Pattern.compile(pattern);
 		Matcher matcher = rg.matcher(successRet.toString());

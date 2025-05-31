@@ -22,37 +22,28 @@ public class ConsumerInitRetryTask implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            if (!resetBlockingQueue.isEmpty()) {
-                ConsumerAdapterForm headForm = resetBlockingQueue.poll();
-                int retryTime = 100;
-                while (retryTime > 0) {
+        // 启动时检查，如果队列空就没必要监听了
+        while (!resetBlockingQueue.isEmpty()) {
+            ConsumerAdapterForm headForm = resetBlockingQueue.poll();
+            int retryTime = 100;
+            while (retryTime > 0) {
+                try {
+                    this.messageHubService.consume(headForm);
+                    log.info("messagehub consumer init retry successful: type {}, topic {} , class {}#{}", headForm.getType(), headForm.getTopic(), headForm.getBean().getClass().getName(), headForm.getInvokeMethod().getName());
+                    break;
+                } catch (Exception e) {
+                    retryTime--;
                     try {
-
-                        this.messageHubService.consume(headForm);
-                        log.info("messagehub consumer init retry successful: type {}, topic {} , class {}#{}", headForm.getType(), headForm.getTopic(), headForm.getBean().getClass().getName(), headForm.getInvokeMethod().getName());
-                        break;
-                    } catch (Exception e) {
-                        retryTime--;
-                        try {
-                            Thread.sleep(20000);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
-                        }
+                        Thread.sleep(20000);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
                     }
                 }
-                if (retryTime == 0) {
-                    log.warn("messagehub consumer init retry failed: type {}, topic {} , class {}#{}", headForm.getType(), headForm.getTopic(), headForm.getBean().getClass().getName(), headForm.getInvokeMethod().getName());
-                }
-            } else {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            }
+            if (retryTime == 0) {
+                log.warn("messagehub consumer init retry failed: type {}, topic {} , class {}#{}", headForm.getType(), headForm.getTopic(), headForm.getBean().getClass().getName(), headForm.getInvokeMethod().getName());
             }
         }
-
     }
 }
 
