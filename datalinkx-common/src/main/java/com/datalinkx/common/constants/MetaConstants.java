@@ -47,6 +47,11 @@ public final class MetaConstants {
         public static final String JOB_NONE_SCHEDULE_TYPE = "FIX_RATE";
         public static final String JOB_RATE_SCHEDULE_CONF = "315360000";
         public static final String STREAM_JOB_HEALTH_CHECK = "stream_health_check";
+        public static Map<Integer, String> JOB_TYPE_NAME_MAP = new HashMap<Integer, String>() {{
+            put(MetaConstants.JobType.JOB_TYPE_BATCH, "批式任务");
+            put(MetaConstants.JobType.JOB_TYPE_STREAM, "流式任务");
+            put(MetaConstants.JobType.JOB_TYPE_COMPUTE, "计算任务");
+        }};
     }
 
     public static class JobStatus {

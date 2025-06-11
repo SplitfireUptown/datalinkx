@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Repository
 public interface JobLogRepository extends CRUDRepository<JobLogBean, String> {
@@ -24,4 +26,6 @@ public interface JobLogRepository extends CRUDRepository<JobLogBean, String> {
     @Transactional
     @Query(value = " update JOB_LOG set is_del = 1 where job_id = :jobId and is_del = 0 ", nativeQuery = true)
     void logicDeleteByJobId(String jobId);
+
+    List<JobLogBean> findAllByIsDel(Integer isDel);
 }

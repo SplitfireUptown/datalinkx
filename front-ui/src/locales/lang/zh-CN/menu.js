@@ -1,6 +1,7 @@
 export default {
   'menu.welcome': '欢迎',
   'menu.home': '主页',
+  'menu.analysis': '资产概览',
   'menu.datasource': '数据源',
   'menu.datasourceList': '数据源列表',
   'menu.batchDataSource': '数据源管理',

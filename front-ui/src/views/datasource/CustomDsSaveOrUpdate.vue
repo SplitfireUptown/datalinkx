@@ -81,9 +81,6 @@ export default {
       type: 'add'
     }
   },
-  created () {
-    this.init()
-  },
   methods: {
     // 获取用户信息
     edit (id, type) {

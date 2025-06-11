@@ -60,7 +60,7 @@ public class TaskHealthCheckLoop implements InitializingBean {
         List<JobBean> statusCheckJob = new ArrayList<>();
         for (JobBean job : allTransferJob) {
             // 流式任务
-            if (MetaConstants.JobType.JOB_TYPE_STREAM.equals(job.getType()) && job.getRetryTime() < 5) {
+            if (MetaConstants.JobType.JOB_TYPE_STREAM.equals(job.getType()) && job.getRetryTime() < 5 && job.getStatus()!= MetaConstants.JobStatus.JOB_STATUS_STOP) {
                 restartJob.add(job);
             }
             // 需要状态检查的批式任务
