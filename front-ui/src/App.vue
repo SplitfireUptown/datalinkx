@@ -12,8 +12,8 @@
           :isOpen="isChatOpen"
           :close="closeChat"
           :open="openChat"
-          :showEmoji="true"
-          :showFile="true"
+          :showEmoji="false"
+          :showFile="false"
           :showEdition="true"
           :showDeletion="true"
           :showTypingIndicator="showTypingIndicator"
@@ -24,7 +24,8 @@
           :disableUserListToggle="false"
           :messageStyling="messageStyling"
           @onType="handleOnType"
-          @edit="editMessage" />
+          @edit="editMessage"
+        />
       </div>
     </div>
   </a-config-provider>
@@ -41,6 +42,8 @@ export default {
   data () {
     return {
       msg: '聊天浮球',
+      // 添加选择框绑定变量
+      selectedOption: '智能问答',
       participants: [
         {
           id: 'user1',
@@ -185,4 +188,15 @@ a {
   position: relative;
   z-index: 9999;
 }
+  .select-box {
+    margin: 10px;
+    padding: 5px;
+    width: 150px;
+    border: 1px solid #4e8cff;
+    border-radius: 4px;
+    position: absolute; /* 添加绝对定位 */
+    top: 10px; /* 距离顶部10px */
+    right: 10px; /* 距离右侧10px */
+    z-index: 10000; /* 确保层级高于聊天容器 */
+  }
 </style>

@@ -30,4 +30,9 @@ public interface DatalinkXServerClient {
     @PostMapping("/api/job_graph/update_job_task_rel")
     WebResult<String> updateJobTaskRel(@RequestParam("jobId") String jobId, @RequestParam("taskId") String taskId);
 
+    @PostMapping("/api/mcp/job/delete_by_name")
+    WebResult<String> deleteJobByName(@RequestParam("name") String jobName);
+
+    @PostMapping("/api/mcp/job/trigger_by_name")
+    WebResult<String> triggerJobByName(@RequestParam("name") String jobName);
 }

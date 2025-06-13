@@ -39,7 +39,12 @@
         </dependency>
         <dependency>
             <groupId>com.datalinkx</groupId>
-            <artifactId>datalinkx-copilot</artifactId>
+            <artifactId>datalinkx-copilot-rag</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.datalinkx</groupId>
+            <artifactId>datalinkx-copilot-mcp</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>

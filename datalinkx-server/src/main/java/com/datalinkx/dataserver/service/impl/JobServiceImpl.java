@@ -316,4 +316,18 @@ public class JobServiceImpl implements JobService {
 	public List<JobVo.JobId2NameVo> list() {
 		return jobRepository.findAll().stream().map(v -> JobVo.JobId2NameVo.builder().JobId(v.getJobId()).jobName(v.getName()).type(v.getType()).build()).collect(Collectors.toList());
 	}
+
+
+	@Transactional(rollbackFor = Exception.class)
+	public String delByName(String name) {
+		JobBean jobBean = jobRepository.findByName(name).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "流转任务不存在"));
+		this.del(jobBean.getJobId(), MetaConstants.JobType.JOB_TYPE_STREAM.equals(jobBean.getType()));
+		return jobBean.getJobId();
+	}
+
+	public String jobExecByName(String name) {
+		JobBean jobBean = jobRepository.findByName(name).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "流转任务不存在"));
+		jobClientApi.trigger(jobBean.getJobId());
+		return jobBean.getJobId();
+	}
 }

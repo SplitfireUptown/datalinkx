@@ -67,6 +67,8 @@ feign:
         connectTimeout: 60000
         readTimeout: 60000
 client:
+  datalinkxserver:
+    url: http://localhost:${server.port}
   datalinkxjob:
     url: http://localhost:23456
   flink:
@@ -84,10 +86,15 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.hql: INFO
 
-
+# 大模型相关配置
 llm:
-#  embedding: "shaw/dmeta-embedding-zh"
-  model: "qwen:7b"
-  vector: "elasticsearch"
-  response_parse: "$.message.content"
-  inner_prompt: "不要回答任何多余的说辞和思考过程!只回答我问题的答案，不要长篇大论一句话，越简洁越好"
+  embedding: "shaw/dmeta-embedding-zh"                  # RAG向量化模型
+  model: "qwen:7b"                                      # RAG问答大模型
+  vector: "elasticsearch"                               # 向量数据库
+  response_parse: "$.message.content"                   # 大模型算子 返回结果解析json_path
+  inner_prompt: "不要回答任何多余的说辞和思考过程!只回答我问题的答案，不要长篇大论一句话，越简洁越好"  # 大模型算子 内部提示词
+  mcp:
+    provider: "openai"                      # 接口风格，可以切换ollama
+    model: "Qwen/Qwen3-8B"                  # MCP问答大模型
+    api-key: ${LLM_MCP_API_KEY}
+    base-url: "https://api.siliconflow.cn/v1/chat/completions"    # 硅基流动api地址
