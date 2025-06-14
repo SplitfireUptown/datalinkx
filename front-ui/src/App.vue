@@ -25,7 +25,17 @@
           :messageStyling="messageStyling"
           @onType="handleOnType"
           @edit="editMessage"
-        />
+        >
+          <template v-slot:header>
+            <!-- 添加 position: relative 作为定位基准 -->
+            <div style="pointer-events: auto; z-index: 10001; overflow: visible; position: relative;">
+              <a-select v-model="chatMode" default-value="qa" style="width: 120px" @change.capture="handleChange">
+                <a-select-option value="qa">智能问答</a-select-option>
+                <a-select-option value="command">指令模式</a-select-option>
+              </a-select>
+            </div>
+          </template>
+        </beautiful-chat>
       </div>
     </div>
   </a-config-provider>
@@ -33,7 +43,6 @@
 
 <script>
 import { domTitle, setDocumentTitle } from '@/utils/domUtil'
-import { copilotChat } from '@/api/system/copilot'
 import { i18nRender } from '@/locales'
 import EVA from '@/assets/eva.png'
 import TitleImg from '@/assets/titleImg.png'
@@ -42,8 +51,8 @@ export default {
   data () {
     return {
       msg: '聊天浮球',
-      // 添加选择框绑定变量
-      selectedOption: '智能问答',
+      // 修正初始值为选项的 value（'qa'）
+      chatMode: 'qa',
       participants: [
         {
           id: 'user1',
@@ -94,7 +103,12 @@ export default {
       const lastChild = document.querySelector('.sc-message-list').lastElementChild
       lastChild.style.display = 'block'
 
-      const eventSource = new EventSource('api/api/copilot/stream/chat?question=' + message.data.text)
+      let targetUrl = 'api/api/copilot/stream/chat'
+      if (this.chatMode === 'command') {
+        targetUrl = 'api/api/mcp/stream/chat'
+      }
+
+      const eventSource = new EventSource(targetUrl + '?question=' + message.data.text)
       eventSource.onopen = function (event) {
         console.log(event.data)
       }
@@ -109,17 +123,27 @@ export default {
         for (const message of self.messageList) {
            if (message.id === answerId) {
              flag = 1
-             console.log(message.data.text)
-             message.data.text = message.data.text.concat(modelMessage.message.content)
+             if (this.chatMode === 'qa') {
+               console.log(message.data.text)
+               message.data.text = message.data.text.concat(modelMessage.message.content)
+             } else {
+               message.data.text = message.data.text.concat(modelMessage.result)
+             }
            }
         }
         if (flag === 0) {
+          let text = ''
+          if (this.chatMode === 'qa') {
+            text = modelMessage.message.content
+          } else {
+            text = modelMessage.result
+          }
           const answer = {
             type: 'text',
             author: `user1`,
             id: answerId,
             data: {
-              text: modelMessage.message.content
+              text: text
             }
           }
           self.messageList.push(answer)
@@ -131,6 +155,9 @@ export default {
         eventSource.close()
       }
       // eventSource.close()
+    },
+    handleChange (value) {
+      console.log(value)
     },
     openChat () {
       // called when the user clicks on the fab button to open the chat
@@ -199,4 +226,56 @@ a {
     right: 10px; /* 距离右侧10px */
     z-index: 10000; /* 确保层级高于聊天容器 */
   }
+</style>
+
+<style>
+/* 非 scoped 样式，直接覆盖全局类 */
+.ant-select-dropdown {
+  z-index: 10002 !important;
+}
+
+/* 优化 a-select 整体样式 */
+.ant-select {
+  font-size: 14px; /* 调整字体大小 */
+}
+
+/* 输入框样式（未聚焦） */
+.ant-select-selector {
+  height: 36px !important; /* 固定高度 */
+  line-height: 36px !important;
+  border: 1px solid #e5e7eb !important; /* 柔和的边框颜色 */
+  border-radius: 8px !important; /* 增大圆角 */
+  padding: 0 12px !important; /* 调整内间距 */
+  transition: all 0.2s ease; /* 动画过渡 */
+}
+
+/* 输入框悬停样式 */
+.ant-select-selector:hover {
+  border-color: #4e8cff !important; /* 悬停时边框颜色（项目主色） */
+}
+
+/* 输入框聚焦样式 */
+.ant-select-focused .ant-select-selector {
+  border-color: #4e8cff !important; /* 聚焦时边框颜色 */
+  box-shadow: 0 0 0 2px rgba(78, 140, 255, 0.1) !important; /* 柔和的阴影 */
+}
+
+/* 下拉箭头样式 */
+.ant-select-arrow {
+  color: #4e8cff !important; /* 箭头颜色与主色一致 */
+  font-size: 16px !important; /* 增大箭头大小 */
+}
+
+/* 选项列表样式（可选，根据需求调整） */
+.ant-select-dropdown .ant-select-item {
+  padding: 8px 12px; /* 选项内间距 */
+  border-radius: 4px; /* 选项圆角 */
+}
+
+/* 选项悬停/选中样式 */
+.ant-select-item:hover,
+.ant-select-item-selected {
+  background-color: rgba(78, 140, 255, 0.05) !important; /* 主色浅背景 */
+  color: #4e8cff !important; /* 文字颜色 */
+}
 </style>
