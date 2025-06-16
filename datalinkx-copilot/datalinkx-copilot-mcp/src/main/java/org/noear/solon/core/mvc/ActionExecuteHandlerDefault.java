@@ -60,7 +60,7 @@ public class ActionExecuteHandlerDefault implements ActionExecuteHandler {
      */
     @Override
     public Object executeHandle(Context ctx, Object target, MethodWrap mWrap) throws Throwable {
-        // FIXME 这里的逻辑有点复杂，加上我们使用springmvc做web，直接简化
+        // FIXME 这里的逻辑有点复杂，加上我们使用spring做web，直接简化
         Map<String, Object> argsMap = (Map) ctx.attrMap().get("MCP_BODY");
         List<Object> args = new ArrayList<>();
         argsMap.forEach((k, v) -> {

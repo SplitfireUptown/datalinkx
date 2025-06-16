@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
+
 @FeignClient(name = "datalinkxserver", url = "${client.datalinkxserver.url}")
 @ConditionalOnProperty(prefix = "client.datalinkxserver", name = "url")
 public interface DatalinkXServerClient {
@@ -35,4 +37,10 @@ public interface DatalinkXServerClient {
 
     @PostMapping("/api/mcp/job/trigger_by_name")
     WebResult<String> triggerJobByName(@RequestParam("name") String jobName);
+
+    @GetMapping("/api/mcp/job/list")
+    WebResult<String> jobList();
+
+    @GetMapping("/api/mcp/job/info")
+    WebResult<String> jobInfo(@RequestParam("name") String jobName);
 }

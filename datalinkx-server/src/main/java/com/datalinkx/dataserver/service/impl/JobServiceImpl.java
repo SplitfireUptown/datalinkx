@@ -28,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -319,15 +320,43 @@ public class JobServiceImpl implements JobService {
 
 
 	@Transactional(rollbackFor = Exception.class)
-	public String delByName(String name) {
+	public String mcpDelByName(String name) {
 		JobBean jobBean = jobRepository.findByName(name).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "流转任务不存在"));
 		this.del(jobBean.getJobId(), MetaConstants.JobType.JOB_TYPE_STREAM.equals(jobBean.getType()));
 		return jobBean.getJobId();
 	}
 
-	public String jobExecByName(String name) {
+	public String mcpJobExecByName(String name) {
 		JobBean jobBean = jobRepository.findByName(name).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "流转任务不存在"));
 		jobClientApi.trigger(jobBean.getJobId());
 		return jobBean.getJobId();
+	}
+
+	public String mcpJobList() {
+		return JsonUtils.toJson(this.list());
+	}
+
+	public String mcpJobInfo(String name) {
+		JobBean jobBean = jobRepository.findByName(name)
+				.orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, "job not exist"));
+
+
+		JobVo.JobInfoVo jobInfoVo = JobVo.JobInfoVo
+				.builder()
+				.jobId(jobBean.getJobId())
+				.jobName(jobBean.getName())
+				.fromDsId(jobBean.getReaderDsId())
+				.toDsId(jobBean.getWriterDsId())
+				.fromTbName(jobBean.getFromTb())
+				.toTbName(jobBean.getToTb())
+				.schedulerConf(jobBean.getCrontab())
+				.cover(jobBean.getCover())
+				.graph(jobBean.getGraph())
+				.syncMode(JsonUtils.toObject(jobBean.getSyncMode(), JobForm.SyncModeForm.class))
+				.build();
+
+		List<JobForm.FieldMappingForm> fieldMappingForms = JsonUtils.toList(jobBean.getConfig(), JobForm.FieldMappingForm.class);
+		jobInfoVo.setFieldMappings(fieldMappingForms);
+		return JsonUtils.toJson(jobInfoVo);
 	}
 }

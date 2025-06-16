@@ -5,9 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.ai.chat.ChatModel;
 import org.noear.solon.ai.chat.ChatResponse;
 import org.noear.solon.rx.SimpleSubscriber;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
@@ -18,6 +17,9 @@ public class MCPChatService {
 
     @Autowired
     ChatModel mcpChatModel;
+
+    @Value("${llm.mcp.inner_prompt}")
+    String innerPrompt;
 
     public String chat(String question) {
         String result;
@@ -31,11 +33,11 @@ public class MCPChatService {
     }
 
     public Flux<WebResult<String>> streamChat(String question) {
-        // 创建支持背压的unicast sink（单播，背压缓冲）
         Sinks.Many<WebResult<String>> sink = Sinks.many().unicast().onBackpressureBuffer();
+        String prompt = String.format("## 问题：%s\n ## 输出规则：%s", question, innerPrompt);
 
         // 订阅模型的流式响应
-        mcpChatModel.prompt(question)
+        mcpChatModel.prompt(prompt)
                 .stream()
                 .subscribe(
                         new SimpleSubscriber<ChatResponse>()

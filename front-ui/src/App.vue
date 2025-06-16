@@ -127,6 +127,9 @@ export default {
                console.log(message.data.text)
                message.data.text = message.data.text.concat(modelMessage.message.content)
              } else {
+               if (modelMessage.result === null || modelMessage.result === '<think>' || modelMessage.result === '</think>') {
+                 continue
+               }
                message.data.text = message.data.text.concat(modelMessage.result)
              }
            }

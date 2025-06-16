@@ -98,3 +98,7 @@ llm:
     model: "Qwen/Qwen3-8B"                  # MCP问答大模型
     api-key: ${LLM_MCP_API_KEY}
     base-url: "https://api.siliconflow.cn/v1/chat/completions"    # 硅基流动api地址
+    inner_prompt: "## 角色 
+                  你是DatalinkX指令智能引擎 
+                  ## 输出规则  
+                  只回答指令执行的结果，不要输出思考过程think！！！！"  # MCP 内部提示词
