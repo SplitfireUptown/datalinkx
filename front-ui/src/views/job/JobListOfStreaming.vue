@@ -123,7 +123,7 @@ export default {
               <div>
                 <a href="javascript:;" onClick={(e) => this.stopJob(record)}>停止</a>
                 <a-divider type="vertical" />
-                <a href="javascript:;" onClick={(e) => this.execJob(record)}>触发</a>
+                <a href="javascript:;" onClick={(e) => this.execJob(record)}>手动触发</a>
                 <a-divider type="vertical" />
                 <a href="javascript:;" onClick={(e) => this.edit(record)}>修改</a>
                 <a-divider type="vertical" />

@@ -1,5 +1,6 @@
 package com.datalinkx.copilot.mcp.config;
 
+import com.datalinkx.copilot.mcp.tools.DataSourceConfigTool;
 import com.datalinkx.copilot.mcp.tools.DataTransferJobTool;
 import org.noear.solon.ai.chat.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class ChatConfig {
     @Autowired
     private DataTransferJobTool dataTransferJobTool;
 
+    @Autowired
+    private DataSourceConfigTool dataSourceConfigTool;
+
     @Bean
     public ChatModel mcpChatModel() {
         return ChatModel.of(baseUrl)
@@ -32,6 +36,7 @@ public class ChatConfig {
                 .provider(provider)
                 .apiKey(apiKey)
                 .defaultToolsAdd(dataTransferJobTool)
+                .defaultToolsAdd(dataSourceConfigTool)
                 .build();
     }
 }

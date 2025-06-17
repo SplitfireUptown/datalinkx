@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Map;
-
 @FeignClient(name = "datalinkxserver", url = "${client.datalinkxserver.url}")
 @ConditionalOnProperty(prefix = "client.datalinkxserver", name = "url")
 public interface DatalinkXServerClient {
@@ -39,8 +37,20 @@ public interface DatalinkXServerClient {
     WebResult<String> triggerJobByName(@RequestParam("name") String jobName);
 
     @GetMapping("/api/mcp/job/list")
-    WebResult<String> jobList();
+    WebResult<String> mcpJobList();
 
     @GetMapping("/api/mcp/job/info")
-    WebResult<String> jobInfo(@RequestParam("name") String jobName);
+    WebResult<String> mcpJobInfo(@RequestParam("name") String jobName);
+
+    @PostMapping("/api/mcp/job/cascade_config")
+    WebResult<String> mcpJobCascadeConfig(@RequestParam("job_name") String jobName, @RequestParam("sub_job_name") String subJobName);
+
+    @PostMapping("/api/mcp/job/cascade_delete")
+    WebResult<String> mcpJobDeleteConfig(@RequestParam("job_name") String jobName);
+
+    @GetMapping("/api/mcp/ds/list")
+    WebResult<String> mcpDsList();
+
+    @GetMapping("/api/mcp/ds/info")
+    WebResult<String> mcpDsInfo(@RequestParam("name") String dsName);
 }

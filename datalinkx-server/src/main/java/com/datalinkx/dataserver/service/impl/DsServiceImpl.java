@@ -9,6 +9,7 @@ import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.dto.JobDto;
+import com.datalinkx.dataserver.bean.vo.DsVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
 import com.datalinkx.dataserver.controller.form.DsForm;
 import com.datalinkx.dataserver.repository.DsRepository;
@@ -22,6 +23,7 @@ import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -277,5 +279,16 @@ public class DsServiceImpl implements DsService {
 				.database(configMap.getOrDefault("database", "").toString())
 				.type(configMap.get("type").toString())
 				.build();
+	}
+
+	public String mcpInfo(String name) {
+		DsBean dsBean = dsRepository.findByName(name);
+		if (ObjectUtils.isEmpty(dsBean)) {
+			throw new DatalinkXServerException(StatusCode.DS_NOT_EXISTS, name + "数据源不存在");
+		}
+
+		DsVo.MCPDsInfo mcpDsInfo = new DsVo.MCPDsInfo();
+		BeanUtils.copyProperties(dsBean, mcpDsInfo);
+		return JsonUtils.toJson(mcpDsInfo);
 	}
 }

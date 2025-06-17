@@ -8,6 +8,7 @@ import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.bean.domain.JobBean;
 import com.datalinkx.dataserver.bean.domain.JobLogBean;
+import com.datalinkx.dataserver.bean.domain.JobRelationBean;
 import com.datalinkx.dataserver.bean.dto.JobDto;
 import com.datalinkx.dataserver.bean.vo.JobVo;
 import com.datalinkx.dataserver.bean.vo.PageVo;
@@ -15,8 +16,8 @@ import com.datalinkx.dataserver.client.JobClientApi;
 import com.datalinkx.dataserver.controller.form.JobForm;
 import com.datalinkx.dataserver.repository.DsRepository;
 import com.datalinkx.dataserver.repository.JobLogRepository;
-import com.datalinkx.dataserver.repository.JobRelationRepository;
 import com.datalinkx.dataserver.repository.JobRepository;
+import com.datalinkx.dataserver.service.JobRelationService;
 import com.datalinkx.dataserver.service.JobService;
 import com.datalinkx.driver.dsdriver.DsDriverFactory;
 import com.datalinkx.driver.dsdriver.IDsReader;
@@ -28,7 +29,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ public class JobServiceImpl implements JobService {
 	JobRepository jobRepository;
 
 	@Autowired
-	JobRelationRepository jobRelationRepository;
+	JobRelationService jobRelationService;
 
 	@Autowired
 	DsServiceImpl dsServiceImpl;
@@ -275,7 +275,7 @@ public class JobServiceImpl implements JobService {
 			this.jobClientApi.del(jobId);
 		}
 		// 删除任务依赖
-		this.jobRelationRepository.logicDeleteByJobId(jobId);
+		this.jobRelationService.del(jobId);
 		// 删除任务
 		this.jobRepository.logicDeleteByJobId(jobId);
 	}
@@ -358,5 +358,25 @@ public class JobServiceImpl implements JobService {
 		List<JobForm.FieldMappingForm> fieldMappingForms = JsonUtils.toList(jobBean.getConfig(), JobForm.FieldMappingForm.class);
 		jobInfoVo.setFieldMappings(fieldMappingForms);
 		return JsonUtils.toJson(jobInfoVo);
+	}
+
+	public String mcpJobCascadeConfig(String jobName, String subJobName) {
+		JobBean jobBean = jobRepository.findByName(jobName).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, jobName + "任务不存在"));
+		JobBean subJobBean = jobRepository.findByName(subJobName).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, subJobName + "任务不存在"));
+
+		JobForm.JobRelationForm jobRelationForm = new JobForm.JobRelationForm();
+		jobRelationForm.setJobId(jobBean.getJobId());
+		jobRelationForm.setSubJobId(subJobBean.getJobId());
+		jobRelationForm.setPriority(0);
+
+		jobRelationService.create(jobRelationForm);
+
+		return "任务级联配置成功";
+	}
+
+	public String mcpJobCascadeDelete(String jobName) {
+		JobBean jobBean = jobRepository.findByName(jobName).orElseThrow(() -> new DatalinkXServerException(StatusCode.JOB_NOT_EXISTS, jobName + "任务不存在"));
+		jobRelationService.delJobRelation(jobBean.getJobId());
+		return jobName + "#任务级联删除成功";
 	}
 }

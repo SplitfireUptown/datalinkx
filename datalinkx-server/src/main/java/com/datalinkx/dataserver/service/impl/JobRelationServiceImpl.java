@@ -184,6 +184,11 @@ public class JobRelationServiceImpl implements JobRelationService {
         return jobRelationBloodVo;
     }
 
+    @Override
+    public void delJobRelation(String jobId) {
+        jobRelationRepository.logicDeleteByJobId(jobId);
+    }
+
     // 递归获取上游任务节点
     private void fetchParentJobs(String jobId, Set<JobVo.JobRelationBloodVoEdge> allEdges) {
         List<JobRelationBean> parentJobs = jobRelationRepository.findParentJob(jobId);

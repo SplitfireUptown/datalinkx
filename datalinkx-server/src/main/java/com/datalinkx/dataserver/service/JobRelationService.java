@@ -29,4 +29,9 @@ public interface JobRelationService {
      * 任务血缘信息
      */
     JobVo.JobRelationBloodVo relationBloodInfo(String jobId);
+
+    /**
+     *  删除指定任务下的血缘关系，无论父子关系
+     */
+    void delJobRelation(String jobId);
 }
