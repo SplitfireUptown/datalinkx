@@ -1,5 +1,6 @@
 package com.datalinkx.copilot.mcp.tools;
 
+import com.datalinkx.common.constants.LLMPromptConstants;
 import com.datalinkx.common.result.WebResult;
 import com.datalinkx.copilot.mcp.converter.JobToolCallResultConverter;
 import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
@@ -22,7 +23,7 @@ public class DataTransferJobTool {
 
     @ToolMapping(description = "删除任务", resultConverter = JobToolCallResultConverter.class)
     public String deleteByName(@Param() String jobName) {
-        return packageJob("删除任务", datalinkXServerClient.triggerJobByName(jobName));
+        return packageJob("删除任务", datalinkXServerClient.deleteJobByName(jobName));
     }
 
 
@@ -33,12 +34,12 @@ public class DataTransferJobTool {
 
     @ToolMapping(description = "查询任务")
     public String list() {
-        return datalinkXServerClient.jobList().getResult();
+        return String.format("数据字段解释: %s; 数据：%s", LLMPromptConstants.JOB_LIST_SCHEMA_PROMPT, datalinkXServerClient.jobList().getResult());
     }
 
     @ToolMapping(description = "任务详情")
     public String info(@Param String name) {
-        return datalinkXServerClient.jobInfo(name).getResult();
+        return String.format("数据字段解释: %s; 数据：%s", LLMPromptConstants.JOB_INFO_SCHEMA_PROMPT, datalinkXServerClient.jobInfo(name).getResult());
     }
 
 

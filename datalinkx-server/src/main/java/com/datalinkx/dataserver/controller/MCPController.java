@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RequestMapping("/api/mcp")
 @RestController
@@ -20,13 +19,15 @@ public class MCPController {
     @ApiOperation("流转任务-删除")
     @PostMapping("/job/delete_by_name")
     public WebResult<String> delete_by_name(@RequestParam String name) {
-        return WebResult.of(jobServiceImpl.mcpDelByName(name));
+        String result = jobServiceImpl.mcpDelByName(name);
+        return WebResult.of("删除成功: " + result);
     }
 
-    @ApiOperation("流转任务-删除")
+    @ApiOperation("流转任务-触发")
     @PostMapping("/job/trigger_by_name")
     public WebResult<String> trigger_by_name(@RequestParam String name) {
-        return WebResult.of(jobServiceImpl.mcpJobExecByName(name));
+        String result = jobServiceImpl.mcpJobExecByName(name);
+        return WebResult.of("触发成功：" + result);
     }
 
     @ApiOperation("流转任务-列表")
