@@ -2,7 +2,6 @@ package com.datalinkx.copilot.mcp.tools;
 
 import com.datalinkx.common.constants.LLMPromptConstants;
 import com.datalinkx.common.result.WebResult;
-import com.datalinkx.copilot.mcp.converter.JobToolCallResultConverter;
 import com.datalinkx.rpc.client.datalinkxserver.DatalinkXServerClient;
 import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.ai.annotation.ToolMapping;
@@ -21,7 +20,7 @@ public class DataTransferJobTool {
     DatalinkXServerClient datalinkXServerClient;
 
 
-    @ToolMapping(description = "删除任务", resultConverter = JobToolCallResultConverter.class)
+    @ToolMapping(description = "删除任务")
     public String deleteByName(@Param() String jobName) {
         return packageJob("删除任务", datalinkXServerClient.deleteJobByName(jobName));
     }
