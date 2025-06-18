@@ -35,6 +35,9 @@
               </a-select>
             </div>
           </template>
+          <template v-slot:system-message-body="{ message }">
+            [System]: {{message.text}}
+          </template>
         </beautiful-chat>
       </div>
     </div>
@@ -115,7 +118,6 @@ export default {
       const answerId = this.getTimestamp()
       var self = this
       eventSource.onmessage = function (event) {
-        console.log(event.data)
         var modelMessage = JSON.parse(event.data)
 
         console.log(answerId)
@@ -141,6 +143,7 @@ export default {
           } else {
             text = modelMessage.result
           }
+          console.log(text)
           const answer = {
             type: 'text',
             author: `user1`,
