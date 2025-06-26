@@ -235,7 +235,7 @@
       isRedisTo () {
         let temp = false
         if (this.selectedTargetSource) {
-          temp = this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 4
+          temp = this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 'redis'
         }
         return temp
       },
