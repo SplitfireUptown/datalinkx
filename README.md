@@ -25,7 +25,7 @@
 <a href="#项目文档"><img src="https://img.shields.io/badge/大模型框架-ollama-orange.svg" alt="大模型框架"></a>
 
 
-🔥🔥 **9W+字，共92个文档，带你玩转datalinkx**，详情可戳：[细致文档带你吃透DatalinkX](https://note.youdao.com/s/a9ltzlc1)
+🔥🔥 **10W+字，共92个文档，带你玩转datalinkx**，详情可戳：[细致文档带你吃透DatalinkX](https://note.youdao.com/s/a9ltzlc1)
 ## 异构数据源同步服务DatalinkX介绍
 
  **核心功能** ：在不同的异构数据源中进行数据同步，对同步任务进行管理和维护
@@ -70,42 +70,6 @@
 | Vue.js					        | 2.X					        |前端框架
 | AntDesignUI			     | 3.0.4					      |前端UI
 | Docker					        | 					           |容器化部署
-
-## 启动姿势
-
-#### 中间件
-执行 `docker compose -p datalinkx up -d` 命令将各组件启动
-
-##### 手动搭建组件：
-xxl-job: https://github.com/xuxueli/xxl-job/archive/refs/tags/2.3.0.zip
-纯Java项目，可clone代码后打包成jar包启动，xxl-job依赖mysql，需要修改对应数据库地址配置，表结构在/xxl-job-2.3.0/doc/db/tables_xxl_job.sql，导入mysql即可。
-
-
-flink：https://archive.apache.org/dist/flink/flink-1.10.3/
-选择flink-1.10.3-bin-scala_2.12.tgz下载，解压进入bin目录执行./start-cluster.sh，首次运行默认只有一个任务slot，访问http://localhost:8081 进去flink后台页面。
-
-seatunnel: 
-进入seatunnel/bin目录直接执行
-
-
-#### DB层
-执行  /datalinkx-server/src/main/resources/db.sql
-
-#### 后端
-1. 运行`datalinkx-server`与`datalinkx-job`模块
-   1. **datalinkx-server**与front交互，依赖mysql、redis
-   2. **datalinkx-job**负责提交、维护任务的生命周期，依赖xxl-job、flink 
-      1. 服务启动后会默认使用netty启动`${xxl.job.executor.port}` 负责监听xxl-job的任务事件 
-      2. 任务执行详细信息通过datalinkx-client的rpc能力访问`${client.dataserver}`
-      3. 如果更改了datalinkx-server端口需要同步更改datalinkx-job配置项`${client.dataserver}`。
-      4. `${flinkx.path}`配置flinkx模块的路径
-   3. 遇到依赖问题执行 ```mvn clean -U ```
-2. flinkx模块为单独的项目 
-   1. 需要手动执行`mvn clean install -U -Dmaven.test.skip=true -Dcheckstyle.skip=true`将插件打包 
-   2. 打包后配置好flinkx/flinkconf中flink的地址`jobmanager.rpc.address:`和端口`rest.port`即可
-
-#### 前端
-`yarn install && export NODE_OPTIONS=--openssl-legacy-provider && yarn run serve`
 
 
 ## 使用姿势
