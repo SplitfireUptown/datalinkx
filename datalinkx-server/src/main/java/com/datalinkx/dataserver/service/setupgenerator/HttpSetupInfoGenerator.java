@@ -1,6 +1,7 @@
 package com.datalinkx.dataserver.service.setupgenerator;
 
 import cn.hutool.core.lang.Pair;
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.dataserver.client.HttpConstructor;
@@ -14,7 +15,7 @@ public class HttpSetupInfoGenerator implements SetupInfoGenerator<HttpSetupInfo>
         Pair<String, Integer> host = HttpConstructor.checkUrlFormat(httpSetupInfo.getUrl());
         httpSetupInfo.setHost(host.getKey());
         httpSetupInfo.setPort(host.getValue());
-        httpSetupInfo.setType("http");
+        httpSetupInfo.setType(MetaConstants.DsType.DS_HTTP);
         return httpSetupInfo;
     }
 }

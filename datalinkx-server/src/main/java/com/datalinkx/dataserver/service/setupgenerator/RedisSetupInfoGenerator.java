@@ -1,5 +1,6 @@
 package com.datalinkx.dataserver.service.setupgenerator;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.driver.dsdriver.setupinfo.RedisSetupInfo;
 import org.springframework.util.StringUtils;
@@ -13,7 +14,7 @@ public class RedisSetupInfoGenerator implements SetupInfoGenerator<RedisSetupInf
         redisSetupInfo.setHost(dsBean.getHost());
         redisSetupInfo.setPort(dsBean.getPort());
         redisSetupInfo.setPwd(dsBean.getPassword());
-        redisSetupInfo.setType("redis");
+        redisSetupInfo.setType(MetaConstants.DsType.DS_REDIS);
         return redisSetupInfo;
     }
 }

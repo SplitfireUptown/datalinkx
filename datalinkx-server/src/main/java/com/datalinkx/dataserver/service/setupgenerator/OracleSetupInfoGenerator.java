@@ -1,5 +1,6 @@
 package com.datalinkx.dataserver.service.setupgenerator;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.common.utils.JsonUtils;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.driver.dsdriver.setupinfo.OracleSetupInfo;
@@ -12,7 +13,7 @@ public class OracleSetupInfoGenerator implements SetupInfoGenerator<OracleSetupI
     @Override
     public OracleSetupInfo generateSetupInfo(DsBean dsBean) {
         OracleSetupInfo oracleSetupInfo = new OracleSetupInfo();
-        oracleSetupInfo.setType("oracle");
+        oracleSetupInfo.setType(MetaConstants.DsType.DS_ORACLE);
         oracleSetupInfo.setServer(dsBean.getHost());
         oracleSetupInfo.setPort(dsBean.getPort());
         oracleSetupInfo.setPwd(dsBean.getPassword());

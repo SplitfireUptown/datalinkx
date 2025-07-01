@@ -235,8 +235,8 @@
         this.jobType = jobType
         this.type = type
         this.selectloading = true
-        const excludeToDs = ['http']
-        const streamDs = ['kafka']
+        const excludeToDs = ['http', 'mysqlcdc']
+        const streamDs = ['kafka', 'mysqlcdc']
         listQuery().then(res => {
           this.selectloading = false
           const record = res.result

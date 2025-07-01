@@ -21,7 +21,6 @@ import com.datalinkx.driver.dsdriver.IDsDriver;
 import com.datalinkx.driver.dsdriver.IDsReader;
 import com.datalinkx.driver.dsdriver.base.meta.DbTableField;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +52,13 @@ public class DsServiceImpl implements DsService {
 
 	@PostConstruct
 	public void init() {
-		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_MYSQL, new MysqlSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_MYSQL, new MySQLSetupInfoGenerator());
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_ELASTICSEARCH, new EsSetupInfoGenerator());
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_ORACLE, new OracleSetupInfoGenerator());
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_REDIS, new RedisSetupInfoGenerator());
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_HTTP, new HttpSetupInfoGenerator());
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_KAFKA, new KafkaSetupInfoGenerator());
+		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_MYSQLCDC, new MySQLCDCInfoGenerator());
 		SETUP_INFO_GENERATORS.put(MetaConstants.DsType.DS_CUSTOM, new CustomSetupInfoGenerator());
 	}
 

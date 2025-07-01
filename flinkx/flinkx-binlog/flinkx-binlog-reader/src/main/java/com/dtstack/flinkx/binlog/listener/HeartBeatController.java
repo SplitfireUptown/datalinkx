@@ -21,12 +21,11 @@ import com.alibaba.otter.canal.common.AbstractCanalLifeCycle;
 import com.alibaba.otter.canal.parse.ha.CanalHAController;
 import com.alibaba.otter.canal.parse.ha.HeartBeatHAController;
 import com.alibaba.otter.canal.parse.inbound.HeartBeatCallback;
-import com.dtstack.flinkx.binlog.listener.BinlogEventSink;
 import com.dtstack.flinkx.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import java.util.LinkedHashMap;
 
 /**
  * HeartBeatController
@@ -57,7 +56,9 @@ public class HeartBeatController extends AbstractCanalLifeCycle implements Canal
             String msg = String.format("HeartBeat failed %s times,please check your source is working,error info->%s", failedTimes, ExceptionUtil.getErrorMessage(e));
             logger.error(msg);
             if (failedTimes >= detectingRetryTimes) {
-                binlogEventSink.processEvent(Collections.singletonMap("e", msg));
+                LinkedHashMap<String, Object> map = new LinkedHashMap();
+                map.put("e", msg);
+                binlogEventSink.processEvent(map);
             }
         }
     }

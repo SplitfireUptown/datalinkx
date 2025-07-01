@@ -54,9 +54,17 @@
             v-decorator="[item.key, {rules: [{required: item.isRequired, message: item.decorator}]}]" />
           <a-select
             :disabled="showable"
-            v-if="item.type === 'select'"
+            v-if="item.type === 'select' && currentDs.dsTypeKey === 'oracle'"
             v-decorator="[item.key, {rules: [{required: item.isRequired, message: item.decorator}]}]"
             :options="OracleServerTypes"
+          >
+          </a-select>
+          <a-select
+            :disabled="showable"
+            mode="tags"
+            v-if="item.type === 'select' && currentDs.dsTypeKey === 'mysqlcdc'"
+            v-decorator="[item.key, {rules: [{required: item.isRequired, message: item.decorator}]}]"
+            :options="MysqlCDCTypes"
           >
           </a-select>
         </a-form-item>
@@ -77,8 +85,7 @@
 <script>
 import pick from 'lodash.pick'
 import { getObj, addObj, putObj } from '@/api/datasource/datasource'
-import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
-import { dsConfigOriginList, OracleServerTypes } from './const'
+import { dsConfigOriginList, OracleServerTypes, MysqlCDCTypes, DataSourceType } from './const'
 import cloneDeep from 'lodash.clonedeep'
 
 let selectTables = []
@@ -101,6 +108,7 @@ export default {
     return {
       dsConfigOriginList,
       OracleServerTypes,
+      MysqlCDCTypes,
       labelCol: {
         xs: { span: 24 },
         sm: { span: 7 }
@@ -119,7 +127,7 @@ export default {
       editable: false,
       addable: false,
       showable: false,
-      DataSourceType: DATA_SOURCE_TYPE,
+      DataSourceType: DataSourceType,
       type: 'add',
       dsId: ''
     }
@@ -173,12 +181,21 @@ export default {
           decorator: '请输入',
           isRequired: true
         })
+      } else if (this.currentDs.dsTypeKey === 'mysqlcdc') {
+        list.push({
+          label: '监听事件',
+          key: 'listentype',
+          type: 'select',
+          decorator: '请选择',
+          isRequired: true
+        })
       }
       return list
     }
   },
   methods: {
     show (id, type, info) {
+      console.log(this.currentDs)
       this.type = type
       this.dsId = id
       switch (type) {
@@ -230,6 +247,12 @@ export default {
           temp['sid'] = config['servername']
         }
       }
+      if (this.currentDs.dsTypeKey === 'mysqlcdc') {
+        const config = JSON.parse(info.config)
+        if (config) {
+          temp['listentype'] = config['listentype']
+        }
+      }
       return temp
     },
     handleChange (value) {
@@ -246,6 +269,11 @@ export default {
           if (this.currentDs.dsTypeKey === 'oracle') {
             const temp = {}
             temp[values.servertype] = values['sid']
+            values.config = JSON.stringify(temp)
+          }
+          if (this.currentDs.dsTypeKey === 'mysqlcdc') {
+            const temp = {}
+            temp['listentype'] = values['listentype']
             values.config = JSON.stringify(temp)
           }
           this.confirmLoading = true

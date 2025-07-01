@@ -69,8 +69,7 @@ import { pageQuery, delObj, getDsGroup } from '@/api/datasource/datasource'
 import HttpDsSaveOrUpdate from './HttpDsSaveOrUpdate.vue'
 import CustomDsSaveOrUpdate from './CustomDsSaveOrUpdate.vue'
 import DsConfig from './DsConfig.vue'
-import { dsTypeList } from './const'
-import { DATA_SOURCE_TYPE } from '@/api/globalConstant'
+import { dsTypeList, DataSourceType, DsGroupDefaultNumber } from './const'
 
 export default {
   name: 'ContainerBottom',
@@ -97,7 +96,7 @@ export default {
           width: '10%',
           dataIndex: 'type',
           customRender: (text) => {
-            const matchedItem = DATA_SOURCE_TYPE.find(item => item.value === text);
+            const matchedItem = DataSourceType.find(item => item.value === text);
             return (
               <div>
                 {matchedItem ? <span>{matchedItem.label}</span> : <span>custom</span>}
@@ -147,15 +146,7 @@ export default {
       },
       queryParam: {},
       dsTypeList,
-      dsGroupNumber: {
-        'mysql': 0,
-        'es': 0,
-        'oracle': 0,
-        'redis': 0,
-        'http': 0,
-        'custom': 0,
-        'kafka': 0
-      },
+      dsGroupNumber: DsGroupDefaultNumber,
       currentDs: {
         value: 'MySQL',
         label: 'MySQL',

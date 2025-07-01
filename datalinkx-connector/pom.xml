@@ -23,6 +23,7 @@
         <module>datalinkx-driver-redis</module>
         <module>datalinkx-driver-kafka</module>
         <module>datalinkx-driver-clickhouse</module>
+        <module>datalinkx-driver-mysqlcdc</module>
     </modules>
 
     <artifactId>datalinkx-connector</artifactId>

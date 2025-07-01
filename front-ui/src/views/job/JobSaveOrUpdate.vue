@@ -235,7 +235,7 @@
       isRedisTo () {
         let temp = false
         if (this.selectedTargetSource) {
-          temp = this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 4
+          temp = this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 'redis'
         }
         return temp
       },
@@ -423,7 +423,7 @@
         this.form.setFieldsValue({ 'selectedTargetTable': '' })
         console.log('当前选中数据源类型', this.selectedTargetSource, this.isRedisTo)
         // 如果目标数据源是redis 则设置为全量
-        if (this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 4) {
+        if (this.toDsList.find(item => { return item.dsId === this.selectedTargetSource })?.type === 'redis') {
           this.syncMode = 'overwrite'
           this.isIncrement = false
         } else {

@@ -5,6 +5,7 @@ import {
   redisPng,
   kafkaPng,
   httpPng,
+  mysqlcdcPng,
   customPng
 } from '@/core/icons'
 
@@ -30,10 +31,26 @@ const DataSourceType = [
     value: 'http'
   },
   {
+    label: 'MYSQLCDC',
+    value: 'mysqlcdc'
+  },
+  {
     label: 'KAFKA',
     value: 'kafka'
   }
 ]
+
+const DsGroupDefaultNumber = {
+    'mysql': 0,
+    'es': 0,
+    'oracle': 0,
+    'redis': 0,
+    'http': 0,
+    'custom': 0,
+    'mysqlcdc': 0,
+    'kafka': 0
+}
+
 const dsTypeList = [
   {
     value: 'MySQL',
@@ -46,6 +63,12 @@ const dsTypeList = [
     label: 'ElasticSearch',
     dsTypeKey: 'es',
     img: ESPng
+  },
+  {
+    value: 'mysqlcdc',
+    label: 'MYSQLCDC',
+    dsTypeKey: 'mysqlcdc',
+    img: mysqlcdcPng
   },
   {
     value: 'oracle',
@@ -85,6 +108,7 @@ const dsImgObj = {
   'redis': redisPng,
   'http': httpPng,
   'custom': customPng,
+  'mysqlcdc': mysqlcdcPng,
   'kafka': kafkaPng
 }
 // 目标数据源 redis 类型
@@ -178,4 +202,15 @@ const OracleServerTypes = [
   }
 ]
 
-export { DataSourceType, dsTypeList, RedisTypes, dsConfigOriginList, OracleServerTypes, dsImgObj }
+const MysqlCDCTypes = [
+  {
+    label: 'INSERT',
+    value: 'INSERT'
+  },
+  {
+    label: 'UPDATE',
+    value: 'UPDATE'
+  }
+]
+
+export { DataSourceType, dsTypeList, RedisTypes, dsConfigOriginList, OracleServerTypes, dsImgObj, MysqlCDCTypes, DsGroupDefaultNumber }

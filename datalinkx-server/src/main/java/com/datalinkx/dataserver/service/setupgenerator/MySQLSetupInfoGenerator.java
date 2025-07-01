@@ -1,9 +1,10 @@
 package com.datalinkx.dataserver.service.setupgenerator;
 
+import com.datalinkx.common.constants.MetaConstants;
 import com.datalinkx.dataserver.bean.domain.DsBean;
 import com.datalinkx.driver.dsdriver.setupinfo.MysqlSetupInfo;
 
-public class MysqlSetupInfoGenerator implements SetupInfoGenerator<MysqlSetupInfo> {
+public class MySQLSetupInfoGenerator implements SetupInfoGenerator<MysqlSetupInfo> {
 
 
     @Override
@@ -11,7 +12,7 @@ public class MysqlSetupInfoGenerator implements SetupInfoGenerator<MysqlSetupInf
         MysqlSetupInfo mysqlSetupInfo = new MysqlSetupInfo();
         mysqlSetupInfo.setServer(dsBean.getHost());
         mysqlSetupInfo.setPort(dsBean.getPort());
-        mysqlSetupInfo.setType("mysql");
+        mysqlSetupInfo.setType(MetaConstants.DsType.DS_MYSQL);
         mysqlSetupInfo.setUid(dsBean.getUsername());
         mysqlSetupInfo.setPwd(dsBean.getPassword());
         mysqlSetupInfo.setDatabase(dsBean.getDatabase());

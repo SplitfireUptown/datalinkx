@@ -130,22 +130,7 @@ seatunnel:
 7. 任务执行
 ![img.png](datalinkx-server/src/main/resources/readme/flink.png)
 
-## 商业版核心功能差异
-| 功能				                    | datalinkx					  | datalinkx pro
-|---------------------------|-----------------|-------
-| 支持mysql读写			              | 	✔️					        | ✔️
-| 支持oracle读写			             | ✔️					         | ✔️
-| 支持elasticsearch读写					    | ✔️					         |✔️
-| 支持http读					              | ✔️					         |✔️
-| 支持redis写					             | ✔️					           |✔️
-| 支持operator计算任务					       | ✔️					           |✔️
-| 适配flink、seatunnel多引擎					 | ✔️					           |✔️
-| 支持clickhouse读写					       | ✔️				           |✔️
-| 告警中心		                    | ✔️			 |✔️
-| 支持mysqlcdc读写					         | ❌					           |✔️
-| 数据源新插件定制					             | ❌				      |✔️
-| UI优化					                 | ❌				      |✔️
-| 支持定制化需求					              | ❌				      |✔️
+
 
 
 ## 项目文档

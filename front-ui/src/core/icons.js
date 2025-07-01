@@ -19,6 +19,7 @@ import httpPng from '@/assets/icons/HTTP.png'
 import redisPng from '@/assets/icons/REDIS.png'
 import kafkaPng from '@/assets/icons/KAFKA.png'
 import customPng from '@/assets/icons/CUSTOM.png'
+import mysqlcdcPng from '@/assets/icons/MYSQLCDC.png'
 
 export {
   bxAnaalyse,
@@ -33,5 +34,6 @@ export {
   httpPng,
   redisPng,
   kafkaPng,
+  mysqlcdcPng,
   customPng
 }

@@ -31,12 +31,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author toutian
@@ -47,7 +48,7 @@ public class BinlogEventSink extends AbstractCanalLifeCycle implements com.aliba
 
     private BinlogInputFormat format;
 
-    private BlockingQueue<Map<String,Object>> queue;
+    private BlockingQueue<LinkedHashMap<String,Object>> queue;
 
     private boolean pavingData;
 
@@ -105,11 +106,11 @@ public class BinlogEventSink extends AbstractCanalLifeCycle implements com.aliba
         }
 
         for(CanalEntry.RowData rowData : rowChange.getRowDatasList()) {
-            Map<String,Object> message = new HashMap<>(8);
-            message.put("type", eventType.toString());
-            message.put("schema", schema);
-            message.put("table", table);
-            message.put("ts", idWorker.nextId());
+            LinkedHashMap<String,Object> message = new LinkedHashMap<>(8);
+//            message.put("type", eventType.toString());
+//            message.put("schema", schema);
+//            message.put("table", table);
+//            message.put("ts", idWorker.nextId());
 
             if (pavingData){
                 for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
@@ -126,19 +127,29 @@ public class BinlogEventSink extends AbstractCanalLifeCycle implements com.aliba
             } else {
                 // message.put("before", processColumnList(rowData.getBeforeColumnsList()));
                 // message.put("after", processColumnList(rowData.getAfterColumnsList()));
-                message = Collections.singletonMap("message", message);
+                message.put("message", message);
             }
 
-            try {
-                queue.put(message);
-            } catch (InterruptedException e) {
-                LOG.error("takeEvent interrupted message:{} error:{}", message, e);
+            while (true) {
+                if (offer(message)) {
+                    break;
+                }
             }
+
             if(DtLogger.isEnableTrace()){
                 LOG.trace("message = {}", GsonUtil.GSON.toJson(message));
             }
         }
+    }
 
+    private boolean offer(LinkedHashMap<String,Object> message) {
+        boolean offer = false;
+        try {
+            offer = queue.offer(message, 5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOG.error("takeEvent interrupted message:{} error:{}", message, e);
+        }
+        return offer;
     }
 
     private Map<String,Object> processColumnList(List<CanalEntry.Column> columnList) {
@@ -163,7 +174,12 @@ public class BinlogEventSink extends AbstractCanalLifeCycle implements com.aliba
             if(map.size() == 1 && map.containsKey("e")){
                 throw new RuntimeException((String) map.get("e"));
             }else{
-                row = Row.of(map);
+                row = new Row(map.size());
+                int i = 0;
+                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                    row.setField(i++, entry.getValue());
+                }
+//                row = Row.of(map);
             }
         } catch (InterruptedException e) {
             LOG.error("takeEvent interrupted error:{}", ExceptionUtil.getErrorMessage(e));
@@ -171,7 +187,7 @@ public class BinlogEventSink extends AbstractCanalLifeCycle implements com.aliba
         return row;
     }
 
-    public void processEvent(Map<String, Object> event) {
+    public void processEvent(LinkedHashMap<String, Object> event) {
         try {
             queue.put(event);
         } catch (InterruptedException e) {
